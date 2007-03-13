@@ -1,4 +1,4 @@
-CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE -D_REENTRANT
+AM_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE -D_REENTRANT
 
 lib_LTLIBRARIES = libjson.la
 

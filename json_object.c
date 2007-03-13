@@ -1,5 +1,5 @@
 /*
- * $Id: json_object.c,v 1.15 2006/01/30 23:07:57 mclark Exp $
+ * $Id: json_object.c,v 1.17 2006/07/25 03:24:50 mclark Exp $
  *
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
@@ -93,6 +93,8 @@ static int json_escape_str(struct printbuf *pb, char *str)
     case '\r':
     case '\t':
     case '"':
+    case '\\':
+    case '/':
       if(pos - start_offset > 0)
 	printbuf_memappend(pb, str + start_offset, pos - start_offset);
       if(c == '\b') printbuf_memappend(pb, "\\b", 2);
@@ -100,6 +102,8 @@ static int json_escape_str(struct printbuf *pb, char *str)
       else if(c == '\r') printbuf_memappend(pb, "\\r", 2);
       else if(c == '\t') printbuf_memappend(pb, "\\t", 2);
       else if(c == '"') printbuf_memappend(pb, "\\\"", 2);
+      else if(c == '\\') printbuf_memappend(pb, "\\\\", 2);
+      else if(c == '/') printbuf_memappend(pb, "\\/", 2);
       start_offset = ++pos;
       break;
     default:

@@ -6,11 +6,19 @@
 
 int main(int argc, char **argv)
 {
+  struct json_tokener *tok;
   struct json_object *my_string, *my_int, *my_object, *my_array;
   struct json_object *new_obj;
   int i;
 
+  mc_set_debug(1);
+
   my_string = json_object_new_string("\t");
+  printf("my_string=%s\n", json_object_get_string(my_string));
+  printf("my_string.to_string()=%s\n", json_object_to_json_string(my_string));
+  json_object_put(my_string);
+
+  my_string = json_object_new_string("\\");
   printf("my_string=%s\n", json_object_get_string(my_string));
   printf("my_string.to_string()=%s\n", json_object_to_json_string(my_string));
   json_object_put(my_string);
@@ -98,6 +106,10 @@ int main(int argc, char **argv)
   printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
   json_object_put(new_obj);
 
+  new_obj = json_tokener_parse("[false]");
+  printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
+  json_object_put(new_obj);
+
   new_obj = json_tokener_parse("[\"abc\",null,\"def\",12]");
   printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
   json_object_put(new_obj);
@@ -127,6 +139,20 @@ int main(int argc, char **argv)
 
   new_obj = json_tokener_parse("foo");
   if(is_error(new_obj)) printf("got error as expected\n");
+
+  new_obj = json_tokener_parse("{ \"foo");
+  if(is_error(new_obj)) printf("got error as expected\n");
+
+  /* test incremental parsing */
+  tok = json_tokener_new();
+  new_obj = json_tokener_parse_ex(tok, "{ \"foo", 6);
+  if(is_error(new_obj)) printf("got error as expected\n");
+  new_obj = json_tokener_parse_ex(tok, "\": {\"bar", 8);
+  if(is_error(new_obj)) printf("got error as expected\n");
+  new_obj = json_tokener_parse_ex(tok, "\":13}}", 6);
+  printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
+  json_object_put(new_obj);  
+  json_tokener_free(tok);
 
   json_object_put(my_string);
   json_object_put(my_int);

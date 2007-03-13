@@ -1,3 +1,9 @@
+0.7
+  * Add escaping of backslash to json output
+  * Add escaping of foward slash on tokenizing and output
+  * Changes to internal tokenizer from using recursion to
+    using a depth state structure to allow incremental parsing
+
 0.6
   * Fix bug in escaping of control characters
     Johan Björklund, johbjo09 at kth dot se
