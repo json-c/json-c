@@ -1,8 +1,4 @@
-AUTOMAKE_OPTIONS = 1.6
-
 CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE -D_REENTRANT
-
-libjson_la_LIBADD = $(JSON_LIBS)
 
 lib_LTLIBRARIES = libjson.la
 

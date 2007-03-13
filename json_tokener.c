@@ -1,18 +1,11 @@
 /*
- * $Id: json_tokener.c,v 1.17 2005/07/26 07:49:11 mclark Exp $
+ * $Id: json_tokener.c,v 1.18 2006/01/26 02:16:28 mclark Exp $
  *
- * Copyright Metaparadigm Pte. Ltd. 2004.
+ * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public (LGPL)
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details: http://www.gnu.org/
+ * This library is free software; you can redistribute it and/or modify
+ * it under the terms of the MIT license. See COPYING for details.
  *
  */
 

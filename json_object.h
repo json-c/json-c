@@ -1,18 +1,11 @@
 /*
- * $Id: json_object.h,v 1.9 2005/06/14 22:41:51 mclark Exp $
+ * $Id: json_object.h,v 1.11 2006/01/26 02:16:28 mclark Exp $
  *
- * Copyright Metaparadigm Pte. Ltd. 2004.
+ * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public (LGPL)
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details: http://www.gnu.org/
+ * This library is free software; you can redistribute it and/or modify
+ * it under the terms of the MIT license. See COPYING for details.
  *
  */
 
@@ -50,27 +43,27 @@ enum json_type {
   json_type_int,
   json_type_object,
   json_type_array,
-  json_type_string,
+  json_type_string
 };
 
 /* reference counting functions */
 
 /**
  * Increment the reference count of json_object
- * @param this the json_object instance
+ * @param obj the json_object instance
  */
-extern struct json_object* json_object_get(struct json_object *this);
+extern struct json_object* json_object_get(struct json_object *obj);
 
 /**
  * Decrement the reference count of json_object and free if it reaches zero
- * @param this the json_object instance
+ * @param obj the json_object instance
  */
-extern void json_object_put(struct json_object *this);
+extern void json_object_put(struct json_object *obj);
 
 
 /**
  * Check if the json_object is of a given type
- * @param this the json_object instance
+ * @param obj the json_object instance
  * @param type one of:
      json_type_boolean,
      json_type_double,
@@ -79,11 +72,11 @@ extern void json_object_put(struct json_object *this);
      json_type_array,
      json_type_string,
  */
-extern int json_object_is_type(struct json_object *this, enum json_type type);
+extern int json_object_is_type(struct json_object *obj, enum json_type type);
 
 /**
  * Get the type of the json_object
- * @param this the json_object instance
+ * @param obj the json_object instance
  * @returns type being one of:
      json_type_boolean,
      json_type_double,
@@ -92,14 +85,14 @@ extern int json_object_is_type(struct json_object *this, enum json_type type);
      json_type_array,
      json_type_string,
  */
-extern enum json_type json_object_get_type(struct json_object *this);
+extern enum json_type json_object_get_type(struct json_object *obj);
 
 
 /** Stringify object to json format
- * @param this the json_object instance
+ * @param obj the json_object instance
  * @returns a string in JSON format
  */
-extern char* json_object_to_json_string(struct json_object *this);
+extern char* json_object_to_json_string(struct json_object *obj);
 
 
 /* object type methods */
@@ -110,10 +103,10 @@ extern char* json_object_to_json_string(struct json_object *this);
 extern struct json_object* json_object_new_object();
 
 /** Get the hashtable of a json_object of type json_type_object
- * @param this the json_object instance
+ * @param obj the json_object instance
  * @returns a linkhash
  */
-extern struct lh_table* json_object_get_object(struct json_object *this);
+extern struct lh_table* json_object_get_object(struct json_object *obj);
 
 /** Add an object field to a json_object of type json_type_object
  *
@@ -121,29 +114,29 @@ extern struct lh_table* json_object_get_object(struct json_object *this);
  * fields to objects in code more compact. If you want to retain a reference
  * to an added object you must wrap the passed object with json_object_get
  *
- * @param this the json_object instance
+ * @param obj the json_object instance
  * @param key the object field name (a private copy will be duplicated)
  * @param val a json_object or NULL member to associate with the given field
  */
-extern void json_object_object_add(struct json_object* this, char *key,
+extern void json_object_object_add(struct json_object* obj, char *key,
 				   struct json_object *val);
 
 /** Get the json_object associate with a given object field
- * @param this the json_object instance
+ * @param obj the json_object instance
  * @param key the object field name
  * @returns the json_object associated with the given field name
  */
-extern struct json_object* json_object_object_get(struct json_object* this,
+extern struct json_object* json_object_object_get(struct json_object* obj,
 						  char *key);
 
 /** Delete the given json_object field
  *
  * The reference count will be decremented for the deleted object
  *
- * @param this the json_object instance
+ * @param obj the json_object instance
  * @param key the object field name
  */
-extern void json_object_object_del(struct json_object* this, char *key);
+extern void json_object_object_del(struct json_object* obj, char *key);
 
 /** Iterate through all keys and values of an object
  * @param obj the json_object instance
@@ -179,16 +172,16 @@ extern void json_object_object_del(struct json_object* this, char *key);
 extern struct json_object* json_object_new_array();
 
 /** Get the arraylist of a json_object of type json_type_array
- * @param this the json_object instance
+ * @param obj the json_object instance
  * @returns an arraylist
  */
-extern struct array_list* json_object_get_array(struct json_object *this);
+extern struct array_list* json_object_get_array(struct json_object *obj);
 
 /** Get the length of a json_object of type json_type_array
- * @param this the json_object instance
+ * @param obj the json_object instance
  * @returns an int
  */
-extern int json_object_array_length(struct json_object *this);
+extern int json_object_array_length(struct json_object *obj);
 
 /** Add an element to the end of a json_object of type json_type_array
  *
@@ -196,10 +189,10 @@ extern int json_object_array_length(struct json_object *this);
  * fields to objects in code more compact. If you want to retain a reference
  * to an added object you must wrap the passed object with json_object_get
  *
- * @param this the json_object instance
+ * @param obj the json_object instance
  * @param val the json_object to be added
  */
-extern int json_object_array_add(struct json_object *this,
+extern int json_object_array_add(struct json_object *obj,
 				 struct json_object *val);
 
 /** Insert or replace an element at a specified index in an array (a json_object of type json_type_array)
@@ -213,19 +206,19 @@ extern int json_object_array_add(struct json_object *this,
  * The array size will be automatically be expanded to the size of the
  * index if the index is larger than the current size.
  *
- * @param this the json_object instance
+ * @param obj the json_object instance
  * @param idx the index to insert the element at
  * @param val the json_object to be added
  */
-extern int json_object_array_put_idx(struct json_object *this, int idx,
+extern int json_object_array_put_idx(struct json_object *obj, int idx,
 				     struct json_object *val);
 
 /** Get the element at specificed index of the array (a json_object of type json_type_array)
- * @param this the json_object instance
+ * @param obj the json_object instance
  * @param idx the index to get the element at
  * @returns the json_object at the specified index (or NULL)
  */
-extern struct json_object* json_object_array_get_idx(struct json_object *this,
+extern struct json_object* json_object_array_get_idx(struct json_object *obj,
 						     int idx);
 
 /* boolean type methods */
@@ -244,10 +237,10 @@ extern struct json_object* json_object_new_boolean(boolean b);
  * TRUE if it has a non zero length. If any other object type is passed
  * TRUE will be returned if the object is not NULL.
  *
- * @param this the json_object instance
+ * @param obj the json_object instance
  * @returns a boolean
  */
-extern boolean json_object_get_boolean(struct json_object *this);
+extern boolean json_object_get_boolean(struct json_object *obj);
 
 
 /* int type methods */
@@ -264,10 +257,10 @@ extern struct json_object* json_object_new_int(int i);
  * double objects will return their integer conversion. Strings will be
  * parsed as an integer. If no conversion exists then 0 is returned.
  *
- * @param this the json_object instance
+ * @param obj the json_object instance
  * @returns an int
  */
-extern int json_object_get_int(struct json_object *this);
+extern int json_object_get_int(struct json_object *obj);
 
 
 /* double type methods */
@@ -284,10 +277,10 @@ extern struct json_object* json_object_new_double(double d);
  * integer objects will return their dboule conversion. Strings will be
  * parsed as a double. If no conversion exists then 0.0 is returned.
  *
- * @param this the json_object instance
+ * @param obj the json_object instance
  * @returns an double
  */
-extern double json_object_get_double(struct json_object *this);
+extern double json_object_get_double(struct json_object *obj);
 
 
 /* string type methods */
@@ -311,9 +304,9 @@ extern struct json_object* json_object_new_string_len(char *s, int len);
  * The returned string memory is managed by the json_object and will
  * be freed when the reference count of the json_object drops to zero.
  *
- * @param this the json_object instance
+ * @param obj the json_object instance
  * @returns a string
  */
-extern char* json_object_get_string(struct json_object *this);
+extern char* json_object_get_string(struct json_object *obj);
 
 #endif

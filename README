@@ -2,11 +2,7 @@ Building on Unix with gcc and autotools
 
 If checking out from CVS:
 
-	aclocal-1.6
-	libtoolize --copy
-	autoheader
-	automake-1.6 --add-missing --copy
-	autoconf
+	sh autogen.sh
 
 Then configure, make, make install
 

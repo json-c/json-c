@@ -1,3 +1,15 @@
+0.5
+  * Make headers C++ compatible by change *this to *obj
+  * Add ifdef C++ extern "C" to headers
+  * Use simpler definition of min and max in bits.h
+    Larry Lansing, llansing at fuzzynerd dot com
+
+  * Remove automake 1.6 requirement
+  * Move autogen commands into autogen.sh. Update README
+  * Remove error pointer special case for Windows
+  * Change license from LGPL to MIT
+    Michael Clark <michael@metaparadigm.com>
+
 0.4
   * Fix additional error case in object parsing
   * Add back sign reversal in nested object parse as error pointer
