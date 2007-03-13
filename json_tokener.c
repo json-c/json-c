@@ -1,5 +1,5 @@
 /*
- * $Id: json_tokener.c,v 1.14 2005/06/14 22:41:51 mclark Exp $
+ * $Id: json_tokener.c,v 1.15 2005/07/15 03:19:43 mclark Exp $
  *
  * Copyright Metaparadigm Pte. Ltd. 2004.
  * Michael Clark <michael@metaparadigm.com>
@@ -273,16 +273,16 @@ static struct json_object* json_tokener_do_parse(struct json_tokener *this)
 	    hexdigit(*(this->source + start_offset + 3));
 	  if (ucs_char < 0x80) {
 	    utf_out[0] = ucs_char;
-	    printbuf_memappend(this->pb, utf_out, 1);
+	    printbuf_memappend(this->pb, (char*)utf_out, 1);
 	  } else if (ucs_char < 0x800) {
 	    utf_out[0] = 0xc0 | (ucs_char >> 6);
 	    utf_out[1] = 0x80 | (ucs_char & 0x3f);
-	    printbuf_memappend(this->pb, utf_out, 2);
+	    printbuf_memappend(this->pb, (char*)utf_out, 2);
 	  } else {
 	    utf_out[0] = 0xe0 | (ucs_char >> 12);
 	    utf_out[1] = 0x80 | ((ucs_char >> 6) & 0x3f);
 	    utf_out[2] = 0x80 | (ucs_char & 0x3f);
-	    printbuf_memappend(this->pb, utf_out, 3);
+	    printbuf_memappend(this->pb, (char*)utf_out, 3);
 	  }
 	  start_offset = this->pos;
 	  state = saved_state;

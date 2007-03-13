@@ -1,5 +1,5 @@
 /*
- * $Id: bits.h,v 1.4 2005/06/14 22:41:51 mclark Exp $
+ * $Id: bits.h,v 1.7 2005/07/15 02:40:44 mclark Exp $
  *
  * Copyright Metaparadigm Pte. Ltd. 2004.
  * Michael Clark <michael@metaparadigm.com>
@@ -48,6 +48,10 @@
 
 #define hexdigit(x) (((x) <= '9') ? (x) - '0' : ((x) & 7) + 9)
 #define error_ptr(error) ((void*)error)
-#define is_error(ptr) ((ptrdiff_t)ptr < (ptrdiff_t)-4000L)
+#ifdef _MSC_VER
+#define is_error(ptr) ((UINT_PTR)ptr > (UINT_PTR)-4000L)
+#else
+#define is_error(ptr) ((unsigned long)ptr > (unsigned long)-4000L)
+#endif
 
 #endif

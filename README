@@ -2,9 +2,10 @@ Building on Unix with gcc and autotools
 
 If checking out from CVS:
 
-	cp /usr/share/libtool/ltmain.sh .
 	aclocal-1.6
-	automake-1.6 --add-missing
+	libtoolize --copy
+	autoheader
+	automake-1.6 --add-missing --copy
 	autoconf
 
 Then configure, make, make install

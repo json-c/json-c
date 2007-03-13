@@ -1,7 +1,7 @@
 AC_PREREQ(2.52)
 
 # Process this file with autoconf to produce a configure script.
-AC_INIT([JSON C Library], 0.2, [michael@metaparadigm.com], [json-c])
+AC_INIT([JSON C Library], 0.3, [michael@metaparadigm.com], [json-c])
 
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 
