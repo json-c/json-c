@@ -1,3 +1,10 @@
+0.6
+  * Fix bug in escaping of control characters
+    Johan Björklund, johbjo09 at kth dot se
+  * Remove include "config.h" from headers (should only
+    be included from .c files)
+    Michael Clark <michael@metaparadigm.com>
+
 0.5
   * Make headers C++ compatible by change *this to *obj
   * Add ifdef C++ extern "C" to headers

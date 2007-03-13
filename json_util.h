@@ -1,5 +1,5 @@
 /*
- * $Id: json_util.h,v 1.3 2006/01/26 02:16:28 mclark Exp $
+ * $Id: json_util.h,v 1.4 2006/01/30 23:07:57 mclark Exp $
  *
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
@@ -12,19 +12,7 @@
 #ifndef _json_util_h_
 #define _json_util_h_
 
-#include "config.h"
-
-#ifdef WIN32
-# define WIN32_LEAN_AND_MEAN
-# include <windows.h>
-# include <io.h>
-#endif
-
 #include "json_object.h"
-
-#if !HAVE_OPEN && defined(WIN32)
-# define open _open
-#endif
 
 #define JSON_FILE_BUF_SIZE 4096
 

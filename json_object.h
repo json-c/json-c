@@ -1,5 +1,5 @@
 /*
- * $Id: json_object.h,v 1.11 2006/01/26 02:16:28 mclark Exp $
+ * $Id: json_object.h,v 1.12 2006/01/30 23:07:57 mclark Exp $
  *
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
@@ -11,8 +11,6 @@
 
 #ifndef _json_object_h_
 #define _json_object_h_
-
-#include "config.h"
 
 #define JSON_OBJECT_DEF_HASH_ENTIRES 16
 

@@ -1,5 +1,5 @@
 /*
- * $Id: bits.h,v 1.9 2006/01/26 02:16:28 mclark Exp $
+ * $Id: bits.h,v 1.10 2006/01/30 23:07:57 mclark Exp $
  *
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
@@ -11,17 +11,6 @@
 
 #ifndef _bits_h_
 #define _bits_h_
-
-#include "config.h"
-
-#if STDC_HEADERS
-# include <stddef.h>
-#endif /* STDC_HEADERS */
-
-/* CAW: wrapped in ifndef's to make win32 compliant
-**      this fails to take over GCC specifics, but this
-**      seems to be unimportant.
- */
 
 #ifndef min
 #define min(a,b) ((a) < (b) ? (a) : (b))

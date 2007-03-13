@@ -1,5 +1,5 @@
 /*
- * $Id: debug.h,v 1.4 2006/01/26 02:16:28 mclark Exp $
+ * $Id: debug.h,v 1.5 2006/01/30 23:07:57 mclark Exp $
  *
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
@@ -11,14 +11,6 @@
 
 #ifndef _DEBUG_H_
 #define _DEBUG_H_
-
-#include "config.h"
-
-#if HAVE_STRERROR
-#define errstr strerror(errno)
-#else /* !HAVE_STRERROR */
-#define errstr
-#endif /* HAVE_STRERROR */
 
 extern void mc_set_debug(int debug);
 extern int mc_get_debug();

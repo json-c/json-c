@@ -1,5 +1,5 @@
 /*
- * $Id: json_util.c,v 1.3 2006/01/26 02:16:28 mclark Exp $
+ * $Id: json_util.c,v 1.4 2006/01/30 23:07:57 mclark Exp $
  *
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
@@ -38,6 +38,11 @@
 # include <windows.h>
 # include <io.h>
 #endif /* defined(WIN32) */
+
+#if !HAVE_OPEN && defined(WIN32)
+# define open _open
+#endif
+
 
 #include "bits.h"
 #include "debug.h"

@@ -1,5 +1,5 @@
 /*
- * $Id: json_tokener.c,v 1.18 2006/01/26 02:16:28 mclark Exp $
+ * $Id: json_tokener.c,v 1.19 2006/01/30 23:07:57 mclark Exp $
  *
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
@@ -22,6 +22,14 @@
 #include "arraylist.h"
 #include "json_object.h"
 #include "json_tokener.h"
+
+#if !HAVE_STRNCASECMP && defined(_MSC_VER)
+  /* MSC has the version as _strnicmp */
+# define strncasecmp _strnicmp
+#elif !HAVE_STRNCASECMP
+# error You do not have strncasecmp on your system.
+#endif /* HAVE_STRNCASECMP */
+
 
 static struct json_object* json_tokener_do_parse(struct json_tokener *this);
 

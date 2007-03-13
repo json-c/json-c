@@ -1,5 +1,5 @@
 /*
- * $Id: json_object.c,v 1.14 2006/01/26 02:16:28 mclark Exp $
+ * $Id: json_object.c,v 1.15 2006/01/30 23:07:57 mclark Exp $
  *
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
@@ -22,6 +22,10 @@
 #include "json_object.h"
 #include "json_object_private.h"
 #include "json_tokener.h"
+
+#if !HAVE_STRNDUP
+  char* strndup(const char* str, size_t n);
+#endif /* !HAVE_STRNDUP */
 
 /* #define REFCOUNT_DEBUG 1 */
 
@@ -78,10 +82,12 @@ static void json_object_fini() {
 static int json_escape_str(struct printbuf *pb, char *str)
 {
   int pos = 0, start_offset = 0;
-  char c;
+  unsigned char c;
   do {
     c = str[pos];
     switch(c) {
+    case '\0':
+      break;
     case '\b':
     case '\n':
     case '\r':
@@ -97,14 +103,14 @@ static int json_escape_str(struct printbuf *pb, char *str)
       start_offset = ++pos;
       break;
     default:
-      if(c && c < ' ') {
+      if(c < ' ') {
 	if(pos - start_offset > 0)
 	  printbuf_memappend(pb, str + start_offset, pos - start_offset);
 	sprintbuf(pb, "\\u00%c%c",
 		  json_hex_chars[c >> 4],
 		  json_hex_chars[c & 0xf]);
 	start_offset = ++pos;
-      } else if(c) pos++;
+      } else pos++;
     }
   } while(c);
   if(pos - start_offset > 0)
