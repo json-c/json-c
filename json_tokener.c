@@ -1,5 +1,5 @@
 /*
- * $Id: json_tokener.c,v 1.15 2005/07/15 03:19:43 mclark Exp $
+ * $Id: json_tokener.c,v 1.17 2005/07/26 07:49:11 mclark Exp $
  *
  * Copyright Metaparadigm Pte. Ltd. 2004.
  * Michael Clark <michael@metaparadigm.com>
@@ -350,7 +350,7 @@ static struct json_object* json_tokener_do_parse(struct json_tokener *this)
       } else {
 	obj = json_tokener_do_parse(this);
 	if(is_error(obj)) {
-	  err = (enum json_tokener_error)obj;
+	  err = -(enum json_tokener_error)obj;
 	  goto out;
 	}
 	json_object_array_add(current, obj);
@@ -389,6 +389,9 @@ static struct json_object* json_tokener_do_parse(struct json_tokener *this)
 	printbuf_reset(this->pb);
 	state = json_tokener_state_object_field;
 	start_offset = ++this->pos;
+      } else {
+	err = json_tokener_error_parse_object;
+	goto out;
       }
       break;
 
@@ -419,7 +422,7 @@ static struct json_object* json_tokener_do_parse(struct json_tokener *this)
     case json_tokener_state_object_value:
       obj = json_tokener_do_parse(this);
       if(is_error(obj)) {
-	err = (enum json_tokener_error)obj;
+	err = -(enum json_tokener_error)obj;
 	goto out;
       }
       json_object_object_add(current, obj_field_name, obj);
@@ -457,5 +460,5 @@ static struct json_object* json_tokener_do_parse(struct json_tokener *this)
   mc_debug("json_tokener_do_parse: error=%d state=%d char=%c\n",
 	   err, state, c);
   json_object_put(current);
-  return error_ptr((ptrdiff_t)-err);
+  return error_ptr(-err);
 }

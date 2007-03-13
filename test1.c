@@ -121,6 +121,9 @@ int main(int argc, char **argv)
   printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
   json_object_put(new_obj);
 
+  new_obj = json_tokener_parse("{ foo }");
+  if(is_error(new_obj)) printf("got error as expected\n");
+
   new_obj = json_tokener_parse("foo");
   if(is_error(new_obj)) printf("got error as expected\n");
 
