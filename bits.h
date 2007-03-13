@@ -1,5 +1,5 @@
 /*
- * $Id: bits.h,v 1.3 2004/07/21 10:10:22 mclark Exp $
+ * $Id: bits.h,v 1.4 2005/06/14 22:41:51 mclark Exp $
  *
  * Copyright Metaparadigm Pte. Ltd. 2004.
  * Michael Clark <michael@metaparadigm.com>
@@ -19,20 +19,35 @@
 #ifndef _bits_h_
 #define _bits_h_
 
+#include "config.h"
+
+#if STDC_HEADERS
+# include <stddef.h>
+#endif /* STDC_HEADERS */
+
+/* CAW: wrapped in ifndef's to make win32 compliant
+**      this fails to take over GCC specifics, but this
+**      seems to be unimportant.
+ */
+
+#ifndef min
 #define min(x,y) ({             \
         typeof(x) _x = (x);     \
         typeof(y) _y = (y);     \
         (void) (&_x == &_y);    \
         _x < _y ? _x : _y; })
+#endif
 
+#ifndef max
 #define max(x,y) ({             \
         typeof(x) _x = (x);     \
         typeof(y) _y = (y);     \
         (void) (&_x == &_y);    \
         _x > _y ? _x : _y; })
+#endif
 
 #define hexdigit(x) (((x) <= '9') ? (x) - '0' : ((x) & 7) + 9)
 #define error_ptr(error) ((void*)error)
-#define is_error(ptr) ((unsigned long)ptr > (unsigned long)-4000L)
+#define is_error(ptr) ((ptrdiff_t)ptr < (ptrdiff_t)-4000L)
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: json_tokener.h,v 1.5 2004/07/22 01:20:05 mclark Exp $
+ * $Id: json_tokener.h,v 1.6 2005/06/14 22:41:51 mclark Exp $
  *
  * Copyright Metaparadigm Pte. Ltd. 2004.
  * Michael Clark <michael@metaparadigm.com>
@@ -19,6 +19,7 @@
 #ifndef _json_tokener_h_
 #define _json_tokener_h_
 
+#include "config.h"
 #include "json_object.h"
 
 enum json_tokener_error {
@@ -64,6 +65,17 @@ struct json_tokener
   int pos;
   struct printbuf *pb;
 };
+
+#if !HAVE_STRNCASECMP && defined(_MSC_VER)
+  /* MSC has the version as _strnicmp */
+# define strncasecmp _strnicmp
+#elif !HAVE_STRNCASECMP
+# error You do not have strncasecmp on your system.  
+#endif /* HAVE_STRNCASECMP */
+
+#if !HAVE_STRNDUP
+  char* strndup(const char* str, size_t n);
+#endif /* !HAVE_STRNDUP */
 
 extern struct json_object* json_tokener_parse(char *s);
 

@@ -1,0 +1,33 @@
+AC_PREREQ(2.52)
+
+# Process this file with autoconf to produce a configure script.
+AC_INIT([JSON C Library], 0.2, [michael@metaparadigm.com], [json-c])
+
+AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
+
+# Checks for programs.
+
+# Checks for libraries.
+
+# Checks for header files.
+AM_CONFIG_HEADER(config.h)
+AC_HEADER_STDC
+AC_CHECK_HEADERS(fcntl.h limits.h strings.h syslog.h unistd.h [sys/param.h] stdarg.h)
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_SIZE_T
+
+# Checks for library functions.
+AC_FUNC_VPRINTF
+AC_FUNC_MEMCMP
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
+AC_CHECK_FUNCS(strndup strerror vsnprintf vasprintf open vsyslog strncasecmp)
+
+AM_PROG_LIBTOOL
+
+AC_OUTPUT([
+Makefile
+json.pc
+])

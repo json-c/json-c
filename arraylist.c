@@ -1,5 +1,5 @@
 /*
- * $Id: arraylist.c,v 1.2 2004/07/21 01:24:33 mclark Exp $
+ * $Id: arraylist.c,v 1.3 2005/06/14 22:41:51 mclark Exp $
  *
  * Copyright Metaparadigm Pte. Ltd. 2004.
  * Michael Clark <michael@metaparadigm.com>
@@ -16,13 +16,19 @@
  *
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <strings.h>
+#include "config.h"
+
+#if STDC_HEADERS
+# include <stdlib.h>
+# include <string.h>
+#endif /* STDC_HEADERS */
+
+#if HAVE_STRINGS_H
+# include <strings.h>
+#endif /* HAVE_STRINGS_H */
 
 #include "bits.h"
 #include "arraylist.h"
-
 
 struct array_list*
 array_list_new(array_list_free_fn *free_fn)
@@ -66,7 +72,7 @@ static int array_list_expand_internal(struct array_list *this, int max)
   new_size = max(this->size << 1, max);
   if(!(t = realloc(this->array, new_size*sizeof(void*)))) return -1;
   this->array = t;
-  bzero(this->array + this->size, (new_size-this->size)*sizeof(void*));
+  (void)memset(this->array + this->size, 0, (new_size-this->size)*sizeof(void*));
   this->size = new_size;
   return 0;
 }

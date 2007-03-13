@@ -1,0 +1,24 @@
+0.2
+  * printbuf.c - C. Watford (christopher.watford@gmail.com)
+    Added a Win32/Win64 compliant implementation of vasprintf
+  * debug.c - C. Watford (christopher.watford@gmail.com)
+    Removed usage of vsyslog on Win32/Win64 systems, needs to be handled
+    by a configure script
+  * json_object.c - C. Watford (christopher.watford@gmail.com)
+    Added scope operator to wrap usage of json_object_object_foreach, this
+    needs to be rethought to be more ANSI C friendly
+  * json_object.h - C. Watford (christopher.watford@gmail.com)
+    Added Microsoft C friendly version of json_object_object_foreach
+  * json_tokener.c - C. Watford (christopher.watford@gmail.com)
+    Added a Win32/Win64 compliant implementation of strndup
+  * json_util.c - C. Watford (christopher.watford@gmail.com)
+    Added cast and mask to suffice size_t v. unsigned int conversion
+    correctness 
+  * json_tokener.c - sign reversal issue on error info for nested object parse
+    spotted by Johan Björklund (johbjo09 at kth.se)
+  * json_object.c - escape " in json_escape_str
+  * Change to automake and libtool to build shared and static library
+    Michael Clark <michael@metaparadigm.com>
+	
+0.1
+  * initial release

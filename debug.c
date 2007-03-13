@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.3 2004/08/07 03:11:38 mclark Exp $
+ * $Id: debug.c,v 1.4 2005/06/14 22:41:51 mclark Exp $
  *
  * Copyright Metaparadigm Pte. Ltd. 2004.
  * Michael Clark <michael@metaparadigm.com>
@@ -16,16 +16,26 @@
  *
  */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include <syslog.h>
-#include <unistd.h>
+
+#if HAVE_SYSLOG_H
+# include <syslog.h>
+#endif /* HAVE_SYSLOG_H */
+
+#if HAVE_UNISTD_H
+# include <unistd.h>
+#endif /* HAVE_UNISTD_H */
+
+#if HAVE_SYS_PARAM_H
 #include <sys/param.h>
+#endif /* HAVE_SYS_PARAM_H */
 
 #include "debug.h"
-
 
 static int _syslog = 0;
 static int _debug = 0;
@@ -42,8 +52,12 @@ void mc_abort(const char *msg, ...)
 {
   va_list ap;
   va_start(ap, msg);
-  if(_syslog) vsyslog(LOG_ERR, msg, ap);
-  else vprintf(msg, ap);
+#if HAVE_VSYSLOG
+  if(_syslog) {
+	  vsyslog(LOG_ERR, msg, ap);
+  } else
+#endif
+	  vprintf(msg, ap);
   exit(1);
 }
 
@@ -53,8 +67,12 @@ void mc_debug(const char *msg, ...)
   va_list ap;
   if(_debug) {
     va_start(ap, msg);
-    if(_syslog) vsyslog(LOG_DEBUG, msg, ap);
-    else vprintf(msg, ap);
+#if HAVE_VSYSLOG
+    if(_syslog) {
+		vsyslog(LOG_DEBUG, msg, ap);
+	} else
+#endif
+		vprintf(msg, ap);
   }
 }
 
@@ -62,14 +80,22 @@ void mc_error(const char *msg, ...)
 {
   va_list ap;
   va_start(ap, msg);
-  if(_syslog) vsyslog(LOG_ERR, msg, ap);
-  else vfprintf(stderr, msg, ap);
+#if HAVE_VSYSLOG
+    if(_syslog) {
+		vsyslog(LOG_ERR, msg, ap);
+	} else
+#endif
+		vfprintf(stderr, msg, ap);
 }
 
 void mc_info(const char *msg, ...)
 {
   va_list ap;
   va_start(ap, msg);
-  if(_syslog) vsyslog(LOG_INFO, msg, ap);
-  else vfprintf(stderr, msg, ap);
+#if HAVE_VSYSLOG
+    if(_syslog) {
+		vsyslog(LOG_INFO, msg, ap);
+	} else 
+#endif
+		vfprintf(stderr, msg, ap);
 }

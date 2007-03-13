@@ -1,5 +1,5 @@
 /*
- * $Id: linkhash.c,v 1.2 2004/07/21 01:24:33 mclark Exp $
+ * $Id: linkhash.c,v 1.3 2005/06/14 22:41:51 mclark Exp $
  *
  * Copyright Metaparadigm Pte. Ltd. 2004.
  * Michael Clark <michael@metaparadigm.com>
@@ -16,13 +16,16 @@
  *
  */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <stddef.h>
+#include <limits.h>
 
 #include "linkhash.h"
-
 
 void lh_abort(const char *msg, ...)
 {
@@ -32,18 +35,16 @@ void lh_abort(const char *msg, ...)
 	exit(1);
 }
 
-
 unsigned long lh_ptr_hash(void *k)
 {
-	return ((long)k * LH_PRIME) >> 4;
+	/* CAW: refactored to be 64bit nice */
+	return (unsigned long)((((ptrdiff_t)k * LH_PRIME) >> 4) & ULONG_MAX);
 }
-
 
 int lh_ptr_equal(void *k1, void *k2)
 {
 	return (k1 == k2);
 }
-
 
 unsigned long lh_char_hash(void *k)
 {
@@ -55,12 +56,10 @@ unsigned long lh_char_hash(void *k)
 	return h;
 }
 
-
 int lh_char_equal(void *k1, void *k2)
 {
 	return (strcmp((char*)k1, (char*)k2) == 0);
 }
-
 
 struct lh_table* lh_table_new(int size, char *name,
 			      lh_entry_free_fn *free_fn,
@@ -84,20 +83,17 @@ struct lh_table* lh_table_new(int size, char *name,
 	return t;
 }
 
-
 struct lh_table* lh_kchar_table_new(int size, char *name,
 				    lh_entry_free_fn *free_fn)
 {
 	return lh_table_new(size, name, free_fn, lh_char_hash, lh_char_equal);
 }
 
-
 struct lh_table* lh_kptr_table_new(int size, char *name,
 				   lh_entry_free_fn *free_fn)
 {
 	return lh_table_new(size, name, free_fn, lh_ptr_hash, lh_ptr_equal);
 }
-
 
 void lh_table_resize(struct lh_table *t, int new_size)
 {
@@ -118,7 +114,6 @@ void lh_table_resize(struct lh_table *t, int new_size)
 	t->resizes++;
 	free(new_t);
 }
-
 
 void lh_table_free(struct lh_table *t)
 {
@@ -193,7 +188,11 @@ void* lh_table_lookup(struct lh_table *t, void *k)
 
 int lh_table_delete_entry(struct lh_table *t, struct lh_entry *e)
 {
-	int n = e - t->table;
+	ptrdiff_t n = (ptrdiff_t)(e - t->table); /* CAW: fixed to be 64bit nice, still need the crazy negative case... */
+
+	/* CAW: this is bad, really bad, maybe stack goes other direction on this machine... */
+	if(n < 0) { return -2; }
+
 	if(t->table[n].k == LH_EMPTY || t->table[n].k == LH_FREED) return -1;
 	t->count--;
 	if(t->free_fn) t->free_fn(e);

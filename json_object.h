@@ -1,5 +1,5 @@
 /*
- * $Id: json_object.h,v 1.8 2004/08/07 04:21:27 mclark Exp $
+ * $Id: json_object.h,v 1.9 2005/06/14 22:41:51 mclark Exp $
  *
  * Copyright Metaparadigm Pte. Ltd. 2004.
  * Michael Clark <michael@metaparadigm.com>
@@ -19,6 +19,8 @@
 #ifndef _json_object_h_
 #define _json_object_h_
 
+#include "config.h"
+
 #define JSON_OBJECT_DEF_HASH_ENTIRES 16
 
 #undef FALSE
@@ -37,6 +39,7 @@ struct printbuf;
 struct lh_table;
 struct array_list;
 struct json_object;
+struct json_object_iter;
 
 /* supported object types */
 
@@ -143,14 +146,30 @@ extern struct json_object* json_object_object_get(struct json_object* this,
 extern void json_object_object_del(struct json_object* this, char *key);
 
 /** Iterate through all keys and values of an object
- * @param this the json_object instance
+ * @param obj the json_object instance
  * @param key the local name for the char* key variable defined in the body
  * @param val the local name for the json_object* object variable defined in the body
  */
-#define json_object_object_foreach(obj,key,val) \
-char *key; struct json_object *val; \
-for(struct lh_entry *entry = json_object_get_object(obj)->head; ({ if(entry) { key = (char*)entry->k; val = (struct json_object*)entry->v; } ; entry; }); entry = entry->next )
+#if defined(__GNUC__) && !defined(__STRICT_ANSI__)
 
+# define json_object_object_foreach(obj,key,val) \
+ char *key; struct json_object *val; \
+ for(struct lh_entry *entry = json_object_get_object(obj)->head; ({ if(entry) { key = (char*)entry->k; val = (struct json_object*)entry->v; } ; entry; }); entry = entry->next )
+
+#else /* ANSI C or MSC */
+
+# define json_object_object_foreach(obj,key,val) \
+ char *key; struct json_object *val; struct lh_entry *entry; \
+ for(entry = json_object_get_object(obj)->head; (entry ? (key = (char*)entry->k, val = (struct json_object*)entry->v, entry) : 0); entry = entry->next)
+
+#endif /* defined(__GNUC__) && !defined(__STRICT_ANSI__) */
+
+/** Iterate through all keys and values of an object (ANSI C Safe)
+ * @param obj the json_object instance
+ * @param iter the object iterator
+ */
+#define json_object_object_foreachC(obj,iter) \
+ for(iter.entry = json_object_get_object(obj)->head; (iter.entry ? (iter.key = (char*)iter.entry->k, iter.val = (struct json_object*)iter.entry->v, iter.entry) : 0); iter.entry = iter.entry->next)
 
 /* Array type methods */
 

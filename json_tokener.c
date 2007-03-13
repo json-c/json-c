@@ -1,5 +1,5 @@
 /*
- * $Id: json_tokener.c,v 1.10 2004/07/27 00:42:31 mclark Exp $
+ * $Id: json_tokener.c,v 1.14 2005/06/14 22:41:51 mclark Exp $
  *
  * Copyright Metaparadigm Pte. Ltd. 2004.
  * Michael Clark <michael@metaparadigm.com>
@@ -16,6 +16,8 @@
  *
  */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -27,7 +29,6 @@
 #include "arraylist.h"
 #include "json_object.h"
 #include "json_tokener.h"
-
 
 static struct json_object* json_tokener_do_parse(struct json_tokener *this);
 
@@ -44,6 +45,27 @@ struct json_object* json_tokener_parse(char * s)
   return obj;
 }
 
+#if !HAVE_STRNDUP
+/* CAW: compliant version of strndup() */
+char* strndup(const char* str, size_t n)
+{
+	if(str) {
+  	    size_t len = strlen(str);
+		size_t nn = min(len,n);
+		char* s = (char*)malloc(sizeof(char) * (nn + 1));
+
+		if(s) {
+		   memcpy(s, str, nn);
+		   s[nn] = '\0';
+		}
+
+		return s;
+	}
+
+	return NULL;
+}
+#endif
+
 static struct json_object* json_tokener_do_parse(struct json_tokener *this)
 {
   enum json_tokener_state state, saved_state;
@@ -52,11 +74,11 @@ static struct json_object* json_tokener_do_parse(struct json_tokener *this)
   char *obj_field_name = NULL;
   char quote_char;
   int deemed_double, start_offset;
+  char c;
 
   state = json_tokener_state_eatws;
   saved_state = json_tokener_state_start;
 
-  char c;
   do {
     c = this->source[this->pos];
     switch(state) {
@@ -105,7 +127,20 @@ static struct json_object* json_tokener_do_parse(struct json_tokener *this)
 	state = json_tokener_state_boolean;
 	start_offset = this->pos++;
 	break;
-      case '0' ... '9':
+#if defined(__GNUC__)
+	  case '0' ... '9':
+#else
+	  case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+#endif
       case '-':
 	deemed_double = 0;
 	state = json_tokener_state_number;
@@ -422,5 +457,5 @@ static struct json_object* json_tokener_do_parse(struct json_tokener *this)
   mc_debug("json_tokener_do_parse: error=%d state=%d char=%c\n",
 	   err, state, c);
   json_object_put(current);
-  return error_ptr(-err);
+  return error_ptr((ptrdiff_t)-err);
 }

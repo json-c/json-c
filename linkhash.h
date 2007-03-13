@@ -1,5 +1,5 @@
 /*
- * $Id: linkhash.h,v 1.3 2004/08/07 03:29:47 mclark Exp $
+ * $Id: linkhash.h,v 1.4 2005/06/14 22:41:51 mclark Exp $
  *
  * Copyright Metaparadigm Pte. Ltd. 2004.
  * Michael Clark <michael@metaparadigm.com>
@@ -19,6 +19,8 @@
 #ifndef _linkhash_h_
 #define _linkhash_h_
 
+#include "config.h"
+
 /**
  * golden prime used in hash functions
  */
@@ -34,9 +36,7 @@
  */
 #define LH_FREED (void*)-2
 
-
 struct lh_entry;
-
 
 /**
  * callback function prototypes

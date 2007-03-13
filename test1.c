@@ -4,7 +4,6 @@
 
 #include "json.h"
 
-
 int main(int argc, char **argv)
 {
   struct json_object *my_string, *my_int, *my_object, *my_array;

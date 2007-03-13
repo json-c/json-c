@@ -1,5 +1,5 @@
 /*
- * $Id: json_object.c,v 1.10 2004/08/07 03:12:43 mclark Exp $
+ * $Id: json_object.c,v 1.13 2005/06/14 22:41:51 mclark Exp $
  *
  * Copyright Metaparadigm Pte. Ltd. 2004.
  * Michael Clark <michael@metaparadigm.com>
@@ -16,6 +16,8 @@
  *
  */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,9 +28,9 @@
 #include "arraylist.h"
 #include "json_object.h"
 #include "json_object_private.h"
+#include "json_tokener.h"
 
-
-/* #define REFCOUNT_DEBUG */
+/* #define REFCOUNT_DEBUG 1 */
 
 char *json_number_chars = "0123456789.+-e";
 char *json_hex_chars = "0123456789abcdef";
@@ -43,7 +45,7 @@ static char* json_type_name[] = {
   "array",
   "string",
 };
-#endif
+#endif /* REFCOUNT_DEBUG */
 
 static void json_object_generic_delete(struct json_object* this);
 static struct json_object* json_object_new(enum json_type o_type);
@@ -75,7 +77,7 @@ static void json_object_fini() {
   mc_debug("json_object_fini: freeing object table\n");
   lh_table_free(json_object_table);
 }
-#endif
+#endif /* REFCOUNT_DEBUG */
 
 
 /* string escaping */
@@ -91,12 +93,14 @@ static int json_escape_str(struct printbuf *pb, char *str)
     case '\n':
     case '\r':
     case '\t':
+    case '"':
       if(pos - start_offset > 0)
 	printbuf_memappend(pb, str + start_offset, pos - start_offset);
       if(c == '\b') printbuf_memappend(pb, "\\b", 2);
       else if(c == '\n') printbuf_memappend(pb, "\\n", 2);
       else if(c == '\r') printbuf_memappend(pb, "\\r", 2);
       else if(c == '\t') printbuf_memappend(pb, "\\t", 2);
+      else if(c == '"') printbuf_memappend(pb, "\\\"", 2);
       start_offset = ++pos;
       break;
     default:
@@ -143,7 +147,7 @@ static void json_object_generic_delete(struct json_object* this)
   mc_debug("json_object_delete_%s: %p\n",
 	   json_type_name[this->o_type], this);
   lh_table_delete(json_object_table, this);
-#endif
+#endif /* REFCOUNT_DEBUG */
   printbuf_free(this->_pb);
   free(this);
 }
@@ -158,7 +162,7 @@ static struct json_object* json_object_new(enum json_type o_type)
 #ifdef REFCOUNT_DEBUG
   lh_table_insert(json_object_table, this, this);
   mc_debug("json_object_new_%s: %p\n", json_type_name[this->o_type], this);
-#endif
+#endif /* REFCOUNT_DEBUG */
   return this;
 }
 
@@ -197,16 +201,21 @@ static int json_object_object_to_json_string(struct json_object* this,
 					     struct printbuf *pb)
 {
   int i=0;
+  struct json_object_iter iter;
   sprintbuf(pb, "{");
-  json_object_object_foreach(this, key, val) {
-    if(i) sprintbuf(pb, ",");
-    sprintbuf(pb, " \"");
-    json_escape_str(pb, key);
-    sprintbuf(pb, "\": ");
-    if(val == NULL) sprintbuf(pb, "null");
-    else val->_to_json_string(val, pb);
-    i++;
-  }
+
+  /* CAW: scope operator to make ANSI correctness */
+  /* CAW: switched to json_object_object_foreachC which uses an iterator struct */
+	json_object_object_foreachC(this, iter) {
+			if(i) sprintbuf(pb, ",");
+			sprintbuf(pb, " \"");
+			json_escape_str(pb, iter.key);
+			sprintbuf(pb, "\": ");
+			if(iter.val == NULL) sprintbuf(pb, "null");
+			else iter.val->_to_json_string(iter.val, pb);
+			i++;
+	}
+
   return sprintbuf(pb, " }");
 }
 
@@ -324,7 +333,7 @@ int json_object_get_int(struct json_object *this)
   case json_type_int:
     return this->o.c_int;
   case json_type_double:
-    return this->o.c_double;
+    return (int)this->o.c_double;
   case json_type_boolean:
     return this->o.c_boolean;
   case json_type_string:
@@ -426,13 +435,16 @@ char* json_object_get_string(struct json_object *this)
 static int json_object_array_to_json_string(struct json_object* this,
 					    struct printbuf *pb)
 {
+  int i;
   sprintbuf(pb, "[");
-  for(int i=0; i < json_object_array_length(this); i++) {
-    if(i) sprintbuf(pb, ", ");
-    else sprintbuf(pb, " ");
-    struct json_object *val = json_object_array_get_idx(this, i);
-    if(val == NULL) sprintbuf(pb, "null");
-    else val->_to_json_string(val, pb);
+  for(i=0; i < json_object_array_length(this); i++) {
+	  struct json_object *val;
+	  if(i) { sprintbuf(pb, ", "); }
+	  else { sprintbuf(pb, " "); }
+
+      val = json_object_array_get_idx(this, i);
+	  if(val == NULL) { sprintbuf(pb, "null"); }
+	  else { val->_to_json_string(val, pb); }
   }
   return sprintbuf(pb, " ]");
 }

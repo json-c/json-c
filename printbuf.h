@@ -1,5 +1,5 @@
 /*
- * $Id: printbuf.h,v 1.2 2004/07/21 01:24:33 mclark Exp $
+ * $Id: printbuf.h,v 1.3 2005/06/14 22:41:51 mclark Exp $
  *
  * Copyright Metaparadigm Pte. Ltd. 2004.
  * Michael Clark <michael@metaparadigm.com>
@@ -18,6 +18,8 @@
 
 #ifndef _printbuf_h_
 #define _printbuf_h_
+
+#undef PRINTBUF_DEBUG
 
 struct printbuf {
   char *buf;
