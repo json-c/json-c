@@ -46,7 +46,7 @@ int printbuf_memappend(struct printbuf *p, char *buf, int size)
   if(p->size - p->bpos <= size) {
     int new_size = max(p->size * 2, p->bpos + size + 8);
 #ifdef PRINTBUF_DEBUG
-    mc_debug("printbuf_memappend: realloc "
+    MC_DEBUG("printbuf_memappend: realloc "
 	     "bpos=%d wrsize=%d old_size=%d new_size=%d\n",
 	     p->bpos, size, p->size, new_size);
 #endif /* PRINTBUF_DEBUG */

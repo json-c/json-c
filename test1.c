@@ -11,7 +11,7 @@ int main(int argc, char **argv)
   struct json_object *new_obj;
   int i;
 
-  mc_set_debug(1);
+  MC_SET_DEBUG(1);
 
   my_string = json_object_new_string("\t");
   printf("my_string=%s\n", json_object_get_string(my_string));
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
   json_object_object_add(my_object, "baz", json_object_new_string("bang"));
   json_object_object_add(my_object, "baz", json_object_new_string("fark"));
   json_object_object_del(my_object, "baz");
-  json_object_object_add(my_object, "arr", my_array);
+  /*json_object_object_add(my_object, "arr", my_array);*/
   printf("my_object=\n");
   json_object_object_foreach(my_object, key, val) {
     printf("\t%s: %s\n", key, json_object_to_json_string(val));

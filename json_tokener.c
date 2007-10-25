@@ -265,7 +265,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 
     case json_tokener_state_comment_eol:
       if(c == '\n') {
-	mc_debug("json_tokener_comment: %s\n", tok->pb->buf);
+	MC_DEBUG("json_tokener_comment: %s\n", tok->pb->buf);
 	state = json_tokener_state_eatws;
       } else {
 	printbuf_memappend(tok->pb, &c, 1);
@@ -275,7 +275,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
     case json_tokener_state_comment_end:
       printbuf_memappend(tok->pb, &c, 1);
       if(c == '/') {
-	mc_debug("json_tokener_comment: %s\n", tok->pb->buf);
+	MC_DEBUG("json_tokener_comment: %s\n", tok->pb->buf);
 	state = json_tokener_state_eatws;
       } else {
 	state = json_tokener_state_comment;
@@ -510,7 +510,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 
  out:
   if(tok->err == json_tokener_success) return json_object_get(current);
-  mc_debug("json_tokener_parse_ex: error %s at offset %d\n",
+  MC_DEBUG("json_tokener_parse_ex: error %s at offset %d\n",
 	   json_tokener_errors[tok->err], tok->char_offset);
   return NULL;
 }

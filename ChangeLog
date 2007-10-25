@@ -1,3 +1,7 @@
+0.8
+  * Add macros to enable compiling out debug code
+    Geoffrey Young, geoff at modperlcookbook dot org
+
 0.7
   * Add escaping of backslash to json output
   * Add escaping of foward slash on tokenizing and output

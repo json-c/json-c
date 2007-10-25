@@ -27,7 +27,7 @@
   char* strndup(const char* str, size_t n);
 #endif /* !HAVE_STRNDUP */
 
-/* #define REFCOUNT_DEBUG 1 */
+#define REFCOUNT_DEBUG 1
 
 char *json_number_chars = "0123456789.+-e";
 char *json_hex_chars = "0123456789abcdef";
@@ -56,22 +56,24 @@ static struct lh_table *json_object_table;
 
 static void json_object_init() __attribute__ ((constructor));
 static void json_object_init() {
-  mc_debug("json_object_init: creating object table\n");
+  MC_DEBUG("json_object_init: creating object table\n");
   json_object_table = lh_kptr_table_new(128, "json_object_table", NULL);
 }
 
 static void json_object_fini() __attribute__ ((destructor));
 static void json_object_fini() {
   struct lh_entry *ent;
-  if(mc_get_debug() && json_object_table->count) {
-    mc_debug("json_object_fini: %d referenced objects at exit\n",
-	     json_object_table->count);
-    lh_foreach(json_object_table, ent) {
-      struct json_object* obj = (struct json_object*)ent->v;
-      mc_debug("\t%s:%p\n", json_type_name[obj->o_type], obj);
+  if(MC_GET_DEBUG()) {
+    if (json_object_table->count) {
+      MC_DEBUG("json_object_fini: %d referenced objects at exit\n",
+  	       json_object_table->count);
+      lh_foreach(json_object_table, ent) {
+        struct json_object* obj = (struct json_object*)ent->v;
+        MC_DEBUG("\t%s:%p\n", json_type_name[obj->o_type], obj);
+      }
     }
   }
-  mc_debug("json_object_fini: freeing object table\n");
+  MC_DEBUG("json_object_fini: freeing object table\n");
   lh_table_free(json_object_table);
 }
 #endif /* REFCOUNT_DEBUG */
@@ -147,7 +149,7 @@ extern void json_object_put(struct json_object *this)
 static void json_object_generic_delete(struct json_object* this)
 {
 #ifdef REFCOUNT_DEBUG
-  mc_debug("json_object_delete_%s: %p\n",
+  MC_DEBUG("json_object_delete_%s: %p\n",
 	   json_type_name[this->o_type], this);
   lh_table_delete(json_object_table, this);
 #endif /* REFCOUNT_DEBUG */
@@ -164,7 +166,7 @@ static struct json_object* json_object_new(enum json_type o_type)
   this->_delete = &json_object_generic_delete;
 #ifdef REFCOUNT_DEBUG
   lh_table_insert(json_object_table, this, this);
-  mc_debug("json_object_new_%s: %p\n", json_type_name[this->o_type], this);
+  MC_DEBUG("json_object_new_%s: %p\n", json_type_name[this->o_type], this);
 #endif /* REFCOUNT_DEBUG */
   return this;
 }

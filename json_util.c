@@ -59,12 +59,12 @@ struct json_object* json_object_from_file(char *filename)
   int fd, ret;
 
   if((fd = open(filename, O_RDONLY)) < 0) {
-    mc_error("json_object_from_file: error reading file %s: %s\n",
+    MC_ERROR("json_object_from_file: error reading file %s: %s\n",
 	     filename, strerror(errno));
     return error_ptr(-1);
   }
   if(!(pb = printbuf_new())) {
-    mc_error("json_object_from_file: printbuf_new failed\n");
+    MC_ERROR("json_object_from_file: printbuf_new failed\n");
     return error_ptr(-1);
   }
   while((ret = read(fd, buf, JSON_FILE_BUF_SIZE)) > 0) {
@@ -72,7 +72,7 @@ struct json_object* json_object_from_file(char *filename)
   }
   close(fd);
   if(ret < 0) {
-    mc_abort("json_object_from_file: error reading file %s: %s\n",
+    MC_ABORT("json_object_from_file: error reading file %s: %s\n",
 	     filename, strerror(errno));
     printbuf_free(pb);
     return error_ptr(-1);
@@ -89,12 +89,12 @@ int json_object_to_file(char *filename, struct json_object *obj)
   unsigned int wpos, wsize;
 
   if(!obj) {
-    mc_error("json_object_to_file: object is null\n");
+    MC_ERROR("json_object_to_file: object is null\n");
     return -1;
   }
 
   if((fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT, 0644)) < 0) {
-    mc_error("json_object_to_file: error opening file %s: %s\n",
+    MC_ERROR("json_object_to_file: error opening file %s: %s\n",
 	     filename, strerror(errno));
     return -1;
   }
@@ -107,7 +107,7 @@ int json_object_to_file(char *filename, struct json_object *obj)
   while(wpos < wsize) {
     if((ret = write(fd, json_str + wpos, wsize-wpos)) < 0) {
       close(fd);
-      mc_error("json_object_to_file: error writing file %s: %s\n",
+      MC_ERROR("json_object_to_file: error writing file %s: %s\n",
 	     filename, strerror(errno));
       return -1;
     }
