@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include <ctype.h>
 #include <string.h>
 
@@ -378,7 +379,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
     case json_tokener_state_number:
       if(c && strchr(json_number_chars, c)) {
 	printbuf_memappend(tok->pb, &c, 1);	
-	if(c == '.' || c == 'e') tok->is_double = 1;
+	if(c == '.' || c == 'e' || c == 'E') tok->is_double = 1;
       } else {
 	int numi;
 	double numd;

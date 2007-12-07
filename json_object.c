@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include <string.h>
 
 #include "debug.h"
@@ -29,7 +30,7 @@
 
 #define REFCOUNT_DEBUG 1
 
-char *json_number_chars = "0123456789.+-e";
+char *json_number_chars = "0123456789.+-eE";
 char *json_hex_chars = "0123456789abcdef";
 
 #ifdef REFCOUNT_DEBUG
