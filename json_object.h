@@ -98,7 +98,7 @@ extern char* json_object_to_json_string(struct json_object *obj);
 /** Create a new empty object
  * @returns a json_object of type json_type_object
  */
-extern struct json_object* json_object_new_object();
+extern struct json_object* json_object_new_object(void);
 
 /** Get the hashtable of a json_object of type json_type_object
  * @param obj the json_object instance
@@ -167,7 +167,7 @@ extern void json_object_object_del(struct json_object* obj, char *key);
 /** Create a new empty json_object of type json_type_array
  * @returns a json_object of type json_type_array
  */
-extern struct json_object* json_object_new_array();
+extern struct json_object* json_object_new_array(void);
 
 /** Get the arraylist of a json_object of type json_type_array
  * @param obj the json_object instance

@@ -4,6 +4,9 @@
   * Fix bug with use of capital E in numbers with exponents
     Mateusz Loskot, mateusz at loskot dot net
   * Add stddef.h include
+  * Patch allows for json-c compile with -Werror and not fail due to
+    -Wmissing-prototypes -Wstrict-prototypes -Wmissing-declarations
+    Geoffrey Young, geoff at modperlcookbook dot org
 
 0.7
   * Add escaping of backslash to json output

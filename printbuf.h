@@ -21,7 +21,7 @@ struct printbuf {
 };
 
 extern struct printbuf*
-printbuf_new();
+printbuf_new(void);
 
 extern int
 printbuf_memappend(struct printbuf *p, char *buf, int size);

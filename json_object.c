@@ -55,14 +55,14 @@ static struct json_object* json_object_new(enum json_type o_type);
 
 static struct lh_table *json_object_table;
 
-static void json_object_init() __attribute__ ((constructor));
-static void json_object_init() {
+static void json_object_init(void) __attribute__ ((constructor));
+static void json_object_init(void) {
   MC_DEBUG("json_object_init: creating object table\n");
   json_object_table = lh_kptr_table_new(128, "json_object_table", NULL);
 }
 
-static void json_object_fini() __attribute__ ((destructor));
-static void json_object_fini() {
+static void json_object_fini(void) __attribute__ ((destructor));
+static void json_object_fini(void) {
   struct lh_entry *ent;
   if(MC_GET_DEBUG()) {
     if (json_object_table->count) {

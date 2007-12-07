@@ -13,7 +13,7 @@
 #define _DEBUG_H_
 
 extern void mc_set_debug(int debug);
-extern int mc_get_debug();
+extern int mc_get_debug(void);
 
 extern void mc_set_syslog(int syslog);
 extern void mc_abort(const char *msg, ...);

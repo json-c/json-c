@@ -258,4 +258,7 @@ extern int lh_table_delete_entry(struct lh_table *t, struct lh_entry *e);
 extern int lh_table_delete(struct lh_table *t, void *k);
 
 
+void lh_abort(const char *msg, ...);
+void lh_table_resize(struct lh_table *t, int new_size);
+
 #endif
