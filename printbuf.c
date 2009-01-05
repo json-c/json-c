@@ -119,8 +119,9 @@ int sprintbuf(struct printbuf *p, const char *msg, ...)
   if(size == -1 || size > 127) {
     int ret;
     va_start(ap, msg);
-    if((size = vasprintf(&t, msg, ap)) == -1) return -1;
+    size = vasprintf(&t, msg, ap);
     va_end(ap);
+    if(size == -1) return -1;
     ret = printbuf_memappend(p, t, size);
     free(t);
     return ret;

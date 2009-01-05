@@ -1,4 +1,6 @@
 0.8
+  * Add va_end for every va_start
+    Dotan Barak, dotanba at gmail dot com
   * Add macros to enable compiling out debug code
     Geoffrey Young, geoff at modperlcookbook dot org
   * Fix bug with use of capital E in numbers with exponents
