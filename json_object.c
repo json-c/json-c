@@ -30,11 +30,11 @@
 
 #define REFCOUNT_DEBUG 1
 
-char *json_number_chars = "0123456789.+-eE";
-char *json_hex_chars = "0123456789abcdef";
+const char *json_number_chars = "0123456789.+-eE";
+const char *json_hex_chars = "0123456789abcdef";
 
 #ifdef REFCOUNT_DEBUG
-static char* json_type_name[] = {
+static const char* json_type_name[] = {
   "null",
   "boolean",
   "double",
@@ -188,7 +188,7 @@ enum json_type json_object_get_type(struct json_object *this)
 
 /* json_object_to_json_string */
 
-char* json_object_to_json_string(struct json_object *this)
+const char* json_object_to_json_string(struct json_object *this)
 {
   if(!this) return "null";
   if(!this->_pb) {
@@ -259,19 +259,19 @@ struct lh_table* json_object_get_object(struct json_object *this)
   }
 }
 
-void json_object_object_add(struct json_object* this, char *key,
+void json_object_object_add(struct json_object* this, const char *key,
 			    struct json_object *val)
 {
   lh_table_delete(this->o.c_object, key);
   lh_table_insert(this->o.c_object, strdup(key), val);
 }
 
-struct json_object* json_object_object_get(struct json_object* this, char *key)
+struct json_object* json_object_object_get(struct json_object* this, const char *key)
 {
   return (struct json_object*) lh_table_lookup(this->o.c_object, key);
 }
 
-void json_object_object_del(struct json_object* this, char *key)
+void json_object_object_del(struct json_object* this, const char *key)
 {
   lh_table_delete(this->o.c_object, key);
 }
@@ -404,7 +404,7 @@ static void json_object_string_delete(struct json_object* this)
   json_object_generic_delete(this);
 }
 
-struct json_object* json_object_new_string(char *s)
+struct json_object* json_object_new_string(const char *s)
 {
   struct json_object *this = json_object_new(json_type_string);
   if(!this) return NULL;
@@ -414,7 +414,7 @@ struct json_object* json_object_new_string(char *s)
   return this;
 }
 
-struct json_object* json_object_new_string_len(char *s, int len)
+struct json_object* json_object_new_string_len(const char *s, int len)
 {
   struct json_object *this = json_object_new(json_type_string);
   if(!this) return NULL;
@@ -424,7 +424,7 @@ struct json_object* json_object_new_string_len(char *s, int len)
   return this;
 }
 
-char* json_object_get_string(struct json_object *this)
+const char* json_object_get_string(struct json_object *this)
 {
   if(!this) return NULL;
   switch(this->o_type) {

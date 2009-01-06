@@ -24,7 +24,7 @@ extern struct printbuf*
 printbuf_new(void);
 
 extern int
-printbuf_memappend(struct printbuf *p, char *buf, int size);
+printbuf_memappend(struct printbuf *p, const char *buf, int size);
 
 extern int
 sprintbuf(struct printbuf *p, const char *msg, ...);

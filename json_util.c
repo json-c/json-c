@@ -85,7 +85,7 @@ struct json_object* json_object_from_file(char *filename)
 
 int json_object_to_file(char *filename, struct json_object *obj)
 {
-  char *json_str;
+  const char *json_str;
   int fd, ret;
   unsigned int wpos, wsize;
 

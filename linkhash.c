@@ -29,18 +29,18 @@ void lh_abort(const char *msg, ...)
 	exit(1);
 }
 
-unsigned long lh_ptr_hash(void *k)
+unsigned long lh_ptr_hash(const void *k)
 {
 	/* CAW: refactored to be 64bit nice */
 	return (unsigned long)((((ptrdiff_t)k * LH_PRIME) >> 4) & ULONG_MAX);
 }
 
-int lh_ptr_equal(void *k1, void *k2)
+int lh_ptr_equal(const void *k1, const void *k2)
 {
 	return (k1 == k2);
 }
 
-unsigned long lh_char_hash(void *k)
+unsigned long lh_char_hash(const void *k)
 {
 	unsigned int h = 0;
 	const char* data = k;
@@ -50,12 +50,12 @@ unsigned long lh_char_hash(void *k)
 	return h;
 }
 
-int lh_char_equal(void *k1, void *k2)
+int lh_char_equal(const void *k1, const void *k2)
 {
-	return (strcmp((char*)k1, (char*)k2) == 0);
+	return (strcmp((const char*)k1, (const char*)k2) == 0);
 }
 
-struct lh_table* lh_table_new(int size, char *name,
+struct lh_table* lh_table_new(int size, const char *name,
 			      lh_entry_free_fn *free_fn,
 			      lh_hash_fn *hash_fn,
 			      lh_equal_fn *equal_fn)
@@ -77,13 +77,13 @@ struct lh_table* lh_table_new(int size, char *name,
 	return t;
 }
 
-struct lh_table* lh_kchar_table_new(int size, char *name,
+struct lh_table* lh_kchar_table_new(int size, const char *name,
 				    lh_entry_free_fn *free_fn)
 {
 	return lh_table_new(size, name, free_fn, lh_char_hash, lh_char_equal);
 }
 
-struct lh_table* lh_kptr_table_new(int size, char *name,
+struct lh_table* lh_kptr_table_new(int size, const char *name,
 				   lh_entry_free_fn *free_fn)
 {
 	return lh_table_new(size, name, free_fn, lh_ptr_hash, lh_ptr_equal);
@@ -122,7 +122,7 @@ void lh_table_free(struct lh_table *t)
 }
 
 
-int lh_table_insert(struct lh_table *t, void *k, void *v)
+int lh_table_insert(struct lh_table *t, void *k, const void *v)
 {
 	unsigned long h, n;
 
@@ -156,7 +156,7 @@ int lh_table_insert(struct lh_table *t, void *k, void *v)
 }
 
 
-struct lh_entry* lh_table_lookup_entry(struct lh_table *t, void *k)
+struct lh_entry* lh_table_lookup_entry(struct lh_table *t, const void *k)
 {
 	unsigned long h = t->hash_fn(k);
 	unsigned long n = h % t->size;
@@ -172,7 +172,7 @@ struct lh_entry* lh_table_lookup_entry(struct lh_table *t, void *k)
 }
 
 
-void* lh_table_lookup(struct lh_table *t, void *k)
+const void* lh_table_lookup(struct lh_table *t, const void *k)
 {
 	struct lh_entry *e = lh_table_lookup_entry(t, k);
 	if(e) return e->v;
@@ -209,7 +209,7 @@ int lh_table_delete_entry(struct lh_table *t, struct lh_entry *e)
 }
 
 
-int lh_table_delete(struct lh_table *t, void *k)
+int lh_table_delete(struct lh_table *t, const void *k)
 {
 	struct lh_entry *e = lh_table_lookup_entry(t, k);
 	if(!e) return -1;

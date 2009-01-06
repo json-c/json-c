@@ -40,7 +40,7 @@ struct printbuf* printbuf_new()
 }
 
 
-int printbuf_memappend(struct printbuf *p, char *buf, int size)
+int printbuf_memappend(struct printbuf *p, const char *buf, int size)
 {
   char *t;
   if(p->size - p->bpos <= size) {

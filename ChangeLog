@@ -1,3 +1,7 @@
+0.9
+  * Add const correctness to public interfaces
+    Gerard Krol, g dot c dot krol at student dot tudelft dot nl
+
 0.8
   * Add va_end for every va_start
     Dotan Barak, dotanba at gmail dot com

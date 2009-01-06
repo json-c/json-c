@@ -20,8 +20,8 @@
 #undef TRUE
 #define TRUE ((boolean)1)
 
-extern char *json_number_chars;
-extern char *json_hex_chars;
+extern const char *json_number_chars;
+extern const char *json_hex_chars;
 
 /* forward structure definitions */
 
@@ -90,7 +90,7 @@ extern enum json_type json_object_get_type(struct json_object *obj);
  * @param obj the json_object instance
  * @returns a string in JSON format
  */
-extern char* json_object_to_json_string(struct json_object *obj);
+extern const char* json_object_to_json_string(struct json_object *obj);
 
 
 /* object type methods */
@@ -116,7 +116,7 @@ extern struct lh_table* json_object_get_object(struct json_object *obj);
  * @param key the object field name (a private copy will be duplicated)
  * @param val a json_object or NULL member to associate with the given field
  */
-extern void json_object_object_add(struct json_object* obj, char *key,
+extern void json_object_object_add(struct json_object* obj, const char *key,
 				   struct json_object *val);
 
 /** Get the json_object associate with a given object field
@@ -125,7 +125,7 @@ extern void json_object_object_add(struct json_object* obj, char *key,
  * @returns the json_object associated with the given field name
  */
 extern struct json_object* json_object_object_get(struct json_object* obj,
-						  char *key);
+						  const char *key);
 
 /** Delete the given json_object field
  *
@@ -134,7 +134,7 @@ extern struct json_object* json_object_object_get(struct json_object* obj,
  * @param obj the json_object instance
  * @param key the object field name
  */
-extern void json_object_object_del(struct json_object* obj, char *key);
+extern void json_object_object_del(struct json_object* obj, const char *key);
 
 /** Iterate through all keys and values of an object
  * @param obj the json_object instance
@@ -290,9 +290,9 @@ extern double json_object_get_double(struct json_object *obj);
  * @param s the string
  * @returns a json_object of type json_type_string
  */
-extern struct json_object* json_object_new_string(char *s);
+extern struct json_object* json_object_new_string(const char *s);
 
-extern struct json_object* json_object_new_string_len(char *s, int len);
+extern struct json_object* json_object_new_string_len(const char *s, int len);
 
 /** Get the string value of a json_object
  *
@@ -305,6 +305,6 @@ extern struct json_object* json_object_new_string_len(char *s, int len);
  * @param obj the json_object instance
  * @returns a string
  */
-extern char* json_object_get_string(struct json_object *obj);
+extern const char* json_object_get_string(struct json_object *obj);
 
 #endif
