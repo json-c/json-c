@@ -1,5 +1,7 @@
 AM_CFLAGS = -Wall -std=gnu99 -D_GNU_SOURCE -D_REENTRANT
 
+EXTRA_DIST = doc
+
 lib_LTLIBRARIES = libjson.la
 
 pkgconfigdir = $(libdir)/pkgconfig
