@@ -243,7 +243,7 @@ struct json_object* json_object_new_object()
   if(!this) return NULL;
   this->_delete = &json_object_object_delete;
   this->_to_json_string = &json_object_object_to_json_string;
-  this->o.c_object = lh_kchar_table_new(JSON_OBJECT_DEF_HASH_ENTIRES,
+  this->o.c_object = lh_kchar_table_new(JSON_OBJECT_DEF_HASH_ENTRIES,
 					NULL, &json_object_lh_entry_free);
   return this;
 }

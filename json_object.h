@@ -12,7 +12,7 @@
 #ifndef _json_object_h_
 #define _json_object_h_
 
-#define JSON_OBJECT_DEF_HASH_ENTIRES 16
+#define JSON_OBJECT_DEF_HASH_ENTRIES 16
 
 #undef FALSE
 #define FALSE ((boolean)0)
