@@ -16,7 +16,7 @@
 # include <string.h>
 #endif /* STDC_HEADERS */
 
-#if HAVE_STRINGS_H
+#if defined HAVE_STRINGS_H && !defined _STRING_H && !defined __USE_BSD
 # include <strings.h>
 #endif /* HAVE_STRINGS_H */
 

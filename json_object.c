@@ -22,7 +22,6 @@
 #include "arraylist.h"
 #include "json_object.h"
 #include "json_object_private.h"
-#include "json_tokener.h"
 
 #if !HAVE_STRNDUP
   char* strndup(const char* str, size_t n);
@@ -306,7 +305,7 @@ boolean json_object_get_boolean(struct json_object *this)
   case json_type_double:
     return (this->o.c_double != 0);
   case json_type_string:
-    if(strlen(this->o.c_string)) return TRUE;
+    return (strlen(this->o.c_string) != 0);
   default:
     return TRUE;
   }

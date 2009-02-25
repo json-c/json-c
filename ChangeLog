@@ -1,4 +1,7 @@
 0.9
+  * Null pointer dereference fix. Fix json_object_get_boolean strlen test
+    to not return TRUE for zero length string. Remove redundant includes.
+    Erik Hovland, erik at hovland dot org
   * Fixed warning reported by adding -Wstrict-prototypes
     -Wold-style-definition to the compilatin flags.
     Dotan Barak, dotanba at gmail dot com
