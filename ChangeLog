@@ -1,4 +1,7 @@
 0.9
+  * Fixed warning reported by adding -Wstrict-prototypes
+    -Wold-style-definition to the compilatin flags.
+    Dotan Barak, dotanba at gmail dot com
   * Add const correctness to public interfaces
     Gerard Krol, g dot c dot krol at student dot tudelft dot nl
 

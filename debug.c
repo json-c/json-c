@@ -34,7 +34,7 @@ static int _syslog = 0;
 static int _debug = 0;
 
 void mc_set_debug(int debug) { _debug = debug; }
-int mc_get_debug() { return _debug; }
+int mc_get_debug(void) { return _debug; }
 
 extern void mc_set_syslog(int syslog)
 {

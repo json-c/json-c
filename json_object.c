@@ -237,7 +237,7 @@ static void json_object_object_delete(struct json_object* this)
   json_object_generic_delete(this);
 }
 
-struct json_object* json_object_new_object()
+struct json_object* json_object_new_object(void)
 {
   struct json_object *this = json_object_new(json_type_object);
   if(!this) return NULL;
@@ -466,7 +466,7 @@ static void json_object_array_delete(struct json_object* this)
   json_object_generic_delete(this);
 }
 
-struct json_object* json_object_new_array()
+struct json_object* json_object_new_array(void)
 {
   struct json_object *this = json_object_new(json_type_array);
   if(!this) return NULL;

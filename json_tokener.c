@@ -55,7 +55,7 @@ const char* json_tokener_errors[] = {
 };
 
 
-struct json_tokener* json_tokener_new()
+struct json_tokener* json_tokener_new(void)
 {
   struct json_tokener *tok = calloc(1, sizeof(struct json_tokener));
   tok->pb = printbuf_new();

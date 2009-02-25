@@ -25,7 +25,7 @@
 #include "debug.h"
 #include "printbuf.h"
 
-struct printbuf* printbuf_new()
+struct printbuf* printbuf_new(void)
 {
   struct printbuf *p;
 
