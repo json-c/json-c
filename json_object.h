@@ -12,6 +12,10 @@
 #ifndef _json_object_h_
 #define _json_object_h_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define JSON_OBJECT_DEF_HASH_ENTRIES 16
 
 #undef FALSE
@@ -26,15 +30,16 @@ extern const char *json_hex_chars;
 /* forward structure definitions */
 
 typedef int boolean;
-struct printbuf;
-struct lh_table;
-struct array_list;
-struct json_object;
-struct json_object_iter;
+typedef struct printbuf printbuf;
+typedef struct lh_table lh_table;
+typedef struct array_list array_list;
+typedef struct json_object json_object;
+typedef struct json_object_iter json_object_iter;
+typedef struct json_tokener json_tokener;
 
 /* supported object types */
 
-enum json_type {
+typedef enum json_type {
   json_type_null,
   json_type_boolean,
   json_type_double,
@@ -42,7 +47,7 @@ enum json_type {
   json_type_object,
   json_type_array,
   json_type_string
-};
+} json_type;
 
 /* reference counting functions */
 
@@ -306,5 +311,9 @@ extern struct json_object* json_object_new_string_len(const char *s, int len);
  * @returns a string
  */
 extern const char* json_object_get_string(struct json_object *obj);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

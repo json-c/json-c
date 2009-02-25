@@ -8,7 +8,7 @@
 
 int main(int argc, char **argv)
 {
-  struct json_object *new_obj;
+  json_object *new_obj;
 
   MC_SET_DEBUG(1);
 

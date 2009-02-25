@@ -159,7 +159,9 @@ static void json_object_generic_delete(struct json_object* jso)
 
 static struct json_object* json_object_new(enum json_type o_type)
 {
-  struct json_object *jso = calloc(sizeof(struct json_object), 1);
+  struct json_object *jso;
+
+  jso = (struct json_object*)calloc(sizeof(struct json_object), 1);
   if(!jso) return NULL;
   jso->o_type = o_type;
   jso->_ref_count = 1;

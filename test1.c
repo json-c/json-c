@@ -7,9 +7,9 @@
 
 int main(int argc, char **argv)
 {
-  struct json_tokener *tok;
-  struct json_object *my_string, *my_int, *my_object, *my_array;
-  struct json_object *new_obj;
+  json_tokener *tok;
+  json_object *my_string, *my_int, *my_object, *my_array;
+  json_object *new_obj;
   int i;
 
   MC_SET_DEBUG(1);
@@ -39,7 +39,7 @@ int main(int argc, char **argv)
   json_object_array_put_idx(my_array, 4, json_object_new_int(5));
   printf("my_array=\n");
   for(i=0; i < json_object_array_length(my_array); i++) {
-    struct json_object *obj = json_object_array_get_idx(my_array, i);
+    json_object *obj = json_object_array_get_idx(my_array, i);
     printf("\t[%d]=%s\n", i, json_object_to_json_string(obj));
   }
   printf("my_array.to_string()=%s\n", json_object_to_json_string(my_array));    

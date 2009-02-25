@@ -12,6 +12,10 @@
 #ifndef _printbuf_h_
 #define _printbuf_h_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #undef PRINTBUF_DEBUG
 
 struct printbuf {
@@ -34,5 +38,9 @@ printbuf_reset(struct printbuf *p);
 
 extern void
 printbuf_free(struct printbuf *p);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

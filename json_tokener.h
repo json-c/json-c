@@ -15,6 +15,10 @@
 #include <stddef.h>
 #include "json_object.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum json_tokener_error {
   json_tokener_success,
   json_tokener_continue,
@@ -86,5 +90,9 @@ extern void json_tokener_reset(struct json_tokener *tok);
 extern struct json_object* json_tokener_parse(char *str);
 extern struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 						 char *str, int len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

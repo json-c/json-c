@@ -1,5 +1,8 @@
 0.9
   * Don't use this as a variable, so we can compile with a C++ compiler
+  * Add casts from void* to type of assignment when using malloc 
+  * Add #ifdef __cplusplus guards to all of the headers
+  * Add typedefs for json_object, json_tokener, array_list, printbuf, lh_table
     Michael Clark, <michael@metaparadigm.com>
   * Null pointer dereference fix. Fix json_object_get_boolean strlen test
     to not return TRUE for zero length string. Remove redundant includes.

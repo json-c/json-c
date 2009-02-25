@@ -12,6 +12,10 @@
 #ifndef _DEBUG_H_
 #define _DEBUG_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern void mc_set_debug(int debug);
 extern int mc_get_debug(void);
 
@@ -37,6 +41,10 @@ extern void mc_info(const char *msg, ...);
 #define MC_DEBUG(x, ...) if (0) mc_debug(x, ##__VA_ARGS__)
 #define MC_ERROR(x, ...) if (0) mc_error(x, ##__VA_ARGS__)
 #define MC_INFO(x, ...) if (0) mc_info(x, ##__VA_ARGS__)
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

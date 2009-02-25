@@ -41,7 +41,7 @@ int lh_ptr_equal(const void *k1, const void *k2)
 unsigned long lh_char_hash(const void *k)
 {
 	unsigned int h = 0;
-	const char* data = k;
+	const char* data = (const char*)k;
  
 	while( *data!=0 ) h = h*129 + (unsigned int)(*data++) + LH_PRIME;
 
@@ -61,12 +61,12 @@ struct lh_table* lh_table_new(int size, const char *name,
 	int i;
 	struct lh_table *t;
 
-	t = calloc(1, sizeof(struct lh_table));
+	t = (struct lh_table*)calloc(1, sizeof(struct lh_table));
 	if(!t) lh_abort("lh_table_new: calloc failed\n");
 	t->count = 0;
 	t->size = size;
 	t->name = name;
-	t->table = calloc(size, sizeof(struct lh_entry));
+	t->table = (struct lh_entry*)calloc(size, sizeof(struct lh_entry));
 	if(!t->table) lh_abort("lh_table_new: calloc failed\n");
 	t->free_fn = free_fn;
 	t->hash_fn = hash_fn;
