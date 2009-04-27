@@ -309,7 +309,7 @@ boolean json_object_get_boolean(struct json_object *jso)
   case json_type_string:
     return (strlen(jso->o.c_string) != 0);
   default:
-    return TRUE;
+    return FALSE;
   }
 }
 
