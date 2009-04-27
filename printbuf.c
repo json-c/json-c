@@ -7,6 +7,10 @@
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the MIT license. See COPYING for details.
  *
+ *
+ * Copyright (c) 2008-2009 Yahoo! Inc.  All rights reserved.
+ * The copyrights to the contents of this file are licensed under the MIT License
+ * (http://www.opensource.org/licenses/mit-license.php)
  */
 
 #include "config.h"
@@ -118,16 +122,15 @@ int sprintbuf(struct printbuf *p, const char *msg, ...)
      if output is truncated whereas some return the number of bytes that
      would have been writen - this code handles both cases. */
   if(size == -1 || size > 127) {
-    int ret;
     va_start(ap, msg);
-    size = vasprintf(&t, msg, ap);
+    if((size = vasprintf(&t, msg, ap)) == -1) return -1;
     va_end(ap);
-    if(size == -1) return -1;
-    ret = printbuf_memappend(p, t, size);
+    printbuf_memappend(p, t, size);
     free(t);
-    return ret;
+    return size;
   } else {
-    return printbuf_memappend(p, buf, size);
+    printbuf_memappend(p, buf, size);
+    return size;
   }
 }
 
