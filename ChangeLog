@@ -3,6 +3,7 @@
     Spotted by Vitaly Kruglikov, Vitaly dot Kruglikov at palm dot com
   * optimizations to json_tokener_parse_ex(), printbuf_memappend()
     Brent Miller, bdmiller at yahoo dash inc dot com
+  * Disable REFCOUNT_DEBUG by default in json_object.c
   * Don't use this as a variable, so we can compile with a C++ compiler
   * Add casts from void* to type of assignment when using malloc 
   * Add #ifdef __cplusplus guards to all of the headers

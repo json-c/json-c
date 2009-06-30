@@ -27,7 +27,7 @@
   char* strndup(const char* str, size_t n);
 #endif /* !HAVE_STRNDUP */
 
-#define REFCOUNT_DEBUG 1
+/* #define REFCOUNT_DEBUG 1 */
 
 const char *json_number_chars = "0123456789.+-eE";
 const char *json_hex_chars = "0123456789abcdef";
