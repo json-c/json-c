@@ -120,10 +120,10 @@ int sprintbuf(struct printbuf *p, const char *msg, ...)
   /* if string is greater than stack buffer, then use dynamic string
      with vasprintf.  Note: some implementation of vsnprintf return -1
      if output is truncated whereas some return the number of bytes that
-     would have been writen - this code handles both cases. */
+     would have been written - this code handles both cases. */
   if(size == -1 || size > 127) {
     va_start(ap, msg);
-    if((size = vasprintf(&t, msg, ap)) == -1) return -1;
+    if((size = vasprintf(&t, msg, ap)) == -1) { va_end(ap); return -1; }
     va_end(ap);
     printbuf_memappend(p, t, size);
     free(t);

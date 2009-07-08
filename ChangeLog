@@ -1,4 +1,8 @@
 0.9
+  * Fix any noticeable spelling or grammar errors.
+  * Make sure every va_start has a va_end.
+  * Check all pointers for validity.
+    Erik Hovland, erik at hovland dot org
   * Fix json_object_get_boolean to return false for empty string
     Spotted by Vitaly Kruglikov, Vitaly dot Kruglikov at palm dot com
   * optimizations to json_tokener_parse_ex(), printbuf_memappend()

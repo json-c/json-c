@@ -64,6 +64,7 @@ struct json_tokener* json_tokener_new(void)
   struct json_tokener *tok;
 
   tok = (struct json_tokener*)calloc(1, sizeof(struct json_tokener));
+  if (!tok) return NULL;
   tok->pb = printbuf_new();
   json_tokener_reset(tok);
   return tok;
