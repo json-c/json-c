@@ -99,7 +99,7 @@ void json_tokener_reset(struct json_tokener *tok)
   tok->err = json_tokener_success;
 }
 
-struct json_object* json_tokener_parse(char *str)
+struct json_object* json_tokener_parse(const char *str)
 {
   struct json_tokener* tok;
   struct json_object* obj;
@@ -180,7 +180,7 @@ char* strndup(const char* str, size_t n)
 
 
 struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
-					  char *str, int len)
+					  const char *str, int len)
 {
   struct json_object *obj = NULL;
   char c = '\1';
@@ -305,7 +305,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
     case json_tokener_state_comment:
               {
           /* Advance until we change state */
-          char *case_start = str;
+          const char *case_start = str;
           while(c != '*') {
             if (!ADVANCE_CHAR(str, tok) || !POP_CHAR(c, tok)) {
               printbuf_memappend_fast(tok->pb, case_start, str-case_start);
@@ -320,7 +320,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
     case json_tokener_state_comment_eol:
       {
 	/* Advance until we change state */
-	char *case_start = str;
+	const char *case_start = str;
 	while(c != '\n') {
 	  if (!ADVANCE_CHAR(str, tok) || !POP_CHAR(c, tok)) {
 	    printbuf_memappend_fast(tok->pb, case_start, str-case_start);
@@ -346,7 +346,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
     case json_tokener_state_string:
       {
 	/* Advance until we change state */
-	char *case_start = str;
+	const char *case_start = str;
 	while(1) {
 	  if(c == tok->quote_char) {
 	    printbuf_memappend_fast(tok->pb, case_start, str-case_start);
@@ -464,7 +464,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
     case json_tokener_state_number:
       {
 	/* Advance until we change state */
-	char *case_start = str;
+	const char *case_start = str;
 	int case_len=0;
 	while(c && strchr(json_number_chars, c)) {
 	  ++case_len;
@@ -546,7 +546,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
     case json_tokener_state_object_field:
       {
 	/* Advance until we change state */
-	char *case_start = str;
+	const char *case_start = str;
 	while(1) {
 	  if(c == tok->quote_char) {
 	    printbuf_memappend_fast(tok->pb, case_start, str-case_start);
