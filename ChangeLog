@@ -1,6 +1,6 @@
 0.9
   * Rename min and max so we can never clash with C or C++ std library
-    Ian Atha, thatha at yahoo-inc dot com
+    Ian Atha, thatha at yahoo dash inc dot com
   * Fix any noticeable spelling or grammar errors.
   * Make sure every va_start has a va_end.
   * Check all pointers for validity.
