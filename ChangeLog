@@ -1,4 +1,6 @@
 0.9
+  * Add README.html README-WIN32.html config.h.win32 to Makefile.am
+    Michael Clark, <michael@metaparadigm.com>
   * Add const qualifier to the json_tokener_parse functions
     Eric Haszlakiewicz, EHASZLA at transunion dot com
   * Rename min and max so we can never clash with C or C++ std library
