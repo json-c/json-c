@@ -1,3 +1,5 @@
+  * Add handling of surrogate pairs (json_tokener.c, test4.c, Makefile.am)
+    Brent Miller, bdmiller at yahoo dash inc dot com
   * Correction to comment describing printbuf_memappend in printbuf.h
     Brent Miller, bdmiller at yahoo dash inc dot com
 

@@ -31,7 +31,7 @@ libjson_la_SOURCES = \
 	linkhash.c \
 	printbuf.c
 
-check_PROGRAMS = test1 test2 test3
+check_PROGRAMS = test1 test2 test3 test4
 
 test1_SOURCES = test1.c
 test1_LDADD = $(lib_LTLIBRARIES)
@@ -41,3 +41,6 @@ test2_LDADD = $(lib_LTLIBRARIES)
 
 test3_SOURCES = test3.c
 test3_LDADD = $(lib_LTLIBRARIES)
+
+test4_SOURCES = test4.c
+test4_LDADD = $(lib_LTLIBRARIES)

@@ -58,6 +58,12 @@ const char* json_tokener_errors[] = {
   "expected comment",
 };
 
+/* Stuff for decoding unicode sequences */
+#define IS_HIGH_SURROGATE(uc) (((uc) & 0xFC00) == 0xD800)
+#define IS_LOW_SURROGATE(uc)  (((uc) & 0xFC00) == 0xDC00)
+#define DECODE_SURROGATE_PAIR(hi,lo) ((((hi) & 0x3FF) << 10) + ((lo) & 0x3FF) + 0x10000)
+static unsigned char utf8_replacement_char[3] = { 0xEF, 0xBF, 0xBD };
+
 
 struct json_tokener* json_tokener_new(void)
 {
@@ -175,6 +181,7 @@ char* strndup(const char* str, size_t n)
  */
 #define ADVANCE_CHAR(str, tok) \
   ( ++(str), ((tok)->char_offset)++, c)
+
 
 /* End optimization macro defs */
 
@@ -398,40 +405,97 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
       break;
 
     case json_tokener_state_escape_unicode:
-            /* Note that the following code is inefficient for handling large
-       * chunks of extended chars, calling printbuf_memappend() once
-       * for each multi-byte character of input.
-       * This is a good area for future optimization.
-       */
 	{
-	  /* Advance until we change state */
+          unsigned int got_hi_surrogate = 0;
+
+	  /* Handle a 4-byte sequence, or two sequences if a surrogate pair */
 	  while(1) {
 	    if(strchr(json_hex_chars, c)) {
 	      tok->ucs_char += ((unsigned int)hexdigit(c) << ((3-tok->st_pos++)*4));
 	      if(tok->st_pos == 4) {
-		unsigned char utf_out[3];
+		unsigned char unescaped_utf[4];
+
+                if (got_hi_surrogate) {
+		  if (IS_LOW_SURROGATE(tok->ucs_char)) {
+                    /* Recalculate the ucs_char, then fall thru to process normally */
+                    tok->ucs_char = DECODE_SURROGATE_PAIR(got_hi_surrogate, tok->ucs_char);
+                  } else {
+                    /* Hi surrogate was not followed by a low surrogate */
+                    /* Replace the hi and process the rest normally */
+		    printbuf_memappend_fast(tok->pb, (char*)utf8_replacement_char, 3);
+                  }
+                  got_hi_surrogate = 0;
+                }
+
 		if (tok->ucs_char < 0x80) {
-		  utf_out[0] = tok->ucs_char;
-		  printbuf_memappend_fast(tok->pb, (char*)utf_out, 1);
+		  unescaped_utf[0] = tok->ucs_char;
+		  printbuf_memappend_fast(tok->pb, (char*)unescaped_utf, 1);
 		} else if (tok->ucs_char < 0x800) {
-		  utf_out[0] = 0xc0 | (tok->ucs_char >> 6);
-		  utf_out[1] = 0x80 | (tok->ucs_char & 0x3f);
-		  printbuf_memappend_fast(tok->pb, (char*)utf_out, 2);
+		  unescaped_utf[0] = 0xc0 | (tok->ucs_char >> 6);
+		  unescaped_utf[1] = 0x80 | (tok->ucs_char & 0x3f);
+		  printbuf_memappend_fast(tok->pb, (char*)unescaped_utf, 2);
+		} else if (IS_HIGH_SURROGATE(tok->ucs_char)) {
+                  /* Got a high surrogate.  Remember it and look for the
+                   * the beginning of another sequence, which should be the
+                   * low surrogate.
+                   */
+                  got_hi_surrogate = tok->ucs_char;
+                  /* Not at end, and the next two chars should be "\u" */
+                  if ((tok->char_offset+1 != len) &&
+                      (tok->char_offset+2 != len) &&
+                      (str[1] == '\\') &&
+                      (str[2] == 'u'))
+                  {
+	            ADVANCE_CHAR(str, tok);
+	            ADVANCE_CHAR(str, tok);
+
+                    /* Advance to the first char of the next sequence and
+                     * continue processing with the next sequence.
+                     */
+	            if (!ADVANCE_CHAR(str, tok) || !POP_CHAR(c, tok)) {
+	              printbuf_memappend_fast(tok->pb, (char*)utf8_replacement_char, 3);
+	              goto out;
+                    }
+	            tok->ucs_char = 0;
+                    tok->st_pos = 0;
+                    continue; /* other json_tokener_state_escape_unicode */
+                  } else {
+                    /* Got a high surrogate without another sequence following
+                     * it.  Put a replacement char in for the hi surrogate
+                     * and pretend we finished.
+                     */
+		    printbuf_memappend_fast(tok->pb, (char*)utf8_replacement_char, 3);
+                  }
+		} else if (IS_LOW_SURROGATE(tok->ucs_char)) {
+                  /* Got a low surrogate not preceded by a high */
+		  printbuf_memappend_fast(tok->pb, (char*)utf8_replacement_char, 3);
+                } else if (tok->ucs_char < 0x10000) {
+		  unescaped_utf[0] = 0xe0 | (tok->ucs_char >> 12);
+		  unescaped_utf[1] = 0x80 | ((tok->ucs_char >> 6) & 0x3f);
+		  unescaped_utf[2] = 0x80 | (tok->ucs_char & 0x3f);
+		  printbuf_memappend_fast(tok->pb, (char*)unescaped_utf, 3);
+		} else if (tok->ucs_char < 0x110000) {
+		  unescaped_utf[0] = 0xf0 | ((tok->ucs_char >> 18) & 0x07);
+		  unescaped_utf[1] = 0x80 | ((tok->ucs_char >> 12) & 0x3f);
+		  unescaped_utf[2] = 0x80 | ((tok->ucs_char >> 6) & 0x3f);
+		  unescaped_utf[3] = 0x80 | (tok->ucs_char & 0x3f);
+		  printbuf_memappend_fast(tok->pb, (char*)unescaped_utf, 4);
 		} else {
-		  utf_out[0] = 0xe0 | (tok->ucs_char >> 12);
-		  utf_out[1] = 0x80 | ((tok->ucs_char >> 6) & 0x3f);
-		  utf_out[2] = 0x80 | (tok->ucs_char & 0x3f);
-		  printbuf_memappend_fast(tok->pb, (char*)utf_out, 3);
-		}
+                  /* Don't know what we got--insert the replacement char */
+		  printbuf_memappend_fast(tok->pb, (char*)utf8_replacement_char, 3);
+                }
 		state = saved_state;
 		break;
 	      }
 	    } else {
 	      tok->err = json_tokener_error_parse_string;
 	      goto out;
-	      	  }
-	  if (!ADVANCE_CHAR(str, tok) || !POP_CHAR(c, tok))
+	    }
+	  if (!ADVANCE_CHAR(str, tok) || !POP_CHAR(c, tok)) {
+            if (got_hi_surrogate) /* Clean up any pending chars */
+	      printbuf_memappend_fast(tok->pb, (char*)utf8_replacement_char, 3);
 	    goto out;
+	  }
 	}
       }
       break;
