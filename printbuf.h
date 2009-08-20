@@ -31,10 +31,12 @@ struct printbuf {
 extern struct printbuf*
 printbuf_new(void);
 
-/* As an optimization, printbuf_memappend is defined as a macro that
- * handles copying data if the buffer is large enough; otherwise it
- * invokes printbuf_memappend_real() which performs the heavy lifting
- * of realloc()ing the buffer and copying data.
+/* As an optimization, printbuf_memappend_fast is defined as a macro
+ * that handles copying data if the buffer is large enough; otherwise
+ * it invokes printbuf_memappend_real() which performs the heavy
+ * lifting of realloc()ing the buffer and copying data.
+ * Your code should not use printbuf_memappend directly--use
+ * printbuf_memappend_fast instead.
  */
 extern int
 printbuf_memappend(struct printbuf *p, const char *buf, int size);

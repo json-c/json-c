@@ -1,3 +1,6 @@
+  * Correction to comment describing printbuf_memappend in printbuf.h
+    Brent Miller, bdmiller at yahoo dash inc dot com
+
 0.9
   * Add README.html README-WIN32.html config.h.win32 to Makefile.am
     Michael Clark, <michael@metaparadigm.com>
