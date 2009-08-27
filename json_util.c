@@ -52,7 +52,7 @@
 #include "json_tokener.h"
 #include "json_util.h"
 
-struct json_object* json_object_from_file(char *filename)
+struct json_object* json_object_from_file(const char *filename)
 {
   struct printbuf *pb;
   struct json_object *obj;
