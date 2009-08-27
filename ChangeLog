@@ -1,3 +1,9 @@
+0.10
+  * Fix subtle bug in linkhash where lookup could hang after all slots
+    were filled then successively freed.
+    Spotted by Jean-Marc Naud, j dash m at newtraxtech dot com
+  * Make json_object_from_file take const char *filename
+    Spotted by Vikram Raj V, vsagar at attinteractive dot com
   * Add handling of surrogate pairs (json_tokener.c, test4.c, Makefile.am)
     Brent Miller, bdmiller at yahoo dash inc dot com
   * Correction to comment describing printbuf_memappend in printbuf.h
