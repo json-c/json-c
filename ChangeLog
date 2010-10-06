@@ -1,4 +1,8 @@
 0.10
+  * Add int64 support. Two new functions json_object_net_int64 and
+    json_object_get_int64. Binary compatibility preserved.
+    Eric Haszlakiewicz, EHASZLA at transunion com
+    Rui Miguel Silva Seabra, rms at 1407 dot org
   * Fix subtle bug in linkhash where lookup could hang after all slots
     were filled then successively freed.
     Spotted by Jean-Marc Naud, j dash m at newtraxtech dot com

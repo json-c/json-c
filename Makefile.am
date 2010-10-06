@@ -9,16 +9,17 @@ pkgconfig_DATA = json.pc
 
 libjsonincludedir = $(includedir)/json
 libjsoninclude_HEADERS = \
-        json.h \
+	arraylist.h \
 	bits.h \
 	debug.h \
-	linkhash.h \
-	arraylist.h \
-        printbuf.h \
-	json_util.h \
+	json.h \
+	json_inttypes.h \
 	json_object.h \
-        json_object_private.h \
-	json_tokener.h
+	json_object_private.h \
+	json_tokener.h \
+	json_util.h \
+	linkhash.h \
+	printbuf.h
 
 libjson_la_LDFLAGS = -version-info 0:1:0
 
@@ -31,7 +32,7 @@ libjson_la_SOURCES = \
 	linkhash.c \
 	printbuf.c
 
-check_PROGRAMS = test1 test2 test3 test4
+check_PROGRAMS = test1 test2 test4 test_parse_int64
 
 test1_SOURCES = test1.c
 test1_LDADD = $(lib_LTLIBRARIES)
@@ -39,8 +40,17 @@ test1_LDADD = $(lib_LTLIBRARIES)
 test2_SOURCES = test2.c
 test2_LDADD = $(lib_LTLIBRARIES)
 
-test3_SOURCES = test3.c
-test3_LDADD = $(lib_LTLIBRARIES)
-
 test4_SOURCES = test4.c
 test4_LDADD = $(lib_LTLIBRARIES)
+
+test_parse_int64_SOURCES = test_parse_int64.c
+test_parse_int64_LDADD = $(lib_LTLIBRARIES)
+
+TESTS = test1.test test2.test test4.test parse_int64.test
+EXTRA_DIST += $(TESTS)
+testsubdir=testSubDir
+TESTS_ENVIRONMENT       = top_builddir=$(top_builddir)
+
+distclean-local:
+	-rm -rf $(testsubdir)
+

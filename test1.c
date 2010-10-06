@@ -158,7 +158,7 @@ int main(int argc, char **argv)
   json_object_put(my_string);
   json_object_put(my_int);
   json_object_put(my_object);
-  //json_object_put(my_array);
+  json_object_put(my_array);
 
   return 0;
 }

@@ -4,11 +4,14 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <json/json_object.h>
-#include <json/json_tokener.h>
+#include "config.h"
 
-void print_hex( const unsigned char* s) {
-        const unsigned char *iter = s;
+#include "json_inttypes.h"
+#include "json_object.h"
+#include "json_tokener.h"
+
+void print_hex( const char* s) {
+        const char *iter = s;
         unsigned char ch;
         while ((ch = *iter++) != 0) {
            if( ',' != ch)
@@ -28,10 +31,10 @@ int main() {
     printf("input: %s\n", input);
 
     int strings_match = !strcmp( expected, unjson);
+	int retval = 0;
     if (strings_match) {
         printf("JSON parse result is correct: %s\n", unjson);
         printf("PASS\n");
-        return(0);
     } else {
         printf("JSON parse result doesn't match expected string\n");
         printf("expected string bytes: ");
@@ -39,6 +42,8 @@ int main() {
         printf("parsed string bytes:   ");
         print_hex( unjson);
         printf("FAIL\n");
-        return(1);
+        retval = 1;
     }
+	json_object_put(parse_result);
+	return retval;
 }

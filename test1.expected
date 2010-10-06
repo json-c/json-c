@@ -1,0 +1,44 @@
+my_string=	
+my_string.to_string()="\t"
+my_string=\
+my_string.to_string()="\\"
+my_string=foo
+my_string.to_string()="foo"
+my_int=9
+my_int.to_string()=9
+my_array=
+	[0]=1
+	[1]=2
+	[2]=3
+	[3]=null
+	[4]=5
+my_array.to_string()=[ 1, 2, 3, null, 5 ]
+my_object=
+	abc: 12
+	foo: "bar"
+	bool0: false
+	bool1: true
+my_object.to_string()={ "abc": 12, "foo": "bar", "bool0": false, "bool1": true }
+new_obj.to_string()="\u0003"
+new_obj.to_string()="foo"
+new_obj.to_string()="foo"
+new_obj.to_string()="ABC"
+new_obj.to_string()=null
+new_obj.to_string()=true
+new_obj.to_string()=12
+new_obj.to_string()=12.300000
+new_obj.to_string()=[ "\n" ]
+new_obj.to_string()=[ "\nabc\n" ]
+new_obj.to_string()=[ null ]
+new_obj.to_string()=[ ]
+new_obj.to_string()=[ false ]
+new_obj.to_string()=[ "abc", null, "def", 12 ]
+new_obj.to_string()={ }
+new_obj.to_string()={ "foo": "bar" }
+new_obj.to_string()={ "foo": "bar", "baz": null, "bool0": true }
+new_obj.to_string()={ "foo": [ null, "foo" ] }
+new_obj.to_string()={ "abc": 12, "foo": "bar", "bool0": false, "bool1": true, "arr": [ 1, 2, 3, null, 5 ] }
+got error as expected
+got error as expected
+got error as expected
+new_obj.to_string()={ "foo": { "bar": 13 } }

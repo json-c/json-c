@@ -17,6 +17,7 @@
 #include <limits.h>
 #include <string.h>
 #include <errno.h>
+#include <ctype.h>
 
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
@@ -48,6 +49,7 @@
 #include "bits.h"
 #include "debug.h"
 #include "printbuf.h"
+#include "json_inttypes.h"
 #include "json_object.h"
 #include "json_tokener.h"
 #include "json_util.h"
@@ -119,4 +121,67 @@ int json_object_to_file(char *filename, struct json_object *obj)
 
   close(fd);
   return 0;
+}
+
+int json_parse_int64(const char *buf, int64_t *retval)
+{
+	int64_t num64;
+	if (sscanf(buf, "%" SCNd64, &num64) != 1)
+	{
+		printf("Failed to parse, sscanf != 1\n");
+		return 1;
+	}
+	const char *buf_skip_space = buf;
+	int orig_has_neg = 0;
+	// Skip leading spaces
+	while (isspace((int)*buf_skip_space) && *buf_skip_space)
+		buf_skip_space++;
+	if (*buf_skip_space == '-')
+	{
+		buf_skip_space++;
+		orig_has_neg = 1;
+	}
+	// Skip leading zeros
+	while (*buf_skip_space == '0' && *buf_skip_space)
+		buf_skip_space++;
+	
+	if (errno != ERANGE)
+	{
+		char buf_cmp[100];
+		char *buf_cmp_start = buf_cmp;
+		int recheck_has_neg = 0;
+		snprintf(buf_cmp_start, sizeof(buf_cmp), "%" PRId64, num64);
+		if (*buf_cmp_start == '-')
+		{
+			recheck_has_neg = 1;
+			buf_cmp_start++;
+		}
+		// No need to skip leading spaces or zeros here.
+
+		int buf_cmp_len = strlen(buf_cmp_start);
+		/**
+		 * If the sign is different, or
+		 * some of the digits are different, or
+		 * there is another digit present in the original string
+		 * then we NOT successfully parsed the value.
+		 */
+		if (orig_has_neg != recheck_has_neg ||
+		    strncmp(buf_skip_space, buf_cmp_start, strlen(buf_cmp_start)) != 0 ||
+			(strlen(buf_skip_space) != buf_cmp_len &&
+			 isdigit(buf_skip_space[buf_cmp_len])
+		    )
+		   )
+		{
+			errno = ERANGE;
+		}
+	}
+	if (errno == ERANGE)
+	{
+		if (orig_has_neg)
+			num64 = INT64_MIN;
+		else
+			num64 = INT64_MAX;
+	}
+	*retval = num64;
+	return 0;
 }

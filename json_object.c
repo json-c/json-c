@@ -20,8 +20,10 @@
 #include "printbuf.h"
 #include "linkhash.h"
 #include "arraylist.h"
+#include "json_inttypes.h"
 #include "json_object.h"
 #include "json_object_private.h"
+#include "json_util.h"
 
 #if !HAVE_STRNDUP
   char* strndup(const char* str, size_t n);
@@ -41,6 +43,7 @@ static const char* json_type_name[] = {
   "object",
   "array",
   "string",
+  "int64",
 };
 #endif /* REFCOUNT_DEBUG */
 
@@ -304,6 +307,8 @@ boolean json_object_get_boolean(struct json_object *jso)
     return jso->o.c_boolean;
   case json_type_int:
     return (jso->o.c_int != 0);
+  case json_type_int64:
+    return (jso->o.c_int64 != 0);
   case json_type_double:
     return (jso->o.c_double != 0);
   case json_type_string:
@@ -322,7 +327,11 @@ static int json_object_int_to_json_string(struct json_object* jso,
   return sprintbuf(pb, "%d", jso->o.c_int);
 }
 
-struct json_object* json_object_new_int(int i)
+static int json_object_int64_to_json_string(struct json_object* jso, struct printbuf *pb) {
+  return sprintbuf(pb, "%"PRId64, jso->o.c_int64);
+}
+
+struct json_object* json_object_new_int(int32_t i)
 {
   struct json_object *jso = json_object_new(json_type_int);
   if(!jso) return NULL;
@@ -331,20 +340,69 @@ struct json_object* json_object_new_int(int i)
   return jso;
 }
 
-int json_object_get_int(struct json_object *jso)
+int32_t json_object_get_int(struct json_object *jso)
 {
-  int cint;
+  if(!jso) return 0;
+
+  enum json_type o_type = jso->o_type;
+  int64_t cint64 = jso->o.c_int64;
+
+  if (o_type == json_type_string)
+  {
+	/*
+	 * Parse strings into 64-bit numbers, then use the
+	 * 64-to-32-bit number handling below.
+	 */
+	if (json_parse_int64(jso->o.c_string, &cint64) != 0)
+		return 0; /* whoops, it didn't work. */
+	o_type = json_type_int64;
+  }
+
+  switch(jso->o_type) {
+  case json_type_int:
+    return jso->o.c_int;
+  case json_type_int64:
+	/* Make sure we return the correct values for out of range numbers. */
+	if (cint64 <= INT32_MIN)
+		return INT32_MIN;
+	else if (cint64 >= INT32_MAX)
+		return INT32_MAX;
+	else
+		return (int32_t)cint64;
+  case json_type_double:
+    return (int32_t)jso->o.c_double;
+  case json_type_boolean:
+    return jso->o.c_boolean;
+  default:
+    return 0;
+  }
+}
+
+struct json_object* json_object_new_int64(int64_t i)
+{
+  struct json_object *jso = json_object_new(json_type_int64);
+  if(!jso) return NULL;
+  jso->_to_json_string = &json_object_int64_to_json_string;
+  jso->o.c_int64 = i;
+  return jso;
+}
+
+int64_t json_object_get_int64(struct json_object *jso)
+{
+   int64_t cint;
 
   if(!jso) return 0;
   switch(jso->o_type) {
   case json_type_int:
-    return jso->o.c_int;
+    return (int64_t)jso->o.c_int;
+  case json_type_int64:
+    return jso->o.c_int64;
   case json_type_double:
-    return (int)jso->o.c_double;
+    return (int64_t)jso->o.c_double;
   case json_type_boolean:
     return jso->o.c_boolean;
   case json_type_string:
-    if(sscanf(jso->o.c_string, "%d", &cint) == 1) return cint;
+	if (json_parse_int64(jso->o.c_string, &cint) == 0) return cint;
   default:
     return 0;
   }
@@ -378,6 +436,8 @@ double json_object_get_double(struct json_object *jso)
     return jso->o.c_double;
   case json_type_int:
     return jso->o.c_int;
+  case json_type_int64:
+    return jso->o.c_int64;
   case json_type_boolean:
     return jso->o.c_boolean;
   case json_type_string:

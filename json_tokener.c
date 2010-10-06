@@ -20,14 +20,16 @@
 #include <stddef.h>
 #include <ctype.h>
 #include <string.h>
+#include <limits.h>
 
 #include "bits.h"
 #include "debug.h"
 #include "printbuf.h"
 #include "arraylist.h"
+#include "json_inttypes.h"
 #include "json_object.h"
 #include "json_tokener.h"
-
+#include "json_util.h"
 
 #if !HAVE_STRNCASECMP && defined(_MSC_VER)
   /* MSC has the version as _strnicmp */
@@ -542,11 +544,21 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
           printbuf_memappend_fast(tok->pb, case_start, case_len);
       }
       {
-        int numi;
-        double numd;
-        if(!tok->is_double && sscanf(tok->pb->buf, "%d", &numi) == 1) {
-          current = json_object_new_int(numi);
-        } else if(tok->is_double && sscanf(tok->pb->buf, "%lf", &numd) == 1) {
+	int64_t num64;
+	double  numd;
+	if (!tok->is_double && json_parse_int64(tok->pb->buf, &num64) == 0) {
+		// Decode the type based on the value range to keep compatibilty
+		//  with code that checks the type of objects. i.e. this:
+		//   json_object_get_type(o) == json_type_int
+		//  will continue to work.
+		// The other option would be to eliminate any distinction between
+		//  int and int64 types, but that would change the ABI of
+		//  json_object_get_int().
+		if (num64 < INT32_MAX && num64 > INT32_MIN)
+			current = json_object_new_int(num64);
+		else
+			current = json_object_new_int64(num64);
+	} else if(tok->is_double && sscanf(tok->pb->buf, "%lf", &numd) == 1) {
           current = json_object_new_double(numd);
         } else {
           tok->err = json_tokener_error_parse_number;
