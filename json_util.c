@@ -103,8 +103,10 @@ int json_object_to_file(char *filename, struct json_object *obj)
     return -1;
   }
 
-  if(!(json_str = json_object_to_json_string(obj))) { return -1; }
-
+  if(!(json_str = json_object_to_json_string(obj))) {
+    close(fd);
+    return -1;
+  }
 
   wsize = (unsigned int)(strlen(json_str) & UINT_MAX); /* CAW: probably unnecessary, but the most 64bit safe */
   wpos = 0;
