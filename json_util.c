@@ -67,6 +67,7 @@ struct json_object* json_object_from_file(const char *filename)
     return (struct json_object*)error_ptr(-1);
   }
   if(!(pb = printbuf_new())) {
+    close(fd);
     MC_ERROR("json_object_from_file: printbuf_new failed\n");
     return (struct json_object*)error_ptr(-1);
   }

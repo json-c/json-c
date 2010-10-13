@@ -1,4 +1,6 @@
 0.10
+  * Fix file descriptor leak if memory allocation fails in json_util
+    Zachary Blair, zack_blair at hotmail dot com
   * Add int64 support. Two new functions json_object_net_int64 and
     json_object_get_int64. Binary compatibility preserved.
     Eric Haszlakiewicz, EHASZLA at transunion com
