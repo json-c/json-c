@@ -29,6 +29,12 @@ int main()
 
 	checkit("x");
 
+	checkit("0");
+	checkit("-0");
+
+	checkit("00000000");
+	checkit("-00000000");
+
 	checkit("1");
 
 	strcpy(buf, "2147483647"); // aka INT32_MAX

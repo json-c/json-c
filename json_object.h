@@ -47,7 +47,6 @@ typedef enum json_type {
   json_type_object,
   json_type_array,
   json_type_string,
-  json_type_int64
 } json_type;
 
 /* reference counting functions */
@@ -75,7 +74,6 @@ extern void json_object_put(struct json_object *obj);
      json_type_object,
      json_type_array,
      json_type_string,
-     json_type_int64,
  */
 extern int json_object_is_type(struct json_object *obj, enum json_type type);
 
@@ -89,7 +87,6 @@ extern int json_object_is_type(struct json_object *obj, enum json_type type);
      json_type_object,
      json_type_array,
      json_type_string,
-     json_type_int64,
  */
 extern enum json_type json_object_get_type(struct json_object *obj);
 
@@ -252,15 +249,17 @@ extern boolean json_object_get_boolean(struct json_object *obj);
 /* int type methods */
 
 /** Create a new empty json_object of type json_type_int
+ * Note that values are stored as 64-bit values internally.
+ * To ensure the full range is maintained, use json_object_new_int64 instead.
  * @param i the integer
  * @returns a json_object of type json_type_int
  */
 extern struct json_object* json_object_new_int(int32_t i);
 
 
-/** Create a new empty json_object of type json_type_int64
+/** Create a new empty json_object of type json_type_int
  * @param i the integer
- * @returns a json_object of type json_type_int64
+ * @returns a json_object of type json_type_int
  */
 extern struct json_object* json_object_new_int64(int64_t i);
 
@@ -270,6 +269,10 @@ extern struct json_object* json_object_new_int64(int64_t i);
  * The type is coerced to a int if the passed object is not a int.
  * double objects will return their integer conversion. Strings will be
  * parsed as an integer. If no conversion exists then 0 is returned.
+ *
+ * Note that integers are stored internally as 64-bit values.
+ * If the value of too big or too small to fit into 32-bit, INT32_MAX or
+ * INT32_MIN are returned, respectively.
  *
  * @param obj the json_object instance
  * @returns an int

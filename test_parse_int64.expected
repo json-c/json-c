@@ -1,5 +1,8 @@
-Failed to parse, sscanf != 1
 buf=x parseit=1, value=-666 
+buf=0 parseit=0, value=0 
+buf=-0 parseit=0, value=0 
+buf=00000000 parseit=0, value=0 
+buf=-00000000 parseit=0, value=0 
 buf=1 parseit=0, value=1 
 buf=2147483647 parseit=0, value=2147483647 
 buf=-1 parseit=0, value=-1 

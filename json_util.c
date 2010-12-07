@@ -10,6 +10,7 @@
  */
 
 #include "config.h"
+#undef realloc
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -131,7 +132,7 @@ int json_parse_int64(const char *buf, int64_t *retval)
 	int64_t num64;
 	if (sscanf(buf, "%" SCNd64, &num64) != 1)
 	{
-		printf("Failed to parse, sscanf != 1\n");
+		MC_DEBUG("Failed to parse, sscanf != 1\n");
 		return 1;
 	}
 	const char *buf_skip_space = buf;
@@ -144,9 +145,11 @@ int json_parse_int64(const char *buf, int64_t *retval)
 		buf_skip_space++;
 		orig_has_neg = 1;
 	}
-	// Skip leading zeros
-	while (*buf_skip_space == '0' && *buf_skip_space)
+	// Skip leading zeros, but keep at least one digit
+	while (buf_skip_space[0] == '0' && buf_skip_space[1] != '\0')
 		buf_skip_space++;
+	if (buf_skip_space[0] == '0' && buf_skip_space[1] == '\0')
+		orig_has_neg = 0; // "-0" is the same as just plain "0"
 	
 	if (errno != ERANGE)
 	{
@@ -171,7 +174,7 @@ int json_parse_int64(const char *buf, int64_t *retval)
 		if (orig_has_neg != recheck_has_neg ||
 		    strncmp(buf_skip_space, buf_cmp_start, strlen(buf_cmp_start)) != 0 ||
 			(strlen(buf_skip_space) != buf_cmp_len &&
-			 isdigit(buf_skip_space[buf_cmp_len])
+			 isdigit((int)buf_skip_space[buf_cmp_len])
 		    )
 		   )
 		{
@@ -188,3 +191,14 @@ int json_parse_int64(const char *buf, int64_t *retval)
 	*retval = num64;
 	return 0;
 }
+
+#if HAVE_REALLOC == 0
+void* rpl_realloc(void* p, size_t n)
+{
+	if (n == 0)
+		n = 1;
+	if (p == 0)
+		return malloc(n);
+	return realloc(p, n);
+}
+#endif

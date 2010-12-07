@@ -204,7 +204,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 
     case json_tokener_state_eatws:
       /* Advance until we change state */
-      while (isspace(c)) {
+      while (isspace((int)c)) {
 	if ((!ADVANCE_CHAR(str, tok)) || (!POP_CHAR(c, tok)))
 	  goto out;
       }
@@ -547,17 +547,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	int64_t num64;
 	double  numd;
 	if (!tok->is_double && json_parse_int64(tok->pb->buf, &num64) == 0) {
-		// Decode the type based on the value range to keep compatibilty
-		//  with code that checks the type of objects. i.e. this:
-		//   json_object_get_type(o) == json_type_int
-		//  will continue to work.
-		// The other option would be to eliminate any distinction between
-		//  int and int64 types, but that would change the ABI of
-		//  json_object_get_int().
-		if (num64 < INT32_MAX && num64 > INT32_MIN)
-			current = json_object_new_int(num64);
-		else
-			current = json_object_new_int64(num64);
+		current = json_object_new_int64(num64);
 	} else if(tok->is_double && sscanf(tok->pb->buf, "%lf", &numd) == 1) {
           current = json_object_new_double(numd);
         } else {

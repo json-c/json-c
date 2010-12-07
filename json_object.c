@@ -43,7 +43,6 @@ static const char* json_type_name[] = {
   "object",
   "array",
   "string",
-  "int64",
 };
 #endif /* REFCOUNT_DEBUG */
 
@@ -306,8 +305,6 @@ boolean json_object_get_boolean(struct json_object *jso)
   case json_type_boolean:
     return jso->o.c_boolean;
   case json_type_int:
-    return (jso->o.c_int != 0);
-  case json_type_int64:
     return (jso->o.c_int64 != 0);
   case json_type_double:
     return (jso->o.c_double != 0);
@@ -324,10 +321,6 @@ boolean json_object_get_boolean(struct json_object *jso)
 static int json_object_int_to_json_string(struct json_object* jso,
 					  struct printbuf *pb)
 {
-  return sprintbuf(pb, "%d", jso->o.c_int);
-}
-
-static int json_object_int64_to_json_string(struct json_object* jso, struct printbuf *pb) {
   return sprintbuf(pb, "%"PRId64, jso->o.c_int64);
 }
 
@@ -336,7 +329,7 @@ struct json_object* json_object_new_int(int32_t i)
   struct json_object *jso = json_object_new(json_type_int);
   if(!jso) return NULL;
   jso->_to_json_string = &json_object_int_to_json_string;
-  jso->o.c_int = i;
+  jso->o.c_int64 = i;
   return jso;
 }
 
@@ -355,13 +348,11 @@ int32_t json_object_get_int(struct json_object *jso)
 	 */
 	if (json_parse_int64(jso->o.c_string, &cint64) != 0)
 		return 0; /* whoops, it didn't work. */
-	o_type = json_type_int64;
+	o_type = json_type_int;
   }
 
   switch(jso->o_type) {
   case json_type_int:
-    return jso->o.c_int;
-  case json_type_int64:
 	/* Make sure we return the correct values for out of range numbers. */
 	if (cint64 <= INT32_MIN)
 		return INT32_MIN;
@@ -380,9 +371,9 @@ int32_t json_object_get_int(struct json_object *jso)
 
 struct json_object* json_object_new_int64(int64_t i)
 {
-  struct json_object *jso = json_object_new(json_type_int64);
+  struct json_object *jso = json_object_new(json_type_int);
   if(!jso) return NULL;
-  jso->_to_json_string = &json_object_int64_to_json_string;
+  jso->_to_json_string = &json_object_int_to_json_string;
   jso->o.c_int64 = i;
   return jso;
 }
@@ -394,8 +385,6 @@ int64_t json_object_get_int64(struct json_object *jso)
   if(!jso) return 0;
   switch(jso->o_type) {
   case json_type_int:
-    return (int64_t)jso->o.c_int;
-  case json_type_int64:
     return jso->o.c_int64;
   case json_type_double:
     return (int64_t)jso->o.c_double;
@@ -435,8 +424,6 @@ double json_object_get_double(struct json_object *jso)
   case json_type_double:
     return jso->o.c_double;
   case json_type_int:
-    return jso->o.c_int;
-  case json_type_int64:
     return jso->o.c_int64;
   case json_type_boolean:
     return jso->o.c_boolean;
