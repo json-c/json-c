@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <assert.h>
 
 #include "json.h"
 
@@ -135,11 +136,21 @@ int main(int argc, char **argv)
   printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
   json_object_put(new_obj);
 
+  enum json_tokener_error error = json_tokener_success;
+  new_obj = json_tokener_parse_verbose("{ foo }", &error);
+  assert (error == json_tokener_error_parse_object_key_name);
+  assert (new_obj == NULL);
+
   new_obj = json_tokener_parse("{ foo }");
-  if(is_error(new_obj)) printf("got error as expected\n");
+  assert (new_obj == NULL);
+  
+  // if(is_error(new_obj)) printf("got error as expected\n");
 
   new_obj = json_tokener_parse("foo");
-  if(is_error(new_obj)) printf("got error as expected\n");
+  assert (new_obj == NULL);
+  new_obj = json_tokener_parse_verbose("foo", &error);
+  assert (new_obj == NULL);
+  assert (error == json_tokener_error_parse_boolean);
 
   new_obj = json_tokener_parse("{ \"foo");
   if(is_error(new_obj)) printf("got error as expected\n");

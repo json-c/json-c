@@ -115,9 +115,25 @@ struct json_object* json_tokener_parse(const char *str)
   tok = json_tokener_new();
   obj = json_tokener_parse_ex(tok, str, -1);
   if(tok->err != json_tokener_success)
-    obj = (struct json_object*)error_ptr(-tok->err);
+    obj = NULL;
   json_tokener_free(tok);
   return obj;
+}
+
+struct json_object* json_tokener_parse_verbose(const char *str, enum json_tokener_error *error)
+{
+    struct json_tokener* tok;
+    struct json_object* obj;
+
+    tok = json_tokener_new();
+    obj = json_tokener_parse_ex(tok, str, -1);
+    *error = tok->err;
+    if(tok->err != json_tokener_success) {
+        obj = NULL;
+    }
+
+    json_tokener_free(tok);
+    return obj;
 }
 
 

@@ -76,7 +76,7 @@ struct json_tokener
   char *str;
   struct printbuf *pb;
   int depth, is_double, st_pos, char_offset;
-  ptrdiff_t err;
+  enum json_tokener_error err;
   unsigned int ucs_char;
   char quote_char;
   struct json_tokener_srec stack[JSON_TOKENER_MAX_DEPTH];
@@ -88,6 +88,7 @@ extern struct json_tokener* json_tokener_new(void);
 extern void json_tokener_free(struct json_tokener *tok);
 extern void json_tokener_reset(struct json_tokener *tok);
 extern struct json_object* json_tokener_parse(const char *str);
+extern struct json_object* json_tokener_parse_verbose(const char *str, enum json_tokener_error *error);
 extern struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 						 const char *str, int len);
 
