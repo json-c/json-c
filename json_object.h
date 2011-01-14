@@ -337,6 +337,16 @@ extern struct json_object* json_object_new_string_len(const char *s, int len);
  */
 extern const char* json_object_get_string(struct json_object *obj);
 
+/** Get the string length of a json_object
+ *
+ * If the passed object is not of type json_type_string then zero
+ * will be returned.
+ *
+ * @param obj the json_object instance
+ * @returns int
+ */
+extern int json_object_get_string_len(struct json_object *obj);
+
 #ifdef __cplusplus
 }
 #endif

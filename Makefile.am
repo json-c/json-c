@@ -32,7 +32,7 @@ libjson_la_SOURCES = \
 	linkhash.c \
 	printbuf.c
 
-check_PROGRAMS = test1 test2 test4 test_parse_int64
+check_PROGRAMS = test1 test2 test4 test_parse_int64 test_null
 
 test1_SOURCES = test1.c
 test1_LDADD = $(lib_LTLIBRARIES)
@@ -46,7 +46,10 @@ test4_LDADD = $(lib_LTLIBRARIES)
 test_parse_int64_SOURCES = test_parse_int64.c
 test_parse_int64_LDADD = $(lib_LTLIBRARIES)
 
-TESTS = test1.test test2.test test4.test parse_int64.test
+test_null_SOURCES = test_null.c
+test_null_LDADD = $(lib_LTLIBRARIES)
+
+TESTS = test1.test test2.test test4.test parse_int64.test test_null.test
 EXTRA_DIST += $(TESTS)
 testsubdir=testSubDir
 TESTS_ENVIRONMENT       = top_builddir=$(top_builddir)
