@@ -1,16 +1,18 @@
 Building on Unix with gcc and autotools
 
-If checking out from CVS:
+If checking out from SVN (http://svn.metaparadigm.com/svn/json-c/trunk) or Git (https://github.com/jehiah/json-c):
 
-	sh autogen.sh
+    $ sh autogen.sh
 
-Then configure, make, make install
+Then 
 
+    $ ./configure
+    $ make
+    $ make install
 
-Test programs
+To build and run the test programs run 
 
-To build the test programs run 'make check'
-
+    $ make check
 
 Linking to libjson
 
