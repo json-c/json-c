@@ -349,7 +349,7 @@ int32_t json_object_get_int(struct json_object *jso)
 	o_type = json_type_int;
   }
 
-  switch(jso->o_type) {
+  switch(o_type) {
   case json_type_int:
 	/* Make sure we return the correct values for out of range numbers. */
 	if (cint64 <= INT32_MIN)
