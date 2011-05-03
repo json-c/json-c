@@ -1,4 +1,13 @@
 0.10
+  * Fix a bug in json_object_get_int(), which would incorrectly return 0
+    when called on a string type object.
+    Eric Haszlakiewicz
+  * Add a json_type_to_name() function.
+    Eric Haszlakiewicz
+  * Add a json_tokener_parse_verbose() function.
+    Jehiah Czebotar
+  * Improve support for null bytes within JSON strings.
+    Jehiah Czebotar
   * Fix file descriptor leak if memory allocation fails in json_util
     Zachary Blair, zack_blair at hotmail dot com
   * Add int64 support. Two new functions json_object_net_int64 and
