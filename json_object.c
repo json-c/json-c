@@ -34,18 +34,6 @@
 const char *json_number_chars = "0123456789.+-eE";
 const char *json_hex_chars = "0123456789abcdef";
 
-#ifdef REFCOUNT_DEBUG
-static const char* json_type_name[] = {
-  "null",
-  "boolean",
-  "double",
-  "int",
-  "object",
-  "array",
-  "string",
-};
-#endif /* REFCOUNT_DEBUG */
-
 static void json_object_generic_delete(struct json_object* jso);
 static struct json_object* json_object_new(enum json_type o_type);
 
@@ -71,7 +59,7 @@ static void json_object_fini(void) {
   	       json_object_table->count);
       lh_foreach(json_object_table, ent) {
         struct json_object* obj = (struct json_object*)ent->v;
-        MC_DEBUG("\t%s:%p\n", json_type_name[obj->o_type], obj);
+        MC_DEBUG("\t%s:%p\n", json_type_to_name(obj->o_type), obj);
       }
     }
   }
@@ -150,7 +138,7 @@ static void json_object_generic_delete(struct json_object* jso)
 {
 #ifdef REFCOUNT_DEBUG
   MC_DEBUG("json_object_delete_%s: %p\n",
-	   json_type_name[jso->o_type], jso);
+	   json_type_to_name(jso->o_type), jso);
   lh_table_delete(json_object_table, jso);
 #endif /* REFCOUNT_DEBUG */
   printbuf_free(jso->_pb);
@@ -168,7 +156,7 @@ static struct json_object* json_object_new(enum json_type o_type)
   jso->_delete = &json_object_generic_delete;
 #ifdef REFCOUNT_DEBUG
   lh_table_insert(json_object_table, jso, jso);
-  MC_DEBUG("json_object_new_%s: %p\n", json_type_name[jso->o_type], jso);
+  MC_DEBUG("json_object_new_%s: %p\n", json_type_to_name(jso->o_type), jso);
 #endif /* REFCOUNT_DEBUG */
   return jso;
 }
@@ -185,7 +173,6 @@ enum json_type json_object_get_type(struct json_object *jso)
 {
   return jso->o_type;
 }
-
 
 /* json_object_to_json_string */
 

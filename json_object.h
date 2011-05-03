@@ -40,6 +40,7 @@ typedef struct json_tokener json_tokener;
 /* supported object types */
 
 typedef enum json_type {
+  /* If you change this, be sure to update json_type_to_name() too */
   json_type_null,
   json_type_boolean,
   json_type_double,

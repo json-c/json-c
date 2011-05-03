@@ -202,3 +202,26 @@ void* rpl_realloc(void* p, size_t n)
 	return realloc(p, n);
 }
 #endif
+
+#define NELEM(a)        (sizeof(a) / sizeof(a[0]))
+static const char* json_type_name[] = {
+  /* If you change this, be sure to update the enum json_type definition too */
+  "null",
+  "boolean",
+  "double",
+  "int",
+  "object",
+  "array",
+  "string",
+};
+
+const char *json_type_to_name(enum json_type o_type)
+{
+	if (o_type < 0 || o_type >= NELEM(json_type_name))
+	{
+		MC_ERROR("json_type_to_name: type %d is out of range [0,%d]\n", o_type, NELEM(json_type_name));
+		return NULL;
+	}
+	return json_type_name[o_type];
+}
+
