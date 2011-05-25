@@ -27,6 +27,14 @@ extern "C" {
 extern const char *json_number_chars;
 extern const char *json_hex_chars;
 
+/* CAW: added for ANSI C iteration correctness */
+struct json_object_iter
+{
+	char *key;
+	struct json_object *val;
+	struct lh_entry *entry;
+};
+
 /* forward structure definitions */
 
 typedef int boolean;

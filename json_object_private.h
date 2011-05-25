@@ -40,14 +40,6 @@ struct json_object
   } o;
 };
 
-/* CAW: added for ANSI C iteration correctness */
-struct json_object_iter
-{
-	char *key;
-	struct json_object *val;
-	struct lh_entry *entry;
-};
-
 #ifdef __cplusplus
 }
 #endif
