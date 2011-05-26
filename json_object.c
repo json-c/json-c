@@ -256,6 +256,7 @@ void json_object_object_add(struct json_object* jso, const char *key,
 
 struct json_object* json_object_object_get(struct json_object* jso, const char *key)
 {
+  if(!jso) return NULL;
   return (struct json_object*) lh_table_lookup(jso->o.c_object, key);
 }
 
