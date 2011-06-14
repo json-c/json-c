@@ -1,10 +1,13 @@
-Building on Unix with gcc and autotools
+Building on Unix with git, gcc and autotools
 
 Home page for json-c:
   http://oss.metaparadigm.com/json-c/
 
-If checking out from SVN (http://svn.metaparadigm.com/svn/json-c/trunk) or Git (https://github.com/jehiah/json-c):
+Github repo for json-c:
+  https://github.com/json-c/json-c
 
+    $ git clone https://github.com/json-c/json-c.git
+    $ cd json-c
     $ sh autogen.sh
 
 Then 
