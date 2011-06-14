@@ -1,0 +1,34 @@
+
+Release checklist:
+
+release=0.10
+git clone https://github.com/json-c/json-c json-c-${release}
+cd json-c-${release}
+
+Check that the compile works on Linux
+Check that the compile works on Windows
+Check ChangeLog to see if anything should be added.
+
+git branch json-c-${release}
+git checkout json-c-${release}
+sh autogen.sh
+XXX doxygen
+
+XXX Add generated files to git?
+
+cd ..
+tar czf json-c-${release}.tar.gz json-c-${release}
+
+XXX upload tarball to ???
+
+===================================
+
+Post-release checklist:
+
+git branch master
+Add new section to CHANGES
+Update the version in Doxyfile
+Update the version in configure.in
+Update the libjson_la_LDFLAGS line in Makefile.am to the new version.
+	http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+
