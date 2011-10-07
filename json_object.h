@@ -195,6 +195,16 @@ extern struct array_list* json_object_get_array(struct json_object *obj);
  */
 extern int json_object_array_length(struct json_object *obj);
 
+/** Sorts the elements of jso of type json_type_array
+*
+* Pointers to the json_object pointers will be passed as the two arguments
+* to @sort_fn
+*
+* @param obj the json_object instance
+* @param sort_fn a sorting function
+*/
+extern void json_object_array_sort(struct json_object *jso, int(*sort_fn)(const void *, const void *));
+
 /** Add an element to the end of a json_object of type json_type_array
  *
  * The reference count will *not* be incremented. This is to make adding

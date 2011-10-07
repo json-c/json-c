@@ -534,6 +534,11 @@ struct array_list* json_object_get_array(struct json_object *jso)
   }
 }
 
+void json_object_array_sort(struct json_object *jso, int(*sort_fn)(const void *, const void *))
+{
+  array_list_sort(jso->o.c_array, sort_fn);
+}
+
 int json_object_array_length(struct json_object *jso)
 {
   return array_list_length(jso->o.c_array);
