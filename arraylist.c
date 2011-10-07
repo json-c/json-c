@@ -87,6 +87,13 @@ array_list_add(struct array_list *arr, void *data)
   return array_list_put_idx(arr, arr->length, data);
 }
 
+void
+array_list_sort(struct array_list *arr, int(*sort_fn)(const void *, const void *))
+{
+  qsort(arr->array, arr->length, sizeof(arr->array[0]),
+	(int (*)(const void *, const void *))sort_fn);
+}
+
 int
 array_list_length(struct array_list *arr)
 {
