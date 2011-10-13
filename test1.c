@@ -6,6 +6,29 @@
 
 #include "json.h"
 
+static int sort_fn (const void *j1, const void *j2)
+{
+  json_object **jso1, **jso2;
+  int i1, i2;
+
+  jso1 = j1;
+  jso2 = j2;
+  if (!*jso1 && !*jso2) {
+    return 0;
+  }
+  if (!*jso1) {
+    return -1;
+  }
+  if (!*jso2) {
+    return 1;
+  }
+
+  i1 = json_object_get_int(*jso1);
+  i2 = json_object_get_int(*jso2);
+
+  return i1 - i2;
+}
+
 int main(int argc, char **argv)
 {
   json_tokener *tok;
@@ -38,6 +61,27 @@ int main(int argc, char **argv)
   json_object_array_add(my_array, json_object_new_int(2));
   json_object_array_add(my_array, json_object_new_int(3));
   json_object_array_put_idx(my_array, 4, json_object_new_int(5));
+  printf("my_array=\n");
+  for(i=0; i < json_object_array_length(my_array); i++) {
+    json_object *obj = json_object_array_get_idx(my_array, i);
+    printf("\t[%d]=%s\n", i, json_object_to_json_string(obj));
+  }
+  printf("my_array.to_string()=%s\n", json_object_to_json_string(my_array));    
+
+  json_object_put(my_array);
+
+  my_array = json_object_new_array();
+  json_object_array_add(my_array, json_object_new_int(3));
+  json_object_array_add(my_array, json_object_new_int(1));
+  json_object_array_add(my_array, json_object_new_int(2));
+  json_object_array_put_idx(my_array, 4, json_object_new_int(0));
+  printf("my_array=\n");
+  for(i=0; i < json_object_array_length(my_array); i++) {
+    json_object *obj = json_object_array_get_idx(my_array, i);
+    printf("\t[%d]=%s\n", i, json_object_to_json_string(obj));
+  }
+  printf("my_array.to_string()=%s\n", json_object_to_json_string(my_array));    
+  json_object_array_sort(my_array, sort_fn);
   printf("my_array=\n");
   for(i=0; i < json_object_array_length(my_array); i++) {
     json_object *obj = json_object_array_get_idx(my_array, i);
