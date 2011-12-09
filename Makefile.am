@@ -21,7 +21,7 @@ libjsoninclude_HEADERS = \
 	linkhash.h \
 	printbuf.h
 
-libjson_la_LDFLAGS = -version-info 1:0:1
+libjson_la_LDFLAGS = -version-info 1:0:1 -no-undefined
 
 libjson_la_SOURCES = \
 	arraylist.c \
