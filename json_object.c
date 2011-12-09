@@ -32,7 +32,7 @@
 /* #define REFCOUNT_DEBUG 1 */
 
 const char *json_number_chars = "0123456789.+-eE";
-const char *json_hex_chars = "0123456789abcdef";
+const char *json_hex_chars = "0123456789abcdefABCDEF";
 
 static void json_object_generic_delete(struct json_object* jso);
 static struct json_object* json_object_new(enum json_type o_type);
