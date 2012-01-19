@@ -113,6 +113,8 @@ struct json_object* json_tokener_parse(const char *str)
   struct json_object* obj;
 
   tok = json_tokener_new();
+  if (!tok)
+    return NULL;
   obj = json_tokener_parse_ex(tok, str, -1);
   if(tok->err != json_tokener_success)
     obj = NULL;
