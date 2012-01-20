@@ -44,3 +44,17 @@ distclean-local:
 	-rm -rf $(testsubdir)
 	-rm -rf config.h.in~ Makefile.in aclocal.m4 autom4te.cache/ config.guess config.sub configure depcomp install-sh ltmain.sh missing
 
+ANDROID_CFLAGS = -I$(top_srcdir) -DHAVE_CONFIG_H
+
+Android.mk: Makefile.am
+	androgenizer -:PROJECT json-c \
+		-:SHARED libjson \
+		-:TAGS eng debug \
+		-:REL_TOP $(top_srcdir) -:ABS_TOP $(abs_top_srcdir) \
+		-:SOURCES $(libjson_la_SOURCES) $(nodist_libjson_la_SOURCES) \
+		-:CFLAGS $(DEFS) $(ANDROID_CFLAGS) $(libjson_la_CFLAGS) \
+		-:LDFLAGS $(libjson_la_LDFLAGS) $(libjson_la_LIBADD) \
+		-:HEADER_TARGET json \
+		-:HEADERS $(libjsoninclude_HEADERS) \
+		-:PASSTHROUGH LOCAL_ARM_MODE:=arm \
+	> $@
