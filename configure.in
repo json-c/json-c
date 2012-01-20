@@ -35,6 +35,7 @@ AC_CONFIG_FILES([
 Makefile
 json.pc
 tests/Makefile
+json-uninstalled.pc
 ])
 
 AC_OUTPUT
