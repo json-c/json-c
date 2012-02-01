@@ -321,10 +321,13 @@ struct json_object* json_object_new_int(int32_t i)
 
 int32_t json_object_get_int(struct json_object *jso)
 {
+  int64_t cint64;
+  enum json_type o_type;
+
   if(!jso) return 0;
 
-  enum json_type o_type = jso->o_type;
-  int64_t cint64 = jso->o.c_int64;
+  o_type = jso->o_type;
+  cint64 = jso->o.c_int64;
 
   if (o_type == json_type_string)
   {

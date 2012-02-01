@@ -22,3 +22,5 @@ test2
 test4
 testSubDir
 test_parse_int64
+Debug
+Release
