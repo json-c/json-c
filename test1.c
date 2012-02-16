@@ -8,7 +8,7 @@
 
 static int sort_fn (const void *j1, const void *j2)
 {
-  json_object **jso1, **jso2;
+  json_object * const *jso1, * const *jso2;
   int i1, i2;
 
   jso1 = j1;
