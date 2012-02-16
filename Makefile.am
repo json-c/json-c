@@ -13,6 +13,7 @@ libjsoninclude_HEADERS = \
 	bits.h \
 	debug.h \
 	json.h \
+	json_config.h \
 	json_inttypes.h \
 	json_object.h \
 	json_object_private.h \
@@ -20,6 +21,11 @@ libjsoninclude_HEADERS = \
 	json_util.h \
 	linkhash.h \
 	printbuf.h
+
+#libjsonx_includedir = $(libdir)/json-c-@VERSION@
+#
+#libjsonx_include_HEADERS = \
+#	json_config.h
 
 libjson_la_LDFLAGS = -version-info 1:0:1 -no-undefined
 

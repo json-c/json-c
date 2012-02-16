@@ -2,6 +2,8 @@
 #ifndef _json_inttypes_h_
 #define _json_inttypes_h_
 
+#include "json_config.h"
+
 #if defined(_MSC_VER) && _MSC_VER < 1600
 
 /* Anything less than Visual Studio C++ 10 is missing stdint.h and inttypes.h */
@@ -14,7 +16,7 @@ typedef __int64 int64_t;
 
 #else
 
-#ifdef HAVE_INTTYPES_H
+#ifdef JSON_C_HAVE_INTTYPES_H
 #include <inttypes.h>
 #endif
 /* inttypes.h includes stdint.h */

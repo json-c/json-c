@@ -12,6 +12,8 @@
 #ifndef _json_object_h_
 #define _json_object_h_
 
+#include "json_inttypes.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
