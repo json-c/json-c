@@ -43,6 +43,7 @@ static const char* json_null_str = "null";
 static const char* json_true_str = "true";
 static const char* json_false_str = "false";
 
+// XXX after v0.10 this array will become static:
 const char* json_tokener_errors[] = {
   "success",
   "continue",
@@ -59,6 +60,18 @@ const char* json_tokener_errors[] = {
   "invalid string sequence",
   "expected comment",
 };
+
+const char *json_tokener_error_desc(enum json_tokener_error jerr)
+{
+	if (jerr < 0 || jerr > sizeof(json_tokener_errors))
+		return "Unknown error, invalid json_tokener_error value passed to json_tokener_error_desc()";
+	return json_tokener_errors[jerr];
+}
+
+enum json_tokener_error json_tokener_get_error(json_tokener *tok)
+{
+	return tok->err;
+}
 
 /* Stuff for decoding unicode sequences */
 #define IS_HIGH_SURROGATE(uc) (((uc) & 0xFC00) == 0xD800)
