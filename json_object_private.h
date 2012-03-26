@@ -28,7 +28,7 @@ struct json_object
   int _ref_count;
   struct printbuf *_pb;
   union data {
-    boolean c_boolean;
+    json_bool c_boolean;
     double c_double;
     int64_t c_int64;
     struct lh_table *c_object;
