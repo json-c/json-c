@@ -31,3 +31,5 @@ Release
 *.lo
 *.o
 libjson.la
+json-c.pc
+json_config.h
