@@ -2,12 +2,12 @@ AM_CFLAGS = -Wall -Wwrite-strings -Werror -std=gnu99 -D_GNU_SOURCE -D_REENTRANT
 
 EXTRA_DIST = README.html README-WIN32.html config.h.win32 doc json-c.vcproj
 
-lib_LTLIBRARIES = libjson.la
+lib_LTLIBRARIES = libjson-c.la
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = json.pc
+pkgconfig_DATA = json-c.pc
 
-libjsonincludedir = $(includedir)/json
+libjsonincludedir = $(includedir)/json-c
 libjsoninclude_HEADERS = \
 	arraylist.h \
 	bits.h \
@@ -27,9 +27,9 @@ libjsoninclude_HEADERS = \
 #libjsonx_include_HEADERS = \
 #	json_config.h
 
-libjson_la_LDFLAGS = -version-info 1:0:1 -no-undefined
+libjson_c_la_LDFLAGS = -version-info 1:0:1 -no-undefined
 
-libjson_la_SOURCES = \
+libjson_c_la_SOURCES = \
 	arraylist.c \
 	debug.c \
 	json_object.c \

@@ -31,5 +31,5 @@ AM_PROG_LIBTOOL
 
 AC_OUTPUT([
 Makefile
-json.pc
+json-c.pc
 ])
