@@ -17,10 +17,16 @@ Makefile
 Makefile.in
 missing
 stamp-h1
+stamp-h2
 test1
 test2
 test4
 testSubDir
 test_parse_int64
+test_cast
+test_null
 Debug
 Release
+*.lo
+*.o
+libjson.la
