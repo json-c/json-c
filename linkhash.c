@@ -125,7 +125,7 @@ int lh_table_insert(struct lh_table *t, void *k, const void *v)
 	unsigned long h, n;
 
 	t->inserts++;
-	if(t->count > t->size * 0.66) lh_table_resize(t, t->size * 2);
+	if(t->count >= t->size * LH_LOAD_FACTOR) lh_table_resize(t, t->size * 2);
 
 	h = t->hash_fn(k);
 	n = h % t->size;
