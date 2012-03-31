@@ -22,6 +22,13 @@ extern "C" {
 #define LH_PRIME 0x9e370001UL
 
 /**
+ * The fraction of filled hash buckets until an insert will cause the table
+ * to be resized.  
+ * This can range from just above 0 up to 1.0.
+ */
+#define LH_LOAD_FACTOR 0.66
+
+/**
  * sentinel pointer value for empty slots
  */
 #define LH_EMPTY (void*)-1
