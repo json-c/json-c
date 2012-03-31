@@ -275,7 +275,7 @@ static int json_object_boolean_to_json_string(struct json_object* jso,
   else return sprintbuf(pb, "false");
 }
 
-struct json_object* json_object_new_boolean(boolean b)
+struct json_object* json_object_new_boolean(json_bool b)
 {
   struct json_object *jso = json_object_new(json_type_boolean);
   if(!jso) return NULL;
@@ -284,7 +284,7 @@ struct json_object* json_object_new_boolean(boolean b)
   return jso;
 }
 
-boolean json_object_get_boolean(struct json_object *jso)
+json_bool json_object_get_boolean(struct json_object *jso)
 {
   if(!jso) return FALSE;
   switch(jso->o_type) {
