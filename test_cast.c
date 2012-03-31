@@ -1,5 +1,6 @@
 /*
  * Tests if casting within the json_object_get_* functions work correctly.
+ * Also checks the json_object_get_type and json_object_is_type functions.
  */
 
 #include <stdio.h>
@@ -13,6 +14,8 @@
 #include "json_util.h"
 
 static void getit(struct json_object *new_obj, const char *field);
+static void checktype_header(void);
+static void checktype(struct json_object *new_obj, const char *field);
 
 int main(int argc, char **argv)
 {
@@ -23,6 +26,7 @@ int main(int argc, char **argv)
 		\"boolean_true\": true,\n\
 		\"boolean_false\": false,\n\
 		\"big_number\": 2147483649,\n\
+		\"a_null\": null,\n\
 	}";
 	/* Note: 2147483649 = INT_MAX + 2 */
 
@@ -40,6 +44,19 @@ int main(int argc, char **argv)
 	getit(new_obj, "boolean_true");
 	getit(new_obj, "boolean_false");
 	getit(new_obj, "big_number");
+	getit(new_obj, "a_null");
+
+	// Now check the behaviour of the json_object_is_type() function.
+	printf("\n================================\n");
+	checktype_header();
+	checktype(new_obj, NULL);
+	checktype(new_obj, "string_of_digits");
+	checktype(new_obj, "regular_number");
+	checktype(new_obj, "decimal_number");
+	checktype(new_obj, "boolean_true");
+	checktype(new_obj, "boolean_false");
+	checktype(new_obj, "big_number");
+	checktype(new_obj, "a_null");
 
     json_object_put(new_obj);
 
@@ -61,4 +78,29 @@ static void getit(struct json_object *new_obj, const char *field)
 	       json_object_get_boolean(o));
 	printf("new_obj.%s json_object_get_double()=%f\n", field,
 	       json_object_get_double(o));
+}
+
+static void checktype_header()
+{
+	printf("json_object_is_type: %s,%s,%s,%s,%s,%s,%s\n",
+		json_type_to_name(json_type_null),
+		json_type_to_name(json_type_boolean),
+		json_type_to_name(json_type_double),
+		json_type_to_name(json_type_int),
+		json_type_to_name(json_type_object),
+		json_type_to_name(json_type_array),
+		json_type_to_name(json_type_string));
+}
+static void checktype(struct json_object *new_obj, const char *field)
+{
+	struct json_object *o = field ? json_object_object_get(new_obj, field) : new_obj;
+	printf("new_obj%s%-18s: %d,%d,%d,%d,%d,%d,%d\n",
+		field ? "." : " ", field ? field : "",
+		json_object_is_type(o, json_type_null),
+		json_object_is_type(o, json_type_boolean),
+		json_object_is_type(o, json_type_double),
+		json_object_is_type(o, json_type_int),
+		json_object_is_type(o, json_type_object),
+		json_object_is_type(o, json_type_array),
+		json_object_is_type(o, json_type_string));
 }

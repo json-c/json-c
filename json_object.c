@@ -166,11 +166,15 @@ static struct json_object* json_object_new(enum json_type o_type)
 
 int json_object_is_type(struct json_object *jso, enum json_type type)
 {
+  if (!jso)
+    return (type == json_type_null);
   return (jso->o_type == type);
 }
 
 enum json_type json_object_get_type(struct json_object *jso)
 {
+  if (!jso)
+    return json_type_null;
   return jso->o_type;
 }
 

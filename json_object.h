@@ -79,6 +79,7 @@ extern void json_object_put(struct json_object *obj);
  * Check if the json_object is of a given type
  * @param obj the json_object instance
  * @param type one of:
+     json_type_null (i.e. obj == NULL),
      json_type_boolean,
      json_type_double,
      json_type_int,
@@ -92,6 +93,7 @@ extern int json_object_is_type(struct json_object *obj, enum json_type type);
  * Get the type of the json_object
  * @param obj the json_object instance
  * @returns type being one of:
+     json_type_null (i.e. obj == NULL),
      json_type_boolean,
      json_type_double,
      json_type_int,
