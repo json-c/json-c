@@ -715,7 +715,17 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
       tok->err = json_tokener_error_parse_eof;
   }
 
-  if(tok->err == json_tokener_success) return json_object_get(current);
+  if (tok->err == json_tokener_success) 
+  {
+    json_object *ret = json_object_get(current);
+	int ii;
+
+	/* Partially reset, so we parse additional objects on subsequent calls. */
+    for(ii = tok->depth; ii >= 0; ii--)
+      json_tokener_reset_level(tok, ii);
+    return ret;
+  }
+
   MC_DEBUG("json_tokener_parse_ex: error %s at offset %d\n",
 	   json_tokener_errors[tok->err], tok->char_offset);
   return NULL;
