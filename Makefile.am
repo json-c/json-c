@@ -68,4 +68,5 @@ TESTS_ENVIRONMENT       = top_builddir=$(top_builddir)
 
 distclean-local:
 	-rm -rf $(testsubdir)
+	-rm -rf config.h.in~ Makefile.in aclocal.m4 autom4te.cache/ config.guess config.sub configure depcomp install-sh ltmain.sh missing
 
