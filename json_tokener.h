@@ -88,13 +88,13 @@ struct json_tokener
  *
  * @return a generic error message is returned if an invalid error value is provided.
  */
-const char *json_tokeners_errors(enum json_tokener_error jerr);
+const char *json_tokener_error_desc(enum json_tokener_error jerr);
 
 /** 
  * @b XXX do not use json_tokener_errors directly.  
  * After v0.10 this will be removed.
  *
- * See json_tokeners_errors() instead.
+ * See json_tokener_error_desc() instead.
  */
 extern const char* json_tokener_errors[];
 
@@ -162,7 +162,7 @@ do {
 } while ((jerr = json_tokener_get_error(tok)) == json_tokener_continue);
 if (jerr != json_tokener_success)
 {
-	fprintf(stderr, "Error: %s\n", json_tokener_errors[jerr]);
+	fprintf(stderr, "Error: %s\n", json_tokener_error_desc(jerr));
 	// Handle errors, as appropriate for your application.
 }
 if (tok->char_offset < stringlen) // XXX shouldn't access internal fields
