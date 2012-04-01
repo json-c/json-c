@@ -23,6 +23,7 @@ test2
 test4
 testSubDir
 test_parse_int64
+test_parse
 test_cast
 test_null
 Debug
