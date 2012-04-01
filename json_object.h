@@ -90,7 +90,9 @@ extern void json_object_put(struct json_object *obj);
 extern int json_object_is_type(struct json_object *obj, enum json_type type);
 
 /**
- * Get the type of the json_object
+ * Get the type of the json_object.  See also json_type_to_name() to turn this
+ * into a string suitable, for instance, for logging.
+ *
  * @param obj the json_object instance
  * @returns type being one of:
      json_type_null (i.e. obj == NULL),
