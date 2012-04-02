@@ -50,6 +50,19 @@ do {                                                         \
   } else {  printbuf_memappend(p, (bufptr), bufsize); }      \
 } while (0)
 
+#define printbuf_length(p) ((p)->bpos)
+
+/**
+ * Set len bytes of the buffer to charvalue, starting at offset offset.
+ * Similar to calling memset(x, charvalue, len);
+ *
+ * The memory allocated for the buffer is extended as necessary.
+ *
+ * If offset is -1, this starts at the end of the current data in the buffer.
+ */
+extern int
+printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len);
+
 extern int
 sprintbuf(struct printbuf *p, const char *msg, ...);
 
