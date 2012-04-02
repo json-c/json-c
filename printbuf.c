@@ -29,6 +29,8 @@
 #include "debug.h"
 #include "printbuf.h"
 
+static int printbuf_extend(struct printbuf *p, int min_size);
+
 struct printbuf* printbuf_new(void)
 {
   struct printbuf *p;
@@ -45,24 +47,57 @@ struct printbuf* printbuf_new(void)
 }
 
 
+static int printbuf_extend(struct printbuf *p, int min_size)
+{
+	char *t;
+	int new_size;
+
+	if (p->size >= min_size)
+		return 0;
+
+	new_size = json_max(p->size * 2, p->bpos + min_size + 8);
+#ifdef PRINTBUF_DEBUG
+	MC_DEBUG("printbuf_memappend: realloc "
+	  "bpos=%d wrsize=%d old_size=%d new_size=%d\n",
+	  p->bpos, size, p->size, new_size);
+#endif /* PRINTBUF_DEBUG */
+	if(!(t = (char*)realloc(p->buf, new_size)))
+		return -1;
+	p->size = new_size;
+	p->buf = t;
+	return 0;
+}
+
 int printbuf_memappend(struct printbuf *p, const char *buf, int size)
 {
-  char *t;
   if(p->size - p->bpos <= size) {
-    int new_size = json_max(p->size * 2, p->bpos + size + 8);
-#ifdef PRINTBUF_DEBUG
-    MC_DEBUG("printbuf_memappend: realloc "
-	     "bpos=%d wrsize=%d old_size=%d new_size=%d\n",
-	     p->bpos, size, p->size, new_size);
-#endif /* PRINTBUF_DEBUG */
-    if(!(t = (char*)realloc(p->buf, new_size))) return -1;
-    p->size = new_size;
-    p->buf = t;
+    if (printbuf_extend(p, size) < 0)
+      return -1;
   }
   memcpy(p->buf + p->bpos, buf, size);
   p->bpos += size;
   p->buf[p->bpos]= '\0';
   return size;
+}
+
+int printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len)
+{
+	int size_needed;
+
+	if (offset == -1)
+		offset = pb->bpos;
+	size_needed = offset + len;
+	if(pb->size - pb->bpos <= size_needed)
+	{
+		if (printbuf_extend(pb, size_needed) < 0)
+			return -1;
+	}
+
+	memset(pb->buf + offset, charvalue, len);
+	if (pb->bpos < size_needed)
+		pb->bpos = size_needed;
+
+	return 0;
 }
 
 #if !HAVE_VSNPRINTF && defined(_MSC_VER)
