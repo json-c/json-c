@@ -20,8 +20,6 @@
 extern "C" {
 #endif
 
-#undef PRINTBUF_DEBUG
-
 struct printbuf {
   char *buf;
   int bpos;
