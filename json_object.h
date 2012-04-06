@@ -63,13 +63,18 @@ typedef enum json_type {
 /* reference counting functions */
 
 /**
- * Increment the reference count of json_object
+ * Increment the reference count of json_object, thereby grabbing shared 
+ * ownership of obj.
+ *
  * @param obj the json_object instance
  */
 extern struct json_object* json_object_get(struct json_object *obj);
 
 /**
- * Decrement the reference count of json_object and free if it reaches zero
+ * Decrement the reference count of json_object and free if it reaches zero.
+ * You must have ownership of obj prior to doing this or you will cause an
+ * imbalance in the reference count.
+ *
  * @param obj the json_object instance
  */
 extern void json_object_put(struct json_object *obj);
@@ -115,7 +120,14 @@ extern const char* json_object_to_json_string(struct json_object *obj);
 
 /* object type methods */
 
-/** Create a new empty object
+/** Create a new empty object with a reference count of 1.  The caller of
+ * this object initially has sole ownership.  Remember, when using
+ * json_object_object_add or json_object_array_put_idx, ownership will
+ * transfer to the object/array.  Call json_object_get if you want to maintain
+ * shared ownership or also add this object as a child of multiple objects or
+ * arrays.  Any ownerships you acquired but did not transfer must be released
+ * through json_object_put.
+ *
  * @returns a json_object of type json_type_object
  */
 extern struct json_object* json_object_new_object(void);
@@ -130,7 +142,13 @@ extern struct lh_table* json_object_get_object(struct json_object *obj);
  *
  * The reference count will *not* be incremented. This is to make adding
  * fields to objects in code more compact. If you want to retain a reference
- * to an added object you must wrap the passed object with json_object_get
+ * to an added object, independent of the lifetime of obj, you must wrap the
+ * passed object with json_object_get.
+ *
+ * Upon calling this, the ownership of val transfers to obj.  Thus you must
+ * make sure that you do in fact have ownership over this object.  For instance,
+ * json_object_new_object will give you ownership until you transfer it,
+ * whereas json_object_object_get does not.
  *
  * @param obj the json_object instance
  * @param key the object field name (a private copy will be duplicated)
@@ -140,6 +158,17 @@ extern void json_object_object_add(struct json_object* obj, const char *key,
 				   struct json_object *val);
 
 /** Get the json_object associate with a given object field
+ *
+ * *No* reference counts will be changed.  There is no need to manually adjust
+ * reference counts through the json_object_put/json_object_get methods unless
+ * you need to have the child (value) reference maintain a different lifetime
+ * than the owning parent (obj). Ownership of the returned value is retained
+ * by obj (do not do json_object_put unless you have done a json_object_get).
+ * If you delete the value from obj (json_object_object_del) and wish to access
+ * the returned reference afterwards, make sure you have first gotten shared
+ * ownership through json_object_get (& don't forget to do a json_object_put
+ * or transfer ownership to prevent a memory leak).
+ *
  * @param obj the json_object instance
  * @param key the object field name
  * @returns the json_object associated with the given field name
@@ -149,7 +178,9 @@ extern struct json_object* json_object_object_get(struct json_object* obj,
 
 /** Delete the given json_object field
  *
- * The reference count will be decremented for the deleted object
+ * The reference count will be decremented for the deleted object.  If there
+ * are no more owners of the value represented by this key, then the value is
+ * freed.  Otherwise, the reference to the value will remain in memory.
  *
  * @param obj the json_object instance
  * @param key the object field name
@@ -159,7 +190,8 @@ extern void json_object_object_del(struct json_object* obj, const char *key);
 /** Iterate through all keys and values of an object
  * @param obj the json_object instance
  * @param key the local name for the char* key variable defined in the body
- * @param val the local name for the json_object* object variable defined in the body
+ * @param val the local name for the json_object* object variable defined in
+ *            the body
  */
 #if defined(__GNUC__) && !defined(__STRICT_ANSI__)
 
@@ -293,7 +325,8 @@ extern struct json_object* json_object_new_int64(int64_t i);
  *
  * The type is coerced to a int if the passed object is not a int.
  * double objects will return their integer conversion. Strings will be
- * parsed as an integer. If no conversion exists then 0 is returned.
+ * parsed as an integer. If no conversion exists then 0 is returned
+ * and errno is set to EINVAL. null is equivalent to 0 (no error values set)
  *
  * Note that integers are stored internally as 64-bit values.
  * If the value of too big or too small to fit into 32-bit, INT32_MAX or
@@ -310,6 +343,10 @@ extern int32_t json_object_get_int(struct json_object *obj);
  * double objects will return their int64 conversion. Strings will be
  * parsed as an int64. If no conversion exists then 0 is returned.
  *
+ * NOTE: Set errno to 0 directly before a call to this function to determine
+ * whether or not conversion was successful (it does not clear the value for
+ * you).
+ *
  * @param obj the json_object instance
  * @returns an int64
  */
@@ -324,14 +361,28 @@ extern int64_t json_object_get_int64(struct json_object *obj);
  */
 extern struct json_object* json_object_new_double(double d);
 
-/** Get the double value of a json_object
+/** Get the double floating point value of a json_object
  *
  * The type is coerced to a double if the passed object is not a double.
- * integer objects will return their dboule conversion. Strings will be
- * parsed as a double. If no conversion exists then 0.0 is returned.
+ * integer objects will return their double conversion. Strings will be
+ * parsed as a double. If no conversion exists then 0.0 is returned and
+ * errno is set to EINVAL. null is equivalent to 0 (no error values set)
+ *
+ * If the value is too big to fit in a double, then the value is set to
+ * the closest infinity with errno set to ERANGE. If strings cannot be
+ * converted to their double value, then EINVAL is set & NaN is returned.
+ *
+ * Arrays of length 0 are interpreted as 0 (with no error flags set).
+ * Arrays of length 1 are effectively cast to the equivalent object and
+ * converted using the above rules.  All other arrays set the error to
+ * EINVAL & return NaN.
+ *
+ * NOTE: Set errno to 0 directly before a call to this function to
+ * determine whether or not conversion was successful (it does not clear
+ * the value for you).
  *
  * @param obj the json_object instance
- * @returns an double
+ * @returns a double floating point number
  */
 extern double json_object_get_double(struct json_object *obj);
 
