@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
+ * Copyright (c) 2009 Hewlett-Packard Development Company, L.P.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the MIT license. See COPYING for details.
@@ -11,6 +12,8 @@
  
 #ifndef _linkhash_h_
 #define _linkhash_h_
+
+#include "json_object.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -241,9 +244,18 @@ extern struct lh_entry* lh_table_lookup_entry(struct lh_table *t, const void *k)
  * @param t the table to lookup
  * @param k a pointer to the key to lookup
  * @return a pointer to the found value or NULL if it does not exist.
+ * @deprecated Use lh_table_lookup_ex instead.
  */
 extern const void* lh_table_lookup(struct lh_table *t, const void *k);
 
+/**
+ * Lookup a record in the table
+ * @param t the table to lookup
+ * @param k a pointer to the key to lookup
+ * @param v a pointer to a where to store the found value (set to NULL if it doesn't exist).
+ * @return whether or not the key was found
+ */
+extern json_bool lh_table_lookup_ex(struct lh_table *t, const void *k, void **v);
 
 /**
  * Delete a record from the table.
