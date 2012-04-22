@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
+ * Copyright (c) 2009 Hewlett-Packard Development Company, L.P.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the MIT license. See COPYING for details.
@@ -174,11 +175,21 @@ struct lh_entry* lh_table_lookup_entry(struct lh_table *t, const void *k)
 
 const void* lh_table_lookup(struct lh_table *t, const void *k)
 {
-	struct lh_entry *e = lh_table_lookup_entry(t, k);
-	if(e) return e->v;
-	return NULL;
+	void *result;
+	lh_table_lookup_ex(t, k, &result);
+	return result;
 }
 
+json_bool lh_table_lookup_ex(struct lh_table* t, const void* k, void **v)
+{
+	struct lh_entry *e = lh_table_lookup_entry(t, k);
+	if (e != NULL) {
+		if (v != NULL) *v = (void *)e->v;
+		return TRUE; /* key found */
+	}
+	if (v != NULL) *v = NULL;
+	return FALSE; /* key not found */
+}
 
 int lh_table_delete_entry(struct lh_table *t, struct lh_entry *e)
 {
