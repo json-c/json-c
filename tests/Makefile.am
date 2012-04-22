@@ -20,6 +20,11 @@ test_cast_LDADD = $(LIBJSON_LA)
 test_parse_LDADD = $(LIBJSON_LA)
 
 TESTS = test1.test test2.test test4.test parse_int64.test test_null.test test_cast.test test_parse.test
+
+TESTS+= test_printbuf.test
+check_PROGRAMS+=test_printbuf
+test_printbuf_LDADD = $(LIBJSON_LA)
+
 EXTRA_DIST=
 EXTRA_DIST += $(TESTS)
 
