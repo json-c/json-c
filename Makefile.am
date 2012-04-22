@@ -1,6 +1,7 @@
-AM_CFLAGS = -Wall -Wwrite-strings -Werror -std=gnu99 -D_GNU_SOURCE -D_REENTRANT
+include Makefile.am.inc
 
 EXTRA_DIST = README.html README-WIN32.html config.h.win32 doc json-c.vcproj
+SUBDIRS = . tests
 
 lib_LTLIBRARIES = libjson.la
 
@@ -38,10 +39,7 @@ libjson_la_SOURCES = \
 	linkhash.c \
 	printbuf.c
 
-check_PROGRAMS = test1 test2 test4 test_parse_int64 test_null test_cast test_parse
-
-test1_SOURCES = test1.c
-test1_LDADD = $(lib_LTLIBRARIES)
+check_PROGRAMS = test2 test4 test_parse_int64 test_null test_cast test_parse
 
 test2_SOURCES = test2.c
 test2_LDADD = $(lib_LTLIBRARIES)
@@ -61,7 +59,7 @@ test_cast_LDADD = $(lib_LTLIBRARIES)
 test_parse_SOURCES = test_parse.c
 test_parse_LDADD = $(lib_LTLIBRARIES)
 
-TESTS = test1.test test2.test test4.test parse_int64.test test_null.test test_cast.test test_parse.test
+TESTS = test2.test test4.test parse_int64.test test_null.test test_cast.test test_parse.test
 EXTRA_DIST += $(TESTS)
 testsubdir=testSubDir
 TESTS_ENVIRONMENT       = top_builddir=$(top_builddir)

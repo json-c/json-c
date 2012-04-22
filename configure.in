@@ -5,6 +5,8 @@ AC_INIT([json-c], 0.10, [json-c@googlegroups.com])
 
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 
+AC_PROG_MAKE_SET
+
 # Checks for programs.
 
 # Checks for libraries.
@@ -29,7 +31,11 @@ AC_CHECK_FUNCS(strndup strerror vsnprintf vasprintf open vsyslog strncasecmp)
 
 AM_PROG_LIBTOOL
 
-AC_OUTPUT([
+AC_CONFIG_FILES([
 Makefile
 json.pc
+tests/Makefile
 ])
+
+AC_OUTPUT
+
