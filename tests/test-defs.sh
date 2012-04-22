@@ -1,5 +1,4 @@
-
-#! /bin/sh
+#!/bin/sh
 
 # Make sure srcdir is an absolute path.  Supply the variable
 # if it does not exist.  We want to be able to run the tests
@@ -21,6 +20,8 @@ case "$top_builddir" in
     /* | [A-Za-z]:\\*) ;;
     *) top_builddir=`\cd ${top_builddir-..} && pwd` ;;
 esac
+
+top_builddir=${top_builddir}/tests
 
 progname=`echo "$0" | sed 's,^.*/,,'`
 testname=`echo "$progname" | sed 's,-.*$,,'`

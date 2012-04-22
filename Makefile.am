@@ -39,30 +39,6 @@ libjson_la_SOURCES = \
 	linkhash.c \
 	printbuf.c
 
-check_PROGRAMS = test2 test4 test_parse_int64 test_null test_cast test_parse
-
-test2_SOURCES = test2.c
-test2_LDADD = $(lib_LTLIBRARIES)
-
-test4_SOURCES = test4.c
-test4_LDADD = $(lib_LTLIBRARIES)
-
-test_parse_int64_SOURCES = test_parse_int64.c
-test_parse_int64_LDADD = $(lib_LTLIBRARIES)
-
-test_null_SOURCES = test_null.c
-test_null_LDADD = $(lib_LTLIBRARIES)
-
-test_cast_SOURCES = test_cast.c
-test_cast_LDADD = $(lib_LTLIBRARIES)
-
-test_parse_SOURCES = test_parse.c
-test_parse_LDADD = $(lib_LTLIBRARIES)
-
-TESTS = test2.test test4.test parse_int64.test test_null.test test_cast.test test_parse.test
-EXTRA_DIST += $(TESTS)
-testsubdir=testSubDir
-TESTS_ENVIRONMENT       = top_builddir=$(top_builddir)
 
 distclean-local:
 	-rm -rf $(testsubdir)
