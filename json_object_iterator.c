@@ -1,17 +1,17 @@
-/** 
+/**
 *******************************************************************************
-* @file cjson_object_iterator.c
-* 
-* Copyright (c) 2009 Hewlett-Packard Development Company, L.P.
+* @file json_object_iterator.c
+*
+* Copyright (c) 2009-2012 Hewlett-Packard Development Company, L.P.
 *
 * This library is free software; you can redistribute it and/or modify
 * it under the terms of the MIT license. See COPYING for details.
 *
-* @brief  cjson forces clients to use its private data
+* @brief  json-c forces clients to use its private data
 *         structures for JSON Object iteration.  This API
 *         implementation corrects that by abstracting the
-*         private cjson details.
-* 
+*         private json-c details.
+*
 *******************************************************************************
 */
 
@@ -25,30 +25,30 @@
 
 /**
  * How It Works
- * 
- * For each JSON Object, cjson maintains a linked list of zero
+ *
+ * For each JSON Object, json-c maintains a linked list of zero
  * or more lh_entry (link-hash entry) structures inside the
  * Object's link-hash table (lh_table).
- * 
+ *
  * Each lh_entry structure on the JSON Object's linked list
  * represents a single name/value pair.  The "next" field of the
  * last lh_entry in the list is set to NULL, which terminates
  * the list.
- * 
+ *
  * We represent a valid iterator that refers to an actual
  * name/value pair via a pointer to the pair's lh_entry
  * structure set as the iterator's opaque_ field.
- * 
- * We follow cjson's current pair list representation by
+ *
+ * We follow json-c's current pair list representation by
  * representing a valid "end" iterator (one that refers past the
  * last pair) with a NULL value in the iterator's opaque_ field.
- * 
+ *
  * A JSON Object without any pairs in it will have the "head"
  * field of its lh_table structure set to NULL.  For such an
  * object, json_object_iter_begin will return an iterator with
  * the opaque_ field set to NULL, which is equivalent to the
  * "end" iterator.
- * 
+ *
  * When iterating, we simply update the iterator's opaque_ field
  * to point to the next lh_entry structure in the linked list.
  * opaque_ will become NULL once we iterate past the last pair
@@ -57,7 +57,7 @@
  */
 
 /// Our current representation of the "end" iterator;
-/// 
+///
 /// @note May not always be NULL
 static const void* kObjectEndIterValue = NULL;
 
