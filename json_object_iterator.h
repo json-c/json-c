@@ -29,7 +29,8 @@
 #define JSON_OBJECT_ITERATOR_H
 
 #include <stddef.h>
-#include <stdbool.h>
+
+#include "json_stdbool.h"
 
 #ifdef __cplusplus 
 extern "C" {

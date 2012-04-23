@@ -16,13 +16,11 @@
 */
 
 #include <stddef.h>
-#include <stdbool.h>
 
 #include "json.h"
 #include "json_object_private.h"
-
 #include "json_object_iterator.h"
-
+#include "json_stdbool.h"
 /**
  * How It Works
  * 
