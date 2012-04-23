@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
+ * Copyright (c) 2009 Hewlett-Packard Development Company, L.P.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the MIT license. See COPYING for details.
@@ -172,9 +173,32 @@ extern void json_object_object_add(struct json_object* obj, const char *key,
  * @param obj the json_object instance
  * @param key the object field name
  * @returns the json_object associated with the given field name
+ * @deprecated Please use json_object_object_get_ex
  */
 extern struct json_object* json_object_object_get(struct json_object* obj,
 						  const char *key);
+
+/** Get the json_object associated with a given object field.  
+ *
+ * This returns true if the key is found, false in all other cases (including 
+ * if obj isn't a json_type_object).
+ *
+ * *No* reference counts will be changed.  There is no need to manually adjust
+ * reference counts through the json_object_put/json_object_get methods unless
+ * you need to have the child (value) reference maintain a different lifetime
+ * than the owning parent (obj).  Ownership of value is retained by obj.
+ *
+ * @param obj the json_object instance
+ * @param key the object field name
+ * @param value a pointer where to store a reference to the json_object 
+ *              associated with the given field name.
+ *
+ *              It is safe to pass a NULL value.
+ * @returns whether or not the key exists
+ */
+extern json_bool json_object_object_get_ex(struct json_object* obj,
+						  const char *key,
+                                                  struct json_object **value);
 
 /** Delete the given json_object field
  *

@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
+ * Copyright (c) 2009 Hewlett-Packard Development Company, L.P.
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the MIT license. See COPYING for details.
@@ -24,11 +25,13 @@
 #include "json_object.h"
 #include "json_object_private.h"
 #include "json_util.h"
+#include "json_tokener.h"
 
 #if !HAVE_STRNDUP
   char* strndup(const char* str, size_t n);
 #endif /* !HAVE_STRNDUP */
 
+// Don't define this.  It's not thread-safe.
 /* #define REFCOUNT_DEBUG 1 */
 
 const char *json_number_chars = "0123456789.+-eE";
@@ -260,8 +263,24 @@ void json_object_object_add(struct json_object* jso, const char *key,
 
 struct json_object* json_object_object_get(struct json_object* jso, const char *key)
 {
-  if(!jso) return NULL;
-  return (struct json_object*) lh_table_lookup(jso->o.c_object, key);
+  struct json_object *result;
+  json_object_object_get_ex(jso, key, &result);
+  return result;
+}
+
+json_bool json_object_object_get_ex(struct json_object* jso, const char *key, struct json_object **value)
+{
+  if (NULL == jso) return FALSE;
+
+  switch(jso->o_type) {
+  case json_type_object:
+    return lh_table_lookup_ex(jso->o.c_object, (void*)key, (void**)value);
+  default:
+    if (value != NULL) {
+      *value = NULL;
+    }
+    return FALSE;
+  }
 }
 
 void json_object_object_del(struct json_object* jso, const char *key)
