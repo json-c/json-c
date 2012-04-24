@@ -562,7 +562,8 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	int case_len=0;
 	while(c && strchr(json_number_chars, c)) {
 	  ++case_len;
-	  if(c == '.' || c == 'e') tok->is_double = 1;
+	  if(c == '.' || c == 'e' || c == 'E')
+		  tok->is_double = 1;
 	  if (!ADVANCE_CHAR(str, tok) || !POP_CHAR(c, tok)) {
 	    printbuf_memappend_fast(tok->pb, case_start, case_len);
 	    goto out;
