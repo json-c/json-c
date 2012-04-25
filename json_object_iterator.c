@@ -16,7 +16,6 @@
 */
 
 #include <stddef.h>
-#include <stdbool.h>
 
 #include "json.h"
 #include "json_object_private.h"
@@ -139,7 +138,7 @@ json_object_iter_peek_value(const struct json_object_iterator* iter)
 /**
  * ****************************************************************************
  */
-bool
+json_bool
 json_object_iter_equal(const struct json_object_iterator* iter1,
                        const struct json_object_iterator* iter2)
 {

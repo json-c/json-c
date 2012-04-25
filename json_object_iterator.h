@@ -24,7 +24,6 @@
 #define JSON_OBJECT_ITERATOR_H
 
 #include <stddef.h>
-#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -223,11 +222,11 @@ json_object_iter_peek_value(const struct json_object_iterator* iter);
  *       	different JSON Object instances are passed, bad things
  *       	will happen!
  *
- * @return bool non-zero if iterators are equal (i.e., both
+ * @return json_bool non-zero if iterators are equal (i.e., both
  *         reference the same name/value pair or are both at
  *         "end"); zero if they are not equal.
  */
-bool
+json_bool
 json_object_iter_equal(const struct json_object_iterator* iter1,
                        const struct json_object_iterator* iter2);
 
