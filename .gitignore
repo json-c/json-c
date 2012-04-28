@@ -22,7 +22,9 @@
 /tests/Makefile
 /tests/Makefile.in
 /tests/test1
+/tests/test1Formatted
 /tests/test2
+/tests/test2Formatted
 /tests/test4
 /tests/testSubDir
 /tests/test_parse_int64
