@@ -9,4 +9,14 @@ fi
 . "$srcdir/test-defs.sh"
 
 run_output_test test2
-exit $?
+_err=$?
+
+for flag in plain spaced pretty ; do
+	run_output_test -o test2Formatted_${flag} test2Formatted ${flag}
+	_err2=$?
+	if [ $_err -eq 0 ] ; then
+		_err=$_err2
+	fi
+done
+
+exit $_err

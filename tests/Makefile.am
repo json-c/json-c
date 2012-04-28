@@ -3,11 +3,25 @@ include ../Makefile.am.inc
 
 LIBJSON_LA=$(top_builddir)/libjson.la
 
-check_PROGRAMS = test1 test2 test4 test_parse_int64 test_null test_cast test_parse
+check_PROGRAMS = test1 test1Formatted 
+check_PROGRAMS += test2 test2Formatted
+check_PROGRAMS += test4
+check_PROGRAMS += test_parse_int64
+check_PROGRAMS += test_null
+check_PROGRAMS += test_cast
+check_PROGRAMS += test_parse
 
 test1_LDADD = $(LIBJSON_LA)
 
+test1Formatted_LDADD= $(LIBJSON_LA)
+test1Formatted_SOURCES = test1.c parse_flags.c
+test1Formatted_CPPFLAGS = -DTEST_FORMATTED
+
 test2_LDADD = $(LIBJSON_LA)
+
+test2Formatted_LDADD= $(LIBJSON_LA)
+test2Formatted_SOURCES = test2.c parse_flags.c
+test2Formatted_CPPFLAGS = -DTEST_FORMATTED
 
 test4_LDADD = $(LIBJSON_LA)
 

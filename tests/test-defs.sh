@@ -26,22 +26,24 @@ top_builddir=${top_builddir}/tests
 progname=`echo "$0" | sed 's,^.*/,,'`
 testname=`echo "$progname" | sed 's,-.*$,,'`
 testsubdir=${testsubdir-testSubDir}
+testsubdir=${testsubdir}/${progname}
 
 # User can set VERBOSE to cause output redirection
 case "$VERBOSE" in
 [Nn]|[Nn][Oo]|0|"")
 	VERBOSE=0
-	exec > /dev/null 2>&1
+	exec > /dev/null
 	;;
 [Yy]|[Yy][Ee][Ss])
 	VERBOSE=1
 	;;
 esac
 
-rm -rf "$testsubdir/$progname" > /dev/null 2>&1
-mkdir -p "$testsubdir/$progname"
-cd "$testsubdir/$progname" \
-   || { echo "Cannot make or change into $testsubdir/$progname"; exit 1; }
+rm -rf "$testsubdir" > /dev/null 2>&1
+mkdir -p "$testsubdir"
+CURDIR=$(pwd)
+cd "$testsubdir" \
+   || { echo "Cannot make or change into $testsubdir"; exit 1; }
 
 echo "=== Running test $progname"
 
@@ -68,44 +70,55 @@ fi
 #
 run_output_test()
 {
+	if [ "$1" = "-o" ] ; then
+		TEST_OUTPUT="$2"
+		shift
+		shift
+	fi
 	TEST_COMMAND="$1"
+	shift
+	if [ -z "${TEST_OUTPUT}" ] ; then	
+		TEST_OUTPUT=${TEST_COMMAND}
+	fi
 
-	REDIR_OUTPUT="> \"${TEST_COMMAND}.out\""
+	REDIR_OUTPUT="> \"${TEST_OUTPUT}.out\""
 	if [ $VERBOSE -gt 1 ] ; then
-		REDIR_OUTPUT="| tee \"${TEST_COMMAND}.out\""
+		REDIR_OUTPUT="| tee \"${TEST_OUTPUT}.out\""
 	fi
 
 	if [ $use_valgrind -eq 1 ] ; then
 		eval valgrind --tool=memcheck \
 			--trace-children=yes \
 			--demangle=yes \
-			--log-file=vg.out \
+			--log-file="${TEST_OUTPUT}.vg.out" \
 			--leak-check=full \
 			--show-reachable=yes \
 			--run-libc-freeres=yes \
-		"\"${top_builddir}/${TEST_COMMAND}\"" ${REDIR_OUTPUT}
+		"\"${top_builddir}/${TEST_COMMAND}\"" \"\$@\" ${REDIR_OUTPUT}
 		err=$?
 
 	else
-		eval "\"${top_builddir}/${TEST_COMMAND}"\" ${REDIR_OUTPUT}
+		eval "\"${top_builddir}/${TEST_COMMAND}"\" \"\$@\" ${REDIR_OUTPUT}
 		err=$?
 	fi
 
 	if [ $err -ne 0 ] ; then
-		echo "ERROR: ${TEST_COMMAND} exited with non-zero exit status: $err" 1>&2
+		echo "ERROR: \"${TEST_COMMAND} $@\" exited with non-zero exit status: $err" 1>&2
 	fi
 
 	if [ $use_valgrind -eq 1 ] ; then
-		if ! tail -1 "vg.out" | grep -q "ERROR SUMMARY: 0 errors" ; then
+		if ! tail -1 "${TEST_OUTPUT}.vg.out" | grep -q "ERROR SUMMARY: 0 errors" ; then
 			echo "ERROR: valgrind found errors during execution:" 1>&2
-			cat vg.out
+			cat "${TEST_OUTPUT}.vg.out"
 			err=1
 		fi
 	fi
 
-	if ! "$CMP" -s "${top_builddir}/${TEST_COMMAND}.expected" "${TEST_COMMAND}.out" ; then
-		echo "ERROR: ${TEST_COMMAND} failed:" 1>&2
-		diff "${top_builddir}/${TEST_COMMAND}.expected" "${TEST_COMMAND}.out" 1>&2
+	if ! "$CMP" -s "${top_builddir}/${TEST_OUTPUT}.expected" "${TEST_OUTPUT}.out" ; then
+		echo "ERROR: \"${TEST_COMMAND} $@\" (${TEST_OUTPUT}) failed (set VERBOSE=1 to see full output):" 1>&2
+		(cd "${CURDIR}" ; set -x ; diff "${top_builddir}/${TEST_OUTPUT}.expected" "$testsubdir/${TEST_OUTPUT}.out")
+		echo "cp \"$testsubdir/${TEST_OUTPUT}.out\" \"${top_builddir}/${TEST_OUTPUT}.expected\"" 1>&2
+
 		err=1
 	fi
 
