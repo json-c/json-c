@@ -65,12 +65,12 @@ struct json_object* json_object_from_file(const char *filename)
   if((fd = open(filename, O_RDONLY)) < 0) {
     MC_ERROR("json_object_from_file: error reading file %s: %s\n",
 	     filename, strerror(errno));
-    return (struct json_object*)error_ptr(-1);
+    return NULL; // XAX this is an API change!
   }
   if(!(pb = printbuf_new())) {
     close(fd);
     MC_ERROR("json_object_from_file: printbuf_new failed\n");
-    return (struct json_object*)error_ptr(-1);
+    return NULL;
   }
   while((ret = read(fd, buf, JSON_FILE_BUF_SIZE)) > 0) {
     printbuf_memappend(pb, buf, ret);
@@ -80,14 +80,16 @@ struct json_object* json_object_from_file(const char *filename)
     MC_ABORT("json_object_from_file: error reading file %s: %s\n",
 	     filename, strerror(errno));
     printbuf_free(pb);
-    return (struct json_object*)error_ptr(-1);
+    return NULL;
   }
   obj = json_tokener_parse(pb->buf);
   printbuf_free(pb);
   return obj;
 }
 
-int json_object_to_file(char *filename, struct json_object *obj)
+/* extended "format and write to file" function */
+
+int json_object_to_file_ext(char *filename, struct json_object *obj, int flags)
 {
   const char *json_str;
   int fd, ret;
@@ -104,7 +106,7 @@ int json_object_to_file(char *filename, struct json_object *obj)
     return -1;
   }
 
-  if(!(json_str = json_object_to_json_string(obj))) {
+  if(!(json_str = json_object_to_json_string_ext(obj,flags))) {
     close(fd);
     return -1;
   }
@@ -125,6 +127,13 @@ int json_object_to_file(char *filename, struct json_object *obj)
 
   close(fd);
   return 0;
+}
+
+// backwards compatible "format and write to file" function
+
+int json_object_to_file(char *filename, struct json_object *obj)
+{
+  return json_object_to_file_ext(filename, obj, JSON_C_TO_STRING_PLAIN);
 }
 
 int json_parse_int64(const char *buf, int64_t *retval)

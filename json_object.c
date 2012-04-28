@@ -180,44 +180,87 @@ enum json_type json_object_get_type(struct json_object *jso)
   return jso->o_type;
 }
 
-/* json_object_to_json_string */
+/* extended conversion to string */
+
+const char* json_object_to_json_string_ext(struct json_object *jso, int flags)
+{
+	if (!jso)
+		return "null";
+
+	if ((!jso->_pb) && !(jso->_pb = printbuf_new()))
+		return NULL;
+
+	printbuf_reset(jso->_pb);
+
+	if(jso->_to_json_string(jso, jso->_pb, 0, flags) < 0)
+		return NULL;
+
+	return jso->_pb->buf;
+}
+
+/* backwards-compatible conversion to string */
 
 const char* json_object_to_json_string(struct json_object *jso)
 {
-  if(!jso) return "null";
-  if(!jso->_pb) {
-    if(!(jso->_pb = printbuf_new())) return NULL;
-  } else {
-    printbuf_reset(jso->_pb);
-  }
-  if(jso->_to_json_string(jso, jso->_pb) < 0) return NULL;
-  return jso->_pb->buf;
+	return json_object_to_json_string_ext(jso, JSON_C_TO_STRING_SPACED);
 }
 
+static void indent(struct printbuf *pb, int level, int flags)
+{
+	if (flags & JSON_C_TO_STRING_PRETTY)
+	{
+		printbuf_memset(pb, -1, ' ', level * 2);
+	}
+}
 
 /* json_object_object */
 
 static int json_object_object_to_json_string(struct json_object* jso,
-					     struct printbuf *pb)
+					     struct printbuf *pb,
+					     int level,
+						 int flags)
 {
-  int i=0;
-  struct json_object_iter iter;
-  sprintbuf(pb, "{");
+	int had_children = 0;
+	struct json_object_iter iter;
 
-  /* CAW: scope operator to make ANSI correctness */
-  /* CAW: switched to json_object_object_foreachC which uses an iterator struct */
-	json_object_object_foreachC(jso, iter) {
-			if(i) sprintbuf(pb, ",");
-			sprintbuf(pb, " \"");
-			json_escape_str(pb, iter.key, strlen(iter.key));
+	sprintbuf(pb, "{" /*}*/);
+	if (flags & JSON_C_TO_STRING_PRETTY)
+		sprintbuf(pb, "\n");
+	json_object_object_foreachC(jso, iter)
+	{
+		if (had_children)
+		{
+			sprintbuf(pb, ",");
+			if (flags & JSON_C_TO_STRING_PRETTY)
+				sprintbuf(pb, "\n");
+		}
+		had_children = 1;
+		if (flags & JSON_C_TO_STRING_SPACED)
+			sprintbuf(pb, " ");
+		indent(pb, level+1, flags);
+		sprintbuf(pb, "\"");
+		json_escape_str(pb, iter.key, strlen(iter.key));
+		if (flags & JSON_C_TO_STRING_SPACED)
 			sprintbuf(pb, "\": ");
-			if(iter.val == NULL) sprintbuf(pb, "null");
-			else iter.val->_to_json_string(iter.val, pb);
-			i++;
+		else
+			sprintbuf(pb, "\":");
+		if(iter.val == NULL)
+			sprintbuf(pb, "null");
+		else
+			iter.val->_to_json_string(iter.val, pb, level+1,flags);
 	}
-
-  return sprintbuf(pb, " }");
+	if (flags & JSON_C_TO_STRING_PRETTY)
+	{
+		if (had_children)
+			sprintbuf(pb, "\n");
+		indent(pb,level,flags);
+	}
+	if (flags & JSON_C_TO_STRING_SPACED)
+		return sprintbuf(pb, /*{*/ " }");
+	else
+		return sprintbuf(pb, /*{*/ "}");
 }
+
 
 static void json_object_lh_entry_free(struct lh_entry *ent)
 {
@@ -291,7 +334,9 @@ void json_object_object_del(struct json_object* jso, const char *key)
 /* json_object_boolean */
 
 static int json_object_boolean_to_json_string(struct json_object* jso,
-					      struct printbuf *pb)
+					      struct printbuf *pb,
+					      int level,
+						  int flags)
 {
   if(jso->o.c_boolean) return sprintbuf(pb, "true");
   else return sprintbuf(pb, "false");
@@ -327,7 +372,9 @@ json_bool json_object_get_boolean(struct json_object *jso)
 /* json_object_int */
 
 static int json_object_int_to_json_string(struct json_object* jso,
-					  struct printbuf *pb)
+					  struct printbuf *pb,
+					  int level,
+					  int flags)
 {
   return sprintbuf(pb, "%"PRId64, jso->o.c_int64);
 }
@@ -412,7 +459,9 @@ int64_t json_object_get_int64(struct json_object *jso)
 /* json_object_double */
 
 static int json_object_double_to_json_string(struct json_object* jso,
-					     struct printbuf *pb)
+					     struct printbuf *pb,
+					     int level,
+						 int flags)
 {
   return sprintbuf(pb, "%lf", jso->o.c_double);
 }
@@ -449,7 +498,9 @@ double json_object_get_double(struct json_object *jso)
 /* json_object_string */
 
 static int json_object_string_to_json_string(struct json_object* jso,
-					     struct printbuf *pb)
+					     struct printbuf *pb,
+					     int level,
+						 int flags)
 {
   sprintbuf(pb, "\"");
   json_escape_str(pb, jso->o.c_string.str, jso->o.c_string.len);
@@ -511,20 +562,45 @@ int json_object_get_string_len(struct json_object *jso)  {
 /* json_object_array */
 
 static int json_object_array_to_json_string(struct json_object* jso,
-					    struct printbuf *pb)
+                                            struct printbuf *pb,
+                                            int level,
+                                            int flags)
 {
-  int i;
-  sprintbuf(pb, "[");
-  for(i=0; i < json_object_array_length(jso); i++) {
-	  struct json_object *val;
-	  if(i) { sprintbuf(pb, ", "); }
-	  else { sprintbuf(pb, " "); }
+	int had_children = 0;
+	int ii;
+	sprintbuf(pb, "[");
+	if (flags & JSON_C_TO_STRING_PRETTY)
+		sprintbuf(pb, "\n");
+	for(ii=0; ii < json_object_array_length(jso); ii++)
+	{
+		struct json_object *val;
+		if (had_children)
+		{
+			sprintbuf(pb, ",");
+			if (flags & JSON_C_TO_STRING_PRETTY)
+				sprintbuf(pb, "\n");
+		}
+		had_children = 1;
+		if (flags & JSON_C_TO_STRING_SPACED)
+			sprintbuf(pb, " ");
+		indent(pb, level + 1, flags);
+		val = json_object_array_get_idx(jso, ii);
+		if(val == NULL)
+			sprintbuf(pb, "null");
+		else
+			val->_to_json_string(val, pb, level+1, flags);
+	}
+	if (flags & JSON_C_TO_STRING_PRETTY)
+	{
+		if (had_children)
+			sprintbuf(pb, "\n");
+		indent(pb,level,flags);
+	}
 
-      val = json_object_array_get_idx(jso, i);
-	  if(val == NULL) { sprintbuf(pb, "null"); }
-	  else { val->_to_json_string(val, pb); }
-  }
-  return sprintbuf(pb, " ]");
+	if (flags & JSON_C_TO_STRING_SPACED)
+		return sprintbuf(pb, " ]");
+	else
+		return sprintbuf(pb, "]");
 }
 
 static void json_object_array_entry_free(void *data)

@@ -21,6 +21,28 @@ extern "C" {
 
 #define JSON_OBJECT_DEF_HASH_ENTRIES 16
 
+/**
+ * A flag for the json_object_to_json_string_ext() and
+ * json_object_to_file_ext() functions which causes the output
+ * to have no extra whitespace or formatting applied.
+ */
+#define JSON_C_TO_STRING_PLAIN      0
+/**
+ * A flag for the json_object_to_json_string_ext() and
+ * json_object_to_file_ext() functions which causes the output to have
+ * minimal whitespace inserted to make things slightly more readable.
+ */
+#define JSON_C_TO_STRING_SPACED     (1<<0)
+/**
+ * A flag for the json_object_to_json_string_ext() and
+ * json_object_to_file_ext() functions which causes
+ * the output to be formatted.
+ *
+ * See the "Two Space Tab" option at http://jsonformatter.curiousconcept.com/
+ * for an example of the format.
+ */
+#define JSON_C_TO_STRING_PRETTY     (1<<1)
+
 #undef FALSE
 #define FALSE ((json_bool)0)
 
@@ -112,11 +134,20 @@ extern int json_object_is_type(struct json_object *obj, enum json_type type);
 extern enum json_type json_object_get_type(struct json_object *obj);
 
 
-/** Stringify object to json format
+/** Stringify object to json format.
+ * Equivalent to json_object_to_json_string_ext(obj, JSON_C_TO_STRING_SPACED)
  * @param obj the json_object instance
  * @returns a string in JSON format
  */
 extern const char* json_object_to_json_string(struct json_object *obj);
+
+/** Stringify object to json format
+ * @param obj the json_object instance
+ * @param flags formatting options, see JSON_C_TO_STRING_PRETTY and other constants
+ * @returns a string in JSON format
+ */
+extern const char* json_object_to_json_string_ext(struct json_object *obj, int
+flags);
 
 
 /* object type methods */

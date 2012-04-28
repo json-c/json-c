@@ -18,7 +18,9 @@ extern "C" {
 
 typedef void (json_object_delete_fn)(struct json_object *o);
 typedef int (json_object_to_json_string_fn)(struct json_object *o,
-					    struct printbuf *pb);
+						struct printbuf *pb,
+						int level,
+						int flags);
 
 struct json_object
 {
