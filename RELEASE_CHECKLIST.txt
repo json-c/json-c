@@ -6,20 +6,43 @@ git clone https://github.com/json-c/json-c json-c-${release}
 cd json-c-${release}
 
 Check that the compile works on Linux
+Check that the compile works on NetBSD
 Check that the compile works on Windows
 Check ChangeLog to see if anything should be added.
 
-git branch json-c-${release}
-git checkout json-c-${release}
-sh autogen.sh
-XXX doxygen
+  git branch json-c-${release}
+  git checkout json-c-${release}
 
-XXX Add generated files to git?
+Generate the configure script and other files:
+  sh autogen.sh
+  git add -f Makefile.in aclocal.m4 config.guess \
+       config.sub configure depcomp install-sh \
+       ltmain.sh missing tests/Makefile.in
+
+  # check for anything else to be added:
+  git status --ignored
+  git commit
+
+Generate the doxygen documentation:
+  doxygen
+  git add doc
+  git commit doc
 
 cd ..
-tar czf json-c-${release}.tar.gz json-c-${release}
+echo .git > excludes
+echo autom4te.cache >> excludes
+tar -czf json-c-${release}.tar.gz -X excludes json-c-${release}
 
-XXX upload tarball to ???
+echo doc >> excludes
+tar -czf json-c-${release}-doc.tar.gz -X excludes json-c-${release}
+
+Tag the branch:
+cd json-c-${release}
+git tag json-c-${release}-$(date +%Y%m%d)
+
+Go to https://github.com/json-c/json-c/downloads
+Upload the two tarballs.
+
 
 ===================================
 
