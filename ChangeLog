@@ -1,4 +1,26 @@
 0.10
+
+  * Add a json_object_to_json_string_ext() function to allow output to be
+     formatted in a more human readable form.
+  * Add json_object_object_get_ex(), a NULL-safe get object method, to be able
+     to distinguish between a key not present and the value being NULL.
+  * Add an alternative iterator implementation, see json_object_iterator.h
+  * Make json_object_iter public to enable external use of the
+     json_object_object_foreachC macro.
+  * Add a printbuf_memset() function to provide an effecient way to set and
+     append things like whitespace indentation.
+  * Adjust json_object_is_type and json_object_get_type so they return
+      json_type_null for NULL objects and handle NULL passed to
+      json_objct_object_get().
+  * Rename boolean type to json_bool.
+  * Fix various compile issues for Visual Studio and MinGW.
+  * Allow json_tokener_parse_ex() to be re-used to parse multiple object.
+     Also, fix some parsing issues with capitalized hexadecimal numbers and
+     number in E notation.
+  * Add json_tokener_get_error() and json_tokener_error_desc() to better 
+     encapsulate the process of retrieving errors while parsing.
+  * Various improvements to the documentation of many functions.
+  * Add new json_object_array_sort() function.
   * Fix a bug in json_object_get_int(), which would incorrectly return 0
     when called on a string type object.
     Eric Haszlakiewicz
