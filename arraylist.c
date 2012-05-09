@@ -74,7 +74,7 @@ static int array_list_expand_internal(struct array_list *arr, int max)
 int
 array_list_put_idx(struct array_list *arr, int idx, void *data)
 {
-  if(array_list_expand_internal(arr, idx)) return -1;
+  if(array_list_expand_internal(arr, idx+1)) return -1;
   if(arr->array[idx]) arr->free_fn(arr->array[idx]);
   arr->array[idx] = data;
   if(arr->length <= idx) arr->length = idx + 1;
