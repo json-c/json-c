@@ -26,7 +26,14 @@
 #include "json_object_private.h"
 #include "json_util.h"
 
-#if !HAVE_STRNDUP
+#if !defined(HAVE_STRDUP) && defined(_MSC_VER)
+  /* MSC has the version as _strdup */
+# define strdup _strdup
+#elif !defined(HAVE_STRDUP)
+# error You do not have strdup on your system.
+#endif /* HAVE_STRDUP */
+
+#if !defined(HAVE_STRNDUP)
   char* strndup(const char* str, size_t n);
 #endif /* !HAVE_STRNDUP */
 

@@ -20,19 +20,19 @@
 #include <errno.h>
 #include <ctype.h>
 
-#if HAVE_SYS_TYPES_H
+#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif /* HAVE_SYS_TYPES_H */
 
-#if HAVE_SYS_STAT_H
+#ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #endif /* HAVE_SYS_STAT_H */
 
-#if HAVE_FCNTL_H
+#ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif /* HAVE_FCNTL_H */
 
-#if HAVE_UNISTD_H
+#ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif /* HAVE_UNISTD_H */
 
@@ -42,10 +42,16 @@
 # include <io.h>
 #endif /* defined(WIN32) */
 
-#if !HAVE_OPEN && defined(WIN32)
+#if !defined(HAVE_OPEN) && defined(WIN32)
 # define open _open
 #endif
 
+#if !defined(HAVE_SNPRINTF) && defined(_MSC_VER)
+  /* MSC has the version as _snprintf */
+# define snprintf _snprintf
+#elif !defined(HAVE_SNPRINTF)
+# error You do not have snprintf on your system.
+#endif /* HAVE_SNPRINTF */
 
 #include "bits.h"
 #include "debug.h"
@@ -204,7 +210,7 @@ int json_parse_int64(const char *buf, int64_t *retval)
 	return 0;
 }
 
-#if HAVE_REALLOC == 0
+#ifndef HAVE_REALLOC
 void* rpl_realloc(void* p, size_t n)
 {
 	if (n == 0)

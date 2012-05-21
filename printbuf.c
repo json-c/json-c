@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if HAVE_STDARG_H
+#ifdef HAVE_STDARG_H
 # include <stdarg.h>
 #else /* !HAVE_STDARG_H */
 # error Not enough var arg support!
@@ -108,13 +108,13 @@ int printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len)
 	return 0;
 }
 
-#if !HAVE_VSNPRINTF && defined(_MSC_VER)
+#if !defined(HAVE_VSNPRINTF) && defined(_MSC_VER)
 # define vsnprintf _vsnprintf
-#elif !HAVE_VSNPRINTF /* !HAVE_VSNPRINTF */
+#elif !defined(HAVE_VSNPRINTF) /* !HAVE_VSNPRINTF */
 # error Need vsnprintf!
 #endif /* !HAVE_VSNPRINTF && defined(WIN32) */
 
-#if !HAVE_VASPRINTF
+#if !defined(HAVE_VASPRINTF)
 /* CAW: compliant version of vasprintf */
 static int vasprintf(char **buf, const char *fmt, va_list ap)
 {
