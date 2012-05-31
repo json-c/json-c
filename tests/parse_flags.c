@@ -1,8 +1,16 @@
+#include "config.h"
+
 #include <stdio.h>
 #include <string.h>
 
 #include "json.h"
 #include "parse_flags.h"
+
+#if !defined(HAVE_STRCASECMP) && defined(_MSC_VER)
+# define strcasecmp _stricmp
+#elif !defined(HAVE_STRCASECMP)
+# error You do not have strcasecmp on your system.
+#endif /* HAVE_STRNCASECMP */
 
 static struct {
 	const char *arg;

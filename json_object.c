@@ -26,7 +26,14 @@
 #include "json_object_private.h"
 #include "json_util.h"
 
-#if !HAVE_STRNDUP
+#if !defined(HAVE_STRDUP) && defined(_MSC_VER)
+  /* MSC has the version as _strdup */
+# define strdup _strdup
+#elif !defined(HAVE_STRDUP)
+# error You do not have strdup on your system.
+#endif /* HAVE_STRDUP */
+
+#if !defined(HAVE_STRNDUP)
   char* strndup(const char* str, size_t n);
 #endif /* !HAVE_STRNDUP */
 
@@ -531,7 +538,7 @@ struct json_object* json_object_new_string_len(const char *s, int len)
   if(!jso) return NULL;
   jso->_delete = &json_object_string_delete;
   jso->_to_json_string = &json_object_string_to_json_string;
-  jso->o.c_string.str = malloc(len);
+  jso->o.c_string.str = (char*)malloc(len);
   memcpy(jso->o.c_string.str, (void *)s, len);
   jso->o.c_string.len = len;
   return jso;

@@ -12,8 +12,8 @@ static int sort_fn (const void *j1, const void *j2)
   json_object * const *jso1, * const *jso2;
   int i1, i2;
 
-  jso1 = j1;
-  jso2 = j2;
+  jso1 = (json_object* const*)j1;
+  jso2 = (json_object* const*)j2;
   if (!*jso1 && !*jso2) {
     return 0;
   }
