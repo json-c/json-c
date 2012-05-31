@@ -523,6 +523,7 @@ static void json_object_string_delete(struct json_object* jso)
 
 struct json_object* json_object_new_string(const char *s)
 {
+  if(!s) return NULL;
   struct json_object *jso = json_object_new(json_type_string);
   if(!jso) return NULL;
   jso->_delete = &json_object_string_delete;
