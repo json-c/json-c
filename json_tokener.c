@@ -31,13 +31,19 @@
 #include "json_tokener.h"
 #include "json_util.h"
 
+#if !HAVE_STRDUP && defined(_MSC_VER)
+  /* MSC has the version as _strdup */
+# define strdup _strdup
+#elif !HAVE_STRDUP
+# error You do not have strdup on your system.
+#endif /* HAVE_STRDUP */
+
 #if !HAVE_STRNCASECMP && defined(_MSC_VER)
   /* MSC has the version as _strnicmp */
 # define strncasecmp _strnicmp
 #elif !HAVE_STRNCASECMP
 # error You do not have strncasecmp on your system.
 #endif /* HAVE_STRNCASECMP */
-
 
 static const char* json_null_str = "null";
 static const char* json_true_str = "true";
