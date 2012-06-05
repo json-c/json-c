@@ -18,10 +18,12 @@ libjsoninclude_HEADERS = \
 	json_inttypes.h \
 	json_object.h \
 	json_object_private.h \
+	json_object_iterator.h \
 	json_tokener.h \
 	json_util.h \
 	linkhash.h \
 	printbuf.h
+	
 
 #libjsonx_includedir = $(libdir)/json-c-@VERSION@
 #
