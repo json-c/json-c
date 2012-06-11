@@ -27,7 +27,7 @@ AC_FUNC_VPRINTF
 AC_FUNC_MEMCMP
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
-AC_CHECK_FUNCS(strndup strerror vsnprintf vasprintf open vsyslog strncasecmp)
+AC_CHECK_FUNCS(strndup strerror vsnprintf vasprintf open vsyslog strncasecmp strdup snprintf)
 
 AM_PROG_LIBTOOL
 
