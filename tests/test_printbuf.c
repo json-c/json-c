@@ -124,7 +124,7 @@ static void test_sprintbuf(int before_resize)
 	memset(data, 'X', before_resize + 1 + 1);
 	data[before_resize + 1] = '\0';
 	sprintbuf(pb, "%s", data);
-	printf("sprintbuf to just after resize(%d+1): %d, [%s], strlen(buf)=%d\n", before_resize, printbuf_length(pb), pb->buf, strlen(pb->buf));
+	printf("sprintbuf to just after resize(%d+1): %d, [%s], strlen(buf)=%zd\n", before_resize, printbuf_length(pb), pb->buf, strlen(pb->buf));
 
 	printbuf_reset(pb);
 	sprintbuf(pb, "plain");
