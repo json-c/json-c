@@ -71,7 +71,7 @@ struct json_object* json_object_from_file(const char *filename)
   if((fd = open(filename, O_RDONLY)) < 0) {
     MC_ERROR("json_object_from_file: error reading file %s: %s\n",
 	     filename, strerror(errno));
-    return NULL; // XAX this is an API change!
+    return NULL;
   }
   if(!(pb = printbuf_new())) {
     close(fd);
