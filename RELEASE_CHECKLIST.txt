@@ -38,7 +38,9 @@ tar -czf json-c-${release}-nodoc.tar.gz -X excludes json-c-${release}
 
 Tag the branch:
 cd json-c-${release}
-git tag json-c-${release}-$(date +%Y%m%d)
+git tag -a json-c-${release}-$(date +%Y%m%d)
+git push
+git push --tags
 
 Go to https://github.com/json-c/json-c/downloads
 Upload the two tarballs.
