@@ -167,8 +167,7 @@ int json_parse_int64(const char *buf, int64_t *retval)
 		buf_skip_space++;
 	if (buf_skip_space[0] == '0' && buf_skip_space[1] == '\0')
 		orig_has_neg = 0; // "-0" is the same as just plain "0"
-	
-	if (errno != ERANGE)
+
 	{
 		char buf_cmp[100];
 		char *buf_cmp_start = buf_cmp;
@@ -196,15 +195,11 @@ int json_parse_int64(const char *buf, int64_t *retval)
 		    )
 		   )
 		{
-			errno = ERANGE;
+			if (orig_has_neg)
+				num64 = INT64_MIN;
+			else
+				num64 = INT64_MAX;
 		}
-	}
-	if (errno == ERANGE)
-	{
-		if (orig_has_neg)
-			num64 = INT64_MIN;
-		else
-			num64 = INT64_MAX;
 	}
 	*retval = num64;
 	return 0;
