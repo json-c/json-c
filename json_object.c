@@ -306,8 +306,20 @@ struct lh_table* json_object_get_object(struct json_object *jso)
 void json_object_object_add(struct json_object* jso, const char *key,
 			    struct json_object *val)
 {
-  lh_table_delete(jso->o.c_object, key);
-  lh_table_insert(jso->o.c_object, strdup(key), val);
+	// We lookup the entry and replace the value, rather than just deleting
+	// and re-adding it, so the existing key remains valid.
+	json_object *existing_value = NULL;
+	struct lh_entry *existing_entry;
+	existing_entry = lh_table_lookup_entry(jso->o.c_object, (void*)key);
+	if (!existing_entry)
+	{
+		lh_table_insert(jso->o.c_object, strdup(key), val);
+		return;
+	}
+	existing_value = (void *)existing_entry->v;
+	if (existing_value)
+		json_object_put(existing_value);
+	existing_entry->v = val;
 }
 
 struct json_object* json_object_object_get(struct json_object* jso, const char *key)
