@@ -11,8 +11,9 @@
 /configure
 /depcomp
 /install-sh
+/json.pc
 /json-c.pc
-/json-uninstalled.pc
+/json-c-uninstalled.pc
 /libtool
 /ltmain.sh
 /Makefile

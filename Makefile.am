@@ -10,6 +10,9 @@ endif
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = json-c.pc
+if ENABLE_OLDNAME_COMPAT
+pkgconfig_DATA += json.pc
+endif
 
 libjson_cincludedir = $(includedir)/json-c
 libjson_cinclude_HEADERS = \
