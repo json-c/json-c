@@ -147,11 +147,14 @@ int json_parse_int64(const char *buf, int64_t *retval)
 	int64_t num64;
 	const char *buf_skip_space;
 	int orig_has_neg;
+	int _errno;
+	errno = 0; // sscanf won't always set errno, so initialize
 	if (sscanf(buf, "%" SCNd64, &num64) != 1)
 	{
 		MC_DEBUG("Failed to parse, sscanf != 1\n");
 		return 1;
 	}
+	_errno = errno;
 	buf_skip_space = buf;
 	orig_has_neg = 0;
 	// Skip leading spaces
@@ -168,7 +171,7 @@ int json_parse_int64(const char *buf, int64_t *retval)
 	if (buf_skip_space[0] == '0' && buf_skip_space[1] == '\0')
 		orig_has_neg = 0; // "-0" is the same as just plain "0"
 	
-	if (errno != ERANGE)
+	if (_errno != ERANGE)
 	{
 		char buf_cmp[100];
 		char *buf_cmp_start = buf_cmp;
@@ -196,10 +199,10 @@ int json_parse_int64(const char *buf, int64_t *retval)
 		    )
 		   )
 		{
-			errno = ERANGE;
+			_errno = ERANGE;
 		}
 	}
-	if (errno == ERANGE)
+	if (_errno == ERANGE)
 	{
 		if (orig_has_neg)
 			num64 = INT64_MIN;
