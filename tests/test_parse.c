@@ -166,6 +166,15 @@ struct incremental_step {
 	/* Strings have a well defined end point, so we can stop at the quote */
 	{ "\"blue\"",         -1, -1, json_tokener_success, 0 },
 
+	/* Check each of the escape sequences defined by the spec */
+	{ "\"\\\"\"",         -1, -1, json_tokener_success, 0 },
+	{ "\"\\\\\"",         -1, -1, json_tokener_success, 0 },
+	{ "\"\\b\"",         -1, -1, json_tokener_success, 0 },
+	{ "\"\\f\"",         -1, -1, json_tokener_success, 0 },
+	{ "\"\\n\"",         -1, -1, json_tokener_success, 0 },
+	{ "\"\\r\"",         -1, -1, json_tokener_success, 0 },
+	{ "\"\\t\"",         -1, -1, json_tokener_success, 0 },
+
 	{ "[1,2,3]",          -1, -1, json_tokener_success, 0 },
 
 	/* This behaviour doesn't entirely follow the json spec, but until we have
@@ -190,6 +199,8 @@ static void test_incremental_parse()
 	num_error = 0;
 
 	printf("Starting incremental tests.\n");
+	printf("Note: quotes and backslashes seen in the output here are literal values passed\n");
+	printf("     to the parse functions.  e.g. this is 4 characters: \"\\f\"\n");
 
 	string_to_parse = "{ \"foo"; /* } */
 	printf("json_tokener_parse(%s) ... ", string_to_parse);

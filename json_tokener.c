@@ -423,10 +423,12 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
       case 'n':
       case 'r':
       case 't':
+      case 'f':
 	if(c == 'b') printbuf_memappend_fast(tok->pb, "\b", 1);
 	else if(c == 'n') printbuf_memappend_fast(tok->pb, "\n", 1);
 	else if(c == 'r') printbuf_memappend_fast(tok->pb, "\r", 1);
 	else if(c == 't') printbuf_memappend_fast(tok->pb, "\t", 1);
+	else if(c == 'f') printbuf_memappend_fast(tok->pb, "\f", 1);
 	state = saved_state;
 	break;
       case 'u':
