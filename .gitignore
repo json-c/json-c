@@ -12,6 +12,7 @@
 /depcomp
 /install-sh
 /json-c.pc
+/json-uninstalled.pc
 /libtool
 /ltmain.sh
 /Makefile
@@ -36,4 +37,5 @@
 /Release
 *.lo
 *.o
+/libjson-c.la
 /libjson.la
