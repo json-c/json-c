@@ -56,6 +56,17 @@ distclean-local:
 	-rm -rf $(testsubdir)
 	-rm -rf config.h.in~ Makefile.in aclocal.m4 autom4te.cache/ config.guess config.sub configure depcomp install-sh ltmain.sh missing
 
+if ENABLE_OLDNAME_COMPAT
+install-data-hook:
+	test \! -d "$(includedir)/json" || rmdir "$(includedir)/json"
+	test \! -e "$(includedir)/json" || rm "$(includedir)/json"
+	$(LN_S) json-c "$(includedir)/json"
+
+uninstall-local:
+	rm -f "$(includedir)/json"
+
+endif
+
 ANDROID_CFLAGS = -I$(top_srcdir) -DHAVE_CONFIG_H
 
 Android.mk: Makefile.am
