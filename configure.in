@@ -33,7 +33,7 @@ AM_PROG_LIBTOOL
 
 AC_CONFIG_FILES([
 Makefile
-json.pc
+json-c.pc
 tests/Makefile
 json-uninstalled.pc
 ])
