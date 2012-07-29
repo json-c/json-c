@@ -1,3 +1,13 @@
+
+NEXT.VERSION
+
+  * IMPORTANT: the name of the library has changed to libjson-c.so and
+     the header files are now in include/json-c.
+     The pkgconfig name has also changed from json to json-c.
+     You should change your build to use appropriate -I and -l options.
+     A compatibility shim is in place so builds using the old name will
+     continue to work, but that will be removed in the next release.
+
 0.10
 
   * Add a json_object_to_json_string_ext() function to allow output to be
