@@ -3,7 +3,7 @@ include Makefile.am.inc
 EXTRA_DIST = README.html README-WIN32.html config.h.win32 doc json-c.vcproj
 SUBDIRS = . tests
 
-lib_LTLIBRARIES = libjson-c.la
+lib_LTLIBRARIES = libjson-c.la libjson.la
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = json-c.pc
@@ -30,6 +30,10 @@ libjsoninclude_HEADERS = \
 #	json_config.h
 
 libjson_c_la_LDFLAGS = -version-info 1:0:1 -no-undefined
+libjson_la_LDFLAGS = -version-info 1:0:1 -no-undefined -ljson-c
+
+# Temporary libjson library.  This will be removed after one release.
+libjson_la_LIBADD = -ljson-c
 
 libjson_c_la_SOURCES = \
 	arraylist.c \
