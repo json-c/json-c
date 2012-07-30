@@ -28,6 +28,7 @@
 /tests/test2
 /tests/test2Formatted
 /tests/test4
+/tests/testReplaceExisting
 /tests/testSubDir
 /tests/test_parse_int64
 /tests/test_parse
