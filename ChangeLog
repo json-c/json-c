@@ -2,33 +2,33 @@
 NEXT.VERSION
 
   * IMPORTANT: the name of the library has changed to libjson-c.so and
-     the header files are now in include/json-c.
-     The pkgconfig name has also changed from json to json-c.
-     You should change your build to use appropriate -I and -l options.
-     A compatibility shim is in place so builds using the old name will
-     continue to work, but that will be removed in the next release.
+    the header files are now in include/json-c.
+    The pkgconfig name has also changed from json to json-c.
+    You should change your build to use appropriate -I and -l options.
+    A compatibility shim is in place so builds using the old name will
+    continue to work, but that will be removed in the next release.
 
 0.10
 
   * Add a json_object_to_json_string_ext() function to allow output to be
-     formatted in a more human readable form.
+    formatted in a more human readable form.
   * Add json_object_object_get_ex(), a NULL-safe get object method, to be able
-     to distinguish between a key not present and the value being NULL.
+    to distinguish between a key not present and the value being NULL.
   * Add an alternative iterator implementation, see json_object_iterator.h
   * Make json_object_iter public to enable external use of the
-     json_object_object_foreachC macro.
-  * Add a printbuf_memset() function to provide an effecient way to set and
-     append things like whitespace indentation.
+    json_object_object_foreachC macro.
+  * Add a printbuf_memset() function to provide an efficient way to set and
+    append things like whitespace indentation.
   * Adjust json_object_is_type and json_object_get_type so they return
-      json_type_null for NULL objects and handle NULL passed to
-      json_objct_object_get().
+    json_type_null for NULL objects and handle NULL passed to
+    json_object_object_get().
   * Rename boolean type to json_bool.
   * Fix various compile issues for Visual Studio and MinGW.
   * Allow json_tokener_parse_ex() to be re-used to parse multiple object.
-     Also, fix some parsing issues with capitalized hexadecimal numbers and
-     number in E notation.
-  * Add json_tokener_get_error() and json_tokener_error_desc() to better 
-     encapsulate the process of retrieving errors while parsing.
+    Also, fix some parsing issues with capitalized hexadecimal numbers and
+    number in E notation.
+  * Add json_tokener_get_error() and json_tokener_error_desc() to better
+    encapsulate the process of retrieving errors while parsing.
   * Various improvements to the documentation of many functions.
   * Add new json_object_array_sort() function.
   * Fix a bug in json_object_get_int(), which would incorrectly return 0
@@ -42,7 +42,7 @@ NEXT.VERSION
     Jehiah Czebotar
   * Fix file descriptor leak if memory allocation fails in json_util
     Zachary Blair, zack_blair at hotmail dot com
-  * Add int64 support. Two new functions json_object_net_int64 and
+  * Add int64 support. Two new functions json_object_new_int64 and
     json_object_get_int64. Binary compatibility preserved.
     Eric Haszlakiewicz, EHASZLA at transunion com
     Rui Miguel Silva Seabra, rms at 1407 dot org
@@ -73,7 +73,7 @@ NEXT.VERSION
     Brent Miller, bdmiller at yahoo dash inc dot com
   * Disable REFCOUNT_DEBUG by default in json_object.c
   * Don't use this as a variable, so we can compile with a C++ compiler
-  * Add casts from void* to type of assignment when using malloc 
+  * Add casts from void* to type of assignment when using malloc
   * Add #ifdef __cplusplus guards to all of the headers
   * Add typedefs for json_object, json_tokener, array_list, printbuf, lh_table
     Michael Clark, <michael@metaparadigm.com>
@@ -81,7 +81,7 @@ NEXT.VERSION
     to not return TRUE for zero length string. Remove redundant includes.
     Erik Hovland, erik at hovland dot org
   * Fixed warning reported by adding -Wstrict-prototypes
-    -Wold-style-definition to the compilatin flags.
+    -Wold-style-definition to the compilation flags.
     Dotan Barak, dotanba at gmail dot com
   * Add const correctness to public interfaces
     Gerard Krol, g dot c dot krol at student dot tudelft dot nl
@@ -100,7 +100,7 @@ NEXT.VERSION
 
 0.7
   * Add escaping of backslash to json output
-  * Add escaping of foward slash on tokenizing and output
+  * Add escaping of forward slash on tokenizing and output
   * Changes to internal tokenizer from using recursion to
     using a depth state structure to allow incremental parsing
 
@@ -150,12 +150,12 @@ NEXT.VERSION
     Added a Win32/Win64 compliant implementation of strndup
   * json_util.c - C. Watford (christopher.watford@gmail.com)
     Added cast and mask to suffice size_t v. unsigned int conversion
-    correctness 
+    correctness
   * json_tokener.c - sign reversal issue on error info for nested object parse
     spotted by Johan Björklund (johbjo09 at kth.se)
   * json_object.c - escape " in json_escape_str
   * Change to automake and libtool to build shared and static library
     Michael Clark <michael@metaparadigm.com>
-	
+
 0.1
   * initial release
