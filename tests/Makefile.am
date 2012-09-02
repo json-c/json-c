@@ -42,6 +42,10 @@ TESTS+= test_printbuf.test
 check_PROGRAMS+=test_printbuf
 test_printbuf_LDADD = $(LIBJSON_LA)
 
+TESTS+= test_set_serializer.test
+check_PROGRAMS += test_set_serializer
+test_set_serializer_LDADD = $(LIBJSON_LA)
+
 EXTRA_DIST=
 EXTRA_DIST += $(TESTS)
 

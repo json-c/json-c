@@ -16,16 +16,12 @@
 extern "C" {
 #endif
 
-typedef void (json_object_delete_fn)(struct json_object *o);
-typedef int (json_object_to_json_string_fn)(struct json_object *o,
-						struct printbuf *pb,
-						int level,
-						int flags);
+typedef void (json_object_private_delete_fn)(struct json_object *o);
 
 struct json_object
 {
   enum json_type o_type;
-  json_object_delete_fn *_delete;
+  json_object_private_delete_fn *_delete;
   json_object_to_json_string_fn *_to_json_string;
   int _ref_count;
   struct printbuf *_pb;
@@ -40,6 +36,8 @@ struct json_object
         int len;
     } c_string;
   } o;
+  json_object_delete_fn *_user_delete;
+  void *_userdata;
 };
 
 #ifdef __cplusplus

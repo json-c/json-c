@@ -46,6 +46,13 @@ const char *json_hex_chars = "0123456789abcdefABCDEF";
 static void json_object_generic_delete(struct json_object* jso);
 static struct json_object* json_object_new(enum json_type o_type);
 
+static json_object_to_json_string_fn json_object_object_to_json_string;
+static json_object_to_json_string_fn json_object_boolean_to_json_string;
+static json_object_to_json_string_fn json_object_int_to_json_string;
+static json_object_to_json_string_fn json_object_double_to_json_string;
+static json_object_to_json_string_fn json_object_string_to_json_string;
+static json_object_to_json_string_fn json_object_array_to_json_string;
+
 
 /* ref count debugging */
 
@@ -134,10 +141,16 @@ extern struct json_object* json_object_get(struct json_object *jso)
 
 extern void json_object_put(struct json_object *jso)
 {
-  if(jso) {
-    jso->_ref_count--;
-    if(!jso->_ref_count) jso->_delete(jso);
-  }
+	if(jso)
+	{
+		jso->_ref_count--;
+		if(!jso->_ref_count)
+		{
+			if (jso->_user_delete)
+				jso->_user_delete(jso, jso->_userdata);
+			jso->_delete(jso);
+		}
+	}
 }
 
 
@@ -186,6 +199,57 @@ enum json_type json_object_get_type(struct json_object *jso)
     return json_type_null;
   return jso->o_type;
 }
+
+/* set a custom conversion to string */
+
+void json_object_set_serializer(json_object *jso,
+	json_object_to_json_string_fn to_string_func,
+	void *userdata,
+	json_object_delete_fn *user_delete)
+{
+	// First, clean up any previously existing user info
+	if (jso->_user_delete)
+	{
+		jso->_user_delete(jso, jso->_userdata);
+	}
+	jso->_userdata = NULL;
+	jso->_user_delete = NULL;
+
+	if (to_string_func == NULL)
+	{
+		// Reset to the standard serialization function
+		switch(jso->o_type)
+		{
+		case json_type_null:
+			jso->_to_json_string = NULL;
+			break;
+		case json_type_boolean:
+			jso->_to_json_string = &json_object_boolean_to_json_string;
+			break;
+		case json_type_double:
+			jso->_to_json_string = &json_object_double_to_json_string;
+			break;
+		case json_type_int:
+			jso->_to_json_string = &json_object_int_to_json_string;
+			break;
+		case json_type_object:
+			jso->_to_json_string = &json_object_object_to_json_string;
+			break;
+		case json_type_array:
+			jso->_to_json_string = &json_object_array_to_json_string;
+			break;
+		case json_type_string:
+			jso->_to_json_string = &json_object_string_to_json_string;
+			break;
+		}
+		return;
+	}
+
+	jso->_to_json_string = to_string_func;
+	jso->_userdata = userdata;
+	jso->_user_delete = user_delete;
+}
+
 
 /* extended conversion to string */
 

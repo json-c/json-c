@@ -70,6 +70,19 @@ typedef struct json_object json_object;
 typedef struct json_object_iter json_object_iter;
 typedef struct json_tokener json_tokener;
 
+/**
+ * Type of custom user delete functions.  See json_object_set_serializer.
+ */
+typedef void (json_object_delete_fn)(struct json_object *jso, void *userdata);
+
+/**
+ * Type of a custom serialization function.  See json_object_set_serializer.
+ */
+typedef int (json_object_to_json_string_fn)(struct json_object *jso,
+						struct printbuf *pb,
+						int level,
+						int flags);
+
 /* supported object types */
 
 typedef enum json_type {
@@ -148,6 +161,38 @@ extern const char* json_object_to_json_string(struct json_object *obj);
  */
 extern const char* json_object_to_json_string_ext(struct json_object *obj, int
 flags);
+
+/**
+ * Set a custom serialization function to be used when this particular object
+ * is converted to a string by json_object_to_json_string.
+ *
+ * If a custom serializer is already set on this object, any existing 
+ * user_delete function is called before the new one is set.
+ *
+ * If to_string_func is NULL, the other parameters are ignored
+ * and the default behaviour is reset.
+ *
+ * The userdata parameter is optional and may be passed as NULL.  If provided,
+ * it is passed to to_string_func as-is.  This parameter may be NULL even
+ * if user_delete is non-NULL.
+ *
+ * The user_delete parameter is optional and may be passed as NULL, even if
+ * the userdata parameter is non-NULL.  It will be called just before the
+ * json_object is deleted, after it's reference count goes to zero
+ * (see json_object_put()).
+ * If this is not provided, it is up to the caller to free the userdata at
+ * an appropriate time. (i.e. after the json_object is deleted)
+ *
+ * @param jso the object to customize
+ * @param to_string_func the custom serialization function
+ * @param userdata an optional opaque cookie
+ * @param user_delete an optional function from freeing userdata
+ */
+void json_object_set_serializer(json_object *jso,
+	json_object_to_json_string_fn to_string_func,
+	void *userdata,
+	json_object_delete_fn *user_delete);
+
 
 
 /* object type methods */
