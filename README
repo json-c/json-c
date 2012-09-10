@@ -1,9 +1,17 @@
 Building on Unix with git, gcc and autotools
 
 Home page for json-c:
-  http://oss.metaparadigm.com/json-c/
+  https://github.com/json-c/json-c/wiki
 
   Caution: do NOT use sources from svn.metaparadigm.com, they are old.
+
+Prerequisites:
+	gcc (or another C compiler)
+	libtool
+
+	If you're not using a release tarball, you'll also need:
+	autoconf (autoreconf)
+	automake
 
 Github repo for json-c:
   https://github.com/json-c/json-c
