@@ -37,6 +37,24 @@ AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS(strcasecmp strdup strndup strerror snprintf vsnprintf vasprintf open vsyslog strncasecmp)
 
+#check if .section.gnu.warning accepts long strings (for __warn_references)
+AC_LANG_PUSH([C])
+
+AC_MSG_CHECKING([if .gnu.warning accepts long strings])
+AC_LINK_IFELSE([[
+extern void json_object_get();
+__asm__(".section .gnu.json_object_get,\n\t.ascii \"Please link against libjson-c instead of libjson\"\n\t.text");
+
+int main(int c,char* v) {return 0;}
+]], [
+    AC_DEFINE(HAS_GNU_WARNING_LONG, 1, [Define if .gnu.warning accepts long strings.])
+    AC_MSG_RESULT(yes)
+], [
+   AC_MSG_RESULT(no)
+])
+
+AC_LANG_POP([C])
+
 AM_PROG_LIBTOOL
 
 AC_CONFIG_FILES([
