@@ -27,6 +27,7 @@ my_array=
 	[3]=2
 	[4]=3
 my_array.to_string()=[ null, 0, 1, 2, 3 ]
+baz_obj.to_string()="fark"
 my_object=
 	abc: 12
 	foo: "bar"

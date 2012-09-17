@@ -107,8 +107,15 @@ int main(int argc, char **argv)
 	json_object_object_add(my_object, "bool0", json_object_new_boolean(0));
 	json_object_object_add(my_object, "bool1", json_object_new_boolean(1));
 	json_object_object_add(my_object, "baz", json_object_new_string("bang"));
-	json_object_object_add(my_object, "baz", json_object_new_string("fark"));
+
+	json_object *baz_obj = json_object_new_string("fark");
+	json_object_object_add(my_object, "baz", baz_obj);
 	json_object_object_del(my_object, "baz");
+
+	/* baz_obj should still be valid */
+	printf("baz_obj.to_string()=%s\n", json_object_to_json_string(baz_obj));
+	json_object_put(baz_obj);
+
 	/*json_object_object_add(my_object, "arr", my_array);*/
 	printf("my_object=\n");
 	json_object_object_foreach(my_object, key, val)

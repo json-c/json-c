@@ -45,6 +45,7 @@ my_array.to_string()=[
   2,
   3
 ]
+baz_obj.to_string()="fark"
 my_object=
 	abc: 12
 	foo: "bar"
