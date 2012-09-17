@@ -14,7 +14,7 @@ static void test_printbuf_memset_length(void);
 static void test_basic_printbuf_memset()
 {
 	struct printbuf *pb;
-	
+
 	printf("%s: starting test\n", __func__);
 	pb = printbuf_new();
 	sprintbuf(pb, "blue:%d", 1);
@@ -104,7 +104,7 @@ static void test_printbuf_memappend(int *before_resize)
 	memset(data, 'X', *before_resize + 1);
 	printbuf_memappend_fast(pb, data, *before_resize + 1);
 	printf("Append to just after resize: %d, [%s]\n", printbuf_length(pb), pb->buf);
-	
+
 	free(data);
 
 	printbuf_free(pb);

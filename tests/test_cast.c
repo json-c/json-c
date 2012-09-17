@@ -58,9 +58,9 @@ int main(int argc, char **argv)
 	checktype(new_obj, "big_number");
 	checktype(new_obj, "a_null");
 
-    json_object_put(new_obj);
+	json_object_put(new_obj);
 
-    return 0;
+	return 0;
 }
 
 static void getit(struct json_object *new_obj, const char *field)

@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 	printf("my_object.to_string(custom serializer)=%s\n", json_object_to_json_string(my_object));
 	printf("Next line of output should be from the custom freeit function:\n");
 
-	freeit_was_called = 0;	
+	freeit_was_called = 0;
 	json_object_put(my_object);
 	assert(freeit_was_called);
 
