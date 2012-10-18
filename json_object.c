@@ -390,13 +390,16 @@ void json_object_object_add(struct json_object* jso, const char *key,
 
 struct json_object* json_object_object_get(struct json_object* jso, const char *key)
 {
-  struct json_object *result;
+  struct json_object *result = NULL;
   json_object_object_get_ex(jso, key, &result);
   return result;
 }
 
 json_bool json_object_object_get_ex(struct json_object* jso, const char *key, struct json_object **value)
 {
+	if (value != NULL)
+		*value = NULL;
+
   if (NULL == jso) return FALSE;
 
   switch(jso->o_type) {
