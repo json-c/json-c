@@ -390,9 +390,9 @@ void json_object_object_add(struct json_object* jso, const char *key,
 
 struct json_object* json_object_object_get(struct json_object* jso, const char *key)
 {
-  struct json_object *result = NULL;
-  json_object_object_get_ex(jso, key, &result);
-  return result;
+	struct json_object *result = NULL;
+	json_object_object_get_ex(jso, key, &result);
+	return result;
 }
 
 json_bool json_object_object_get_ex(struct json_object* jso, const char *key, struct json_object **value)
@@ -400,17 +400,18 @@ json_bool json_object_object_get_ex(struct json_object* jso, const char *key, st
 	if (value != NULL)
 		*value = NULL;
 
-  if (NULL == jso) return FALSE;
+	if (NULL == jso)
+		return FALSE;
 
-  switch(jso->o_type) {
-  case json_type_object:
-    return lh_table_lookup_ex(jso->o.c_object, (void*)key, (void**)value);
-  default:
-    if (value != NULL) {
-      *value = NULL;
-    }
-    return FALSE;
-  }
+	switch(jso->o_type)
+	{
+	case json_type_object:
+		return lh_table_lookup_ex(jso->o.c_object, (void*)key, (void**)value);
+	default:
+		if (value != NULL)
+			*value = NULL;
+		return FALSE;
+	}
 }
 
 void json_object_object_del(struct json_object* jso, const char *key)
