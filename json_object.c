@@ -139,7 +139,7 @@ extern struct json_object* json_object_get(struct json_object *jso)
   return jso;
 }
 
-extern void json_object_put(struct json_object *jso)
+int json_object_put(struct json_object *jso)
 {
 	if(jso)
 	{
@@ -149,8 +149,10 @@ extern void json_object_put(struct json_object *jso)
 			if (jso->_user_delete)
 				jso->_user_delete(jso, jso->_userdata);
 			jso->_delete(jso);
+			return 1;
 		}
 	}
+	return 0;
 }
 
 
@@ -410,7 +412,7 @@ json_bool json_object_object_get_ex(struct json_object* jso, const char *key, st
 
 void json_object_object_del(struct json_object* jso, const char *key)
 {
-  lh_table_delete(jso->o.c_object, key);
+	lh_table_delete(jso->o.c_object, key);
 }
 
 
