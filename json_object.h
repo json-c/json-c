@@ -287,7 +287,13 @@ extern json_bool json_object_object_get_ex(struct json_object* obj,
  */
 extern void json_object_object_del(struct json_object* obj, const char *key);
 
-/** Iterate through all keys and values of an object
+/**
+ * Iterate through all keys and values of an object.
+ *
+ * Adding or deleting keys to the object while iterating is NOT allowed.
+ *
+ * Replacing an existing key with a new value IS allowed.
+ *
  * @param obj the json_object instance
  * @param key the local name for the char* key variable defined in the body
  * @param val the local name for the json_object* object variable defined in
@@ -296,14 +302,27 @@ extern void json_object_object_del(struct json_object* obj, const char *key);
 #if defined(__GNUC__) && !defined(__STRICT_ANSI__)
 
 # define json_object_object_foreach(obj,key,val) \
- char *key; struct json_object *val; \
- for(struct lh_entry *entry = json_object_get_object(obj)->head; ({ if(entry) { key = (char*)entry->k; val = (struct json_object*)entry->v; } ; entry; }); entry = entry->next )
+	char *key; \
+	struct json_object *val; \
+	for(struct lh_entry *entry = json_object_get_object(obj)->head; \
+		({ if(entry) { \
+			key = (char*)entry->k; \
+			val = (struct json_object*)entry->v; \
+		} ; entry; }); \
+		entry = entry->next )
 
 #else /* ANSI C or MSC */
 
 # define json_object_object_foreach(obj,key,val) \
- char *key; struct json_object *val; struct lh_entry *entry; \
- for(entry = json_object_get_object(obj)->head; (entry ? (key = (char*)entry->k, val = (struct json_object*)entry->v, entry) : 0); entry = entry->next)
+	char *key;\
+	struct json_object *val; \
+	struct lh_entry *entry; \
+	for(entry = json_object_get_object(obj)->head; \
+		(entry ? ( \
+			key = (char*)entry->k, \
+			val = (struct json_object*)entry->v, \
+			entry) : 0); \
+		entry = entry->next)
 
 #endif /* defined(__GNUC__) && !defined(__STRICT_ANSI__) */
 
