@@ -16,9 +16,29 @@ int main(int argc, char **argv)
 	json_object *my_object = json_object_new_object();
 	json_object_object_add(my_object, "foo1", json_object_new_string("bar1"));
 	json_object_object_add(my_object, "foo2", json_object_new_string("bar2"));
+	json_object_object_add(my_object, "deleteme", json_object_new_string("bar2"));
 	json_object_object_add(my_object, "foo3", json_object_new_string("bar3"));
-	const char *original_key = NULL;
+
+	printf("==== delete-in-loop test starting ====\n");
+
 	int orig_count = 0;
+	json_object_object_foreach(my_object, key0, val0)
+	{
+		printf("Key at index %d is [%s]", orig_count, key0);
+		if (strcmp(key0, "deleteme") == 0)
+		{
+			json_object_object_del(my_object, key0);
+			printf(" (deleted)\n");
+		}
+		else
+			printf(" (kept)\n");
+		orig_count++;
+	}
+
+	printf("==== replace-value first loop starting ====\n");
+
+	const char *original_key = NULL;
+	orig_count = 0;
 	json_object_object_foreach(my_object, key, val)
 	{
 		printf("Key at index %d is [%s]\n", orig_count, key);
