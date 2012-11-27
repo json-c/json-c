@@ -69,17 +69,17 @@ struct json_tokener_srec
   char *obj_field_name;
 };
 
-#define JSON_TOKENER_MAX_DEPTH 32
+#define JSON_TOKENER_DEFAULT_DEPTH 32
 
 struct json_tokener
 {
   char *str;
   struct printbuf *pb;
-  int depth, is_double, st_pos, char_offset;
+  int max_depth, depth, is_double, st_pos, char_offset;
   enum json_tokener_error err;
   unsigned int ucs_char;
   char quote_char;
-  struct json_tokener_srec stack[JSON_TOKENER_MAX_DEPTH];
+  struct json_tokener_srec *stack;
 };
 
 /**
@@ -110,6 +110,7 @@ extern const char* json_tokener_errors[];
 enum json_tokener_error json_tokener_get_error(struct json_tokener *tok);
 
 extern struct json_tokener* json_tokener_new(void);
+extern struct json_tokener* json_tokener_new_ex(int depth);
 extern void json_tokener_free(struct json_tokener *tok);
 extern void json_tokener_reset(struct json_tokener *tok);
 extern struct json_object* json_tokener_parse(const char *str);

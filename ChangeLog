@@ -7,6 +7,9 @@ NEXT.VERSION
      You should change your build to use appropriate -I and -l options.
      A compatibility shim is in place so builds using the old name will
      continue to work, but that will be removed in the next release.
+  * Maximum recursion depth is now a runtime option.
+     json_tokener_new() is provided for compatibility.
+     json_tokener_new_ex(depth)
 
 0.10
 
