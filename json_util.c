@@ -36,6 +36,10 @@
 # include <unistd.h>
 #endif /* HAVE_UNISTD_H */
 
+#ifdef HAVE_LOCALE_H
+#include <locale.h>
+#endif /* HAVE_LOCALE_H */
+
 #ifdef WIN32
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
@@ -140,6 +144,27 @@ int json_object_to_file_ext(char *filename, struct json_object *obj, int flags)
 int json_object_to_file(char *filename, struct json_object *obj)
 {
   return json_object_to_file_ext(filename, obj, JSON_C_TO_STRING_PLAIN);
+}
+
+int json_parse_double(const char *buf, double *retval)
+{
+	int ret;
+#ifdef HAVE_SETLOCALE
+	char *old=NULL, *tmp;
+
+	tmp = setlocale(LC_NUMERIC, NULL);
+	if (tmp) old = strdup(tmp);
+	setlocale(LC_NUMERIC, "C");
+#endif
+
+	ret = sscanf(buf, "%lf", retval);
+
+#ifdef HAVE_SETLOCALE
+	setlocale(LC_NUMERIC, old);
+	if (old) free(old);
+#endif
+
+	return (ret==1 ? 0 : 1);
 }
 
 int json_parse_int64(const char *buf, int64_t *retval)
