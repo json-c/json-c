@@ -109,6 +109,7 @@ int main(int argc, char **argv)
 	json_object_object_add(my_object, "baz", json_object_new_string("bang"));
 
 	json_object *baz_obj = json_object_new_string("fark");
+	json_object_get(baz_obj);
 	json_object_object_add(my_object, "baz", baz_obj);
 	json_object_object_del(my_object, "baz");
 
