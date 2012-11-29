@@ -49,6 +49,7 @@ libjson_c_la_SOURCES = \
 	arraylist.c \
 	debug.c \
 	json_object.c \
+	json_object_iterator.c \
 	json_tokener.c \
 	json_util.c \
 	linkhash.c \
