@@ -562,7 +562,7 @@ static int json_object_double_to_json_string(struct json_object* jso,
   } else {
     p = strchr(buf, '.');
   }
-  if (p) {
+  if (p && (flags & JSON_C_TO_STRING_NOZERO)) {
     /* last useful digit, always keep 1 zero */
     p++;
     for (q=p ; *q ; q++) {
