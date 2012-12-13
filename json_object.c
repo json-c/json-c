@@ -552,7 +552,16 @@ static int json_object_double_to_json_string(struct json_object* jso,
 					     int level,
 						 int flags)
 {
-  return sprintbuf(pb, "%f", jso->o.c_double);
+  char buf[128], *p;
+  int size;
+
+  size = snprintf(buf, 128, "%f", jso->o.c_double);
+  p = strchr(buf, ',');
+  if (p) {
+    *p = '.';
+  }
+  printbuf_memappend(pb, buf, size);
+  return size;
 }
 
 struct json_object* json_object_new_double(double d)
