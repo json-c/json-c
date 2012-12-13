@@ -145,15 +145,20 @@ int json_object_to_file(char *filename, struct json_object *obj)
 int json_parse_int64(const char *buf, int64_t *retval)
 {
 	int64_t num64;
+#ifndef HAS_SSCANF_ERANGE
 	const char *buf_skip_space;
 	int orig_has_neg;
 	int _errno;
+
 	errno = 0; // sscanf won't always set errno, so initialize
+#endif
+
 	if (sscanf(buf, "%" SCNd64, &num64) != 1)
 	{
 		MC_DEBUG("Failed to parse, sscanf != 1\n");
 		return 1;
 	}
+#ifndef HAS_SSCANF_ERANGE
 	_errno = errno;
 	buf_skip_space = buf;
 	orig_has_neg = 0;
@@ -209,6 +214,7 @@ int json_parse_int64(const char *buf, int64_t *retval)
 		else
 			num64 = INT64_MAX;
 	}
+#endif
 	*retval = num64;
 	return 0;
 }
