@@ -70,6 +70,7 @@ install-data-hook:
 
 uninstall-local:
 	rm -f "$(includedir)/json"
+	rm -rf "$(includedir)/json-c"
 
 endif
 
