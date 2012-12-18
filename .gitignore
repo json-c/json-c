@@ -10,6 +10,7 @@
 /config.sub
 /configure
 /depcomp
+/doc
 /install-sh
 /json.pc
 /json-c.pc
