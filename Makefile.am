@@ -65,7 +65,6 @@ maintainer-clean-local:
 
 if ENABLE_OLDNAME_COMPAT
 install-data-hook:
-	test \! -d "$(includedir)/json" || rmdir "$(includedir)/json"
 	test \! -e "$(includedir)/json" || rm "$(includedir)/json"
 	$(LN_S) json-c "$(includedir)/json"
 
