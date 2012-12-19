@@ -1,7 +1,7 @@
 
 include ../Makefile.am.inc
 
-LIBJSON_LA=$(top_builddir)/libjson.la
+LIBJSON_LA=$(top_builddir)/libjson-c.la
 
 check_PROGRAMS = test1 test1Formatted 
 check_PROGRAMS += test2 test2Formatted
