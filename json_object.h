@@ -305,28 +305,28 @@ extern void json_object_object_del(struct json_object* obj, const char *key);
 # define json_object_object_foreach(obj,key,val) \
 	char *key; \
 	struct json_object *val; \
-	for(struct lh_entry *entry = json_object_get_object(obj)->head, *entry_next = NULL; \
-		({ if(entry) { \
-			key = (char*)entry->k; \
-			val = (struct json_object*)entry->v; \
-			entry_next = entry->next; \
-		} ; entry; }); \
-		entry = entry_next )
+	for(struct lh_entry *entry ## key = json_object_get_object(obj)->head, *entry_next ## key = NULL; \
+		({ if(entry ## key) { \
+			key = (char*)entry ## key->k; \
+			val = (struct json_object*)entry ## key->v; \
+			entry_next ## key = entry ## key->next; \
+		} ; entry ## key; }); \
+		entry ## key = entry_next ## key )
 
 #else /* ANSI C or MSC */
 
 # define json_object_object_foreach(obj,key,val) \
 	char *key;\
 	struct json_object *val; \
-	struct lh_entry *entry; \
-	struct lh_entry *entry_next = NULL; \
-	for(entry = json_object_get_object(obj)->head; \
-		(entry ? ( \
-			key = (char*)entry->k, \
-			val = (struct json_object*)entry->v, \
-			entry_next = entry->next, \
-			entry) : 0); \
-		entry = entry_next)
+	struct lh_entry *entry ## key; \
+	struct lh_entry *entry_next ## key = NULL; \
+	for(entry ## key = json_object_get_object(obj)->head; \
+		(entry ## key ? ( \
+			key = (char*)entry ## key->k, \
+			val = (struct json_object*)entry ## key->v, \
+			entry_next ## key = entry ## key->next, \
+			entry ## key) : 0); \
+		entry ## key = entry_next ## key)
 
 #endif /* defined(__GNUC__) && !defined(__STRICT_ANSI__) */
 
