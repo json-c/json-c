@@ -1,3 +1,5 @@
+*~
+*.swp
 .deps/
 .libs/
 /aclocal.m4
