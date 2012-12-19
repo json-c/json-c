@@ -1,5 +1,6 @@
 *~
 *.swp
+/INSTALL
 .deps/
 .libs/
 /aclocal.m4
