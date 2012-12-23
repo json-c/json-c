@@ -85,22 +85,33 @@ enum json_tokener_error json_tokener_get_error(json_tokener *tok)
 #define DECODE_SURROGATE_PAIR(hi,lo) ((((hi) & 0x3FF) << 10) + ((lo) & 0x3FF) + 0x10000)
 static unsigned char utf8_replacement_char[3] = { 0xEF, 0xBF, 0xBD };
 
-
-struct json_tokener* json_tokener_new(void)
+struct json_tokener* json_tokener_new_ex(int depth)
 {
   struct json_tokener *tok;
 
   tok = (struct json_tokener*)calloc(1, sizeof(struct json_tokener));
   if (!tok) return NULL;
+  tok->stack = (struct json_tokener*)calloc(depth, sizeof(struct json_tokener_srec));
+  if (!tok->stack) {
+    free(tok);
+    return NULL;
+  }
   tok->pb = printbuf_new();
+  tok->max_depth = depth;
   json_tokener_reset(tok);
   return tok;
+}
+
+struct json_tokener* json_tokener_new(void)
+{
+  return json_tokener_new_ex(JSON_TOKENER_DEFAULT_DEPTH);
 }
 
 void json_tokener_free(struct json_tokener *tok)
 {
   json_tokener_reset(tok);
-  if(tok) printbuf_free(tok->pb);
+  if (tok->pb) printbuf_free(tok->pb);
+  if (tok->stack) free(tok->stack);
   free(tok);
 }
 
@@ -602,7 +613,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	saved_state = json_tokener_state_finish;
 	state = json_tokener_state_eatws;
       } else {
-	if(tok->depth >= JSON_TOKENER_MAX_DEPTH-1) {
+	if(tok->depth >= tok->max_depth-1) {
 	  tok->err = json_tokener_error_depth;
 	  goto out;
 	}
@@ -682,7 +693,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
       break;
 
     case json_tokener_state_object_value:
-      if(tok->depth >= JSON_TOKENER_MAX_DEPTH-1) {
+      if(tok->depth >= tok->max_depth-1) {
 	tok->err = json_tokener_error_depth;
 	goto out;
       }
