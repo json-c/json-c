@@ -1,3 +1,6 @@
+*~
+*.swp
+/INSTALL
 .deps/
 .libs/
 /aclocal.m4
@@ -10,6 +13,7 @@
 /config.sub
 /configure
 /depcomp
+/doc
 /install-sh
 /json.pc
 /json-c.pc
@@ -36,6 +40,7 @@
 /tests/test_null
 /tests/test_printbuf
 /tests/test_set_serializer
+/tests/*.vg.out
 /Debug
 /Release
 *.lo
