@@ -17,7 +17,8 @@ Generate the configure script and other files:
   sh autogen.sh
   git add -f Makefile.in aclocal.m4 config.guess \
        config.sub configure depcomp install-sh \
-       ltmain.sh missing tests/Makefile.in
+       ltmain.sh missing tests/Makefile.in \
+       INSTALL
 
   # check for anything else to be added:
   git status --ignored
@@ -25,7 +26,7 @@ Generate the configure script and other files:
 
 Generate the doxygen documentation:
   doxygen
-  git add doc
+  git add -f doc
   git commit doc
 
 cd ..
