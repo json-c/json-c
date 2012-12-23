@@ -67,7 +67,7 @@ maintainer-clean-local:
 
 if ENABLE_OLDNAME_COMPAT
 install-data-hook:
-	test \! -e "$(DESTDIR)@includedir@json" || rm "$(DESTDIR)@includedir@/json"
+	test \! -e "$(DESTDIR)@includedir@/json" || rm "$(DESTDIR)@includedir@/json"
 	$(LN_S) json-c "$(DESTDIR)@includedir@/json"
 
 uninstall-local:

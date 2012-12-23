@@ -53,6 +53,7 @@ Post-release checklist:
 
 git branch master
 Add new section to CHANGES
+Update the version in json_c_version.h
 Update the version in Doxyfile
 Update the version in configure.in
 Update the libjson_la_LDFLAGS line in Makefile.am to the new version.
