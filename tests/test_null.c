@@ -41,12 +41,12 @@ int main()
 		int parsed_len = json_object_get_string_len(parsed_str);
 		const char *parsed_cstr = json_object_get_string(parsed_str);
 		int ii;
-		fprintf( stderr, "Re-parsed object string len=%d, chars=[", parsed_len);
+		printf("Re-parsed object string len=%d, chars=[", parsed_len);
 		for (ii = 0; ii < parsed_len ; ii++)
 		{
-			fprintf( stderr, "%s%d", (ii ? ", " : ""), (int)parsed_cstr[ii]);
+			printf("%s%d", (ii ? ", " : ""), (int)parsed_cstr[ii]);
 		}
-		fprintf( stderr, "]\n");
+		printf("]\n");
 		json_object_put(parsed_str);
 	}
 	else
