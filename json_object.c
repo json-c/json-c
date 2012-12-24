@@ -98,6 +98,7 @@ static int json_escape_str(struct printbuf *pb, char *str, int len)
     case '\n':
     case '\r':
     case '\t':
+    case '\f':
     case '"':
     case '\\':
     case '/':
@@ -107,6 +108,7 @@ static int json_escape_str(struct printbuf *pb, char *str, int len)
       else if(c == '\n') printbuf_memappend(pb, "\\n", 2);
       else if(c == '\r') printbuf_memappend(pb, "\\r", 2);
       else if(c == '\t') printbuf_memappend(pb, "\\t", 2);
+      else if(c == '\f') printbuf_memappend(pb, "\\f", 2);
       else if(c == '"') printbuf_memappend(pb, "\\\"", 2);
       else if(c == '\\') printbuf_memappend(pb, "\\\\", 2);
       else if(c == '/') printbuf_memappend(pb, "\\/", 2);
