@@ -57,6 +57,24 @@ AC_LANG_POP([C])
 
 AM_PROG_LIBTOOL
 
+AC_MSG_CHECKING([for working sscanf])
+AC_TRY_RUN([
+#include <stdio.h>
+#include <stdint.h>
+#include <errno.h>
+int main(int argc, char *argv[]){
+long i;
+errno=0;
+return (sscanf("1234567890123456789012345","%ld",&i)==1 && errno==ERANGE && i==INT64_MAX ? 0 : 1);
+}],[
+    AC_MSG_RESULT([yes])
+    AC_DEFINE(HAS_SSCANF_ERANGE, 1, [Whether correctly return ERANGE])
+],[
+    AC_MSG_RESULT([no, not working])
+],[
+    AC_MSG_RESULT([no, not found])
+])
+
 AC_CONFIG_FILES([
 Makefile
 json.pc
