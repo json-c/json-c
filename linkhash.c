@@ -63,17 +63,27 @@ struct lh_table* lh_table_new(int size, const char *name,
 	struct lh_table *t;
 
 	t = (struct lh_table*)calloc(1, sizeof(struct lh_table));
-	if(!t) lh_abort("lh_table_new: calloc failed\n");
+	if(!t) {
+		goto nomem;
+	}
+
 	t->count = 0;
 	t->size = size;
 	t->name = name;
 	t->table = (struct lh_entry*)calloc(size, sizeof(struct lh_entry));
-	if(!t->table) lh_abort("lh_table_new: calloc failed\n");
+	if(!t->table) {
+		goto notablemem;
+	}
 	t->free_fn = free_fn;
 	t->hash_fn = hash_fn;
 	t->equal_fn = equal_fn;
 	for(i = 0; i < size; i++) t->table[i].k = LH_EMPTY;
 	return t;
+
+notablemem:
+	free( t );
+nomem:
+	return NULL;
 }
 
 struct lh_table* lh_kchar_table_new(int size, const char *name,
@@ -88,16 +98,20 @@ struct lh_table* lh_kptr_table_new(int size, const char *name,
 	return lh_table_new(size, name, free_fn, lh_ptr_hash, lh_ptr_equal);
 }
 
-void lh_table_resize(struct lh_table *t, int new_size)
+int lh_table_resize(struct lh_table *t, int new_size)
 {
 	struct lh_table *new_t;
-	struct lh_entry *ent;
 
 	new_t = lh_table_new(new_size, t->name, NULL, t->hash_fn, t->equal_fn);
-	ent = t->head;
-	while(ent) {
-		lh_table_insert(new_t, ent->k, ent->v);
-		ent = ent->next;
+	if ( new_t == NULL ) {
+		goto nonewtable;
+	}
+
+	for ( struct lh_entry * ent = t->head; ent != NULL; ent = ent->next ) {
+		int rc = lh_table_insert(new_t, ent->k, ent->v);
+		if ( rc != 0 ) {
+			goto noinsert;
+		}
 	}
 	free(t->table);
 	t->table = new_t->table;
@@ -106,6 +120,14 @@ void lh_table_resize(struct lh_table *t, int new_size)
 	t->tail = new_t->tail;
 	t->resizes++;
 	free(new_t);
+
+	return 0;
+
+noinsert:
+	free( new_t->table );
+	free( new_t );
+nonewtable:
+	return -1;
 }
 
 void lh_table_free(struct lh_table *t)
@@ -126,7 +148,12 @@ int lh_table_insert(struct lh_table *t, void *k, const void *v)
 	unsigned long h, n;
 
 	t->inserts++;
-	if(t->count >= t->size * LH_LOAD_FACTOR) lh_table_resize(t, t->size * 2);
+	if(t->count >= t->size * LH_LOAD_FACTOR) {
+		int rc = lh_table_resize(t, t->size * 2);
+		if ( rc != 0 ) {
+			return -1;
+		}
+	}
 
 	h = t->hash_fn(k);
 	n = h % t->size;
