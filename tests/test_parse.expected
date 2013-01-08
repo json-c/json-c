@@ -44,7 +44,7 @@ json_tokener_parse_ex(tok, "blue"      ,   6) ... OK: got object of type [string
 json_tokener_parse_ex(tok, "\""        ,   4) ... OK: got object of type [string]: "\""
 json_tokener_parse_ex(tok, "\\"        ,   4) ... OK: got object of type [string]: "\\"
 json_tokener_parse_ex(tok, "\b"        ,   4) ... OK: got object of type [string]: "\b"
-json_tokener_parse_ex(tok, "\f"        ,   4) ... OK: got object of type [string]: "\u000c"
+json_tokener_parse_ex(tok, "\f"        ,   4) ... OK: got object of type [string]: "\f"
 json_tokener_parse_ex(tok, "\n"        ,   4) ... OK: got object of type [string]: "\n"
 json_tokener_parse_ex(tok, "\r"        ,   4) ... OK: got object of type [string]: "\r"
 json_tokener_parse_ex(tok, "\t"        ,   4) ... OK: got object of type [string]: "\t"
