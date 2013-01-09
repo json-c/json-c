@@ -554,7 +554,28 @@ static int json_object_double_to_json_string(struct json_object* jso,
 					     int level,
 						 int flags)
 {
-  return sprintbuf(pb, "%f", jso->o.c_double);
+  char buf[128], *p, *q;
+  int size;
+
+  size = snprintf(buf, 128, "%f", jso->o.c_double);
+  p = strchr(buf, ',');
+  if (p) {
+    *p = '.';
+  } else {
+    p = strchr(buf, '.');
+  }
+  if (p && (flags & JSON_C_TO_STRING_NOZERO)) {
+    /* last useful digit, always keep 1 zero */
+    p++;
+    for (q=p ; *q ; q++) {
+      if (*q!='0') p=q;
+    }
+    /* drop trailing zeroes */
+    *(++p) = 0;
+    size = p-buf;
+  }
+  printbuf_memappend(pb, buf, size);
+  return size;
 }
 
 struct json_object* json_object_new_double(double d)

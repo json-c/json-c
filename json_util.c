@@ -142,6 +142,11 @@ int json_object_to_file(char *filename, struct json_object *obj)
   return json_object_to_file_ext(filename, obj, JSON_C_TO_STRING_PLAIN);
 }
 
+int json_parse_double(const char *buf, double *retval)
+{
+  return (sscanf(buf, "%lf", retval)==1 ? 0 : 1);
+}
+
 int json_parse_int64(const char *buf, int64_t *retval)
 {
 	int64_t num64;
