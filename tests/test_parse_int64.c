@@ -12,7 +12,7 @@ void checkit(const char *buf)
 	int64_t cint64 = -666;
 
 	int retval = json_parse_int64(buf, &cint64);
-	printf("buf=%s parseit=%d, value=%" PRId64 " \n", buf, retval, cint64);
+	printf("buf=%s parseit=%d, value=%" PRId64 "\n", buf, retval, cint64);
 }
 
 /**
@@ -99,6 +99,9 @@ int main()
 	checkit(buf);
 
 	strcpy(buf, "-18446744073709551616"); // -UINT64_MAX
+	checkit(buf);
+
+	strcpy(buf, "1");
 	checkit(buf);
 
 	return 0;
