@@ -134,7 +134,7 @@ int lh_table_insert(struct lh_table *t, void *k, const void *v)
 	while( 1 ) {
 		if(t->table[n].k == LH_EMPTY || t->table[n].k == LH_FREED) break;
 		t->collisions++;
-		if(++n == t->size) n = 0;
+		if ((int)++n == t->size) n = 0;
 	}
 
 	t->table[n].k = k;
@@ -166,7 +166,7 @@ struct lh_entry* lh_table_lookup_entry(struct lh_table *t, const void *k)
 		if(t->table[n].k == LH_EMPTY) return NULL;
 		if(t->table[n].k != LH_FREED &&
 		   t->equal_fn(t->table[n].k, k)) return &t->table[n];
-		if(++n == t->size) n = 0;
+		if ((int)++n == t->size) n = 0;
 		count++;
 	}
 	return NULL;

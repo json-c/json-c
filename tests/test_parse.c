@@ -183,7 +183,7 @@ struct incremental_step {
 	{ "[1,2,3,]",         -1, -1, json_tokener_success, 0 },
 	{ "[1,2,,3,]",        -1, 5, json_tokener_error_parse_unexpected, 0 },
 
-	{ NULL, json_tokener_success },
+	{ NULL, -1, -1, json_tokener_success, 0 },
 };
 
 static void test_incremental_parse()

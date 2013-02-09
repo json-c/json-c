@@ -86,7 +86,7 @@ static void test_printbuf_memappend(int *before_resize)
 
 	char with_nulls[] = { 'a', 'b', '\0', 'c' };
 	printbuf_reset(pb);
-	printbuf_memappend_fast(pb, with_nulls, sizeof(with_nulls));
+	printbuf_memappend_fast(pb, with_nulls, (int)sizeof(with_nulls));
 	printf("With embedded \\0 character: %d, [%s]\n", printbuf_length(pb), pb->buf);
 
 	printbuf_free(pb);

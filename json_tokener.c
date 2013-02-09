@@ -69,7 +69,8 @@ const char* json_tokener_errors[] = {
 
 const char *json_tokener_error_desc(enum json_tokener_error jerr)
 {
-	if (jerr < 0 || jerr > sizeof(json_tokener_errors))
+	int jerr_int = (int)jerr;
+	if (jerr_int < 0 || jerr_int > (int)sizeof(json_tokener_errors))
 		return "Unknown error, invalid json_tokener_error value passed to json_tokener_error_desc()";
 	return json_tokener_errors[jerr];
 }
@@ -91,7 +92,7 @@ struct json_tokener* json_tokener_new_ex(int depth)
 
   tok = (struct json_tokener*)calloc(1, sizeof(struct json_tokener));
   if (!tok) return NULL;
-  tok->stack = (struct json_tokener*)calloc(depth, sizeof(struct json_tokener_srec));
+  tok->stack = (struct json_tokener_srec *)calloc(depth, sizeof(struct json_tokener_srec));
   if (!tok->stack) {
     free(tok);
     return NULL;
@@ -330,8 +331,8 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
     case json_tokener_state_null:
       printbuf_memappend_fast(tok->pb, &c, 1);
       if(strncasecmp(json_null_str, tok->pb->buf,
-		     json_min(tok->st_pos+1, strlen(json_null_str))) == 0) {
-	if(tok->st_pos == strlen(json_null_str)) {
+		     json_min(tok->st_pos+1, (int)strlen(json_null_str))) == 0) {
+	if(tok->st_pos == (int)strlen(json_null_str)) {
 	  current = NULL;
 	  saved_state = json_tokener_state_finish;
 	  state = json_tokener_state_eatws;
@@ -552,16 +553,16 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
     case json_tokener_state_boolean:
       printbuf_memappend_fast(tok->pb, &c, 1);
       if(strncasecmp(json_true_str, tok->pb->buf,
-		     json_min(tok->st_pos+1, strlen(json_true_str))) == 0) {
-	if(tok->st_pos == strlen(json_true_str)) {
+		     json_min(tok->st_pos+1, (int)strlen(json_true_str))) == 0) {
+	if(tok->st_pos == (int)strlen(json_true_str)) {
 	  current = json_object_new_boolean(1);
 	  saved_state = json_tokener_state_finish;
 	  state = json_tokener_state_eatws;
 	  goto redo_char;
 	}
       } else if(strncasecmp(json_false_str, tok->pb->buf,
-			    json_min(tok->st_pos+1, strlen(json_false_str))) == 0) {
-	if(tok->st_pos == strlen(json_false_str)) {
+			    json_min(tok->st_pos+1, (int)strlen(json_false_str))) == 0) {
+	if(tok->st_pos == (int)strlen(json_false_str)) {
 	  current = json_object_new_boolean(0);
 	  saved_state = json_tokener_state_finish;
 	  state = json_tokener_state_eatws;

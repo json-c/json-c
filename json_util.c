@@ -194,7 +194,7 @@ int json_parse_int64(const char *buf, int64_t *retval)
 		 */
 		if (orig_has_neg != recheck_has_neg ||
 		    strncmp(buf_skip_space, buf_cmp_start, strlen(buf_cmp_start)) != 0 ||
-			(strlen(buf_skip_space) != buf_cmp_len &&
+			((int)strlen(buf_skip_space) != buf_cmp_len &&
 			 isdigit((int)buf_skip_space[buf_cmp_len])
 		    )
 		   )
@@ -238,7 +238,8 @@ static const char* json_type_name[] = {
 
 const char *json_type_to_name(enum json_type o_type)
 {
-	if (o_type < 0 || o_type >= NELEM(json_type_name))
+	int o_type_int = (int)o_type;
+	if (o_type_int < 0 || o_type_int >= (int)NELEM(json_type_name))
 	{
 		MC_ERROR("json_type_to_name: type %d is out of range [0,%d]\n", o_type, NELEM(json_type_name));
 		return NULL;
