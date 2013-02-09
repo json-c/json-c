@@ -390,6 +390,11 @@ void json_object_object_add(struct json_object* jso, const char *key,
 	existing_entry->v = val;
 }
 
+int json_object_object_length(struct json_object *jso)
+{
+	return lh_table_length(jso->o.c_object);
+}
+
 struct json_object* json_object_object_get(struct json_object* jso, const char *key)
 {
 	struct json_object *result = NULL;
