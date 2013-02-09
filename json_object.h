@@ -215,6 +215,8 @@ extern struct json_object* json_object_new_object(void);
  */
 extern struct lh_table* json_object_get_object(struct json_object *obj);
 
+extern int json_object_object_length(struct json_object* obj);
+
 /** Add an object field to a json_object of type json_type_object
  *
  * The reference count will *not* be incremented. This is to make adding

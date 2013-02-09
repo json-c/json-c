@@ -227,3 +227,7 @@ int lh_table_delete(struct lh_table *t, const void *k)
 	return lh_table_delete_entry(t, e);
 }
 
+int lh_table_length(struct lh_table *t)
+{
+	return t->count;
+}
