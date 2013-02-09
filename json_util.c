@@ -61,6 +61,10 @@
 #include "json_tokener.h"
 #include "json_util.h"
 
+static int sscanf_is_broken = 0;
+static int sscanf_is_broken_testdone = 0;
+static void sscanf_is_broken_test(void);
+
 struct json_object* json_object_from_file(const char *filename)
 {
   struct printbuf *pb;
@@ -142,41 +146,78 @@ int json_object_to_file(char *filename, struct json_object *obj)
   return json_object_to_file_ext(filename, obj, JSON_C_TO_STRING_PLAIN);
 }
 
+/*
+ * Not all implementations of sscanf actually work properly.
+ * Check whether the one we're currently using does, and if
+ * it's broken, enable the workaround code.
+ */
+static void sscanf_is_broken_test()
+{
+	int64_t num64;
+
+	(void)sscanf(" -01234567890123456789012345", "%" SCNd64, &num64);
+	int ret_errno = errno;
+	int is_int64_min = (num64 == INT64_MIN);
+
+	(void)sscanf(" 01234567890123456789012345", "%" SCNd64, &num64);
+	int ret_errno2 = errno;
+	int is_int64_max = (num64 == INT64_MAX);
+
+	if (ret_errno != ERANGE || !is_int64_min ||
+	    ret_errno2 != ERANGE || !is_int64_max)
+	{
+		MC_DEBUG("sscanf_is_broken_test failed, enabling workaround code\n");
+		sscanf_is_broken = 1;
+	}
+}
+
 int json_parse_int64(const char *buf, int64_t *retval)
 {
 	int64_t num64;
-	const char *buf_skip_space;
+	const char *buf_sig_digits;
 	int orig_has_neg;
 	int saved_errno;
+
+	if (!sscanf_is_broken_testdone)
+	{
+		sscanf_is_broken_test();
+		sscanf_is_broken_testdone = 1;
+	}
+
+	// Skip leading spaces
+	while (isspace((int)*buf) && *buf)
+		buf++;
+
 	errno = 0; // sscanf won't always set errno, so initialize
 	if (sscanf(buf, "%" SCNd64, &num64) != 1)
 	{
 		MC_DEBUG("Failed to parse, sscanf != 1\n");
 		return 1;
 	}
+
 	saved_errno = errno;
-	buf_skip_space = buf;
+	buf_sig_digits = buf;
 	orig_has_neg = 0;
-	// Skip leading spaces
-	while (isspace((int)*buf_skip_space) && *buf_skip_space)
-		buf_skip_space++;
-	if (*buf_skip_space == '-')
+	if (*buf_sig_digits == '-')
 	{
-		buf_skip_space++;
+		buf_sig_digits++;
 		orig_has_neg = 1;
 	}
-	// Skip leading zeros, but keep at least one digit
-	while (buf_skip_space[0] == '0' && buf_skip_space[1] != '\0')
-		buf_skip_space++;
-	if (buf_skip_space[0] == '0' && buf_skip_space[1] == '\0')
-		orig_has_neg = 0; // "-0" is the same as just plain "0"
-	
-	if (saved_errno != ERANGE)
+
+	// Not all sscanf implementations actually work
+	if (sscanf_is_broken && saved_errno != ERANGE)
 	{
 		char buf_cmp[100];
 		char *buf_cmp_start = buf_cmp;
 		int recheck_has_neg = 0;
 		int buf_cmp_len;
+
+		// Skip leading zeros, but keep at least one digit
+		while (buf_sig_digits[0] == '0' && buf_sig_digits[1] != '\0')
+			buf_sig_digits++;
+		if (num64 == 0) // assume all sscanf impl's will parse -0 to 0
+			orig_has_neg = 0; // "-0" is the same as just plain "0"
+
 		snprintf(buf_cmp_start, sizeof(buf_cmp), "%" PRId64, num64);
 		if (*buf_cmp_start == '-')
 		{
@@ -190,18 +231,22 @@ int json_parse_int64(const char *buf, int64_t *retval)
 		 * If the sign is different, or
 		 * some of the digits are different, or
 		 * there is another digit present in the original string
-		 * then we NOT successfully parsed the value.
+		 * then we have NOT successfully parsed the value.
 		 */
 		if (orig_has_neg != recheck_has_neg ||
-		    strncmp(buf_skip_space, buf_cmp_start, strlen(buf_cmp_start)) != 0 ||
-			((int)strlen(buf_skip_space) != buf_cmp_len &&
-			 isdigit((int)buf_skip_space[buf_cmp_len])
+		    strncmp(buf_sig_digits, buf_cmp_start, strlen(buf_cmp_start)) != 0 ||
+			((int)strlen(buf_sig_digits) != buf_cmp_len &&
+			 isdigit((int)buf_sig_digits[buf_cmp_len])
 		    )
 		   )
 		{
 			saved_errno = ERANGE;
 		}
 	}
+
+	// Not all sscanf impl's set the value properly when out of range.
+	// Always do this, even for properly functioning implementations,
+	// since it shouldn't slow things down much.
 	if (saved_errno == ERANGE)
 	{
 		if (orig_has_neg)
