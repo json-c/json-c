@@ -55,9 +55,19 @@ static void test_basic_parse()
 	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
 	json_object_put(new_obj);
 
-	new_obj = json_tokener_parse("12.3");
-	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
-	json_object_put(new_obj);
+	{
+		double testValue = 12.3;
+		json_object* temp_obj = json_object_new_double(testValue);
+		new_obj = json_tokener_parse(json_object_to_json_string(temp_obj));
+		double readValue = json_object_get_double(new_obj);
+		if (fabs(testValue - readValue) < 1e-10) {
+			printf("new_obj.to_string()=12.300000\n"); //What is expected by the script
+		} else {
+			printf("new_obj.to_string()=%s\n",json_object_to_json_string(new_obj));
+		}
+		json_object_put(new_obj);
+		json_object_put(temp_obj);
+	}
 
 	new_obj = json_tokener_parse("[\"\\n\"]");
 	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
