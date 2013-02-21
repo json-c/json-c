@@ -74,5 +74,5 @@ int main(int argc, char **argv)
 
 	json_object_put( my_object );
 
-	return 0;
+	return retval;
 }
