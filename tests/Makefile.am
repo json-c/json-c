@@ -39,7 +39,7 @@ test_parse_LDADD = $(LIBJSON_LA)
 
 test_locale_LDADD = $(LIBJSON_LA)
 
-TESTS = test1.test test2.test test4.test testReplaceExisting.test parse_int64.test test_null.test test_cast.test test_parse.test
+TESTS = test1.test test2.test test4.test testReplaceExisting.test parse_int64.test test_null.test test_cast.test test_parse.test test_locale.test
 
 TESTS+= test_printbuf.test
 check_PROGRAMS+=test_printbuf
