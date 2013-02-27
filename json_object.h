@@ -42,6 +42,10 @@ extern "C" {
  * for an example of the format.
  */
 #define JSON_C_TO_STRING_PRETTY     (1<<1)
+/**
+ * A flag to drop trailing zero for float values
+ */
+#define JSON_C_TO_STRING_NOZERO     (1<<2)
 
 #undef FALSE
 #define FALSE ((json_bool)0)

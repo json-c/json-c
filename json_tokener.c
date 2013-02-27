@@ -31,6 +31,10 @@
 #include "json_tokener.h"
 #include "json_util.h"
 
+#ifdef HAVE_LOCALE_H
+#include <locale.h>
+#endif /* HAVE_LOCALE_H */
+
 #if !HAVE_STRDUP && defined(_MSC_VER)
   /* MSC has the version as _strdup */
 # define strdup _strdup
@@ -239,6 +243,13 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 {
   struct json_object *obj = NULL;
   char c = '\1';
+#ifdef HAVE_SETLOCALE
+  char *oldlocale=NULL, *tmplocale;
+
+  tmplocale = setlocale(LC_NUMERIC, NULL);
+  if (tmplocale) oldlocale = strdup(tmplocale);
+  setlocale(LC_NUMERIC, "C");
+#endif
 
   tok->char_offset = 0;
   tok->err = json_tokener_success;
@@ -597,7 +608,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	double  numd;
 	if (!tok->is_double && json_parse_int64(tok->pb->buf, &num64) == 0) {
 		current = json_object_new_int64(num64);
-	} else if(tok->is_double && sscanf(tok->pb->buf, "%lf", &numd) == 1) {
+	} else if(tok->is_double && json_parse_double(tok->pb->buf, &numd) == 0) {
           current = json_object_new_double(numd);
         } else {
           tok->err = json_tokener_error_parse_number;
@@ -735,6 +746,11 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
        saved_state != json_tokener_state_finish)
       tok->err = json_tokener_error_parse_eof;
   }
+
+#ifdef HAVE_SETLOCALE
+  setlocale(LC_NUMERIC, oldlocale);
+  if (oldlocale) free(oldlocale);
+#endif
 
   if (tok->err == json_tokener_success) 
   {

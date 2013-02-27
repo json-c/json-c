@@ -23,7 +23,7 @@ AM_CONDITIONAL(ENABLE_OLDNAME_COMPAT, [test "x${enable_oldname_compat}" != "xno"
 AM_CONFIG_HEADER(config.h)
 AM_CONFIG_HEADER(json_config.h)
 AC_HEADER_STDC
-AC_CHECK_HEADERS(fcntl.h limits.h strings.h syslog.h unistd.h [sys/cdefs.h] [sys/param.h] stdarg.h)
+AC_CHECK_HEADERS(fcntl.h limits.h strings.h syslog.h unistd.h [sys/cdefs.h] [sys/param.h] stdarg.h locale.h)
 AC_CHECK_HEADER(inttypes.h,[AC_DEFINE([JSON_C_HAVE_INTTYPES_H],[1],[Public define for json_inttypes.h])])
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -35,7 +35,7 @@ AC_FUNC_VPRINTF
 AC_FUNC_MEMCMP
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
-AC_CHECK_FUNCS(strcasecmp strdup strndup strerror snprintf vsnprintf vasprintf open vsyslog strncasecmp)
+AC_CHECK_FUNCS(strcasecmp strdup strndup strerror snprintf vsnprintf vasprintf open vsyslog strncasecmp setlocale)
 
 #check if .section.gnu.warning accepts long strings (for __warn_references)
 AC_LANG_PUSH([C])
