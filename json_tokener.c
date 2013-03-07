@@ -507,9 +507,13 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
                       (str[1] == '\\') &&
                       (str[2] == 'u'))
                   {
-	            ADVANCE_CHAR(str, tok);
-	            ADVANCE_CHAR(str, tok);
-
+                /* Advance through the 16 bit surrogate, and move on to the
+                 * next sequence. The next step is to process the following
+                 * characters.
+                 */
+	            if( !ADVANCE_CHAR(str, tok) || !ADVANCE_CHAR(str, tok) ) {
+                    printbuf_memappend_fast(tok->pb, (char*)utf8_replacement_char, 3);
+                }
                     /* Advance to the first char of the next sequence and
                      * continue processing with the next sequence.
                      */
