@@ -51,5 +51,7 @@ json_tokener_parse_ex(tok, "\t"        ,   4) ... OK: got object of type [string
 json_tokener_parse_ex(tok, [1,2,3]     ,   7) ... OK: got object of type [array]: [ 1, 2, 3 ]
 json_tokener_parse_ex(tok, [1,2,3,]    ,   8) ... OK: got object of type [array]: [ 1, 2, 3 ]
 json_tokener_parse_ex(tok, [1,2,,3,]   ,   9) ... OK: got correct error: unexpected character
-End Incremental Tests OK=27 ERROR=0
+json_tokener_parse_ex(tok, [1,2,3,]    ,   8) ... OK: got correct error: unexpected character
+json_tokener_parse_ex(tok, {"a":1,}    ,   8) ... OK: got correct error: unexpected character
+End Incremental Tests OK=29 ERROR=0
 ==================================

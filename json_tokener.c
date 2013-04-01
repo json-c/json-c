@@ -624,8 +624,15 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
       }
       break;
 
+    case json_tokener_state_array_after_sep:
     case json_tokener_state_array:
       if(c == ']') {
+		if (state == json_tokener_state_array_after_sep &&
+			(tok->flags & JSON_TOKENER_STRICT))
+		{
+			tok->err = json_tokener_error_parse_unexpected;
+			goto out;
+		}
 	saved_state = json_tokener_state_finish;
 	state = json_tokener_state_eatws;
       } else {
@@ -651,7 +658,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	saved_state = json_tokener_state_finish;
 	state = json_tokener_state_eatws;
       } else if(c == ',') {
-	saved_state = json_tokener_state_array;
+	saved_state = json_tokener_state_array_after_sep;
 	state = json_tokener_state_eatws;
       } else {
 	tok->err = json_tokener_error_parse_array;
@@ -660,7 +667,14 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
       break;
 
     case json_tokener_state_object_field_start:
+    case json_tokener_state_object_field_start_after_sep:
       if(c == '}') {
+		if (state == json_tokener_state_object_field_start_after_sep &&
+		    (tok->flags & JSON_TOKENER_STRICT))
+		{
+			tok->err = json_tokener_error_parse_unexpected;
+			goto out;
+		}
 	saved_state = json_tokener_state_finish;
 	state = json_tokener_state_eatws;
       } else if (c == '"' || c == '\'') {
@@ -731,7 +745,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	saved_state = json_tokener_state_finish;
 	state = json_tokener_state_eatws;
       } else if(c == ',') {
-	saved_state = json_tokener_state_object_field_start;
+	saved_state = json_tokener_state_object_field_start_after_sep;
 	state = json_tokener_state_eatws;
       } else {
 	tok->err = json_tokener_error_parse_object_value_sep;
@@ -770,4 +784,9 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
   MC_DEBUG("json_tokener_parse_ex: error %s at offset %d\n",
 	   json_tokener_errors[tok->err], tok->char_offset);
   return NULL;
+}
+
+void json_tokener_set_flags(struct json_tokener *tok, int flags)
+{
+	tok->flags = flags;
 }

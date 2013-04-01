@@ -183,6 +183,9 @@ struct incremental_step {
 	{ "[1,2,3,]",         -1, -1, json_tokener_success, 0 },
 	{ "[1,2,,3,]",        -1, 5, json_tokener_error_parse_unexpected, 0 },
 
+	{ "[1,2,3,]",         -1, 7, json_tokener_error_parse_unexpected, 3 },
+	{ "{\"a\":1,}",         -1, 7, json_tokener_error_parse_unexpected, 3 },
+
 	{ NULL, -1, -1, json_tokener_success, 0 },
 };
 
@@ -215,6 +218,12 @@ static void test_incremental_parse()
 		struct incremental_step *step = &incremental_steps[ii];
 		int length = step->length;
 		int expected_char_offset = step->char_offset;
+
+		if (step->reset_tokener & 2)
+			json_tokener_set_flags(tok, JSON_TOKENER_STRICT);
+		else
+			json_tokener_set_flags(tok, 0);
+
 		if (length == -1)
 			length = strlen(step->string_to_parse);
 		if (expected_char_offset == -1)
@@ -264,7 +273,7 @@ static void test_incremental_parse()
 		if (new_obj)
 			json_object_put(new_obj);
 
-		if (step->reset_tokener)
+		if (step->reset_tokener & 1)
 			json_tokener_reset(tok);
 
 		if (this_step_ok)
