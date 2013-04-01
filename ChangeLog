@@ -1,5 +1,5 @@
 
-NEXT.VERSION
+0.11
 
   * IMPORTANT: the name of the library has changed to libjson-c.so and
      the header files are now in include/json-c.
@@ -10,6 +10,17 @@ NEXT.VERSION
   * Maximum recursion depth is now a runtime option.
      json_tokener_new() is provided for compatibility.
      json_tokener_new_ex(depth)
+  * Include json_object_iterator.h in the installed headers.
+  * Add support for building on Android.
+  * Rewrite json_object_object_add to replace just the value if the key already exists so keys remain valid.
+  * Make it safe to delete keys while iterating with the json_object_object_foreach macro.
+  * Add a json_set_serializer() function to allow the string output of a json_object to be customized.
+  * Make float parsing locale independent.
+  * Add a json_tokener_set_flags() function and a JSON_TOKENER_STRICT flag.
+  * Enable -Werror when building.
+  * speed improvements to parsing 64-bit integers on systems with working sscanf
+  * Add a json_object_object_length function.
+  * Fix a bug (buffer overrun) when expanding arrays to more than 64 entries.
 
 0.10
 
