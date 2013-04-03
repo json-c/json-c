@@ -94,9 +94,24 @@ Leave the libjson_la_LDFLAGS line in Makefile.am alone.
 
 ------------
 
-XXX Update gh-pages branch, index.html:
-    Link to current release.
-    Add new docs.
+Update the gh-pages branch with new docs:
+
+cd json-c-${release}
+git checkout json-c-${release}
+cd ..
+
+git clone -b gh-pages https://github.com/json-c/json-c json-c-pages
+cd json-c-pages
+mkdir json-c-${release}
+cp -R ../json-c-${release}/doc json-c-${release}/.
+cp ../json-c-${release}/README-WIN32.html json-c-${release}/.
+git add json-c-${release}
+git commit
+
+vi index.html
+    Add/change links to current release.
+
+------------
 
 Send an email to the mailing list.
 
