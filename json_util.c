@@ -70,7 +70,8 @@ struct json_object* json_object_from_file(const char *filename)
   struct printbuf *pb;
   struct json_object *obj;
   char buf[JSON_FILE_BUF_SIZE];
-  int fd, ret;
+  int fd;
+  ssize_t ret;
 
   if((fd = open(filename, O_RDONLY)) < 0) {
     MC_ERROR("json_object_from_file: error reading file %s: %s\n",
@@ -102,7 +103,8 @@ struct json_object* json_object_from_file(const char *filename)
 int json_object_to_file_ext(char *filename, struct json_object *obj, int flags)
 {
   const char *json_str;
-  int fd, ret;
+  int fd;
+  ssize_t ret;
   unsigned int wpos, wsize;
 
   if(!obj) {
@@ -215,7 +217,7 @@ int json_parse_int64(const char *buf, int64_t *retval)
 		char buf_cmp[100];
 		char *buf_cmp_start = buf_cmp;
 		int recheck_has_neg = 0;
-		int buf_cmp_len;
+		size_t buf_cmp_len;
 
 		// Skip leading zeros, but keep at least one digit
 		while (buf_sig_digits[0] == '0' && buf_sig_digits[1] != '\0')

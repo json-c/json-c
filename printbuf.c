@@ -29,7 +29,7 @@
 #include "debug.h"
 #include "printbuf.h"
 
-static int printbuf_extend(struct printbuf *p, int min_size);
+static int printbuf_extend(struct printbuf *p, size_t min_size);
 
 struct printbuf* printbuf_new(void)
 {
@@ -55,10 +55,10 @@ struct printbuf* printbuf_new(void)
  * Note: this does not check the available space!  The caller
  *  is responsible for performing those calculations.
  */
-static int printbuf_extend(struct printbuf *p, int min_size)
+static int printbuf_extend(struct printbuf *p, size_t min_size)
 {
 	char *t;
-	int new_size;
+	size_t new_size;
 
 	if (p->size >= min_size)
 		return 0;
@@ -76,7 +76,7 @@ static int printbuf_extend(struct printbuf *p, int min_size)
 	return 0;
 }
 
-int printbuf_memappend(struct printbuf *p, const char *buf, int size)
+size_t printbuf_memappend(struct printbuf *p, const char *buf, size_t size)
 {
   if (p->size <= p->bpos + size + 1) {
     if (printbuf_extend(p, p->bpos + size + 1) < 0)

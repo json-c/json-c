@@ -33,7 +33,7 @@ struct json_object
     struct array_list *c_array;
     struct {
         char *str;
-        int len;
+        size_t len;
     } c_string;
   } o;
   json_object_delete_fn *_user_delete;

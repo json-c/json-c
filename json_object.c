@@ -87,7 +87,7 @@ static void json_object_fini(void) {
 
 /* string escaping */
 
-static int json_escape_str(struct printbuf *pb, char *str, int len)
+static int json_escape_str(struct printbuf *pb, char *str, size_t len)
 {
   int pos = 0, start_offset = 0;
   unsigned char c;
@@ -290,7 +290,7 @@ static void indent(struct printbuf *pb, int level, int flags)
 
 /* json_object_object */
 
-static int json_object_object_to_json_string(struct json_object* jso,
+static long long json_object_object_to_json_string(struct json_object* jso,
 					     struct printbuf *pb,
 					     int level,
 						 int flags)
@@ -429,7 +429,7 @@ void json_object_object_del(struct json_object* jso, const char *key)
 
 /* json_object_boolean */
 
-static int json_object_boolean_to_json_string(struct json_object* jso,
+static long long json_object_boolean_to_json_string(struct json_object* jso,
 					      struct printbuf *pb,
 					      int level,
 						  int flags)
@@ -467,7 +467,7 @@ json_bool json_object_get_boolean(struct json_object *jso)
 
 /* json_object_int */
 
-static int json_object_int_to_json_string(struct json_object* jso,
+static long long json_object_int_to_json_string(struct json_object* jso,
 					  struct printbuf *pb,
 					  int level,
 					  int flags)
@@ -554,13 +554,13 @@ int64_t json_object_get_int64(struct json_object *jso)
 
 /* json_object_double */
 
-static int json_object_double_to_json_string(struct json_object* jso,
+static long long json_object_double_to_json_string(struct json_object* jso,
 					     struct printbuf *pb,
 					     int level,
 						 int flags)
 {
   char buf[128], *p, *q;
-  int size;
+  long long size;
 
   size = snprintf(buf, 128, "%f", jso->o.c_double);
   p = strchr(buf, ',');
@@ -614,7 +614,7 @@ double json_object_get_double(struct json_object *jso)
 
 /* json_object_string */
 
-static int json_object_string_to_json_string(struct json_object* jso,
+static long long json_object_string_to_json_string(struct json_object* jso,
 					     struct printbuf *pb,
 					     int level,
 						 int flags)
@@ -666,7 +666,7 @@ const char* json_object_get_string(struct json_object *jso)
   }
 }
 
-int json_object_get_string_len(struct json_object *jso)  {
+size_t json_object_get_string_len(struct json_object *jso)  {
   if(!jso) return 0;
   switch(jso->o_type) {
   case json_type_string:
@@ -679,7 +679,7 @@ int json_object_get_string_len(struct json_object *jso)  {
 
 /* json_object_array */
 
-static int json_object_array_to_json_string(struct json_object* jso,
+static long long json_object_array_to_json_string(struct json_object* jso,
                                             struct printbuf *pb,
                                             int level,
                                             int flags)

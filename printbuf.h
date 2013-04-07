@@ -23,7 +23,7 @@ extern "C" {
 struct printbuf {
   char *buf;
   int bpos;
-  int size;
+  size_t size;
 };
 
 extern struct printbuf*
@@ -36,8 +36,8 @@ printbuf_new(void);
  * Your code should not use printbuf_memappend directly--use
  * printbuf_memappend_fast instead.
  */
-extern int
-printbuf_memappend(struct printbuf *p, const char *buf, int size);
+extern size_t
+printbuf_memappend(struct printbuf *p, const char *buf, size_t size);
 
 #define printbuf_memappend_fast(p, bufptr, bufsize)          \
 do {                                                         \
