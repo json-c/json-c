@@ -530,7 +530,7 @@ extern double json_object_get_double(struct json_object *obj);
  */
 extern struct json_object* json_object_new_string(const char *s);
 
-extern struct json_object* json_object_new_string_len(const char *s, int len);
+extern struct json_object* json_object_new_string_len(const char *s, size_t len);
 
 /** Get the string value of a json_object
  *

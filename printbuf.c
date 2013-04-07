@@ -88,9 +88,9 @@ size_t printbuf_memappend(struct printbuf *p, const char *buf, size_t size)
   return size;
 }
 
-int printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len)
+int printbuf_memset(struct printbuf *pb, size_t offset, int charvalue, int len)
 {
-	int size_needed;
+	size_t size_needed;
 
 	if (offset == -1)
 		offset = pb->bpos;

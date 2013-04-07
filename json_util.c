@@ -242,7 +242,7 @@ int json_parse_int64(const char *buf, int64_t *retval)
 		 */
 		if (orig_has_neg != recheck_has_neg ||
 		    strncmp(buf_sig_digits, buf_cmp_start, strlen(buf_cmp_start)) != 0 ||
-			((int)strlen(buf_sig_digits) != buf_cmp_len &&
+			(strlen(buf_sig_digits) != buf_cmp_len &&
 			 isdigit((int)buf_sig_digits[buf_cmp_len])
 		    )
 		   )

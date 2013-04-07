@@ -22,7 +22,7 @@ extern "C" {
 
 struct printbuf {
   char *buf;
-  int bpos;
+  size_t bpos;
   size_t size;
 };
 
@@ -59,7 +59,7 @@ do {                                                         \
  * If offset is -1, this starts at the end of the current data in the buffer.
  */
 extern int
-printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len);
+printbuf_memset(struct printbuf *pb, size_t offset, int charvalue, int len);
 
 extern int
 sprintbuf(struct printbuf *p, const char *msg, ...);
