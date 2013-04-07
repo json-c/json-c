@@ -41,7 +41,7 @@ printbuf_memappend(struct printbuf *p, const char *buf, size_t size);
 
 #define printbuf_memappend_fast(p, bufptr, bufsize)          \
 do {                                                         \
-  if ((p->size - p->bpos) > bufsize) {                       \
+  if ((p->size - p->bpos) > (size_t)(bufsize)) {             \
     memcpy(p->buf + p->bpos, (bufptr), bufsize);             \
     p->bpos += bufsize;                                      \
     p->buf[p->bpos]= '\0';                                   \
