@@ -82,7 +82,7 @@ typedef void (json_object_delete_fn)(struct json_object *jso, void *userdata);
 /**
  * Type of a custom serialization function.  See json_object_set_serializer.
  */
-typedef int (json_object_to_json_string_fn)(struct json_object *jso,
+typedef long long (json_object_to_json_string_fn)(struct json_object *jso,
 						struct printbuf *pb,
 						int level,
 						int flags);
@@ -530,7 +530,7 @@ extern double json_object_get_double(struct json_object *obj);
  */
 extern struct json_object* json_object_new_string(const char *s);
 
-extern struct json_object* json_object_new_string_len(const char *s, int len);
+extern struct json_object* json_object_new_string_len(const char *s, size_t len);
 
 /** Get the string value of a json_object
  *
@@ -553,7 +553,7 @@ extern const char* json_object_get_string(struct json_object *obj);
  * @param obj the json_object instance
  * @returns int
  */
-extern int json_object_get_string_len(struct json_object *obj);
+extern size_t json_object_get_string_len(struct json_object *obj);
 
 #ifdef __cplusplus
 }
