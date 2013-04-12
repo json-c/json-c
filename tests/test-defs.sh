@@ -47,7 +47,7 @@ cd "$testsubdir" \
 
 echo "=== Running test $progname"
 
-CMP="${CMP-cmp}"
+DIFF="${DIFF-diff}"
 
 use_valgrind=${USE_VALGRIND-1}
 valgrind_path=$(which valgrind 2> /dev/null)
@@ -86,6 +86,10 @@ run_output_test()
 		REDIR_OUTPUT="| tee \"${TEST_OUTPUT}.out\""
 	fi
 
+	if [ -f ${top_builddir}/${TEST_COMMAND}.exe ]; then
+		TEST_COMMAND=${TEST_COMMAND}.exe
+	fi
+
 	if [ $use_valgrind -eq 1 ] ; then
 		eval valgrind --tool=memcheck \
 			--trace-children=yes \
@@ -114,9 +118,9 @@ run_output_test()
 		fi
 	fi
 
-	if ! "$CMP" -s "${top_builddir}/${TEST_OUTPUT}.expected" "${TEST_OUTPUT}.out" ; then
+	if ! "$DIFF" -w "${top_builddir}/${TEST_OUTPUT}.expected" "${TEST_OUTPUT}.out" ; then
 		echo "ERROR: \"${TEST_COMMAND} $@\" (${TEST_OUTPUT}) failed (set VERBOSE=1 to see full output):" 1>&2
-		(cd "${CURDIR}" ; set -x ; diff "${top_builddir}/${TEST_OUTPUT}.expected" "$testsubdir/${TEST_OUTPUT}.out")
+		(cd "${CURDIR}" ; set -x ; diff -wu "${top_builddir}/${TEST_OUTPUT}.expected" "$testsubdir/${TEST_OUTPUT}.out")
 		echo "cp \"$testsubdir/${TEST_OUTPUT}.out\" \"${top_builddir}/${TEST_OUTPUT}.expected\"" 1>&2
 
 		err=1
