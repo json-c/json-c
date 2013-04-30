@@ -236,4 +236,4 @@ json_object_iter_equal(const struct json_object_iterator* iter1,
 #endif
 
 
-#endif // JSON_OBJECT_ITERATOR_H
+#endif /* JSON_OBJECT_ITERATOR_H */
