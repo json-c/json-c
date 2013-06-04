@@ -159,14 +159,15 @@ int json_parse_double(const char *buf, double *retval)
 static void sscanf_is_broken_test()
 {
 	int64_t num64;
+	int ret_errno, is_int64_min, ret_errno2, is_int64_max;
 
 	(void)sscanf(" -01234567890123456789012345", "%" SCNd64, &num64);
-	int ret_errno = errno;
-	int is_int64_min = (num64 == INT64_MIN);
+	ret_errno = errno;
+	is_int64_min = (num64 == INT64_MIN);
 
 	(void)sscanf(" 01234567890123456789012345", "%" SCNd64, &num64);
-	int ret_errno2 = errno;
-	int is_int64_max = (num64 == INT64_MAX);
+	ret_errno2 = errno;
+	is_int64_max = (num64 == INT64_MAX);
 
 	if (ret_errno != ERANGE || !is_int64_min ||
 	    ret_errno2 != ERANGE || !is_int64_max)
