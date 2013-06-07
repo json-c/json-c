@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <math.h>
 
 #include "debug.h"
 #include "printbuf.h"
@@ -561,8 +562,19 @@ static int json_object_double_to_json_string(struct json_object* jso,
 {
   char buf[128], *p, *q;
   int size;
+  /* Although JSON RFC does not support
+     NaN or Infinity as numeric values
+     ECMA 262 section 9.8.1 defines
+     how to handle these cases as strings */
+  if(isnan(jso->o.c_double))
+    size = snprintf(buf, 128, "NaN");
+  else if(isinf(jso->o.c_double) == 1)
+    size = snprintf(buf, 128, "Infinity");
+  else if(isinf(jso->o.c_double) == -1)
+    size = snprintf(buf, 128, "-Infinity");
+  else
+    size = snprintf(buf, 128, "%f", jso->o.c_double);
 
-  size = snprintf(buf, 128, "%f", jso->o.c_double);
   p = strchr(buf, ',');
   if (p) {
     *p = '.';
