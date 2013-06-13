@@ -611,6 +611,11 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	int64_t num64;
 	double  numd;
 	if (!tok->is_double && json_parse_int64(tok->pb->buf, &num64) == 0) {
+		if (num64 && tok->pb->buf[0]=='0' && (tok->flags & JSON_TOKENER_STRICT)) {
+			/* in strick mode, number must not start with 0 */
+			tok->err = json_tokener_error_parse_number;
+			goto out;
+		}
 		current = json_object_new_int64(num64);
 	} else if(tok->is_double && json_parse_double(tok->pb->buf, &numd) == 0) {
           current = json_object_new_double(numd);
