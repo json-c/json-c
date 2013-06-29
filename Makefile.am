@@ -66,7 +66,13 @@ maintainer-clean-local:
 	-rm -rf configure
 
 if ENABLE_OLDNAME_COMPAT
+# Remove old headers and create a compatibility link
 install-data-hook:
+	if test -d "$(DESTDIR)@includedir@/json" ; then \
+		(cd "$(DESTDIR)@includedir@/json" && \
+		rm -f $(libjson_cinclude_HEADERS)) ; \
+		rmdir "$(DESTDIR)@includedir@/json" ; \
+	fi
 	test \! -e "$(DESTDIR)@includedir@/json" || rm "$(DESTDIR)@includedir@/json"
 	$(LN_S) json-c "$(DESTDIR)@includedir@/json"
 
