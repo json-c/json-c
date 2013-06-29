@@ -23,6 +23,10 @@ extern void mc_set_debug(int debug);
 extern int mc_get_debug(void);
 
 extern void mc_set_syslog(int syslog);
+
+/**
+ * @deprecated Use mc_error(), and return an appropriate error.
+ */
 extern void mc_abort(const char *msg, ...);
 extern void mc_debug(const char *msg, ...);
 extern void mc_error(const char *msg, ...);
@@ -48,6 +52,9 @@ extern void mc_info(const char *msg, ...);
 
 #endif
 
+/**
+ * @deprecated Use MC_ERROR(), and return an appropriate error.
+ */
 #define MC_ABORT(x, ...) mc_abort(x, ##__VA_ARGS__)
 #define MC_ERROR(x, ...) mc_error(x, ##__VA_ARGS__)
 

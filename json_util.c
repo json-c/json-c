@@ -73,7 +73,7 @@ struct json_object* json_object_from_file(const char *filename)
   int fd, ret;
 
   if((fd = open(filename, O_RDONLY)) < 0) {
-    MC_ERROR("json_object_from_file: error reading file %s: %s\n",
+    MC_ERROR("json_object_from_file: error opening file %s: %s\n",
 	     filename, strerror(errno));
     return NULL;
   }
@@ -87,7 +87,7 @@ struct json_object* json_object_from_file(const char *filename)
   }
   close(fd);
   if(ret < 0) {
-    MC_ABORT("json_object_from_file: error reading file %s: %s\n",
+    MC_ERROR("json_object_from_file: error reading file %s: %s\n",
 	     filename, strerror(errno));
     printbuf_free(pb);
     return NULL;
