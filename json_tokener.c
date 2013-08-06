@@ -293,8 +293,13 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	printbuf_reset(tok->pb);
 	tok->st_pos = 0;
 	goto redo_char;
-      case '"':
       case '\'':
+        if (tok->flags & JSON_TOKENER_STRICT) {
+            /* in STRICT mode only double-quote are allowed */
+            tok->err = json_tokener_error_parse_unexpected;
+            goto out;
+        }
+      case '"':
 	state = json_tokener_state_string;
 	printbuf_reset(tok->pb);
 	tok->quote_char = c;
