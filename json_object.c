@@ -34,10 +34,6 @@
 # error You do not have strdup on your system.
 #endif /* HAVE_STRDUP */
 
-#if !defined(HAVE_STRNDUP)
-  char* strndup(const char* str, size_t n);
-#endif /* !HAVE_STRNDUP */
-
 #if !defined(HAVE_SNPRINTF) && defined(_MSC_VER)
   /* MSC has the version as _snprintf */
 # define snprintf _snprintf
