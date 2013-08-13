@@ -99,7 +99,7 @@ struct json_object* json_object_from_file(const char *filename)
 
 /* extended "format and write to file" function */
 
-int json_object_to_file_ext(char *filename, struct json_object *obj, int flags)
+int json_object_to_file_ext(const char *filename, struct json_object *obj, int flags)
 {
   const char *json_str;
   int fd, ret;
@@ -141,7 +141,7 @@ int json_object_to_file_ext(char *filename, struct json_object *obj, int flags)
 
 // backwards compatible "format and write to file" function
 
-int json_object_to_file(char *filename, struct json_object *obj)
+int json_object_to_file(const char *filename, struct json_object *obj)
 {
   return json_object_to_file_ext(filename, obj, JSON_C_TO_STRING_PLAIN);
 }
