@@ -265,7 +265,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	if ((!ADVANCE_CHAR(str, tok)) || (!PEEK_CHAR(c, tok)))
 	  goto out;
       }
-      if(c == '/') {
+      if(c == '/' && !(tok->flags & JSON_TOKENER_STRICT)) {
 	printbuf_reset(tok->pb);
 	printbuf_memappend_fast(tok->pb, &c, 1);
 	state = json_tokener_state_comment_start;
