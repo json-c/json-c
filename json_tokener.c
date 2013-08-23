@@ -769,6 +769,13 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
   } /* while(POP_CHAR) */
 
  out:
+  if (c &&
+     (state == json_tokener_state_finish) &&
+     (tok->depth == 0) &&
+     (tok->flags & JSON_TOKENER_STRICT)) {
+      /* unexpected char after JSON data */
+      tok->err = json_tokener_error_parse_unexpected;
+  }
   if (!c) { /* We hit an eof char (0) */
     if(state != json_tokener_state_finish &&
        saved_state != json_tokener_state_finish)
