@@ -25,6 +25,7 @@
 /missing
 /stamp-h1
 /stamp-h2
+/test-driver
 /tests/Makefile
 /tests/Makefile.in
 /tests/test1
@@ -37,6 +38,7 @@
 /tests/test_parse_int64
 /tests/test_parse
 /tests/test_cast
+/tests/test_locale
 /tests/test_null
 /tests/test_printbuf
 /tests/test_set_serializer
