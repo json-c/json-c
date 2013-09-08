@@ -265,7 +265,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	if ((!ADVANCE_CHAR(str, tok)) || (!PEEK_CHAR(c, tok)))
 	  goto out;
       }
-      if(c == '/') {
+      if(c == '/' && !(tok->flags & JSON_TOKENER_STRICT)) {
 	printbuf_reset(tok->pb);
 	printbuf_memappend_fast(tok->pb, &c, 1);
 	state = json_tokener_state_comment_start;
@@ -293,8 +293,13 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	printbuf_reset(tok->pb);
 	tok->st_pos = 0;
 	goto redo_char;
-      case '"':
       case '\'':
+        if (tok->flags & JSON_TOKENER_STRICT) {
+            /* in STRICT mode only double-quote are allowed */
+            tok->err = json_tokener_error_parse_unexpected;
+            goto out;
+        }
+      case '"':
 	state = json_tokener_state_string;
 	printbuf_reset(tok->pb);
 	tok->quote_char = c;
@@ -764,6 +769,13 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
   } /* while(POP_CHAR) */
 
  out:
+  if (c &&
+     (state == json_tokener_state_finish) &&
+     (tok->depth == 0) &&
+     (tok->flags & JSON_TOKENER_STRICT)) {
+      /* unexpected char after JSON data */
+      tok->err = json_tokener_error_parse_unexpected;
+  }
   if (!c) { /* We hit an eof char (0) */
     if(state != json_tokener_state_finish &&
        saved_state != json_tokener_state_finish)
