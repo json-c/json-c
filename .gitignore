@@ -41,6 +41,8 @@
 /tests/test_printbuf
 /tests/test_set_serializer
 /tests/*.vg.out
+/tests/*.log
+/tests/*.trs
 /Debug
 /Release
 *.lo
