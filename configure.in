@@ -35,7 +35,7 @@ AC_FUNC_VPRINTF
 AC_FUNC_MEMCMP
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
-AC_CHECK_FUNCS(strcasecmp strdup strndup strerror snprintf vsnprintf vasprintf open vsyslog strncasecmp setlocale)
+AC_CHECK_FUNCS(strcasecmp strdup strerror snprintf vsnprintf vasprintf open vsyslog strncasecmp setlocale)
 
 #check if .section.gnu.warning accepts long strings (for __warn_references)
 AC_LANG_PUSH([C])
