@@ -192,7 +192,7 @@ flags);
  * @param userdata an optional opaque cookie
  * @param user_delete an optional function from freeing userdata
  */
-void json_object_set_serializer(json_object *jso,
+extern void json_object_set_serializer(json_object *jso,
 	json_object_to_json_string_fn to_string_func,
 	void *userdata,
 	json_object_delete_fn *user_delete);
