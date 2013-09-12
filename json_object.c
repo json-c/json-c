@@ -601,11 +601,36 @@ static int json_object_double_to_json_string(struct json_object* jso,
 
 struct json_object* json_object_new_double(double d)
 {
-  struct json_object *jso = json_object_new(json_type_double);
-  if(!jso) return NULL;
-  jso->_to_json_string = &json_object_double_to_json_string;
-  jso->o.c_double = d;
-  return jso;
+	struct json_object *jso = json_object_new(json_type_double);
+	if (!jso)
+		return NULL;
+	jso->_to_json_string = &json_object_double_to_json_string;
+	jso->o.c_double = d;
+	return jso;
+}
+
+struct json_object* json_object_new_double_s(double d, const char *ds)
+{
+	struct json_object *jso = json_object_new_double(d);
+	if (!jso)
+		return NULL;
+
+	json_object_set_serializer(jso, json_object_userdata_to_json_string,
+	    strdup(ds), json_object_free_userdata);
+	return jso;
+}
+
+int json_object_userdata_to_json_string(struct json_object *jso,
+	struct printbuf *pb, int level, int flags)
+{
+	int userdata_len = strlen(jso->_userdata);
+	printbuf_memappend(pb, jso->_userdata, userdata_len);
+	return userdata_len;
+}
+
+void json_object_free_userdata(struct json_object *jso, void *userdata)
+{
+	free(userdata);
 }
 
 double json_object_get_double(struct json_object *jso)

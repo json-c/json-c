@@ -599,8 +599,10 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 			goto out;
 		}
 		current = json_object_new_int64(num64);
-	} else if(tok->is_double && json_parse_double(tok->pb->buf, &numd) == 0) {
-          current = json_object_new_double(numd);
+	}
+	else if(tok->is_double && json_parse_double(tok->pb->buf, &numd) == 0)
+	{
+          current = json_object_new_double_s(numd, tok->pb->buf);
         } else {
           tok->err = json_tokener_error_parse_number;
           goto out;

@@ -1,7 +1,10 @@
 
 NEXT.VERSION
 
-  * Nothing yet...
+  * Added a json_object_new_double_s() convenience function to allow
+    an exact string representation of a double to be specified when
+    creating the object and use it in json_tokener_parse_ex() so
+    a re-serialized object more exactly matches the input.
 
 0.11
 
