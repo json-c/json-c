@@ -570,14 +570,14 @@ static int json_object_double_to_json_string(struct json_object* jso,
      ECMA 262 section 9.8.1 defines
      how to handle these cases as strings */
   if(isnan(jso->o.c_double))
-    size = snprintf(buf, 128, "NaN");
+    size = snprintf(buf, sizeof(buf), "NaN");
   else if(isinf(jso->o.c_double))
     if(jso->o.c_double > 0)
-      size = snprintf(buf, 128, "Infinity");
+      size = snprintf(buf, sizeof(buf), "Infinity");
     else
-      size = snprintf(buf, 128, "-Infinity");
+      size = snprintf(buf, sizeof(buf), "-Infinity");
   else
-    size = snprintf(buf, 128, "%f", jso->o.c_double);
+    size = snprintf(buf, sizeof(buf), "%f", jso->o.c_double);
 
   p = strchr(buf, ',');
   if (p) {
