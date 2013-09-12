@@ -577,7 +577,7 @@ static int json_object_double_to_json_string(struct json_object* jso,
     else
       size = snprintf(buf, sizeof(buf), "-Infinity");
   else
-    size = snprintf(buf, sizeof(buf), "%f", jso->o.c_double);
+    size = snprintf(buf, sizeof(buf), "%.17g", jso->o.c_double);
 
   p = strchr(buf, ',');
   if (p) {
