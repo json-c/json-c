@@ -36,10 +36,10 @@ libjson_cinclude_HEADERS = \
 #libjsonx_include_HEADERS = \
 #	json_config.h
 
-libjson_c_la_LDFLAGS = -version-info 2:0:0 -no-undefined
+libjson_c_la_LDFLAGS = -version-info 2:0:0 -no-undefined @JSON_BSYMBOLIC_LDFLAGS@
 
 if ENABLE_OLDNAME_COMPAT
-libjson_la_LDFLAGS = -version-info 1:0:1 -no-undefined -ljson-c
+libjson_la_LDFLAGS = -version-info 1:0:1 -no-undefined -ljson-c @JSON_BSYMBOLIC_LDFLAGS@
 
 # Temporary libjson library.  This will be removed after one release.
 libjson_la_LIBADD = -ljson-c
