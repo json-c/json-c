@@ -12,6 +12,7 @@ check_PROGRAMS += test_null
 check_PROGRAMS += test_cast
 check_PROGRAMS += test_parse
 check_PROGRAMS += test_locale
+check_PROGRAMS += test_case
 
 test1_LDADD = $(LIBJSON_LA)
 
@@ -39,7 +40,9 @@ test_parse_LDADD = $(LIBJSON_LA)
 
 test_locale_LDADD = $(LIBJSON_LA)
 
-TESTS = test1.test test2.test test4.test testReplaceExisting.test parse_int64.test test_null.test test_cast.test test_parse.test test_locale.test
+test_case_LDADD = $(LIBJSON_LA)
+
+TESTS = test1.test test2.test test4.test testReplaceExisting.test parse_int64.test test_null.test test_cast.test test_parse.test test_locale.test test_case.test
 
 TESTS+= test_printbuf.test
 check_PROGRAMS+=test_printbuf
