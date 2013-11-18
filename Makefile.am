@@ -1,6 +1,6 @@
 include Makefile.am.inc
 
-EXTRA_DIST = README.html README-WIN32.html config.h.win32 doc json-c.vcproj
+EXTRA_DIST = README.html README-WIN32.html config.h.win32 json-c.vcproj
 SUBDIRS = . tests
 
 lib_LTLIBRARIES = libjson-c.la 
