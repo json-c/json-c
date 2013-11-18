@@ -20,6 +20,7 @@ AM_CONDITIONAL(ENABLE_OLDNAME_COMPAT, [test "x${enable_oldname_compat}" != "xno"
 # Checks for libraries.
 
 # Checks for header files.
+AM_PROG_CC_C_O
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_HEADER(json_config.h)
 AC_HEADER_STDC

@@ -1,6 +1,8 @@
 
 include ../Makefile.am.inc
 
+AM_CPPFLAGS = -I$(top_srcdir)
+
 LIBJSON_LA=$(top_builddir)/libjson-c.la
 
 check_PROGRAMS = test1 test1Formatted 
@@ -16,14 +18,14 @@ check_PROGRAMS += test_locale
 test1_LDADD = $(LIBJSON_LA)
 
 test1Formatted_LDADD= $(LIBJSON_LA)
-test1Formatted_SOURCES = test1.c parse_flags.c
-test1Formatted_CPPFLAGS = -DTEST_FORMATTED
+test1Formatted_SOURCES = test1.c parse_flags.c parse_flags.h
+test1Formatted_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_FORMATTED
 
 test2_LDADD = $(LIBJSON_LA)
 
 test2Formatted_LDADD= $(LIBJSON_LA)
-test2Formatted_SOURCES = test2.c parse_flags.c
-test2Formatted_CPPFLAGS = -DTEST_FORMATTED
+test2Formatted_SOURCES = test2.c parse_flags.c parse_flags.h
+test2Formatted_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_FORMATTED
 
 test4_LDADD = $(LIBJSON_LA)
 
