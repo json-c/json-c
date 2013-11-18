@@ -39,10 +39,10 @@ libjson_cinclude_HEADERS = \
 libjson_c_la_LDFLAGS = -version-info 2:0:0 -no-undefined
 
 if ENABLE_OLDNAME_COMPAT
-libjson_la_LDFLAGS = -version-info 1:0:1 -no-undefined -ljson-c
+libjson_la_LDFLAGS = -version-info 1:0:1 -no-undefined
 
 # Temporary libjson library.  This will be removed after one release.
-libjson_la_LIBADD = -ljson-c
+libjson_la_LIBADD = libjson-c.la
 endif
 
 
