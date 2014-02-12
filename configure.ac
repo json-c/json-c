@@ -12,6 +12,7 @@ AC_PROG_MAKE_SET
 # Checks for libraries.
 
 # Checks for header files.
+AM_PROG_CC_C_O
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_HEADER(json_config.h)
 AC_HEADER_STDC
