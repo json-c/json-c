@@ -17,6 +17,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <math.h>
+#include <errno.h>
 
 #include "debug.h"
 #include "printbuf.h"
@@ -636,6 +637,7 @@ void json_object_free_userdata(struct json_object *jso, void *userdata)
 double json_object_get_double(struct json_object *jso)
 {
   double cdouble;
+  char *errPtr = NULL;
 
   if(!jso) return 0.0;
   switch(jso->o_type) {
@@ -646,7 +648,36 @@ double json_object_get_double(struct json_object *jso)
   case json_type_boolean:
     return jso->o.c_boolean;
   case json_type_string:
-    if(sscanf(jso->o.c_string.str, "%lf", &cdouble) == 1) return cdouble;
+    errno = 0;
+    cdouble = strtod(jso->o.c_string.str,&errPtr);
+
+    /* if conversion stopped at the first character, return 0.0 */
+    if (errPtr == jso->o.c_string.str)
+        return 0.0;
+
+    /*
+     * Check that the conversion terminated on something sensible
+     *
+     * For example, { "pay" : 123AB } would parse as 123.
+     */
+    if (*errPtr != '\0')
+        return 0.0;
+
+    /*
+     * If strtod encounters a string which would exceed the
+     * capacity of a double, it returns +/- HUGE_VAL and sets
+     * errno to ERANGE. But +/- HUGE_VAL is also a valid result
+     * from a conversion, so we need to check errno.
+     *
+     * Underflow also sets errno to ERANGE, but it returns 0 in
+     * that case, which is what we will return anyway.
+     *
+     * See CERT guideline ERR30-C
+     */
+    if ((HUGE_VAL == cdouble || -HUGE_VAL == cdouble) &&
+        (ERANGE == errno))
+            cdouble = 0.0;
+    return cdouble;
   default:
     return 0.0;
   }
