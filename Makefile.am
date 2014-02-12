@@ -30,7 +30,7 @@ libjson_cinclude_HEADERS = \
 #libjsonx_include_HEADERS = \
 #	json_config.h
 
-libjson_c_la_LDFLAGS = -version-info 2:0:0 -no-undefined
+libjson_c_la_LDFLAGS = -version-info 2:0:0 -no-undefined @JSON_BSYMBOLIC_LDFLAGS@
 
 libjson_c_la_SOURCES = \
 	arraylist.c \
