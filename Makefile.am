@@ -4,15 +4,9 @@ EXTRA_DIST = README.html README-WIN32.html config.h.win32 doc json-c.vcproj
 SUBDIRS = . tests
 
 lib_LTLIBRARIES = libjson-c.la 
-if ENABLE_OLDNAME_COMPAT
-lib_LTLIBRARIES+=libjson.la
-endif
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = json-c.pc
-if ENABLE_OLDNAME_COMPAT
-pkgconfig_DATA += json.pc
-endif
 
 libjson_cincludedir = $(includedir)/json-c
 libjson_cinclude_HEADERS = \
@@ -38,14 +32,6 @@ libjson_cinclude_HEADERS = \
 
 libjson_c_la_LDFLAGS = -version-info 2:0:0 -no-undefined
 
-if ENABLE_OLDNAME_COMPAT
-libjson_la_LDFLAGS = -version-info 1:0:1 -no-undefined -ljson-c
-
-# Temporary libjson library.  This will be removed after one release.
-libjson_la_LIBADD = -ljson-c
-endif
-
-
 libjson_c_la_SOURCES = \
 	arraylist.c \
 	debug.c \
@@ -65,22 +51,9 @@ distclean-local:
 maintainer-clean-local:
 	-rm -rf configure
 
-if ENABLE_OLDNAME_COMPAT
-# Remove old headers and create a compatibility link
-install-data-hook:
-	if test -d "$(DESTDIR)@includedir@/json" ; then \
-		(cd "$(DESTDIR)@includedir@/json" && \
-		rm -f $(libjson_cinclude_HEADERS)) ; \
-		rmdir "$(DESTDIR)@includedir@/json" ; \
-	fi
-	test \! -e "$(DESTDIR)@includedir@/json" || rm "$(DESTDIR)@includedir@/json"
-	$(LN_S) json-c "$(DESTDIR)@includedir@/json"
-
 uninstall-local:
-	rm -f "$(DESTDIR)@includedir@/json"
 	rm -rf "$(DESTDIR)@includedir@/json-c"
-
-endif
+	rm -f "$(DESTDIR)@includedir@/json"
 
 ANDROID_CFLAGS = -I$(top_srcdir) -DHAVE_CONFIG_H
 
