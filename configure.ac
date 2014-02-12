@@ -49,6 +49,32 @@ AC_LANG_POP([C])
 
 AM_PROG_LIBTOOL
 
+# Check for the -Bsymbolic-functions linker flag
+AC_ARG_ENABLE([Bsymbolic],
+              [AS_HELP_STRING([--disable-Bsymbolic], [Avoid linking with -Bsymbolic-function])],
+              [],
+              [enable_Bsymbolic=check])
+
+AS_IF([test "x$enable_Bsymbolic" = "xcheck"],
+      [
+        saved_LDFLAGS="${LDFLAGS}"
+        AC_MSG_CHECKING([for -Bsymbolic-functions linker flag])
+        LDFLAGS=-Wl,-Bsymbolic-functions
+        AC_TRY_LINK([], [int main (void) { return 0; }],
+                    [
+                      AC_MSG_RESULT([yes])
+                      enable_Bsymbolic=yes
+                    ],
+                    [
+                      AC_MSG_RESULT([no])
+                      enable_Bsymbolic=no
+                    ])
+        LDFLAGS="${saved_LDFLAGS}"
+      ])
+
+AS_IF([test "x$enable_Bsymbolic" = "xyes"], [JSON_BSYMBOLIC_LDFLAGS=-Wl[,]-Bsymbolic-functions])
+AC_SUBST(JSON_BSYMBOLIC_LDFLAGS)
+
 AC_CONFIG_FILES([
 Makefile
 json-c.pc
