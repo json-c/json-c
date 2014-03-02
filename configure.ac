@@ -3,7 +3,7 @@ AC_PREREQ(2.52)
 # Process this file with autoconf to produce a configure script.
 AC_INIT([json-c], 0.11.99, [json-c@googlegroups.com])
 
-AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
+AM_INIT_AUTOMAKE
 
 AC_PROG_MAKE_SET
 
@@ -29,6 +29,10 @@ AC_FUNC_MEMCMP
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS(strcasecmp strdup strerror snprintf vsnprintf vasprintf open vsyslog strncasecmp setlocale)
+AC_CHECK_DECLS([isnan], [], [], [[#include <math.h>]])
+AC_CHECK_DECLS([isinf], [], [], [[#include <math.h>]])
+AC_CHECK_DECLS([_isnan], [], [], [[#include <float.h>]])
+AC_CHECK_DECLS([_finite], [], [], [[#include <float.h>]])
 
 #check if .section.gnu.warning accepts long strings (for __warn_references)
 AC_LANG_PUSH([C])
