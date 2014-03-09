@@ -11,6 +11,9 @@
    */
 #undef HAVE_DECL_ISNAN
 
+/* Define to 1 if you have the declaration of `nan', and to 0 if you don't. */
+#undef HAVE_DECL_NAN
+
 /* Define to 1 if you have the declaration of `_finite', and to 0 if you
    don't. */
 #undef HAVE_DECL__FINITE

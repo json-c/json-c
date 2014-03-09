@@ -15,6 +15,7 @@
 
 #include "config.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -49,9 +50,14 @@
 # error You do not have strncasecmp on your system.
 #endif /* HAVE_STRNCASECMP */
 
-static const char* json_null_str = "null";
-static const char* json_true_str = "true";
-static const char* json_false_str = "false";
+static const char json_null_str[] = "null";
+static const int json_null_str_len = sizeof(json_null_str) - 1;
+static const char json_nan_str[] = "NaN";
+static const int json_nan_str_len = sizeof(json_nan_str) - 1;
+static const char json_true_str[] = "true";
+static const int json_true_str_len = sizeof(json_true_str) - 1;
+static const char json_false_str[] = "false";
+static const int json_false_str_len = sizeof(json_false_str) - 1;
 
 // XXX after v0.10 this array will become static:
 const char* json_tokener_errors[] = {
@@ -266,7 +272,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	break;
       case 'N':
       case 'n':
-	state = json_tokener_state_null;
+	state = json_tokener_state_null; // or NaN
 	printbuf_reset(tok->pb);
 	tok->st_pos = 0;
 	goto redo_char;
@@ -324,18 +330,33 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
     case json_tokener_state_null:
       {
 	int size;
+	int size_nan;
 	printbuf_memappend_fast(tok->pb, &c, 1);
-	size = json_min(tok->st_pos+1, (int)strlen(json_null_str));
+	size = json_min(tok->st_pos+1, json_null_str_len);
+	size_nan = json_min(tok->st_pos+1, json_nan_str_len);
 	if((!(tok->flags & JSON_TOKENER_STRICT) &&
 	  strncasecmp(json_null_str, tok->pb->buf, size) == 0)
 	  || (strncmp(json_null_str, tok->pb->buf, size) == 0)
 	  ) {
-	  if(tok->st_pos == (int)strlen(json_null_str)) {
+	  if (tok->st_pos == json_null_str_len) {
 	    current = NULL;
 	    saved_state = json_tokener_state_finish;
 	    state = json_tokener_state_eatws;
 	    goto redo_char;
 	  }
+	}
+	else if ((!(tok->flags & JSON_TOKENER_STRICT) &&
+	          strncasecmp(json_nan_str, tok->pb->buf, size_nan) == 0) ||
+	         (strncmp(json_nan_str, tok->pb->buf, size_nan) == 0)
+	        )
+	{
+		if (tok->st_pos == json_nan_str_len)
+		{
+			current = json_object_new_double(nan(""));
+			saved_state = json_tokener_state_finish;
+			state = json_tokener_state_eatws;
+			goto redo_char;
+		}
 	} else {
 	  tok->err = json_tokener_error_parse_null;
 	  goto out;
@@ -557,13 +578,13 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
       {
 	int size1, size2;
 	printbuf_memappend_fast(tok->pb, &c, 1);
-	size1 = json_min(tok->st_pos+1, (int)strlen(json_true_str));
-	size2 = json_min(tok->st_pos+1, (int)strlen(json_false_str));
+	size1 = json_min(tok->st_pos+1, json_true_str_len);
+	size2 = json_min(tok->st_pos+1, json_false_str_len);
 	if((!(tok->flags & JSON_TOKENER_STRICT) &&
 	  strncasecmp(json_true_str, tok->pb->buf, size1) == 0)
 	  || (strncmp(json_true_str, tok->pb->buf, size1) == 0)
 	  ) {
-	  if(tok->st_pos == (int)strlen(json_true_str)) {
+	  if(tok->st_pos == json_true_str_len) {
 	    current = json_object_new_boolean(1);
 	    saved_state = json_tokener_state_finish;
 	    state = json_tokener_state_eatws;
@@ -572,7 +593,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	} else if((!(tok->flags & JSON_TOKENER_STRICT) &&
 	  strncasecmp(json_false_str, tok->pb->buf, size2) == 0)
 	  || (strncmp(json_false_str, tok->pb->buf, size2) == 0)) {
-	  if(tok->st_pos == (int)strlen(json_false_str)) {
+	  if(tok->st_pos == json_false_str_len) {
 	    current = json_object_new_boolean(0);
 	    saved_state = json_tokener_state_finish;
 	    state = json_tokener_state_eatws;

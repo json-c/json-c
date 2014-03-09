@@ -17,4 +17,8 @@
 # endif
 #endif
 
+#ifndef HAVE_DECL_NAN
+#error This platform does not have nan()
+#endif
+
 #endif

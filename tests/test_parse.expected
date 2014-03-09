@@ -3,6 +3,7 @@ new_obj.to_string()="foo"
 new_obj.to_string()="foo"
 new_obj.to_string()="ABC"
 new_obj.to_string()=null
+new_obj.to_string()=NaN
 new_obj.to_string()=true
 new_obj.to_string()=12
 new_obj.to_string()=12.3
