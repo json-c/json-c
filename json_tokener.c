@@ -50,6 +50,11 @@
 # error You do not have strncasecmp on your system.
 #endif /* HAVE_STRNCASECMP */
 
+/* Use C99 NAN by default; if not available, nan("") should work too. */
+#ifndef NAN
+#define NAN nan("")
+#endif /* !NAN */
+
 static const char json_null_str[] = "null";
 static const int json_null_str_len = sizeof(json_null_str) - 1;
 static const char json_nan_str[] = "NaN";
@@ -352,7 +357,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	{
 		if (tok->st_pos == json_nan_str_len)
 		{
-			current = json_object_new_double(nan(""));
+			current = json_object_new_double(NAN);
 			saved_state = json_tokener_state_finish;
 			state = json_tokener_state_eatws;
 			goto redo_char;
