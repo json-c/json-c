@@ -21,4 +21,8 @@
 #error This platform does not have nan()
 #endif
 
+#ifndef HAVE_DECL_INFINITY
+#error This platform does not have INFINITY
+#endif
+
 #endif

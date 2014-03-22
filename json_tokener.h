@@ -60,7 +60,8 @@ enum json_tokener_state {
   json_tokener_state_object_value_add,
   json_tokener_state_object_sep,
   json_tokener_state_array_after_sep,
-  json_tokener_state_object_field_start_after_sep
+  json_tokener_state_object_field_start_after_sep,
+  json_tokener_state_inf
 };
 
 struct json_tokener_srec

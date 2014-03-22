@@ -3,6 +3,10 @@
 /* Define if .gnu.warning accepts long strings. */
 #undef HAS_GNU_WARNING_LONG
 
+/* Define to 1 if you have the declaration of `INFINITY', and to 0 if you
+   don't. */
+#undef HAVE_DECL_INFINITY
+
 /* Define to 1 if you have the declaration of `isinf', and to 0 if you don't.
    */
 #undef HAVE_DECL_ISINF

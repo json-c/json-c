@@ -29,6 +29,7 @@ AC_FUNC_MEMCMP
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS(strcasecmp strdup strerror snprintf vsnprintf vasprintf open vsyslog strncasecmp setlocale)
+AC_CHECK_DECLS([INFINITY], [], [], [[#include <math.h>]])
 AC_CHECK_DECLS([nan], [], [], [[#include <math.h>]])
 AC_CHECK_DECLS([isnan], [], [], [[#include <math.h>]])
 AC_CHECK_DECLS([isinf], [], [], [[#include <math.h>]])

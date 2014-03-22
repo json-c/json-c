@@ -57,6 +57,8 @@
 
 static const char json_null_str[] = "null";
 static const int json_null_str_len = sizeof(json_null_str) - 1;
+static const char json_inf_str[] = "Infinity";
+static const int json_inf_str_len = sizeof(json_inf_str) - 1;
 static const char json_nan_str[] = "NaN";
 static const int json_nan_str_len = sizeof(json_nan_str) - 1;
 static const char json_true_str[] = "true";
@@ -275,6 +277,12 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	saved_state = json_tokener_state_array;
 	current = json_object_new_array();
 	break;
+      case 'I':
+      case 'i':
+	state = json_tokener_state_inf;
+	printbuf_reset(tok->pb);
+	tok->st_pos = 0;
+	goto redo_char;
       case 'N':
       case 'n':
 	state = json_tokener_state_null; // or NaN
@@ -332,7 +340,41 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
       tok->depth--;
       goto redo_char;
 
-    case json_tokener_state_null:
+    case json_tokener_state_inf: /* aka starts with 'i' */
+      {
+	int size;
+	int size_inf;
+	int is_negative = 0;
+
+	printbuf_memappend_fast(tok->pb, &c, 1);
+	size = json_min(tok->st_pos+1, json_null_str_len);
+	size_inf = json_min(tok->st_pos+1, json_inf_str_len);
+	char *infbuf = tok->pb->buf;
+	if (*infbuf == '-')
+	{
+		infbuf++;
+		is_negative = 1;
+	}
+	if ((!(tok->flags & JSON_TOKENER_STRICT) &&
+	          strncasecmp(json_inf_str, infbuf, size_inf) == 0) ||
+	         (strncmp(json_inf_str, infbuf, size_inf) == 0)
+	        )
+	{
+		if (tok->st_pos == json_inf_str_len)
+		{
+			current = json_object_new_double(is_negative ? -INFINITY : INFINITY); 
+			saved_state = json_tokener_state_finish;
+			state = json_tokener_state_eatws;
+			goto redo_char;
+		}
+	} else {
+		tok->err = json_tokener_error_parse_unexpected;
+		goto out;
+	}
+	tok->st_pos++;
+      }
+      break;
+    case json_tokener_state_null: /* aka starts with 'n' */
       {
 	int size;
 	int size_nan;
@@ -628,6 +670,14 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	}
         if (case_len>0)
           printbuf_memappend_fast(tok->pb, case_start, case_len);
+
+	// Check for -Infinity
+	if (tok->pb->buf[0] == '-' && case_len == 1 &&
+	    (c == 'i' || c == 'I'))
+	{
+		state = json_tokener_state_inf;
+		goto redo_char;
+	}
       }
       {
 	int64_t num64;
