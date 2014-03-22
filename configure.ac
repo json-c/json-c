@@ -40,12 +40,12 @@ AC_CHECK_DECLS([_finite], [], [], [[#include <float.h>]])
 AC_LANG_PUSH([C])
 
 AC_MSG_CHECKING([if .gnu.warning accepts long strings])
-AC_LINK_IFELSE([[
+AC_LINK_IFELSE([AC_LANG_SOURCE([[
 extern void json_object_get();
 __asm__(".section .gnu.json_object_get,\n\t.ascii \"Please link against libjson-c instead of libjson\"\n\t.text");
 
 int main(int c,char* v) {return 0;}
-]], [
+]])], [
     AC_DEFINE(HAS_GNU_WARNING_LONG, 1, [Define if .gnu.warning accepts long strings.])
     AC_MSG_RESULT(yes)
 ], [
