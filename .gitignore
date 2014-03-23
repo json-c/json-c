@@ -39,6 +39,7 @@
 /tests/test_parse_int64
 /tests/test_parse
 /tests/test_cast
+/tests/test_charcase
 /tests/test_locale
 /tests/test_null
 /tests/test_printbuf

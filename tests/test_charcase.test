@@ -8,5 +8,5 @@ if test -z "$srcdir"; then
 fi
 . "$srcdir/test-defs.sh"
 
-run_output_test test_case
+run_output_test test_charcase
 exit $?
