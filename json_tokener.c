@@ -511,7 +511,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	state = saved_state;
 	break;
       case 'u':
-	tok->ucs_char = 0;s
+	tok->ucs_char = 0;
 	tok->st_pos = 0;
 	state = json_tokener_state_escape_unicode;
 	break;
