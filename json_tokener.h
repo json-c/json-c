@@ -106,14 +106,6 @@ struct json_tokener
  */
 const char *json_tokener_error_desc(enum json_tokener_error jerr);
 
-/** 
- * @b XXX do not use json_tokener_errors directly.  
- * After v0.10 this will be removed.
- *
- * See json_tokener_error_desc() instead.
- */
-extern const char* json_tokener_errors[];
-
 /**
  * Retrieve the error caused by the last call to json_tokener_parse_ex(),
  * or json_tokener_success if there is no error.

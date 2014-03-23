@@ -66,8 +66,7 @@ static const int json_true_str_len = sizeof(json_true_str) - 1;
 static const char json_false_str[] = "false";
 static const int json_false_str_len = sizeof(json_false_str) - 1;
 
-// XXX after v0.10 this array will become static:
-const char* json_tokener_errors[] = {
+static const char* json_tokener_errors[] = {
   "success",
   "continue",
   "nesting too deep",
