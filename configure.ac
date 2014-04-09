@@ -7,6 +7,20 @@ AM_INIT_AUTOMAKE
 
 AC_PROG_MAKE_SET
 
+AC_ARG_ENABLE(rdrand,
+ AS_HELP_STRING([--enable-rdrand],
+   [Enable RDRAND Hardware RNG Hash Seed generation on supported x86/x64 platforms.]),
+[if test x$enableval = xyes; then
+  enable_rdrand=yes
+  AC_DEFINE(ENABLE_RDRAND, 1, [Enable RDRANR Hardware RNG Hash Seed])
+fi])
+
+if test "x$enable_rdrand" = "xyes"; then
+  AC_MSG_RESULT([RDRAND Hardware RNG Hash Seed enabled on supported x86/x64 platforms])
+else
+  AC_MSG_RESULT([RDRAND Hardware RNG Hash Seed disabled. Use --enable-rdrand to enable])
+fi
+
 # Checks for programs.
 
 # Checks for libraries.
@@ -16,7 +30,7 @@ AM_PROG_CC_C_O
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_HEADER(json_config.h)
 AC_HEADER_STDC
-AC_CHECK_HEADERS(fcntl.h limits.h strings.h syslog.h unistd.h [sys/cdefs.h] [sys/param.h] stdarg.h locale.h)
+AC_CHECK_HEADERS(fcntl.h limits.h strings.h syslog.h unistd.h [sys/cdefs.h] [sys/param.h] stdarg.h locale.h endian.h)
 AC_CHECK_HEADER(inttypes.h,[AC_DEFINE([JSON_C_HAVE_INTTYPES_H],[1],[Public define for json_inttypes.h])])
 
 # Checks for typedefs, structures, and compiler characteristics.

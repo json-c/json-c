@@ -13,6 +13,14 @@
 #ifndef _json_object_h_
 #define _json_object_h_
 
+#ifdef __GNUC__
+#define THIS_FUNCTION_IS_DEPRECATED(func) func __attribute__ ((deprecated))
+#elif defined(_MSC_VER)
+#define THIS_FUNCTION_IS_DEPRECATED(func) __declspec(deprecated) func
+#else
+#define THIS_FUNCTION_IS_DEPRECATED(func) func
+#endif
+
 #include "json_inttypes.h"
 
 #ifdef __cplusplus
@@ -279,8 +287,8 @@ extern void json_object_object_add(struct json_object* obj, const char *key,
  * @returns the json_object associated with the given field name
  * @deprecated Please use json_object_object_get_ex
  */
-extern struct json_object* json_object_object_get(struct json_object* obj,
-						  const char *key);
+THIS_FUNCTION_IS_DEPRECATED(extern struct json_object* json_object_object_get(struct json_object* obj,
+						  const char *key));
 
 /** Get the json_object associated with a given object field.  
  *

@@ -23,7 +23,8 @@ libjson_cinclude_HEADERS = \
 	json_tokener.h \
 	json_util.h \
 	linkhash.h \
-	printbuf.h
+	printbuf.h \
+	random_seed.h
 
 #libjsonx_includedir = $(libdir)/json-c-@VERSION@
 #
@@ -41,7 +42,8 @@ libjson_c_la_SOURCES = \
 	json_tokener.c \
 	json_util.c \
 	linkhash.c \
-	printbuf.c
+	printbuf.c \
+	random_seed.c
 
 
 distclean-local:

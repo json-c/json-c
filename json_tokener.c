@@ -81,6 +81,7 @@ static const char* json_tokener_errors[] = {
   "object value separator ',' expected",
   "invalid string sequence",
   "expected comment",
+  "buffer size overflow"
 };
 
 const char *json_tokener_error_desc(enum json_tokener_error jerr)
@@ -242,6 +243,16 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 
   tok->char_offset = 0;
   tok->err = json_tokener_success;
+
+  /* this interface is presently not 64-bit clean due to the int len argument
+     and the internal printbuf interface that takes 32-bit int len arguments
+     so the function limits the maximum string size to INT32_MAX (2GB).
+     If the function is called with len == -1 then strlen is called to check
+     the string length is less than INT32_MAX (2GB) */
+  if ((len < -1) || (len == -1 && strlen(str) > INT32_MAX)) {
+    tok->err = json_tokener_error_size;
+    return NULL;
+  }
 
   while (PEEK_CHAR(c, tok)) {
 
