@@ -1,10 +1,42 @@
 
-NEXT.VERSION
+0.12
+
+  * Address security issues:
+    * CVE-2013-6371: hash collision denial of service
+    * CVE-2013-6370: buffer overflow if size_t is larger than int
+
+  * Avoid potential overflow in json_object_get_double
+
+  * Eliminate the mc_abort() function and MC_ABORT macro.
+
+  * Make the json_tokener_errors array local.  It has been deprecated for
+     a while, and json_tokener_error_desc() should be used instead.
+
+  * change the floating point output format to %.17g so values with 
+     more than 6 digits show up in the output.
+
+  * Remove the old libjson.so name compatibility support.  The library is
+      only created as libjson-c.so now and headers are only installed 
+      into the ${prefix}/json-c directory.
+
+  * When supported by the linker, add the -Bsymbolic-functions flag.
+
+  * Various changes to fix the build on MSVC.
+
+  * Make strict mode more strict:
+    * number must not start with 0
+    * no single-quote strings
+    * no comments
+    * trailing char not allowed
+    * only allow lowercase literals
 
   * Added a json_object_new_double_s() convenience function to allow
     an exact string representation of a double to be specified when
     creating the object and use it in json_tokener_parse_ex() so
     a re-serialized object more exactly matches the input.
+
+  * Add support NaN and Infinity
+
 
 0.11
 
