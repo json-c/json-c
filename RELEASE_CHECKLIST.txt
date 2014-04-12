@@ -111,6 +111,21 @@ git commit
 vi index.html
     Add/change links to current release.
 
+git commit index.html
+
+git push
+
+------------
+
+Update checksums on wiki page.
+
+cd ..
+openssl sha -sha256 json-c*gz
+openssl md5 json-c*gz
+
+Copy and paste this output into the wiki page at:
+	https://github.com/json-c/json-c/wiki
+
 ------------
 
 Send an email to the mailing list.
