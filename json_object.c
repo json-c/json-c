@@ -374,6 +374,12 @@ struct json_object* json_object_new_object(void)
 	jso->_to_json_string = &json_object_object_to_json_string;
 	jso->o.c_object = lh_kchar_table_new(JSON_OBJECT_DEF_HASH_ENTRIES,
 					NULL, &json_object_lh_entry_free);
+	if (!jso->o.c_object)
+	{
+		json_object_generic_delete(jso);
+		errno = ENOMEM;
+		return NULL;
+	}
 	return jso;
 }
 
@@ -640,8 +646,15 @@ struct json_object* json_object_new_double_s(double d, const char *ds)
 	if (!jso)
 		return NULL;
 
+	char *new_ds = strdup(ds);
+	if (!new_ds)
+	{
+		json_object_generic_delete(jso);
+		errno = ENOMEM;
+		return NULL;
+	}
 	json_object_set_serializer(jso, json_object_userdata_to_json_string,
-	    strdup(ds), json_object_free_userdata);
+	    new_ds, json_object_free_userdata);
 	return jso;
 }
 
@@ -735,6 +748,12 @@ struct json_object* json_object_new_string(const char *s)
 	jso->_delete = &json_object_string_delete;
 	jso->_to_json_string = &json_object_string_to_json_string;
 	jso->o.c_string.str = strdup(s);
+	if (!jso->o.c_string.str)
+	{
+		json_object_generic_delete(jso);
+		errno = ENOMEM;
+		return NULL;
+	}
 	jso->o.c_string.len = strlen(s);
 	return jso;
 }
@@ -747,6 +766,12 @@ struct json_object* json_object_new_string_len(const char *s, int len)
 	jso->_delete = &json_object_string_delete;
 	jso->_to_json_string = &json_object_string_to_json_string;
 	jso->o.c_string.str = (char*)malloc(len + 1);
+	if (!jso->o.c_string.str)
+	{
+		json_object_generic_delete(jso);
+		errno = ENOMEM;
+		return NULL;
+	}
 	memcpy(jso->o.c_string.str, (void *)s, len);
 	jso->o.c_string.str[len] = '\0';
 	jso->o.c_string.len = len;
