@@ -68,25 +68,29 @@ static struct lh_table *json_object_table;
 
 static void json_object_init(void) __attribute__ ((constructor));
 static void json_object_init(void) {
-  MC_DEBUG("json_object_init: creating object table\n");
-  json_object_table = lh_kptr_table_new(128, "json_object_table", NULL);
+	MC_DEBUG("json_object_init: creating object table\n");
+	json_object_table = lh_kptr_table_new(128, "json_object_table", NULL);
 }
 
 static void json_object_fini(void) __attribute__ ((destructor));
-static void json_object_fini(void) {
-  struct lh_entry *ent;
-  if(MC_GET_DEBUG()) {
-    if (json_object_table->count) {
-      MC_DEBUG("json_object_fini: %d referenced objects at exit\n",
-  	       json_object_table->count);
-      lh_foreach(json_object_table, ent) {
-        struct json_object* obj = (struct json_object*)ent->v;
-        MC_DEBUG("\t%s:%p\n", json_type_to_name(obj->o_type), obj);
-      }
-    }
-  }
-  MC_DEBUG("json_object_fini: freeing object table\n");
-  lh_table_free(json_object_table);
+static void json_object_fini(void)
+{
+	struct lh_entry *ent;
+	if (MC_GET_DEBUG())
+	{
+		if (json_object_table->count)
+		{
+			MC_DEBUG("json_object_fini: %d referenced objects at exit\n",
+			   json_object_table->count);
+			lh_foreach(json_object_table, ent)
+			{
+				struct json_object* obj = (struct json_object*)ent->v;
+				MC_DEBUG("\t%s:%p\n", json_type_to_name(obj->o_type), obj);
+			}
+		}
+	}
+	MC_DEBUG("json_object_fini: freeing object table\n");
+	lh_table_free(json_object_table);
 }
 #endif /* REFCOUNT_DEBUG */
 
@@ -95,45 +99,51 @@ static void json_object_fini(void) {
 
 static int json_escape_str(struct printbuf *pb, char *str, int len)
 {
-  int pos = 0, start_offset = 0;
-  unsigned char c;
-  while (len--) {
-    c = str[pos];
-    switch(c) {
-    case '\b':
-    case '\n':
-    case '\r':
-    case '\t':
-    case '\f':
-    case '"':
-    case '\\':
-    case '/':
-      if(pos - start_offset > 0)
-	printbuf_memappend(pb, str + start_offset, pos - start_offset);
-      if(c == '\b') printbuf_memappend(pb, "\\b", 2);
-      else if(c == '\n') printbuf_memappend(pb, "\\n", 2);
-      else if(c == '\r') printbuf_memappend(pb, "\\r", 2);
-      else if(c == '\t') printbuf_memappend(pb, "\\t", 2);
-      else if(c == '\f') printbuf_memappend(pb, "\\f", 2);
-      else if(c == '"') printbuf_memappend(pb, "\\\"", 2);
-      else if(c == '\\') printbuf_memappend(pb, "\\\\", 2);
-      else if(c == '/') printbuf_memappend(pb, "\\/", 2);
-      start_offset = ++pos;
-      break;
-    default:
-      if(c < ' ') {
-	if(pos - start_offset > 0)
-	  printbuf_memappend(pb, str + start_offset, pos - start_offset);
-	sprintbuf(pb, "\\u00%c%c",
-		  json_hex_chars[c >> 4],
-		  json_hex_chars[c & 0xf]);
-	start_offset = ++pos;
-      } else pos++;
-    }
-  }
-  if(pos - start_offset > 0)
-    printbuf_memappend(pb, str + start_offset, pos - start_offset);
-  return 0;
+	int pos = 0, start_offset = 0;
+	unsigned char c;
+	while (len--)
+	{
+		c = str[pos];
+		switch(c)
+		{
+		case '\b':
+		case '\n':
+		case '\r':
+		case '\t':
+		case '\f':
+		case '"':
+		case '\\':
+		case '/':
+			if(pos - start_offset > 0)
+				printbuf_memappend(pb, str + start_offset, pos - start_offset);
+
+			if(c == '\b') printbuf_memappend(pb, "\\b", 2);
+			else if(c == '\n') printbuf_memappend(pb, "\\n", 2);
+			else if(c == '\r') printbuf_memappend(pb, "\\r", 2);
+			else if(c == '\t') printbuf_memappend(pb, "\\t", 2);
+			else if(c == '\f') printbuf_memappend(pb, "\\f", 2);
+			else if(c == '"') printbuf_memappend(pb, "\\\"", 2);
+			else if(c == '\\') printbuf_memappend(pb, "\\\\", 2);
+			else if(c == '/') printbuf_memappend(pb, "\\/", 2);
+
+			start_offset = ++pos;
+			break;
+		default:
+			if(c < ' ')
+			{
+				if(pos - start_offset > 0)
+				printbuf_memappend(pb, str + start_offset, pos - start_offset);
+				sprintbuf(pb, "\\u00%c%c",
+				json_hex_chars[c >> 4],
+				json_hex_chars[c & 0xf]);
+				start_offset = ++pos;
+			} else
+				pos++;
+		}
+	}
+	if (pos - start_offset > 0)
+		printbuf_memappend(pb, str + start_offset, pos - start_offset);
+	return 0;
 }
 
 
@@ -141,10 +151,9 @@ static int json_escape_str(struct printbuf *pb, char *str, int len)
 
 extern struct json_object* json_object_get(struct json_object *jso)
 {
-  if(jso) {
-    jso->_ref_count++;
-  }
-  return jso;
+	if (jso)
+		jso->_ref_count++;
+	return jso;
 }
 
 int json_object_put(struct json_object *jso)
@@ -169,28 +178,29 @@ int json_object_put(struct json_object *jso)
 static void json_object_generic_delete(struct json_object* jso)
 {
 #ifdef REFCOUNT_DEBUG
-  MC_DEBUG("json_object_delete_%s: %p\n",
+	MC_DEBUG("json_object_delete_%s: %p\n",
 	   json_type_to_name(jso->o_type), jso);
-  lh_table_delete(json_object_table, jso);
+	lh_table_delete(json_object_table, jso);
 #endif /* REFCOUNT_DEBUG */
-  printbuf_free(jso->_pb);
-  free(jso);
+	printbuf_free(jso->_pb);
+	free(jso);
 }
 
 static struct json_object* json_object_new(enum json_type o_type)
 {
-  struct json_object *jso;
+	struct json_object *jso;
 
-  jso = (struct json_object*)calloc(sizeof(struct json_object), 1);
-  if(!jso) return NULL;
-  jso->o_type = o_type;
-  jso->_ref_count = 1;
-  jso->_delete = &json_object_generic_delete;
+	jso = (struct json_object*)calloc(sizeof(struct json_object), 1);
+	if (!jso)
+		return NULL;
+	jso->o_type = o_type;
+	jso->_ref_count = 1;
+	jso->_delete = &json_object_generic_delete;
 #ifdef REFCOUNT_DEBUG
-  lh_table_insert(json_object_table, jso, jso);
-  MC_DEBUG("json_object_new_%s: %p\n", json_type_to_name(jso->o_type), jso);
+	lh_table_insert(json_object_table, jso, jso);
+	MC_DEBUG("json_object_new_%s: %p\n", json_type_to_name(jso->o_type), jso);
 #endif /* REFCOUNT_DEBUG */
-  return jso;
+	return jso;
 }
 
 
@@ -198,16 +208,16 @@ static struct json_object* json_object_new(enum json_type o_type)
 
 int json_object_is_type(struct json_object *jso, enum json_type type)
 {
-  if (!jso)
-    return (type == json_type_null);
-  return (jso->o_type == type);
+	if (!jso)
+		return (type == json_type_null);
+	return (jso->o_type == type);
 }
 
 enum json_type json_object_get_type(struct json_object *jso)
 {
-  if (!jso)
-    return json_type_null;
-  return jso->o_type;
+	if (!jso)
+		return json_type_null;
+	return jso->o_type;
 }
 
 /* set a custom conversion to string */
@@ -345,36 +355,39 @@ static int json_object_object_to_json_string(struct json_object* jso,
 
 static void json_object_lh_entry_free(struct lh_entry *ent)
 {
-  free(ent->k);
-  json_object_put((struct json_object*)ent->v);
+	free(ent->k);
+	json_object_put((struct json_object*)ent->v);
 }
 
 static void json_object_object_delete(struct json_object* jso)
 {
-  lh_table_free(jso->o.c_object);
-  json_object_generic_delete(jso);
+	lh_table_free(jso->o.c_object);
+	json_object_generic_delete(jso);
 }
 
 struct json_object* json_object_new_object(void)
 {
-  struct json_object *jso = json_object_new(json_type_object);
-  if(!jso) return NULL;
-  jso->_delete = &json_object_object_delete;
-  jso->_to_json_string = &json_object_object_to_json_string;
-  jso->o.c_object = lh_kchar_table_new(JSON_OBJECT_DEF_HASH_ENTRIES,
+	struct json_object *jso = json_object_new(json_type_object);
+	if (!jso)
+		return NULL;
+	jso->_delete = &json_object_object_delete;
+	jso->_to_json_string = &json_object_object_to_json_string;
+	jso->o.c_object = lh_kchar_table_new(JSON_OBJECT_DEF_HASH_ENTRIES,
 					NULL, &json_object_lh_entry_free);
-  return jso;
+	return jso;
 }
 
 struct lh_table* json_object_get_object(struct json_object *jso)
 {
-  if(!jso) return NULL;
-  switch(jso->o_type) {
-  case json_type_object:
-    return jso->o.c_object;
-  default:
-    return NULL;
-  }
+	if (!jso)
+		return NULL;
+	switch(jso->o_type)
+	{
+	case json_type_object:
+		return jso->o.c_object;
+	default:
+		return NULL;
+	}
 }
 
 void json_object_object_add(struct json_object* jso, const char *key,
@@ -440,34 +453,39 @@ static int json_object_boolean_to_json_string(struct json_object* jso,
 					      int level,
 						  int flags)
 {
-  if(jso->o.c_boolean) return sprintbuf(pb, "true");
-  else return sprintbuf(pb, "false");
+	if (jso->o.c_boolean)
+		return sprintbuf(pb, "true");
+	else
+		return sprintbuf(pb, "false");
 }
 
 struct json_object* json_object_new_boolean(json_bool b)
 {
-  struct json_object *jso = json_object_new(json_type_boolean);
-  if(!jso) return NULL;
-  jso->_to_json_string = &json_object_boolean_to_json_string;
-  jso->o.c_boolean = b;
-  return jso;
+	struct json_object *jso = json_object_new(json_type_boolean);
+	if (!jso)
+		return NULL;
+	jso->_to_json_string = &json_object_boolean_to_json_string;
+	jso->o.c_boolean = b;
+	return jso;
 }
 
 json_bool json_object_get_boolean(struct json_object *jso)
 {
-  if(!jso) return FALSE;
-  switch(jso->o_type) {
-  case json_type_boolean:
-    return jso->o.c_boolean;
-  case json_type_int:
-    return (jso->o.c_int64 != 0);
-  case json_type_double:
-    return (jso->o.c_double != 0);
-  case json_type_string:
-    return (jso->o.c_string.len != 0);
-  default:
-    return FALSE;
-  }
+	if (!jso)
+		return FALSE;
+	switch(jso->o_type)
+	{
+	case json_type_boolean:
+		return jso->o.c_boolean;
+	case json_type_int:
+		return (jso->o.c_int64 != 0);
+	case json_type_double:
+		return (jso->o.c_double != 0);
+	case json_type_string:
+		return (jso->o.c_string.len != 0);
+	default:
+		return FALSE;
+	}
 }
 
 
@@ -478,16 +496,17 @@ static int json_object_int_to_json_string(struct json_object* jso,
 					  int level,
 					  int flags)
 {
-  return sprintbuf(pb, "%"PRId64, jso->o.c_int64);
+	return sprintbuf(pb, "%"PRId64, jso->o.c_int64);
 }
 
 struct json_object* json_object_new_int(int32_t i)
 {
-  struct json_object *jso = json_object_new(json_type_int);
-  if(!jso) return NULL;
-  jso->_to_json_string = &json_object_int_to_json_string;
-  jso->o.c_int64 = i;
-  return jso;
+	struct json_object *jso = json_object_new(json_type_int);
+	if (!jso)
+		return NULL;
+	jso->_to_json_string = &json_object_int_to_json_string;
+	jso->o.c_int64 = i;
+	return jso;
 }
 
 int32_t json_object_get_int(struct json_object *jso)
@@ -531,30 +550,34 @@ int32_t json_object_get_int(struct json_object *jso)
 
 struct json_object* json_object_new_int64(int64_t i)
 {
-  struct json_object *jso = json_object_new(json_type_int);
-  if(!jso) return NULL;
-  jso->_to_json_string = &json_object_int_to_json_string;
-  jso->o.c_int64 = i;
-  return jso;
+	struct json_object *jso = json_object_new(json_type_int);
+	if (!jso)
+		return NULL;
+	jso->_to_json_string = &json_object_int_to_json_string;
+	jso->o.c_int64 = i;
+	return jso;
 }
 
 int64_t json_object_get_int64(struct json_object *jso)
 {
-   int64_t cint;
+	int64_t cint;
 
-  if(!jso) return 0;
-  switch(jso->o_type) {
-  case json_type_int:
-    return jso->o.c_int64;
-  case json_type_double:
-    return (int64_t)jso->o.c_double;
-  case json_type_boolean:
-    return jso->o.c_boolean;
-  case json_type_string:
-	if (json_parse_int64(jso->o.c_string.str, &cint) == 0) return cint;
-  default:
-    return 0;
-  }
+	if (!jso)
+		return 0;
+	switch(jso->o_type)
+	{
+	case json_type_int:
+		return jso->o.c_int64;
+	case json_type_double:
+		return (int64_t)jso->o.c_double;
+	case json_type_boolean:
+		return jso->o.c_boolean;
+	case json_type_string:
+		if (json_parse_int64(jso->o.c_string.str, &cint) == 0)
+			return cint;
+	default:
+		return 0;
+	}
 }
 
 
@@ -692,61 +715,68 @@ static int json_object_string_to_json_string(struct json_object* jso,
 					     int level,
 						 int flags)
 {
-  sprintbuf(pb, "\"");
-  json_escape_str(pb, jso->o.c_string.str, jso->o.c_string.len);
-  sprintbuf(pb, "\"");
-  return 0;
+	sprintbuf(pb, "\"");
+	json_escape_str(pb, jso->o.c_string.str, jso->o.c_string.len);
+	sprintbuf(pb, "\"");
+	return 0;
 }
 
 static void json_object_string_delete(struct json_object* jso)
 {
-  free(jso->o.c_string.str);
-  json_object_generic_delete(jso);
+	free(jso->o.c_string.str);
+	json_object_generic_delete(jso);
 }
 
 struct json_object* json_object_new_string(const char *s)
 {
-  struct json_object *jso = json_object_new(json_type_string);
-  if(!jso) return NULL;
-  jso->_delete = &json_object_string_delete;
-  jso->_to_json_string = &json_object_string_to_json_string;
-  jso->o.c_string.str = strdup(s);
-  jso->o.c_string.len = strlen(s);
-  return jso;
+	struct json_object *jso = json_object_new(json_type_string);
+	if (!jso)
+		return NULL;
+	jso->_delete = &json_object_string_delete;
+	jso->_to_json_string = &json_object_string_to_json_string;
+	jso->o.c_string.str = strdup(s);
+	jso->o.c_string.len = strlen(s);
+	return jso;
 }
 
 struct json_object* json_object_new_string_len(const char *s, int len)
 {
-  struct json_object *jso = json_object_new(json_type_string);
-  if(!jso) return NULL;
-  jso->_delete = &json_object_string_delete;
-  jso->_to_json_string = &json_object_string_to_json_string;
-  jso->o.c_string.str = (char*)malloc(len + 1);
-  memcpy(jso->o.c_string.str, (void *)s, len);
-  jso->o.c_string.str[len] = '\0';
-  jso->o.c_string.len = len;
-  return jso;
+	struct json_object *jso = json_object_new(json_type_string);
+	if (!jso)
+		return NULL;
+	jso->_delete = &json_object_string_delete;
+	jso->_to_json_string = &json_object_string_to_json_string;
+	jso->o.c_string.str = (char*)malloc(len + 1);
+	memcpy(jso->o.c_string.str, (void *)s, len);
+	jso->o.c_string.str[len] = '\0';
+	jso->o.c_string.len = len;
+	return jso;
 }
 
 const char* json_object_get_string(struct json_object *jso)
 {
-  if(!jso) return NULL;
-  switch(jso->o_type) {
-  case json_type_string:
-    return jso->o.c_string.str;
-  default:
-    return json_object_to_json_string(jso);
-  }
+	if (!jso)
+		return NULL;
+	switch(jso->o_type)
+	{
+	case json_type_string:
+		return jso->o.c_string.str;
+	default:
+		return json_object_to_json_string(jso);
+	}
 }
 
-int json_object_get_string_len(struct json_object *jso)  {
-  if(!jso) return 0;
-  switch(jso->o_type) {
-  case json_type_string:
-    return jso->o.c_string.len;
-  default:
-    return 0;
-  }
+int json_object_get_string_len(struct json_object *jso)
+{
+	if (!jso)
+		return 0;
+	switch(jso->o_type)
+	{
+	case json_type_string:
+		return jso->o.c_string.len;
+	default:
+		return 0;
+	}
 }
 
 
@@ -796,60 +826,63 @@ static int json_object_array_to_json_string(struct json_object* jso,
 
 static void json_object_array_entry_free(void *data)
 {
-  json_object_put((struct json_object*)data);
+	json_object_put((struct json_object*)data);
 }
 
 static void json_object_array_delete(struct json_object* jso)
 {
-  array_list_free(jso->o.c_array);
-  json_object_generic_delete(jso);
+	array_list_free(jso->o.c_array);
+	json_object_generic_delete(jso);
 }
 
 struct json_object* json_object_new_array(void)
 {
-  struct json_object *jso = json_object_new(json_type_array);
-  if(!jso) return NULL;
-  jso->_delete = &json_object_array_delete;
-  jso->_to_json_string = &json_object_array_to_json_string;
-  jso->o.c_array = array_list_new(&json_object_array_entry_free);
-  return jso;
+	struct json_object *jso = json_object_new(json_type_array);
+	if (!jso)
+		return NULL;
+	jso->_delete = &json_object_array_delete;
+	jso->_to_json_string = &json_object_array_to_json_string;
+	jso->o.c_array = array_list_new(&json_object_array_entry_free);
+	return jso;
 }
 
 struct array_list* json_object_get_array(struct json_object *jso)
 {
-  if(!jso) return NULL;
-  switch(jso->o_type) {
-  case json_type_array:
-    return jso->o.c_array;
-  default:
-    return NULL;
-  }
+	if (!jso)
+		return NULL;
+	switch(jso->o_type)
+	{
+	case json_type_array:
+		return jso->o.c_array;
+	default:
+		return NULL;
+	}
 }
 
 void json_object_array_sort(struct json_object *jso, int(*sort_fn)(const void *, const void *))
 {
-  array_list_sort(jso->o.c_array, sort_fn);
+	array_list_sort(jso->o.c_array, sort_fn);
 }
 
 int json_object_array_length(struct json_object *jso)
 {
-  return array_list_length(jso->o.c_array);
+	return array_list_length(jso->o.c_array);
 }
 
 int json_object_array_add(struct json_object *jso,struct json_object *val)
 {
-  return array_list_add(jso->o.c_array, val);
+	return array_list_add(jso->o.c_array, val);
 }
 
 int json_object_array_put_idx(struct json_object *jso, int idx,
 			      struct json_object *val)
 {
-  return array_list_put_idx(jso->o.c_array, idx, val);
+	return array_list_put_idx(jso->o.c_array, idx, val);
 }
 
 struct json_object* json_object_array_get_idx(struct json_object *jso,
 					      int idx)
 {
-  return (struct json_object*)array_list_get_idx(jso->o.c_array, idx);
+	return (struct json_object*)array_list_get_idx(jso->o.c_array, idx);
 }
 
