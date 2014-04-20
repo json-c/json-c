@@ -1,7 +1,7 @@
 `json-c`
 ========
 
-Building on *nix with `git`, `gcc` and `autotools`
+Building on Unix with `git`, `gcc` and `autotools`
 --------------------------------------------------
 
 Home page for json-c: https://github.com/json-c/json-c/wiki
