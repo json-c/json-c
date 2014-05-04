@@ -25,7 +25,6 @@
 # error Not enough var arg support!
 #endif /* HAVE_STDARG_H */
 
-#include "bits.h"
 #include "debug.h"
 #include "printbuf.h"
 
@@ -63,7 +62,9 @@ static int printbuf_extend(struct printbuf *p, int min_size)
 	if (p->size >= min_size)
 		return 0;
 
-	new_size = json_max(p->size * 2, min_size + 8);
+	new_size = p->size * 2;
+	if (new_size < min_size + 8)
+		new_size =  min_size + 8;
 #ifdef PRINTBUF_DEBUG
 	MC_DEBUG("printbuf_memappend: realloc "
 	  "bpos=%d min_size=%d old_size=%d new_size=%d\n",

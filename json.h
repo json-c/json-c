@@ -17,7 +17,6 @@
 extern "C" {
 #endif
 
-#include "bits.h"
 #include "debug.h"
 #include "linkhash.h"
 #include "arraylist.h"

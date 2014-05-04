@@ -53,7 +53,6 @@
 # error You do not have snprintf on your system.
 #endif /* HAVE_SNPRINTF */
 
-#include "bits.h"
 #include "debug.h"
 #include "printbuf.h"
 #include "json_inttypes.h"

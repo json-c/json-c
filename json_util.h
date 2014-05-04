@@ -14,6 +14,15 @@
 
 #include "json_object.h"
 
+#ifndef json_min
+#define json_min(a,b) ((a) < (b) ? (a) : (b))
+#endif
+
+#ifndef json_max
+#define json_max(a,b) ((a) > (b) ? (a) : (b))
+#endif
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif

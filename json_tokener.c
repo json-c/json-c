@@ -23,7 +23,6 @@
 #include <string.h>
 #include <limits.h>
 
-#include "bits.h"
 #include "debug.h"
 #include "printbuf.h"
 #include "arraylist.h"
@@ -35,6 +34,8 @@
 #ifdef HAVE_LOCALE_H
 #include <locale.h>
 #endif /* HAVE_LOCALE_H */
+
+#define jt_hexdigit(x) (((x) <= '9') ? (x) - '0' : ((x) & 7) + 9)
 
 #if !HAVE_STRDUP && defined(_MSC_VER)
   /* MSC has the version as _strdup */
@@ -536,7 +537,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	  /* Handle a 4-byte sequence, or two sequences if a surrogate pair */
 	  while(1) {
 	    if(strchr(json_hex_chars, c)) {
-	      tok->ucs_char += ((unsigned int)hexdigit(c) << ((3-tok->st_pos++)*4));
+	      tok->ucs_char += ((unsigned int)jt_hexdigit(c) << ((3-tok->st_pos++)*4));
 	      if(tok->st_pos == 4) {
 		unsigned char unescaped_utf[4];
 
