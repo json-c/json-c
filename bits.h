@@ -22,7 +22,7 @@
 
 #define hexdigit(x) (((x) <= '9') ? (x) - '0' : ((x) & 7) + 9)
 #define error_ptr(error) ((void*)error)
-#define error_description(error)  (json_tokener_errors[error])
+#define error_description(error)  (json_tokener_get_error(error))
 #define is_error(ptr) (ptr == NULL)
 
 #endif
