@@ -160,13 +160,10 @@ static int get_dev_random_seed()
     int r;
     ssize_t nread = read(fd, &r, sizeof(r));
     if (nread != sizeof(r)) {
-        fprintf(stderr, "error read %s: %s", dev_random_file, strerror(errno));
+        fprintf(stderr, "error short read %s: %s", dev_random_file, strerror(errno));
         exit(1);
     }
-    else if (nread != sizeof(r)) {
-        fprintf(stderr, "error short read %s", dev_random_file);
-        exit(1);
-    }
+
     close(fd);
     return r;
 }
