@@ -181,7 +181,10 @@ static int get_dev_random_seed()
 #define HAVE_CRYPTGENRANDOM 1
 
 #include <windows.h>
+#include <wincrypt.h>
+#ifndef __GNUC__
 #pragma comment(lib, "advapi32.lib")
+#endif
 
 static int get_cryptgenrandom_seed()
 {
