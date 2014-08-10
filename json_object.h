@@ -105,7 +105,7 @@ typedef enum json_type {
   json_type_int,
   json_type_object,
   json_type_array,
-  json_type_string,
+  json_type_string
 } json_type;
 
 /* reference counting functions */
@@ -138,7 +138,7 @@ int json_object_put(struct json_object *obj);
      json_type_int,
      json_type_object,
      json_type_array,
-     json_type_string,
+     json_type_string
  */
 extern int json_object_is_type(struct json_object *obj, enum json_type type);
 
@@ -154,7 +154,7 @@ extern int json_object_is_type(struct json_object *obj, enum json_type type);
      json_type_int,
      json_type_object,
      json_type_array,
-     json_type_string,
+     json_type_string
  */
 extern enum json_type json_object_get_type(struct json_object *obj);
 
