@@ -402,6 +402,25 @@ extern int json_object_array_length(struct json_object *obj);
 */
 extern void json_object_array_sort(struct json_object *jso, int(*sort_fn)(const void *, const void *));
 
+/** Binary search a sorted array for a specified key object.
+ *
+ * It depends on your compare function what's sufficient as a key.
+ * Usually you create some dummy object with the parameter compared in
+ * it, to identify the right item you're actually looking for.
+ *
+ * @see json_object_array_sort() for hints on the compare function.
+ *
+ * @param key a dummy json_object with the right key
+ * @param jso the array object we're searching
+ * @param sort_fn the sort/compare function
+ *
+ * @return the wanted json_object instance
+ */
+extern struct json_object* json_object_array_bsearch(
+		const struct json_object *key,
+		const struct json_object *jso,
+		int (*sort_fn)(const void *, const void *) );
+
 /** Add an element to the end of a json_object of type json_type_array
  *
  * The reference count will *not* be incremented. This is to make adding
