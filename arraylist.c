@@ -42,7 +42,7 @@ array_list_new(array_list_free_fn *free_fn)
 extern void
 array_list_free(struct array_list *arr)
 {
-  int i;
+  size_t i;
   for(i = 0; i < arr->length; i++)
     if(arr->array[i]) arr->free_fn(arr->array[i]);
   free(arr->array);
@@ -50,16 +50,16 @@ array_list_free(struct array_list *arr)
 }
 
 void*
-array_list_get_idx(struct array_list *arr, int i)
+array_list_get_idx(struct array_list *arr, size_t i)
 {
   if(i >= arr->length) return NULL;
   return arr->array[i];
 }
 
-static int array_list_expand_internal(struct array_list *arr, int max)
+static int array_list_expand_internal(struct array_list *arr, size_t max)
 {
   void *t;
-  int new_size;
+  size_t new_size;
 
   if(max < arr->size) return 0;
   new_size = arr->size << 1;
@@ -73,7 +73,7 @@ static int array_list_expand_internal(struct array_list *arr, int max)
 }
 
 int
-array_list_put_idx(struct array_list *arr, int idx, void *data)
+array_list_put_idx(struct array_list *arr, size_t idx, void *data)
 {
   if(array_list_expand_internal(arr, idx+1)) return -1;
   if(arr->array[idx]) arr->free_fn(arr->array[idx]);
@@ -101,7 +101,7 @@ void* array_list_bsearch(const void **key, struct array_list *arr,
 			sort_fn);
 }
 
-int
+size_t
 array_list_length(struct array_list *arr)
 {
   return arr->length;
