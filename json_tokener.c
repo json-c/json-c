@@ -371,7 +371,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	{
 		if (tok->st_pos == json_inf_str_len)
 		{
-			current = json_object_new_double(is_negative ? -INFINITY : INFINITY); 
+			current = json_object_new_double(is_negative ? -INFINITY : INFINITY);
 			saved_state = json_tokener_state_finish;
 			state = json_tokener_state_eatws;
 			goto redo_char;
