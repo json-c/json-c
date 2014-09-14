@@ -17,12 +17,25 @@
 # endif
 #endif
 
+#ifdef WIN32
+#ifndef NAN
+const unsigned long __json_nan[2] = {0xffffffff, 0x7fffffff};
+#define NAN (*(const double*) __json_nan)
+#endif
+#else
 #ifndef HAVE_DECL_NAN
 #error This platform does not have nan()
 #endif
+#endif
 
+#ifdef WIN32
+#include <float.h>
+#ifndef INFINITY
+#define INFINITY DBL_MAX
+#endif
+#else
 #ifndef HAVE_DECL_INFINITY
 #error This platform does not have INFINITY
 #endif
-
+#endif
 #endif

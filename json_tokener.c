@@ -16,6 +16,7 @@
 #include "config.h"
 
 #include <math.h>
+#include "math_compat.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>

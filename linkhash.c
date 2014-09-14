@@ -23,6 +23,12 @@
 
 #include "random_seed.h"
 #include "linkhash.h"
+#include "json_inttypes.h"
+
+#ifdef _MSC_VER
+#define WIN32_MEAN_AND_LEAN
+#include <Windows.h>
+#endif
 
 void lh_abort(const char *msg, ...)
 {
@@ -408,7 +414,7 @@ unsigned long lh_char_hash(const void *k)
 #if defined __GNUC__
 		__sync_val_compare_and_swap(&random_seed, -1, seed);
 #elif defined _MSC_VER
-		InterlockedCompareExchange(&random_seed, seed, -1);
+		InterlockedCompareExchange((LONG *)&random_seed, seed, -1);
 #else
 #warning "racy random seed initializtion if used by multiple threads"
 		random_seed = seed; /* potentially racy */
