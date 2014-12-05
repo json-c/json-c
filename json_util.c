@@ -71,6 +71,20 @@ struct json_object* json_object_from_file(const char *filename)
   char buf[JSON_FILE_BUF_SIZE];
   int fd, ret;
 
+#ifdef HAVE_SYS_STAT_H
+  struct stat st;
+
+  if (stat(filename, &st) < 0) {
+    MC_ERROR("json_object_from_file: could not stat file %s: %s\n",
+	     filename, strerror(errno));
+    return NULL;
+  }
+  if ((st.st_mode & S_IFMT) == S_IFDIR) {
+    MC_ERROR("json_object_from_file: path is a directory %s: %s\n",
+	     filename, strerror(errno));
+  }
+#endif
+
   if((fd = open(filename, O_RDONLY)) < 0) {
     MC_ERROR("json_object_from_file: error opening file %s: %s\n",
 	     filename, strerror(errno));
