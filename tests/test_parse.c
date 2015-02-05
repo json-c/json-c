@@ -91,6 +91,23 @@ static void test_basic_parse()
 	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
 	json_object_put(new_obj);
 
+	new_obj = json_tokener_parse("12.3.4"); /* non-sensical, returns null */
+	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
+	json_object_put(new_obj);
+
+	/* was returning (int)2015 before patch, should return null */
+	new_obj = json_tokener_parse("2015-01-15");
+	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
+	json_object_put(new_obj);
+
+	new_obj = json_tokener_parse("{\"FoO\"  :   -12.3E512}");
+	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
+	json_object_put(new_obj);
+
+	new_obj = json_tokener_parse("{\"FoO\"  :   -12.3E51.2}"); /* non-sensical, returns null */
+	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
+	json_object_put(new_obj);
+
 	new_obj = json_tokener_parse("[\"\\n\"]");
 	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
 	json_object_put(new_obj);
@@ -194,6 +211,9 @@ struct incremental_step {
 	/* To stop parsing a number we need to reach a non-digit, e.g. a \0 */
 	{ "1",                 1, 1, json_tokener_continue, 0 },
 	{ "2",                 2, 1, json_tokener_success, 0 },
+
+	/* Some bad formatting. Check we get the correct error status */
+	{ "2015-01-15",       10, 4, json_tokener_error_parse_number, 1 },
 
 	/* Strings have a well defined end point, so we can stop at the quote */
 	{ "\"blue\"",         -1, -1, json_tokener_success, 0 },

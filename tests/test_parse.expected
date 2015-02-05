@@ -14,6 +14,10 @@ new_obj.to_string()=-Infinity
 new_obj.to_string()=true
 new_obj.to_string()=12
 new_obj.to_string()=12.3
+new_obj.to_string()=null
+new_obj.to_string()=null
+new_obj.to_string()={ "FoO": -12.3E512 }
+new_obj.to_string()=null
 new_obj.to_string()=[ "\n" ]
 new_obj.to_string()=[ "\nabc\n" ]
 new_obj.to_string()=[ null ]
@@ -48,6 +52,7 @@ json_tokener_parse_ex(tok, {"x": 123 }"X",  14) ... OK: got object of type [obje
 json_tokener_parse_ex(tok, "Y"         ,   3) ... OK: got object of type [string]: "Y"
 json_tokener_parse_ex(tok, 1           ,   1) ... OK: got correct error: continue
 json_tokener_parse_ex(tok, 2           ,   2) ... OK: got object of type [int]: 12
+json_tokener_parse_ex(tok, 2015-01-15  ,  10) ... OK: got correct error: number expected
 json_tokener_parse_ex(tok, "blue"      ,   6) ... OK: got object of type [string]: "blue"
 json_tokener_parse_ex(tok, "\""        ,   4) ... OK: got object of type [string]: "\""
 json_tokener_parse_ex(tok, "\\"        ,   4) ... OK: got object of type [string]: "\\"
@@ -61,5 +66,5 @@ json_tokener_parse_ex(tok, [1,2,3,]    ,   8) ... OK: got object of type [array]
 json_tokener_parse_ex(tok, [1,2,,3,]   ,   9) ... OK: got correct error: unexpected character
 json_tokener_parse_ex(tok, [1,2,3,]    ,   8) ... OK: got correct error: unexpected character
 json_tokener_parse_ex(tok, {"a":1,}    ,   8) ... OK: got correct error: unexpected character
-End Incremental Tests OK=29 ERROR=0
+End Incremental Tests OK=30 ERROR=0
 ==================================
