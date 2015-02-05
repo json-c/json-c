@@ -137,6 +137,7 @@ copy json_config.h.win32 json_config.h
     <ClCompile Include="json_util.c" />
     <ClCompile Include="linkhash.c" />
     <ClCompile Include="printbuf.c" />
+    <ClCompile Include="random_seed.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arraylist.h" />

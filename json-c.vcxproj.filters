@@ -39,6 +39,9 @@
     <ClCompile Include="printbuf.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="random_seed.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arraylist.h">
