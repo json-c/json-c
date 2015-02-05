@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{04D8CDBE-FB3E-4362-87E6-07DC3C0083B2}</ProjectGuid>
-    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>jsonc</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -94,14 +94,16 @@ copy json_config.h.win32 json_config.h
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arraylist.h" />
-    <ClInclude Include="bits.h" />
     <ClInclude Include="debug.h" />
+    <ClInclude Include="json_inttypes.h" />
     <ClInclude Include="json_object.h" />
     <ClInclude Include="json_object_private.h" />
     <ClInclude Include="json_tokener.h" />
     <ClInclude Include="json_util.h" />
     <ClInclude Include="linkhash.h" />
+    <ClInclude Include="math_compat.h" />
     <ClInclude Include="printbuf.h" />
+    <ClInclude Include="random_seed.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="config.h.win32" />
