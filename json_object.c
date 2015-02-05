@@ -409,7 +409,7 @@ void json_object_object_add(struct json_object* jso, const char *key,
 		lh_table_insert(jso->o.c_object, strdup(key), val);
 		return;
 	}
-	existing_value = (void *)existing_entry->v;
+	existing_value = (json_object  *)existing_entry->v;
 	if (existing_value)
 		json_object_put(existing_value);
 	existing_entry->v = val;
@@ -661,8 +661,8 @@ struct json_object* json_object_new_double_s(double d, const char *ds)
 int json_object_userdata_to_json_string(struct json_object *jso,
 	struct printbuf *pb, int level, int flags)
 {
-	int userdata_len = strlen(jso->_userdata);
-	printbuf_memappend(pb, jso->_userdata, userdata_len);
+	int userdata_len = strlen((const char *)jso->_userdata);
+	printbuf_memappend(pb, (const char *)jso->_userdata, userdata_len);
 	return userdata_len;
 }
 
