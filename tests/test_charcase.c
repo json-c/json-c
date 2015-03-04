@@ -35,6 +35,6 @@ static void test_case_parse()
 	assert (new_obj == NULL);
 
 	printf("OK\n");
-	
+
 	json_tokener_free(tok);
 }

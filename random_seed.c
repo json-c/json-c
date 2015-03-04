@@ -150,13 +150,13 @@ static int has_dev_urandom()
 static int get_dev_random_seed()
 {
     DEBUG_SEED("get_dev_random_seed");
-    
+
     int fd = open(dev_random_file, O_RDONLY);
     if (fd < 0) {
         fprintf(stderr, "error opening %s: %s", dev_random_file, strerror(errno));
         exit(1);
     }
-    
+
     int r;
     ssize_t nread = read(fd, &r, sizeof(r));
     if (nread != sizeof(r)) {
@@ -186,22 +186,22 @@ static int get_dev_random_seed()
 static int get_cryptgenrandom_seed()
 {
     DEBUG_SEED("get_cryptgenrandom_seed");
-    
+
     HCRYPTPROV hProvider = 0;
     int r;
-    
+
     if (!CryptAcquireContextW(&hProvider, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT)) {
         fprintf(stderr, "error CryptAcquireContextW");
         exit(1);
     }
-    
+
     if (!CryptGenRandom(hProvider, sizeof(r), (BYTE*)&r)) {
         fprintf(stderr, "error CryptGenRandom");
         exit(1);
     }
-    
+
     CryptReleaseContext(hProvider, 0);
-    
+
     return r;
 }
 
@@ -215,7 +215,7 @@ static int get_cryptgenrandom_seed()
 static int get_time_seed()
 {
     DEBUG_SEED("get_time_seed");
-    
+
     return (int)time(NULL) * 433494437;
 }
 
