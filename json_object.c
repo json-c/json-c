@@ -889,6 +889,23 @@ void json_object_array_sort(struct json_object *jso, int(*sort_fn)(const void *,
 	array_list_sort(jso->o.c_array, sort_fn);
 }
 
+struct json_object* json_object_array_bsearch(
+		const struct json_object *key,
+		const struct json_object *jso,
+		int (*sort_fn)(const void *, const void *) )
+{
+	struct json_object **result;
+
+	result = (struct json_object **) array_list_bsearch(
+			(const void **) &key, jso->o.c_array, sort_fn );
+
+	if ( result == NULL ) {
+		return NULL;
+	} else {
+		return *result;
+	}
+}
+
 int json_object_array_length(struct json_object *jso)
 {
 	return array_list_length(jso->o.c_array);
