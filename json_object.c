@@ -114,6 +114,7 @@ static int json_escape_str(struct printbuf *pb, char *str, int len)
 		case '"':
 		case '\\':
 		case '/':
+		case '%':
 			if(pos - start_offset > 0)
 				printbuf_memappend(pb, str + start_offset, pos - start_offset);
 
@@ -125,6 +126,7 @@ static int json_escape_str(struct printbuf *pb, char *str, int len)
 			else if(c == '"') printbuf_memappend(pb, "\\\"", 2);
 			else if(c == '\\') printbuf_memappend(pb, "\\\\", 2);
 			else if(c == '/') printbuf_memappend(pb, "\\/", 2);
+			else if(c == '%') printbuf_memappend(pb, "%%", 2);
 
 			start_offset = ++pos;
 			break;
