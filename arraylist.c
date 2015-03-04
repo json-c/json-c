@@ -94,11 +94,11 @@ array_list_sort(struct array_list *arr, int(*sort_fn)(const void *, const void *
   qsort(arr->array, arr->length, sizeof(arr->array[0]), sort_fn);
 }
 
-void* array_list_bsearch( const void **key, struct array_list *arr,
-		int (*sort_fn)(const void *, const void *) )
+void* array_list_bsearch(const void **key, struct array_list *arr,
+		int (*sort_fn)(const void *, const void *))
 {
-	return bsearch( key, arr->array, arr->length, sizeof(arr->array[0]),
-			sort_fn );
+	return bsearch(key, arr->array, arr->length, sizeof(arr->array[0]),
+			sort_fn);
 }
 
 int

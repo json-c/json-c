@@ -424,7 +424,7 @@ extern void json_object_array_sort(struct json_object *jso, int(*sort_fn)(const 
 extern struct json_object* json_object_array_bsearch(
 		const struct json_object *key,
 		const struct json_object *jso,
-		int (*sort_fn)(const void *, const void *) );
+		int (*sort_fn)(const void *, const void *));
 
 /** Add an element to the end of a json_object of type json_type_array
  *
