@@ -668,10 +668,45 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	/* Advance until we change state */
 	const char *case_start = str;
 	int case_len=0;
+	int is_exponent=0;
+	int negativesign_next_possible_location=1;
 	while(c && strchr(json_number_chars, c)) {
 	  ++case_len;
-	  if(c == '.' || c == 'e' || c == 'E')
+
+	  /* non-digit characters checks */
+	  /* note: since the main loop condition to get here was
+	           an input starting with 0-9 or '-', we are
+	           protected from input starting with '.' or
+	           e/E. */
+	  if (c == '.') {
+	    if (tok->is_double != 0) {
+	      /* '.' can only be found once, and out of the exponent part.
+	         Thus, if the input is already flagged as double, it
+	         is invalid. */
+	      tok->err = json_tokener_error_parse_number;
+	      goto out;
+	    }
 	    tok->is_double = 1;
+	  }
+	  if (c == 'e' || c == 'E') {
+	    if (is_exponent != 0) {
+	      /* only one exponent possible */
+	      tok->err = json_tokener_error_parse_number;
+	      goto out;
+	    }
+	    is_exponent = 1;
+	    tok->is_double = 1;
+	    /* the exponent part can begin with a negative sign */
+	    negativesign_next_possible_location = case_len + 1;
+	  }
+	  if (c == '-' && case_len != negativesign_next_possible_location) {
+	    /* If the negative sign is not where expected (ie
+	       start of input or start of exponent part), the
+	       input is invalid. */
+	    tok->err = json_tokener_error_parse_number;
+	    goto out;
+	  }
+
 	  if (!ADVANCE_CHAR(str, tok) || !PEEK_CHAR(c, tok)) {
 	    printbuf_memappend_fast(tok->pb, case_start, case_len);
 	    goto out;
