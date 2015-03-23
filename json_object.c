@@ -300,7 +300,14 @@ static void indent(struct printbuf *pb, int level, int flags)
 {
 	if (flags & JSON_C_TO_STRING_PRETTY)
 	{
-		printbuf_memset(pb, -1, ' ', level * 2);
+		if (flags & JSON_C_TO_STRING_PRETTY_TAB)
+		{
+			printbuf_memset(pb, -1, '\t', level);
+		}
+		else
+		{
+			printbuf_memset(pb, -1, ' ', level * 2);
+		}
 	}
 }
 

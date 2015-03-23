@@ -51,6 +51,14 @@ extern "C" {
  */
 #define JSON_C_TO_STRING_PRETTY     (1<<1)
 /**
+ * A flag for the json_object_to_json_string_ext() and
+ * json_object_to_file_ext() functions which causes
+ * the output to be formatted.
+ *
+ * Instead of a "Two Space Tab" this gives a single tab character.
+ */
+#define JSON_C_TO_STRING_PRETTY_TAB (1<<3)
+/**
  * A flag to drop trailing zero for float values
  */
 #define JSON_C_TO_STRING_NOZERO     (1<<2)
