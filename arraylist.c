@@ -106,3 +106,18 @@ array_list_length(struct array_list *arr)
 {
   return arr->length;
 }
+
+int
+array_list_del_idx( struct array_list *arr, int idx, int count )
+{
+	int i, stop;
+
+	stop = idx + count;
+	if ( idx >= arr->length || stop > arr->length ) return -1;
+	for ( i = idx; i < stop; ++i ) {
+		if ( arr->array[i] ) arr->free_fn( arr->array[i] );
+	}
+	memmove( arr->array + idx, arr->array + stop, (arr->length - stop) * sizeof(void*) );
+	arr->length -= count;
+	return 0;
+}

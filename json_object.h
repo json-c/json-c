@@ -464,6 +464,19 @@ extern int json_object_array_put_idx(struct json_object *obj, int idx,
 extern struct json_object* json_object_array_get_idx(struct json_object *obj,
 						     int idx);
 
+/** Delete an elements from a specified index in an array (a json_object of type json_type_array)
+ *
+ * The reference count will be decremented for each of the deleted objects.  If there
+ * are no more owners of an element that is being deleted, then the value is 
+ * freed.  Otherwise, the reference to the value will remain in memory.
+ *
+ * @param obj the json_object instance
+ * @param idx the index to start deleting elements at
+ * @param count the number of elements to delete
+ * @returns 0 if the elements were successfully deleted
+ */
+extern int json_object_array_del_idx(struct json_object *obj, int idx, int count);
+
 /* json_bool type methods */
 
 /** Create a new empty json_object of type json_type_boolean
