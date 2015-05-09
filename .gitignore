@@ -49,6 +49,8 @@
 /tests/*.trs
 /Debug
 /Release
+/*/Debug
+/*/Release
 *.lo
 *.o
 /libjson-c.la

@@ -1,7 +1,7 @@
 #ifndef __math_compat_h
 #define __math_compat_h
 
-/* Define isnan and isinf on Windows/MSVC */
+/* Define isnan, isinf, infinity and nan on Windows/MSVC */
 
 #ifndef HAVE_DECL_ISNAN
 # ifdef HAVE_DECL__ISNAN
@@ -17,12 +17,15 @@
 # endif
 #endif
 
-#ifndef HAVE_DECL_NAN
-#error This platform does not have nan()
+#ifndef HAVE_DECL_INFINITY
+#include <float.h>
+#define INFINITY (DBL_MAX + DBL_MAX)
+#define HAVE_DECL_INFINITY
 #endif
 
-#ifndef HAVE_DECL_INFINITY
-#error This platform does not have INFINITY
+#ifndef HAVE_DECL_NAN
+#define NAN (INFINITY - INFINITY)
+#define HAVE_DECL_NAN
 #endif
 
 #endif

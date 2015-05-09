@@ -16,6 +16,7 @@
 #include "config.h"
 
 #include <math.h>
+#include "math_compat.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -353,7 +354,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 
     case json_tokener_state_inf: /* aka starts with 'i' */
       {
-	int size_inf;
+	size_t size_inf;
 	int is_negative = 0;
 
 	printbuf_memappend_fast(tok->pb, &c, 1);
