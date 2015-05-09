@@ -53,6 +53,10 @@ AC_CHECK_DECLS([isinf], [], [], [[#include <math.h>]])
 AC_CHECK_DECLS([_isnan], [], [], [[#include <float.h>]])
 AC_CHECK_DECLS([_finite], [], [], [[#include <float.h>]])
 
+if test "$ac_cv_have_decl_isnan" = "yes" ; then
+   AC_TRY_LINK([#include <math.h>], [float f = 0.0; return isnan(f)], [], [LIBS="$LIBS -lm"])
+fi
+
 #check if .section.gnu.warning accepts long strings (for __warn_references)
 AC_LANG_PUSH([C])
 
