@@ -1,5 +1,3 @@
-
-include ../Makefile.am.inc
 LDADD= $(LIBJSON_LA)
 
 LIBJSON_LA=$(top_builddir)/libjson-c.la
