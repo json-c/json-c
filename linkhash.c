@@ -413,7 +413,7 @@ unsigned long lh_char_hash(const void *k)
 		/* we can't use -1 as it is the unitialized sentinel */
 		while ((seed = json_c_get_random_seed()) == -1);
 #if defined __GNUC__
-		__sync_val_compare_and_swap(&random_seed, -1, seed);
+		(void)__sync_val_compare_and_swap(&random_seed, -1, seed);
 #elif defined _MSC_VER
 		InterlockedCompareExchange((LONG *)&random_seed, seed, -1);
 #else
