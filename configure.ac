@@ -22,7 +22,7 @@ else
 fi
 
 # enable silent build by default
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes]]))
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # Checks for programs.
 
