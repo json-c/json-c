@@ -509,6 +509,8 @@ static int json_object_int_to_json_string(struct json_object* jso,
 					  int level,
 					  int flags)
 {
+	if (flags & JSON_C_TO_STRING_UINT64)
+		return sprintbuf(pb, "%"PRIu64, jso->o.c_int64);
 	return sprintbuf(pb, "%"PRId64, jso->o.c_int64);
 }
 

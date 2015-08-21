@@ -62,6 +62,11 @@ extern "C" {
  * A flag to drop trailing zero for float values
  */
 #define JSON_C_TO_STRING_NOZERO     (1<<2)
+/**
+ * Force integer to output unsigned
+ * Useful when dealing with very large 64 bit numbers without negatives
+ */
+#define JSON_C_TO_STRING_UINT64     (1<<4)
 
 #undef FALSE
 #define FALSE ((json_bool)0)
