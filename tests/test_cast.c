@@ -65,7 +65,9 @@ int main(int argc, char **argv)
 
 static void getit(struct json_object *new_obj, const char *field)
 {
-	struct json_object *o = json_object_object_get(new_obj, field);
+	struct json_object *o = NULL;
+	if (!json_object_object_get_ex(new_obj, field, &o))
+		printf("Field %s does not exist\n", field);
 
 	enum json_type o_type = json_object_get_type(o);
 	printf("new_obj.%s json_object_get_type()=%s\n", field,
@@ -93,7 +95,10 @@ static void checktype_header()
 }
 static void checktype(struct json_object *new_obj, const char *field)
 {
-	struct json_object *o = field ? json_object_object_get(new_obj, field) : new_obj;
+	struct json_object *o = new_obj;
+	if (field && !json_object_object_get_ex(new_obj, field, &o))
+		printf("Field %s does not exist\n", field);
+			
 	printf("new_obj%s%-18s: %d,%d,%d,%d,%d,%d,%d\n",
 		field ? "." : " ", field ? field : "",
 		json_object_is_type(o, json_type_null),
