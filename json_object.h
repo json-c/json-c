@@ -353,7 +353,7 @@ extern void json_object_object_del(struct json_object* obj, const char *key);
 
 # define json_object_object_foreach(obj,key,val) \
 	char *key = NULL; \
-	struct json_object *val = NULL; \
+	struct json_object *val __attribute__((__unused__)) = NULL; \
 	for(struct lh_entry *entry ## key = json_object_get_object(obj)->head, *entry_next ## key = NULL; \
 		({ if(entry ## key) { \
 			key = (char*)entry ## key->k; \
