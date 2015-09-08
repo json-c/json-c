@@ -933,3 +933,85 @@ struct json_object* json_object_array_get_idx(struct json_object *jso,
 	return (struct json_object*)array_list_get_idx(jso->o.c_array, idx);
 }
 
+static json_bool json_array_equal(struct json_object* jso1,
+				  struct json_object* jso2)
+{
+	int len, i;
+
+	len = json_object_array_length(jso1);
+	if (len != json_object_array_length(jso2))
+		return FALSE;
+
+	for (i = 0; i < len; i++) {
+		if (!json_object_equal(json_object_array_get_idx(jso1, i),
+				       json_object_array_get_idx(jso2, i)))
+			return FALSE;
+	}
+	return TRUE;
+}
+
+static json_bool json_hash_equal(struct json_object* jso1,
+				 struct json_object* jso2)
+{
+	struct json_object_iter iter;
+	struct json_object *sub;
+
+        json_object_object_foreachC(jso1, iter) {
+		if (!lh_table_lookup_ex(jso1->o.c_object, (void*)iter.key,
+					(void**)&sub))
+			return FALSE;
+		if (!json_object_equal(iter.val, sub))
+			return FALSE;
+        }
+
+	/* FIXME: Not very efficient, only check remaining keys */
+        json_object_object_foreachC(jso2, iter) {
+		if (!lh_table_lookup_ex(jso2->o.c_object, (void*)iter.key,
+					(void**)&sub))
+			return FALSE;
+		if (!json_object_equal(iter.val, sub))
+			return FALSE;
+        }
+
+	return TRUE;
+}
+
+json_bool json_object_equal(struct json_object* jso1, struct json_object* jso2)
+{
+	if (jso1 == jso2)
+		return TRUE;
+
+	if (!jso1 || !jso2)
+		return FALSE;
+
+	if (jso1->o_type != jso2->o_type)
+		return FALSE;
+
+	switch(jso1->o_type) {
+		case json_type_boolean:
+			return (jso1->o.c_boolean == jso2->o.c_boolean);
+
+		case json_type_double:
+			return (jso1->o.c_double == jso2->o.c_double);
+
+		case json_type_int:
+			return (jso1->o.c_int64 == jso2->o.c_int64);
+
+		case json_type_string:
+			return (jso1->o.c_string.len == jso2->o.c_string.len &&
+				memcmp(jso1->o.c_string.str,
+				       jso2->o.c_string.str,
+				       jso1->o.c_string.len));
+
+		case json_type_object:
+			return json_hash_equal(jso1, jso2);
+
+		case json_type_array:
+			return json_array_equal(jso1, jso2);
+
+		case json_type_null:
+			return TRUE;
+	};
+
+	return FALSE;
+}
