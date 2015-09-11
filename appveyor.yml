@@ -1,0 +1,25 @@
+version: '{branch}.{build}'
+os: Windows Server 2012 R2
+configuration:
+- Debug
+- Release
+platform: x64
+environment:
+  matrix:
+  - PlatformToolset: v140
+  - PlatformToolset: v120
+  - PlatformToolset: Windows7.1SDK
+build_script:
+- >
+  msbuild "json-c.vcxproj" /m /verbosity:normal
+  /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  /p:PlatformToolset=%PlatformToolset%
+artifacts:
+- path: Debug\*
+  name: Debug_x86
+- path: Release\*
+  name: Release_x86
+- path: x64\Debug\*
+  name: Debug_x64
+- path: x64\Release\*
+  name: Release_x64
