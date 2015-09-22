@@ -490,14 +490,13 @@ void lh_table_free(struct lh_table *t)
 }
 
 
-int lh_table_insert(struct lh_table *t, void *k, const void *v)
+int lh_table_insert_w_hash(struct lh_table *t, void *k, const void *v, const unsigned long h)
 {
-	unsigned long h, n;
+	unsigned long n;
 
 	t->inserts++;
 	if(t->count >= t->size * LH_LOAD_FACTOR) lh_table_resize(t, t->size * 2);
 
-	h = t->hash_fn(k);
 	n = h % t->size;
 
 	while( 1 ) {
@@ -522,11 +521,14 @@ int lh_table_insert(struct lh_table *t, void *k, const void *v)
 
 	return 0;
 }
-
-
-struct lh_entry* lh_table_lookup_entry(struct lh_table *t, const void *k)
+int lh_table_insert(struct lh_table *t, void *k, const void *v)
 {
-	unsigned long h = t->hash_fn(k);
+	return lh_table_insert_w_hash(t, k, v, lh_get_hash(t, k));
+}
+
+
+struct lh_entry* lh_table_lookup_entry_w_hash(struct lh_table *t, const void *k, const unsigned long h)
+{
 	unsigned long n = h % t->size;
 	int count = 0;
 
@@ -541,6 +543,10 @@ struct lh_entry* lh_table_lookup_entry(struct lh_table *t, const void *k)
 	return NULL;
 }
 
+struct lh_entry* lh_table_lookup_entry(struct lh_table *t, const void *k)
+{
+	return lh_table_lookup_entry_w_hash(t, k, lh_get_hash(t, k));
+}
 
 const void* lh_table_lookup(struct lh_table *t, const void *k)
 {

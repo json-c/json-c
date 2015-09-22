@@ -232,12 +232,39 @@ extern int lh_table_insert(struct lh_table *t, void *k, const void *v);
 
 
 /**
+ * Insert a record into the table. This one accepts the key's hash in additon
+ * to the key. This is an exension to support functions that need to calculate
+ * the hash several times and allows them to do it just once and then pass
+ * in the hash to all utility functions. Depending on use case, this can be a 
+ * very considerate performance improvement.
+ * @param t the table to insert into.
+ * @param k a pointer to the key to insert.
+ * @param v a pointer to the value to insert.
+ * @param h hash value of the key to insert
+ */
+extern int lh_table_insert_w_hash(struct lh_table *t, void *k, const void *v, const unsigned long h);
+
+
+/**
  * Lookup a record into the table.
  * @param t the table to lookup
  * @param k a pointer to the key to lookup
  * @return a pointer to the record structure of the value or NULL if it does not exist.
  */
 extern struct lh_entry* lh_table_lookup_entry(struct lh_table *t, const void *k);
+
+/**
+ * Lookup a record into the table. This one accepts the key's hash in additon
+ * to the key. This is an exension to support functions that need to calculate
+ * the hash several times and allows them to do it just once and then pass
+ * in the hash to all utility functions. Depending on use case, this can be a 
+ * very considerate performance improvement.
+ * @param t the table to lookup
+ * @param k a pointer to the key to lookup
+ * @param h hash value of the key to lookup
+ * @return a pointer to the record structure of the value or NULL if it does not exist.
+ */
+extern struct lh_entry* lh_table_lookup_entry_w_hash(struct lh_table *t, const void *k, const unsigned long h);
 
 /**
  * Lookup a record into the table
@@ -284,6 +311,22 @@ extern int lh_table_length(struct lh_table *t);
 
 void lh_abort(const char *msg, ...);
 void lh_table_resize(struct lh_table *t, int new_size);
+
+
+/**
+ * Calculate the hash of a key for a given table.
+ * This is an exension to support functions that need to calculate
+ * the hash several times and allows them to do it just once and then pass
+ * in the hash to all utility functions. Depending on use case, this can be a 
+ * very considerate performance improvement.
+ * @param t the table (used to obtain hash function)
+ * @param k a pointer to the key to lookup
+ * @return the key's hash
+ */
+static inline unsigned long lh_get_hash(const struct lh_table *t, const void *k)
+{
+	return t->hash_fn(k);
+}
 
 #ifdef __cplusplus
 }
