@@ -69,7 +69,7 @@ static struct lh_table *json_object_table;
 static void json_object_init(void) __attribute__ ((constructor));
 static void json_object_init(void) {
 	MC_DEBUG("json_object_init: creating object table\n");
-	json_object_table = lh_kptr_table_new(128, "json_object_table", NULL);
+	json_object_table = lh_kptr_table_new(128, NULL);
 }
 
 static void json_object_fini(void) __attribute__ ((destructor));
@@ -374,7 +374,7 @@ struct json_object* json_object_new_object(void)
 	jso->_delete = &json_object_object_delete;
 	jso->_to_json_string = &json_object_object_to_json_string;
 	jso->o.c_object = lh_kchar_table_new(JSON_OBJECT_DEF_HASH_ENTRIES,
-					NULL, &json_object_lh_entry_free);
+					&json_object_lh_entry_free);
 	if (!jso->o.c_object)
 	{
 		json_object_generic_delete(jso);

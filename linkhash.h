@@ -111,36 +111,6 @@ struct lh_table {
 	int count;
 
 	/**
-	 * Number of collisions.
-	 */
-	int collisions;
-
-	/**
-	 * Number of resizes.
-	 */
-	int resizes;
-
-	/**
-	 * Number of lookups.
-	 */
-	int lookups;
-
-	/**
-	 * Number of inserts.
-	 */
-	int inserts;
-
-	/**
-	 * Number of deletes.
-	 */
-	int deletes;
-
-	/**
-	 * Name of the hash table.
-	 */
-	const char *name;
-
-	/**
 	 * The first entry.
 	 */
 	struct lh_entry *head;
@@ -179,7 +149,6 @@ for(entry = table->head; entry && ((tmp = entry->next) || 1); entry = tmp)
  * Create a new linkhash table.
  * @param size initial table size. The table is automatically resized
  * although this incurs a performance penalty.
- * @param name the table name.
  * @param free_fn callback function used to free memory for entries
  * when lh_table_free or lh_table_delete is called.
  * If NULL is provided, then memory for keys and values
@@ -192,7 +161,7 @@ for(entry = table->head; entry && ((tmp = entry->next) || 1); entry = tmp)
  * and C strings respectively.
  * @return a pointer onto the linkhash table.
  */
-extern struct lh_table* lh_table_new(int size, const char *name,
+extern struct lh_table* lh_table_new(int size,
 				     lh_entry_free_fn *free_fn,
 				     lh_hash_fn *hash_fn,
 				     lh_equal_fn *equal_fn);
@@ -205,7 +174,7 @@ extern struct lh_table* lh_table_new(int size, const char *name,
  * @param free_fn callback function used to free memory for entries.
  * @return a pointer onto the linkhash table.
  */
-extern struct lh_table* lh_kchar_table_new(int size, const char *name,
+extern struct lh_table* lh_kchar_table_new(int size,
 					   lh_entry_free_fn *free_fn);
 
 
@@ -217,7 +186,7 @@ extern struct lh_table* lh_kchar_table_new(int size, const char *name,
  * @param free_fn callback function used to free memory for entries.
  * @return a pointer onto the linkhash table.
  */
-extern struct lh_table* lh_kptr_table_new(int size, const char *name,
+extern struct lh_table* lh_kptr_table_new(int size,
 					  lh_entry_free_fn *free_fn);
 
 
