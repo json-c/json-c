@@ -490,7 +490,7 @@ void lh_table_free(struct lh_table *t)
 }
 
 
-int lh_table_insert_w_hash(struct lh_table *t, void *k, const void *v, const unsigned long h)
+int lh_table_insert_w_hash(struct lh_table *t, void *k, const void *v, const unsigned long h, const unsigned opts)
 {
 	unsigned long n;
 
@@ -506,6 +506,7 @@ int lh_table_insert_w_hash(struct lh_table *t, void *k, const void *v, const uns
 	}
 
 	t->table[n].k = k;
+	t->table[n].k_is_constant = (opts & JSON_C_OBJECT_KEY_IS_CONSTANT);
 	t->table[n].v = v;
 	t->count++;
 
@@ -523,7 +524,7 @@ int lh_table_insert_w_hash(struct lh_table *t, void *k, const void *v, const uns
 }
 int lh_table_insert(struct lh_table *t, void *k, const void *v)
 {
-	return lh_table_insert_w_hash(t, k, v, lh_get_hash(t, k));
+	return lh_table_insert_w_hash(t, k, v, lh_get_hash(t, k), 0);
 }
 
 

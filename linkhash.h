@@ -64,6 +64,7 @@ struct lh_entry {
 	 * The key.
 	 */
 	void *k;
+	int k_is_constant;
 	/**
 	 * The value.
 	 */
@@ -241,8 +242,9 @@ extern int lh_table_insert(struct lh_table *t, void *k, const void *v);
  * @param k a pointer to the key to insert.
  * @param v a pointer to the value to insert.
  * @param h hash value of the key to insert
+ * @param opts opts, a subset of JSON_OBJECT_ADD_* flags is supported
  */
-extern int lh_table_insert_w_hash(struct lh_table *t, void *k, const void *v, const unsigned long h);
+extern int lh_table_insert_w_hash(struct lh_table *t, void *k, const void *v, const unsigned long h, const unsigned opts);
 
 
 /**

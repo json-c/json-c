@@ -355,7 +355,8 @@ static int json_object_object_to_json_string(struct json_object* jso,
 
 static void json_object_lh_entry_free(struct lh_entry *ent)
 {
-	free(ent->k);
+	if (!ent->k_is_constant)
+		free(ent->k);
 	json_object_put((struct json_object*)ent->v);
 }
 
@@ -396,6 +397,31 @@ struct lh_table* json_object_get_object(struct json_object *jso)
 	}
 }
 
+void json_object_object_add_ex(struct json_object* jso,
+	const char *const key,
+	struct json_object *const val,
+	const unsigned opts)
+{
+	// We lookup the entry and replace the value, rather than just deleting
+	// and re-adding it, so the existing key remains valid.
+	json_object *existing_value = NULL;
+	struct lh_entry *existing_entry;
+	const unsigned long hash = lh_get_hash(jso->o.c_object, (void*)key);
+	existing_entry = (opts & JSON_C_OBJECT_ADD_KEY_IS_NEW) ? NULL : 
+			      lh_table_lookup_entry_w_hash(jso->o.c_object, (void*)key, hash);
+	if (!existing_entry)
+	{
+		void *const k = (opts & JSON_C_OBJECT_KEY_IS_CONSTANT) ?
+					(void*)key : strdup(key);
+		lh_table_insert_w_hash(jso->o.c_object, k, val, hash, opts);
+		return;
+	}
+	existing_value = (void *)existing_entry->v;
+	if (existing_value)
+		json_object_put(existing_value);
+	existing_entry->v = val;
+}
+
 void json_object_object_add(struct json_object* jso, const char *key,
 			    struct json_object *val)
 {
@@ -407,7 +433,7 @@ void json_object_object_add(struct json_object* jso, const char *key,
 	existing_entry = lh_table_lookup_entry_w_hash(jso->o.c_object, (void*)key, hash);
 	if (!existing_entry)
 	{
-		lh_table_insert_w_hash(jso->o.c_object, strdup(key), val, hash);
+		lh_table_insert_w_hash(jso->o.c_object, strdup(key), val, hash, 0);
 		return;
 	}
 	existing_value = (void *)existing_entry->v;

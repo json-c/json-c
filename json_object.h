@@ -55,6 +55,36 @@ extern "C" {
  */
 #define JSON_C_TO_STRING_NOZERO     (1<<2)
 
+/**
+ * A flag for the json_object_object_add_ex function which
+ * causes the value to be added without a check if it already exists.
+ * Note: it is the responsibilty of the caller to ensure that no
+ * key is added multiple times. If this is done, results are
+ * unpredictable. While this option is somewhat dangerous, it
+ * permits potentially large performance savings in code that
+ * knows for sure the key values are unique (e.g. because the
+ * code adds a well-known set of constant key values).
+ */
+#define JSON_C_OBJECT_ADD_KEY_IS_NEW (1<<1)
+/**
+ * A flag for the json_object_object_add_ex function which
+ * flags the key as being constant memory. This means that
+ * the key will NOT be copied via strdup(), resulting in a
+ * potentially huge performance win (malloc, strdup and
+ * free are usually performance hogs). It is acceptable to
+ * use this flag for keys in non-constant memory blocks if
+ * the caller ensure that the memory holding the key lives
+ * longer than the corresponding json object. However, this
+ * is somewhat dangerous and should only be done if really
+ * justified.
+ * The general use-case for this flag is cases where the
+ * key is given as a real constant value in the function
+ * call, e.g. as in
+ *   json_object_object_add_ex(obj, "ip", json,
+ *       JSON_C_OBJECT_KEY_IS_CONSTANT);
+ */
+#define JSON_C_OBJECT_KEY_IS_CONSTANT (1<<2)
+
 #undef FALSE
 #define FALSE ((json_bool)0)
 
@@ -274,6 +304,22 @@ extern int json_object_object_length(struct json_object* obj);
  */
 extern void json_object_object_add(struct json_object* obj, const char *key,
 				   struct json_object *val);
+
+/** Add an object field to a json_object of type json_type_object
+ *
+ * The semantics are identical to json_object_object_add, except that an
+ * additional flag fields gives you more control over some detail aspects
+ * of processing. See the description of JSON_C_OBJECT_ADD_* flags for more
+ * details.
+ *
+ * @param obj the json_object instance
+ * @param key the object field name (a private copy will be duplicated)
+ * @param val a json_object or NULL member to associate with the given field
+ * @param opts process-modifying options. To specify multiple options, use 
+ *             arithmetic or (OPT1|OPT2)
+ */
+extern void json_object_object_add_ex(struct json_object* obj, const char *key,
+				   struct json_object *val, const unsigned opts);
 
 /** Get the json_object associate with a given object field
  *
