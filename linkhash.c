@@ -24,6 +24,27 @@
 #include "random_seed.h"
 #include "linkhash.h"
 
+/* hash functions */
+static unsigned long lh_char_hash(const void *k);
+static unsigned long lh_perllike_str_hash(const void *k);
+static lh_hash_fn *char_hash_fn = lh_char_hash;
+
+int
+json_global_set_string_hash(const int h)
+{
+	switch(h) {
+	case JSON_C_STR_HASH_DFLT:
+		char_hash_fn = lh_char_hash;
+		break;
+	case JSON_C_STR_HASH_PERLLIKE:
+		char_hash_fn = lh_perllike_str_hash;
+		break;
+	default:
+		return -1;
+	}
+	return 0;
+}
+
 void lh_abort(const char *msg, ...)
 {
 	va_list ap;
@@ -33,7 +54,7 @@ void lh_abort(const char *msg, ...)
 	exit(1);
 }
 
-unsigned long lh_ptr_hash(const void *k)
+static unsigned long lh_ptr_hash(const void *k)
 {
 	/* CAW: refactored to be 64bit nice */
 	return (unsigned long)((((ptrdiff_t)k * LH_PRIME) >> 4) & ULONG_MAX);
@@ -397,7 +418,21 @@ static uint32_t hashlittle( const void *key, size_t length, uint32_t initval)
   return c;
 }
 
-unsigned long lh_char_hash(const void *k)
+/* a simple hash function similiar to what perl does for strings.
+ * for good results, the string should not be excessivly large.
+ */
+static unsigned long lh_perllike_str_hash(const void *k) 
+{
+    const char *rkey = (char*) k;
+    unsigned hashval = 1;
+
+    while (*rkey)
+        hashval = hashval * 33 + *rkey++;
+
+    return hashval;
+}
+
+static unsigned long lh_char_hash(const void *k)
 {
 	static volatile int random_seed = -1;
 
@@ -448,7 +483,7 @@ struct lh_table* lh_table_new(int size, const char *name,
 struct lh_table* lh_kchar_table_new(int size, const char *name,
 				    lh_entry_free_fn *free_fn)
 {
-	return lh_table_new(size, name, free_fn, lh_char_hash, lh_char_equal);
+	return lh_table_new(size, name, free_fn, char_hash_fn, lh_char_equal);
 }
 
 struct lh_table* lh_kptr_table_new(int size, const char *name,

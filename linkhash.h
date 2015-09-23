@@ -41,6 +41,23 @@ extern "C" {
  */
 #define LH_FREED (void*)-2
 
+/**
+ * default string hash function
+ */
+#define JSON_C_STR_HASH_DFLT 0
+
+/**
+ * perl-like string hash function
+ */
+#define JSON_C_STR_HASH_PERLLIKE 1
+
+/**
+ * This function sets the hash function to be used for strings.
+ * Must be one of the JSON_C_STR_HASH_* values.
+ * @returns 0 - ok, -1 if parameter was invalid
+ */
+int json_global_set_string_hash(const int h);
+
 struct lh_entry;
 
 /**
@@ -142,16 +159,6 @@ struct lh_table {
 	lh_hash_fn *hash_fn;
 	lh_equal_fn *equal_fn;
 };
-
-
-/**
- * Pre-defined hash and equality functions
- */
-extern unsigned long lh_ptr_hash(const void *k);
-extern int lh_ptr_equal(const void *k1, const void *k2);
-
-extern unsigned long lh_char_hash(const void *k);
-extern int lh_char_equal(const void *k1, const void *k2);
 
 
 /**
