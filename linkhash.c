@@ -31,6 +31,27 @@
 #include "random_seed.h"
 #include "linkhash.h"
 
+/* hash functions */
+static unsigned long lh_char_hash(const void *k);
+static unsigned long lh_perllike_str_hash(const void *k);
+static lh_hash_fn *char_hash_fn = lh_char_hash;
+
+int
+json_global_set_string_hash(const int h)
+{
+	switch(h) {
+	case JSON_C_STR_HASH_DFLT:
+		char_hash_fn = lh_char_hash;
+		break;
+	case JSON_C_STR_HASH_PERLLIKE:
+		char_hash_fn = lh_perllike_str_hash;
+		break;
+	default:
+		return -1;
+	}
+	return 0;
+}
+
 void lh_abort(const char *msg, ...)
 {
 	va_list ap;
@@ -40,7 +61,7 @@ void lh_abort(const char *msg, ...)
 	exit(1);
 }
 
-unsigned long lh_ptr_hash(const void *k)
+static unsigned long lh_ptr_hash(const void *k)
 {
 	/* CAW: refactored to be 64bit nice */
 	return (unsigned long)((((ptrdiff_t)k * LH_PRIME) >> 4) & ULONG_MAX);
@@ -404,7 +425,21 @@ static uint32_t hashlittle( const void *key, size_t length, uint32_t initval)
   return c;
 }
 
-unsigned long lh_char_hash(const void *k)
+/* a simple hash function similiar to what perl does for strings.
+ * for good results, the string should not be excessivly large.
+ */
+static unsigned long lh_perllike_str_hash(const void *k) 
+{
+    const char *rkey = (char*) k;
+    unsigned hashval = 1;
+
+    while (*rkey)
+        hashval = hashval * 33 + *rkey++;
+
+    return hashval;
+}
+
+static unsigned long lh_char_hash(const void *k)
 {
 	static volatile int random_seed = -1;
 
@@ -430,7 +465,7 @@ int lh_char_equal(const void *k1, const void *k2)
 	return (strcmp((const char*)k1, (const char*)k2) == 0);
 }
 
-struct lh_table* lh_table_new(int size, const char *name,
+struct lh_table* lh_table_new(int size,
 			      lh_entry_free_fn *free_fn,
 			      lh_hash_fn *hash_fn,
 			      lh_equal_fn *equal_fn)
@@ -442,7 +477,6 @@ struct lh_table* lh_table_new(int size, const char *name,
 	if(!t) lh_abort("lh_table_new: calloc failed\n");
 	t->count = 0;
 	t->size = size;
-	t->name = name;
 	t->table = (struct lh_entry*)calloc(size, sizeof(struct lh_entry));
 	if(!t->table) lh_abort("lh_table_new: calloc failed\n");
 	t->free_fn = free_fn;
@@ -452,16 +486,16 @@ struct lh_table* lh_table_new(int size, const char *name,
 	return t;
 }
 
-struct lh_table* lh_kchar_table_new(int size, const char *name,
+struct lh_table* lh_kchar_table_new(int size,
 				    lh_entry_free_fn *free_fn)
 {
-	return lh_table_new(size, name, free_fn, lh_char_hash, lh_char_equal);
+	return lh_table_new(size, free_fn, char_hash_fn, lh_char_equal);
 }
 
-struct lh_table* lh_kptr_table_new(int size, const char *name,
+struct lh_table* lh_kptr_table_new(int size,
 				   lh_entry_free_fn *free_fn)
 {
-	return lh_table_new(size, name, free_fn, lh_ptr_hash, lh_ptr_equal);
+	return lh_table_new(size, free_fn, lh_ptr_hash, lh_ptr_equal);
 }
 
 void lh_table_resize(struct lh_table *t, int new_size)
@@ -469,7 +503,7 @@ void lh_table_resize(struct lh_table *t, int new_size)
 	struct lh_table *new_t;
 	struct lh_entry *ent;
 
-	new_t = lh_table_new(new_size, t->name, NULL, t->hash_fn, t->equal_fn);
+	new_t = lh_table_new(new_size, NULL, t->hash_fn, t->equal_fn);
 	ent = t->head;
 	while(ent) {
 		lh_table_insert(new_t, ent->k, ent->v);
@@ -480,7 +514,6 @@ void lh_table_resize(struct lh_table *t, int new_size)
 	t->size = new_size;
 	t->head = new_t->head;
 	t->tail = new_t->tail;
-	t->resizes++;
 	free(new_t);
 }
 
@@ -497,23 +530,21 @@ void lh_table_free(struct lh_table *t)
 }
 
 
-int lh_table_insert(struct lh_table *t, void *k, const void *v)
+int lh_table_insert_w_hash(struct lh_table *t, void *k, const void *v, const unsigned long h, const unsigned opts)
 {
-	unsigned long h, n;
+	unsigned long n;
 
-	t->inserts++;
 	if(t->count >= t->size * LH_LOAD_FACTOR) lh_table_resize(t, t->size * 2);
 
-	h = t->hash_fn(k);
 	n = h % t->size;
 
 	while( 1 ) {
 		if(t->table[n].k == LH_EMPTY || t->table[n].k == LH_FREED) break;
-		t->collisions++;
 		if ((int)++n == t->size) n = 0;
 	}
 
 	t->table[n].k = k;
+	t->table[n].k_is_constant = (opts & JSON_C_OBJECT_KEY_IS_CONSTANT);
 	t->table[n].v = v;
 	t->count++;
 
@@ -529,15 +560,17 @@ int lh_table_insert(struct lh_table *t, void *k, const void *v)
 
 	return 0;
 }
-
-
-struct lh_entry* lh_table_lookup_entry(struct lh_table *t, const void *k)
+int lh_table_insert(struct lh_table *t, void *k, const void *v)
 {
-	unsigned long h = t->hash_fn(k);
+	return lh_table_insert_w_hash(t, k, v, lh_get_hash(t, k), 0);
+}
+
+
+struct lh_entry* lh_table_lookup_entry_w_hash(struct lh_table *t, const void *k, const unsigned long h)
+{
 	unsigned long n = h % t->size;
 	int count = 0;
 
-	t->lookups++;
 	while( count < t->size ) {
 		if(t->table[n].k == LH_EMPTY) return NULL;
 		if(t->table[n].k != LH_FREED &&
@@ -548,6 +581,10 @@ struct lh_entry* lh_table_lookup_entry(struct lh_table *t, const void *k)
 	return NULL;
 }
 
+struct lh_entry* lh_table_lookup_entry(struct lh_table *t, const void *k)
+{
+	return lh_table_lookup_entry_w_hash(t, k, lh_get_hash(t, k));
+}
 
 const void* lh_table_lookup(struct lh_table *t, const void *k)
 {
