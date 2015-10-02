@@ -41,7 +41,7 @@ esac
 
 rm -rf "$testsubdir" > /dev/null 2>&1
 mkdir -p "$testsubdir"
-CURDIR=$(pwd)
+CURDIR=`pwd`
 cd "$testsubdir" \
    || { echo "Cannot make or change into $testsubdir"; exit 1; }
 
@@ -50,7 +50,7 @@ echo "=== Running test $progname"
 CMP="${CMP-cmp}"
 
 use_valgrind=${USE_VALGRIND-1}
-valgrind_path=$(which valgrind 2> /dev/null)
+valgrind_path=`which valgrind 2> /dev/null`
 if [ -z "${valgrind_path}" -o ! -x "${valgrind_path}" ] ; then
 	use_valgrind=0
 fi

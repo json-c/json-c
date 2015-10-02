@@ -24,21 +24,43 @@ fi
 # enable silent build by default
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
+# Checks for typedefs, structures, and compiler characteristics.
+AC_PROG_CC
+AM_PROG_CC_C_O
+
+dnl Try to detect/use GNU features
+CFLAGS="$CFLAGS -D_GNU_SOURCE"
+
+dnl which flags does the compiler support?
+if test "x$GCC" = "xyes"; then
+  for flag in -Wall -Wno-error=deprecated-declarations -Wextra -Wwrite-strings -Wno-unused-parameter -std=gnu99 -Werror; do
+    oCFLAGS="$CFLAGS"
+    CFLAGS="$CFLAGS $flag"
+    cachename=rd_cv_gcc_flag_`echo $flag|sed 's/[[^A-Za-z]]/_/g'`
+    AC_CACHE_CHECK([if gcc likes the $flag flag], $cachename,
+       [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[return 0 ]])],[eval $cachename=yes],[eval $cachename=no])])
+    if eval test \$$cachename = no; then
+         CFLAGS="$oCFLAGS"
+    fi
+  done
+fi
+
+dnl We need the definition, probably detect by testing the required function
+CFLAGS="$CFLAGS -D_REENTRANT"
+
+AC_C_CONST
+AC_TYPE_SIZE_T
+
 # Checks for programs.
 
 # Checks for libraries.
 
 # Checks for header files.
-AM_PROG_CC_C_O
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_HEADER(json_config.h)
 AC_HEADER_STDC
 AC_CHECK_HEADERS(fcntl.h limits.h strings.h syslog.h unistd.h [sys/cdefs.h] [sys/param.h] stdarg.h locale.h endian.h)
 AC_CHECK_HEADER(inttypes.h,[AC_DEFINE([JSON_C_HAVE_INTTYPES_H],[1],[Public define for json_inttypes.h])])
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_C_CONST
-AC_TYPE_SIZE_T
 
 # Checks for library functions.
 AC_FUNC_VPRINTF
