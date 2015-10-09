@@ -18,7 +18,6 @@ before_script:
 
 script:
   - make
-  - make install
 
 after_success:
   - make check
