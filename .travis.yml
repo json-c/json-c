@@ -1,0 +1,24 @@
+language: cpp
+
+compiler:
+  - gcc
+
+os:
+  - linux
+
+before_install:
+  - echo $LANG
+  - echo $LC_ALL
+
+install:
+  - sh autogen.sh
+
+before_script:
+  - ./configure
+
+script:
+  - make
+  - make install
+
+after_success:
+  - make check
