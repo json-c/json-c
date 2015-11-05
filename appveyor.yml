@@ -33,10 +33,6 @@ after_build:
 - copy json_object_private.h include\json-c\*
 - 7z a json-c.lib.zip lib\json-c.lib include\json-c\*.h
 
-matrix:
-  allow_failures:
-    - PlatformToolset: v140
-
 artifacts:
 - path: json-c.lib.zip
   name: json-c.lib.zip
