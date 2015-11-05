@@ -15,18 +15,28 @@ build_script:
 - >
   msbuild "json-c.vcxproj" /m /verbosity:normal
   /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
-  /p:PlatformToolset=%PlatformToolset%
+  /p:PlatformToolset=%PlatformToolset% /p:OutDir=lib\
+
+after_build:
+- md include\json-c
+- copy json.h include\json-c\*
+- copy debug.h include\json-c\*
+- copy linkhash.h include\json-c\*
+- copy arraylist.h include\json-c\*
+- copy json_util.h include\json-c\*
+- copy json_object.h include\json-c\*
+- copy json_tokener.h include\json-c\*
+- copy json_object_iterator.h include\json-c\*
+- copy json_c_version.h include\json-c\*
+- copy json_inttypes.h include\json-c\*
+- copy json_config.h include\json-c\*
+- copy json_object_private.h include\json-c\*
+- 7z a json-c.lib.zip lib\json-c.lib include\json-c\*.h
 
 matrix:
   allow_failures:
     - PlatformToolset: v140
 
 artifacts:
-- path: Debug\*
-  name: Debug_x86
-- path: Release\*
-  name: Release_x86
-- path: x64\Debug\*
-  name: Debug_x64
-- path: x64\Release\*
-  name: Release_x64
+- path: json-c.lib.zip
+  name: json-c.lib.zip
