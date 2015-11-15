@@ -432,7 +432,7 @@ void json_object_object_add_ex(struct json_object* jso,
 		lh_table_insert_w_hash(jso->o.c_object, k, val, hash, opts);
 		return;
 	}
-	existing_value = (void *)existing_entry->v;
+	existing_value = (json_object *)existing_entry->v;
 	if (existing_value)
 		json_object_put(existing_value);
 	existing_entry->v = val;
@@ -546,7 +546,7 @@ static int json_object_int_to_json_string(struct json_object* jso,
 					  int level,
 					  int flags)
 {
-	return sprintbuf(pb, "%"PRId64, jso->o.c_int64);
+	return sprintbuf(pb, "%" PRId64, jso->o.c_int64);
 }
 
 struct json_object* json_object_new_int(int32_t i)
