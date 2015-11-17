@@ -48,6 +48,17 @@ do {                                                         \
   } else {  printbuf_memappend(p, (bufptr), bufsize); }      \
 } while (0)
 
+/* The following functions provide a printbuf interface where the
+ * string terminator '\0' is not always written. This is faster, but
+ * the string cannot be used with standard functions while being
+ * constructed. To do so, printbuf_terminate_string() must be
+ * called first.
+ */
+extern int
+printbuf_memappend_no_nul(struct printbuf *p, const char *buf, int size);
+extern void
+printbuf_terminate_string(struct printbuf *const p);
+
 #define printbuf_length(p) ((p)->bpos)
 
 /**

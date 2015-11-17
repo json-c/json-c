@@ -92,6 +92,30 @@ int printbuf_memappend(struct printbuf *p, const char *buf, int size)
   return size;
 }
 
+/* same as printbuf_memappend(), but contains some performance enhancements */
+int printbuf_memappend_no_nul(struct printbuf *p, const char *buf, const int size)
+{
+  if (p->size <= p->bpos + size) {
+    if (printbuf_extend(p, p->bpos + size + 1) < 0)
+      return -1;
+  }
+  if(size > 1)
+    memcpy(p->buf + p->bpos, buf, size);
+  else
+    p->buf[p->bpos]= *buf;
+  p->bpos += size;
+  return 1;
+}
+
+void printbuf_terminate_string(struct printbuf *const p)
+{
+  if (p->size <= p->bpos + 1) {
+    if (printbuf_extend(p, p->bpos + 1) < 0)
+      --p->bpos; /* overwrite last byte, best we can do */
+  }
+  p->buf[p->bpos]= '\0';
+}
+
 int printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len)
 {
 	int size_needed;

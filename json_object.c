@@ -124,16 +124,16 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len)
 		case '\\':
 		case '/':
 			if(pos - start_offset > 0)
-				printbuf_memappend(pb, str + start_offset, pos - start_offset);
+				printbuf_memappend_no_nul(pb, str + start_offset, pos - start_offset);
 
-			if(c == '\b') printbuf_memappend(pb, "\\b", 2);
-			else if(c == '\n') printbuf_memappend(pb, "\\n", 2);
-			else if(c == '\r') printbuf_memappend(pb, "\\r", 2);
-			else if(c == '\t') printbuf_memappend(pb, "\\t", 2);
-			else if(c == '\f') printbuf_memappend(pb, "\\f", 2);
-			else if(c == '"') printbuf_memappend(pb, "\\\"", 2);
-			else if(c == '\\') printbuf_memappend(pb, "\\\\", 2);
-			else if(c == '/') printbuf_memappend(pb, "\\/", 2);
+			if(c == '\b') printbuf_memappend_no_nul(pb, "\\b", 2);
+			else if(c == '\n') printbuf_memappend_no_nul(pb, "\\n", 2);
+			else if(c == '\r') printbuf_memappend_no_nul(pb, "\\r", 2);
+			else if(c == '\t') printbuf_memappend_no_nul(pb, "\\t", 2);
+			else if(c == '\f') printbuf_memappend_no_nul(pb, "\\f", 2);
+			else if(c == '"') printbuf_memappend_no_nul(pb, "\\\"", 2);
+			else if(c == '\\') printbuf_memappend_no_nul(pb, "\\\\", 2);
+			else if(c == '/') printbuf_memappend_no_nul(pb, "\\/", 2);
 
 			start_offset = ++pos;
 			break;
@@ -141,7 +141,7 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len)
 			if(c < ' ')
 			{
 				if(pos - start_offset > 0)
-				printbuf_memappend(pb, str + start_offset, pos - start_offset);
+				printbuf_memappend_no_nul(pb, str + start_offset, pos - start_offset);
 				sprintbuf(pb, "\\u00%c%c",
 				json_hex_chars[c >> 4],
 				json_hex_chars[c & 0xf]);
@@ -151,7 +151,7 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len)
 		}
 	}
 	if (pos - start_offset > 0)
-		printbuf_memappend(pb, str + start_offset, pos - start_offset);
+		printbuf_memappend_no_nul(pb, str + start_offset, pos - start_offset);
 	return 0;
 }
 
@@ -295,6 +295,7 @@ const char* json_object_to_json_string_ext(struct json_object *jso, int flags)
 	if(jso->_to_json_string(jso, jso->_pb, 0, flags) < 0)
 		return NULL;
 
+	printbuf_terminate_string(jso->_pb);
 	return jso->_pb->buf;
 }
 
@@ -330,42 +331,42 @@ static int json_object_object_to_json_string(struct json_object* jso,
 	int had_children = 0;
 	struct json_object_iter iter;
 
-	printbuf_memappend(pb, "{" /*}*/, 1);
+	printbuf_memappend_no_nul(pb, "{" /*}*/, 1);
 	if (flags & JSON_C_TO_STRING_PRETTY)
-		printbuf_memappend(pb, "\n", 1);
+		printbuf_memappend_no_nul(pb, "\n", 1);
 	json_object_object_foreachC(jso, iter)
 	{
 		if (had_children)
 		{
-			printbuf_memappend(pb, ",", 1);
+			printbuf_memappend_no_nul(pb, ",", 1);
 			if (flags & JSON_C_TO_STRING_PRETTY)
-				printbuf_memappend(pb, "\n", 1);
+				printbuf_memappend_no_nul(pb, "\n", 1);
 		}
 		had_children = 1;
 		if (flags & JSON_C_TO_STRING_SPACED)
-			printbuf_memappend(pb, " ", 1);
+			printbuf_memappend_no_nul(pb, " ", 1);
 		indent(pb, level+1, flags);
-		printbuf_memappend(pb, "\"", 1);
+		printbuf_memappend_no_nul(pb, "\"", 1);
 		json_escape_str(pb, iter.key, strlen(iter.key));
 		if (flags & JSON_C_TO_STRING_SPACED)
-			printbuf_memappend(pb, "\": ", 3);
+			printbuf_memappend_no_nul(pb, "\": ", 3);
 		else
-			printbuf_memappend(pb, "\":", 2);
+			printbuf_memappend_no_nul(pb, "\":", 2);
 		if(iter.val == NULL)
-			printbuf_memappend(pb, "null", 4);
+			printbuf_memappend_no_nul(pb, "null", 4);
 		else
 			iter.val->_to_json_string(iter.val, pb, level+1,flags);
 	}
 	if (flags & JSON_C_TO_STRING_PRETTY)
 	{
 		if (had_children)
-			printbuf_memappend(pb, "\n",1);
+			printbuf_memappend_no_nul(pb, "\n",1);
 		indent(pb,level,flags);
 	}
 	if (flags & JSON_C_TO_STRING_SPACED)
-		return printbuf_memappend(pb, /*{*/ " }", 2);
+		return printbuf_memappend_no_nul(pb, /*{*/ " }", 2);
 	else
-		return printbuf_memappend(pb, /*{*/ "}", 1);
+		return printbuf_memappend_no_nul(pb, /*{*/ "}", 1);
 }
 
 
@@ -504,9 +505,9 @@ static int json_object_boolean_to_json_string(struct json_object* jso,
 						  int flags)
 {
 	if (jso->o.c_boolean)
-		return printbuf_memappend(pb, "true", 4);
+		return printbuf_memappend_no_nul(pb, "true", 4);
 	else
-		return printbuf_memappend(pb, "false", 5);
+		return printbuf_memappend_no_nul(pb, "false", 5);
 }
 
 struct json_object* json_object_new_boolean(json_bool b)
@@ -670,7 +671,7 @@ static int json_object_double_to_json_string(struct json_object* jso,
     *(++p) = 0;
     size = p-buf;
   }
-  printbuf_memappend(pb, buf, size);
+  printbuf_memappend_no_nul(pb, buf, size);
   return size;
 }
 
@@ -706,7 +707,7 @@ int json_object_userdata_to_json_string(struct json_object *jso,
 	struct printbuf *pb, int level, int flags)
 {
 	int userdata_len = strlen((const char *)jso->_userdata);
-	printbuf_memappend(pb, (const char *)jso->_userdata, userdata_len);
+	printbuf_memappend_no_nul(pb, (const char *)jso->_userdata, userdata_len);
 	return userdata_len;
 }
 
@@ -772,9 +773,9 @@ static int json_object_string_to_json_string(struct json_object* jso,
 					     int level,
 						 int flags)
 {
-	printbuf_memappend(pb, "\"", 1);
+	printbuf_memappend_no_nul(pb, "\"", 1);
 	json_escape_str(pb, get_string_component(jso), jso->o.c_string.len);
-	printbuf_memappend(pb, "\"", 1);
+	printbuf_memappend_no_nul(pb, "\"", 1);
 	return 0;
 }
 
@@ -869,39 +870,39 @@ static int json_object_array_to_json_string(struct json_object* jso,
 {
 	int had_children = 0;
 	int ii;
-	printbuf_memappend(pb, "[", 1);
+	printbuf_memappend_no_nul(pb, "[", 1);
 	if (flags & JSON_C_TO_STRING_PRETTY)
-		printbuf_memappend(pb, "\n", 1);
+		printbuf_memappend_no_nul(pb, "\n", 1);
 	for(ii=0; ii < json_object_array_length(jso); ii++)
 	{
 		struct json_object *val;
 		if (had_children)
 		{
-			printbuf_memappend(pb, ",", 1);
+			printbuf_memappend_no_nul(pb, ",", 1);
 			if (flags & JSON_C_TO_STRING_PRETTY)
-				printbuf_memappend(pb, "\n", 1);
+				printbuf_memappend_no_nul(pb, "\n", 1);
 		}
 		had_children = 1;
 		if (flags & JSON_C_TO_STRING_SPACED)
-			printbuf_memappend(pb, " ", 1);
+			printbuf_memappend_no_nul(pb, " ", 1);
 		indent(pb, level + 1, flags);
 		val = json_object_array_get_idx(jso, ii);
 		if(val == NULL)
-			printbuf_memappend(pb, "null", 4);
+			printbuf_memappend_no_nul(pb, "null", 4);
 		else
 			val->_to_json_string(val, pb, level+1, flags);
 	}
 	if (flags & JSON_C_TO_STRING_PRETTY)
 	{
 		if (had_children)
-			printbuf_memappend(pb, "\n", 1);
+			printbuf_memappend_no_nul(pb, "\n", 1);
 		indent(pb,level,flags);
 	}
 
 	if (flags & JSON_C_TO_STRING_SPACED)
-		return printbuf_memappend(pb, " ]", 2);
+		return printbuf_memappend_no_nul(pb, " ]", 2);
 	else
-		return printbuf_memappend(pb, "]", 1);
+		return printbuf_memappend_no_nul(pb, "]", 1);
 }
 
 static void json_object_array_entry_free(void *data)
