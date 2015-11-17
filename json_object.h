@@ -128,7 +128,7 @@ typedef void (json_object_delete_fn)(struct json_object *jso, void *userdata);
 /**
  * Type of a custom serialization function.  See json_object_set_serializer.
  */
-typedef int (json_object_to_json_string_fn)(struct json_object *jso,
+typedef void (json_object_to_json_string_fn)(struct json_object *jso,
 						struct printbuf *pb,
 						int level,
 						int flags);

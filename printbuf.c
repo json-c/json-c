@@ -93,18 +93,18 @@ int printbuf_memappend(struct printbuf *p, const char *buf, int size)
 }
 
 /* same as printbuf_memappend(), but contains some performance enhancements */
-int printbuf_memappend_no_nul(struct printbuf *p, const char *buf, const int size)
+void printbuf_memappend_no_nul(struct printbuf *p, const char *buf, const int size)
 {
   if (p->size <= p->bpos + size) {
-    if (printbuf_extend(p, p->bpos + size + 1) < 0)
-      return -1;
+    if (printbuf_extend(p, p->bpos + size) < 0)
+       /* ignore new data, best we can do */
+       return;
   }
   if(size > 1)
     memcpy(p->buf + p->bpos, buf, size);
   else
     p->buf[p->bpos]= *buf;
   p->bpos += size;
-  return 1;
 }
 
 void printbuf_terminate_string(struct printbuf *const p)

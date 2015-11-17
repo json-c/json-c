@@ -292,8 +292,7 @@ const char* json_object_to_json_string_ext(struct json_object *jso, int flags)
 
 	printbuf_reset(jso->_pb);
 
-	if(jso->_to_json_string(jso, jso->_pb, 0, flags) < 0)
-		return NULL;
+	jso->_to_json_string(jso, jso->_pb, 0, flags);
 
 	printbuf_terminate_string(jso->_pb);
 	return jso->_pb->buf;
@@ -323,7 +322,7 @@ static void indent(struct printbuf *pb, int level, int flags)
 
 /* json_object_object */
 
-static int json_object_object_to_json_string(struct json_object* jso,
+static void json_object_object_to_json_string(struct json_object* jso,
 					     struct printbuf *pb,
 					     int level,
 						 int flags)
@@ -364,9 +363,9 @@ static int json_object_object_to_json_string(struct json_object* jso,
 		indent(pb,level,flags);
 	}
 	if (flags & JSON_C_TO_STRING_SPACED)
-		return printbuf_memappend_no_nul(pb, /*{*/ " }", 2);
+		printbuf_memappend_no_nul(pb, /*{*/ " }", 2);
 	else
-		return printbuf_memappend_no_nul(pb, /*{*/ "}", 1);
+		printbuf_memappend_no_nul(pb, /*{*/ "}", 1);
 }
 
 
@@ -499,15 +498,15 @@ void json_object_object_del(struct json_object* jso, const char *key)
 
 /* json_object_boolean */
 
-static int json_object_boolean_to_json_string(struct json_object* jso,
+static void json_object_boolean_to_json_string(struct json_object* jso,
 					      struct printbuf *pb,
 					      int level,
 						  int flags)
 {
 	if (jso->o.c_boolean)
-		return printbuf_memappend_no_nul(pb, "true", 4);
+		printbuf_memappend_no_nul(pb, "true", 4);
 	else
-		return printbuf_memappend_no_nul(pb, "false", 5);
+		printbuf_memappend_no_nul(pb, "false", 5);
 }
 
 struct json_object* json_object_new_boolean(json_bool b)
@@ -542,12 +541,12 @@ json_bool json_object_get_boolean(struct json_object *jso)
 
 /* json_object_int */
 
-static int json_object_int_to_json_string(struct json_object* jso,
+static void json_object_int_to_json_string(struct json_object* jso,
 					  struct printbuf *pb,
 					  int level,
 					  int flags)
 {
-	return sprintbuf(pb, "%" PRId64, jso->o.c_int64);
+	sprintbuf(pb, "%" PRId64, jso->o.c_int64);
 }
 
 struct json_object* json_object_new_int(int32_t i)
@@ -634,7 +633,7 @@ int64_t json_object_get_int64(struct json_object *jso)
 
 /* json_object_double */
 
-static int json_object_double_to_json_string(struct json_object* jso,
+static void json_object_double_to_json_string(struct json_object* jso,
 					     struct printbuf *pb,
 					     int level,
 						 int flags)
@@ -672,7 +671,6 @@ static int json_object_double_to_json_string(struct json_object* jso,
     size = p-buf;
   }
   printbuf_memappend_no_nul(pb, buf, size);
-  return size;
 }
 
 struct json_object* json_object_new_double(double d)
@@ -703,12 +701,11 @@ struct json_object* json_object_new_double_s(double d, const char *ds)
 	return jso;
 }
 
-int json_object_userdata_to_json_string(struct json_object *jso,
+void json_object_userdata_to_json_string(struct json_object *jso,
 	struct printbuf *pb, int level, int flags)
 {
 	int userdata_len = strlen((const char *)jso->_userdata);
 	printbuf_memappend_no_nul(pb, (const char *)jso->_userdata, userdata_len);
-	return userdata_len;
 }
 
 void json_object_free_userdata(struct json_object *jso, void *userdata)
@@ -768,7 +765,7 @@ double json_object_get_double(struct json_object *jso)
 
 /* json_object_string */
 
-static int json_object_string_to_json_string(struct json_object* jso,
+static void json_object_string_to_json_string(struct json_object* jso,
 					     struct printbuf *pb,
 					     int level,
 						 int flags)
@@ -776,7 +773,6 @@ static int json_object_string_to_json_string(struct json_object* jso,
 	printbuf_memappend_no_nul(pb, "\"", 1);
 	json_escape_str(pb, get_string_component(jso), jso->o.c_string.len);
 	printbuf_memappend_no_nul(pb, "\"", 1);
-	return 0;
 }
 
 static void json_object_string_delete(struct json_object* jso)
@@ -863,7 +859,7 @@ int json_object_get_string_len(struct json_object *jso)
 
 /* json_object_array */
 
-static int json_object_array_to_json_string(struct json_object* jso,
+static void json_object_array_to_json_string(struct json_object* jso,
                                             struct printbuf *pb,
                                             int level,
                                             int flags)
@@ -900,9 +896,9 @@ static int json_object_array_to_json_string(struct json_object* jso,
 	}
 
 	if (flags & JSON_C_TO_STRING_SPACED)
-		return printbuf_memappend_no_nul(pb, " ]", 2);
+		printbuf_memappend_no_nul(pb, " ]", 2);
 	else
-		return printbuf_memappend_no_nul(pb, "]", 1);
+		printbuf_memappend_no_nul(pb, "]", 1);
 }
 
 static void json_object_array_entry_free(void *data)
