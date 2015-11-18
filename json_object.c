@@ -169,7 +169,7 @@ static char needsEscape[256] = {
 	0, 0, 0, 0, 0, 0, 0, 0
 };
 
-static int json_escape_str(struct printbuf *pb, const char *str, int len)
+static void json_escape_str(struct printbuf *pb, const char *str, int len)
 {
 	int pos = 0, start_offset = 0;
 	unsigned char c;
@@ -177,44 +177,37 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len)
 	{
 		c = str[pos];
 		if(needsEscape[c]) {
+			if(pos - start_offset > 0)
+				printbuf_memappend_no_nul(pb, str + start_offset, pos - start_offset);
 			switch(c)
 			{
-			case '\b':
-			case '\n':
-			case '\r':
-			case '\t':
-			case '\f':
-			case '"':
-			case '\\':
-			case '/':
-				if(pos - start_offset > 0)
-					printbuf_memappend_no_nul(pb, str + start_offset, pos - start_offset);
-
-				if(c == '\b') printbuf_memappend_no_nul(pb, "\\b", 2);
-				else if(c == '\n') printbuf_memappend_no_nul(pb, "\\n", 2);
-				else if(c == '\r') printbuf_memappend_no_nul(pb, "\\r", 2);
-				else if(c == '\t') printbuf_memappend_no_nul(pb, "\\t", 2);
-				else if(c == '\f') printbuf_memappend_no_nul(pb, "\\f", 2);
-				else if(c == '"') printbuf_memappend_no_nul(pb, "\\\"", 2);
-				else if(c == '\\') printbuf_memappend_no_nul(pb, "\\\\", 2);
-				else if(c == '/') printbuf_memappend_no_nul(pb, "\\/", 2);
-
-				start_offset = ++pos;
+			case '\b': printbuf_memappend_no_nul(pb, "\\b", 2);
 				break;
-			default:
-				if(pos - start_offset > 0)
-				printbuf_memappend_no_nul(pb, str + start_offset, pos - start_offset);
-				sprintbuf(pb, "\\u00%c%c",
+			case '\n': printbuf_memappend_no_nul(pb, "\\n", 2);
+				break;
+			case '\r': printbuf_memappend_no_nul(pb, "\\r", 2);
+				break;
+			case '\t': printbuf_memappend_no_nul(pb, "\\t", 2);
+				break;
+			case '\f': printbuf_memappend_no_nul(pb, "\\f", 2);
+				break;
+			case '"': printbuf_memappend_no_nul(pb, "\\\"", 2);
+				break;
+			case '\\': printbuf_memappend_no_nul(pb, "\\\\", 2);
+				break;
+			case '/': printbuf_memappend_no_nul(pb, "\\/", 2);
+				break;
+			default: sprintbuf(pb, "\\u00%c%c",
 				json_hex_chars[c >> 4],
 				json_hex_chars[c & 0xf]);
-				start_offset = ++pos;
+				break;
 			}
+			start_offset = ++pos;
 		} else
 			pos++;
 	}
 	if (pos - start_offset > 0)
 		printbuf_memappend_no_nul(pb, str + start_offset, pos - start_offset);
-	return 0;
 }
 
 
