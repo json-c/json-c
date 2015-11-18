@@ -28,7 +28,13 @@
 #include "debug.h"
 #include "printbuf.h"
 
+static int printbuf_initial_size = 32;
 static int printbuf_extend(struct printbuf *p, int min_size);
+
+void json_global_set_printbuf_initial_size(int size)
+{
+	printbuf_initial_size = size;
+}
 
 struct printbuf* printbuf_new(void)
 {
@@ -36,7 +42,7 @@ struct printbuf* printbuf_new(void)
 
   p = (struct printbuf*)calloc(1, sizeof(struct printbuf));
   if(!p) return NULL;
-  p->size = 32;
+  p->size = printbuf_initial_size;
   p->bpos = 0;
   if(!(p->buf = (char*)malloc(p->size))) {
     free(p);
