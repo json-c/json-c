@@ -104,7 +104,70 @@ get_string_component(struct json_object *jso)
 		   jso->o.c_string.str.data : jso->o.c_string.str.ptr;
 }
 
-/* string escaping */
+/* string escaping
+ *
+ * String escaping is a surprisingly performance intense operation.
+ * I spent many hours in the profiler, and the root problem seems
+ * to be that there is no easy way to detect the character classes
+ * that need to be escaped, where the root cause is that these
+ * characters are spread all over the ascii table. I tried
+ * several approaches, including call tables, re-structuring
+ * the case condition, different types of if conditions and
+ * reordering the if conditions. What worked out best is this:
+ * The regular case is that a character must not be escaped. So
+ * we want to process that as fast as possible. In order to
+ * detect this as quickly as possible, we have a lookup table
+ * that tells us if a char needs escaping ("needsEscape", below).
+ * This table has a spot for each ascii code. Note that it uses
+ * chars, because anything larger causes worse cache operation
+ * and anything smaller requires bit indexing and masking
+ * operations, which are also comparatively costly. So plain
+ * chars work best. What we then do is a single lookup into the
+ * table to detect if we need to escape a character. If we need,
+ * we go into the depth of actual escape detection. But if we
+ * do NOT need to escape, we just quickly advance the index
+ * and are done with that char. Note that it may look like the
+ * extra table lookup costs performance, but right the contrary
+ * is the case. We get amore than 30% performance increase due
+ * to it (compared to the latest version of the code that did not
+ * do the lookups.
+ * rgerhards@adiscon.com, 2015-11-18
+ */
+
+static char needsEscape[256] = {
+	1, 1, 1, 1, 1, 1, 1, 1, /* ascii codes 0 .. 7 */
+	1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1,
+	0, 0, 1, 0, 0, 0, 0, 0, /* ascii codes 32 .. 39 */
+	0, 0, 0, 0, 0, 0, 0, 1,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0
+};
 
 static int json_escape_str(struct printbuf *pb, const char *str, int len)
 {
@@ -113,42 +176,41 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len)
 	while (pos < len)
 	{
 		c = str[pos];
-		switch(c)
-		{
-		case '\b':
-		case '\n':
-		case '\r':
-		case '\t':
-		case '\f':
-		case '"':
-		case '\\':
-		case '/':
-			if(pos - start_offset > 0)
-				printbuf_memappend_no_nul(pb, str + start_offset, pos - start_offset);
-
-			if(c == '\b') printbuf_memappend_no_nul(pb, "\\b", 2);
-			else if(c == '\n') printbuf_memappend_no_nul(pb, "\\n", 2);
-			else if(c == '\r') printbuf_memappend_no_nul(pb, "\\r", 2);
-			else if(c == '\t') printbuf_memappend_no_nul(pb, "\\t", 2);
-			else if(c == '\f') printbuf_memappend_no_nul(pb, "\\f", 2);
-			else if(c == '"') printbuf_memappend_no_nul(pb, "\\\"", 2);
-			else if(c == '\\') printbuf_memappend_no_nul(pb, "\\\\", 2);
-			else if(c == '/') printbuf_memappend_no_nul(pb, "\\/", 2);
-
-			start_offset = ++pos;
-			break;
-		default:
-			if(c < ' ')
+		if(needsEscape[c]) {
+			switch(c)
 			{
+			case '\b':
+			case '\n':
+			case '\r':
+			case '\t':
+			case '\f':
+			case '"':
+			case '\\':
+			case '/':
+				if(pos - start_offset > 0)
+					printbuf_memappend_no_nul(pb, str + start_offset, pos - start_offset);
+
+				if(c == '\b') printbuf_memappend_no_nul(pb, "\\b", 2);
+				else if(c == '\n') printbuf_memappend_no_nul(pb, "\\n", 2);
+				else if(c == '\r') printbuf_memappend_no_nul(pb, "\\r", 2);
+				else if(c == '\t') printbuf_memappend_no_nul(pb, "\\t", 2);
+				else if(c == '\f') printbuf_memappend_no_nul(pb, "\\f", 2);
+				else if(c == '"') printbuf_memappend_no_nul(pb, "\\\"", 2);
+				else if(c == '\\') printbuf_memappend_no_nul(pb, "\\\\", 2);
+				else if(c == '/') printbuf_memappend_no_nul(pb, "\\/", 2);
+
+				start_offset = ++pos;
+				break;
+			default:
 				if(pos - start_offset > 0)
 				printbuf_memappend_no_nul(pb, str + start_offset, pos - start_offset);
 				sprintbuf(pb, "\\u00%c%c",
 				json_hex_chars[c >> 4],
 				json_hex_chars[c & 0xf]);
 				start_offset = ++pos;
-			} else
-				pos++;
-		}
+			}
+		} else
+			pos++;
 	}
 	if (pos - start_offset > 0)
 		printbuf_memappend_no_nul(pb, str + start_offset, pos - start_offset);
