@@ -104,55 +104,110 @@ get_string_component(struct json_object *jso)
 		   jso->o.c_string.str.data : jso->o.c_string.str.ptr;
 }
 
-/* string escaping */
+/* string escaping
+ *
+ * String escaping is a surprisingly performance intense operation.
+ * I spent many hours in the profiler, and the root problem seems
+ * to be that there is no easy way to detect the character classes
+ * that need to be escaped, where the root cause is that these
+ * characters are spread all over the ascii table. I tried
+ * several approaches, including call tables, re-structuring
+ * the case condition, different types of if conditions and
+ * reordering the if conditions. What worked out best is this:
+ * The regular case is that a character must not be escaped. So
+ * we want to process that as fast as possible. In order to
+ * detect this as quickly as possible, we have a lookup table
+ * that tells us if a char needs escaping ("needsEscape", below).
+ * This table has a spot for each ascii code. Note that it uses
+ * chars, because anything larger causes worse cache operation
+ * and anything smaller requires bit indexing and masking
+ * operations, which are also comparatively costly. So plain
+ * chars work best. What we then do is a single lookup into the
+ * table to detect if we need to escape a character. If we need,
+ * we go into the depth of actual escape detection. But if we
+ * do NOT need to escape, we just quickly advance the index
+ * and are done with that char. Note that it may look like the
+ * extra table lookup costs performance, but right the contrary
+ * is the case. We get amore than 30% performance increase due
+ * to it (compared to the latest version of the code that did not
+ * do the lookups.
+ * rgerhards@adiscon.com, 2015-11-18
+ */
 
-static int json_escape_str(struct printbuf *pb, const char *str, int len)
+static char needsEscape[256] = {
+	1, 1, 1, 1, 1, 1, 1, 1, /* ascii codes 0 .. 7 */
+	1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1,
+	0, 0, 1, 0, 0, 0, 0, 0, /* ascii codes 32 .. 39 */
+	0, 0, 0, 0, 0, 0, 0, 1,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 1, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0
+};
+
+static void json_escape_str(struct printbuf *pb, const char *str, int len)
 {
 	int pos = 0, start_offset = 0;
 	unsigned char c;
-	while (len--)
+	while (pos < len)
 	{
 		c = str[pos];
-		switch(c)
-		{
-		case '\b':
-		case '\n':
-		case '\r':
-		case '\t':
-		case '\f':
-		case '"':
-		case '\\':
-		case '/':
+		if(needsEscape[c]) {
 			if(pos - start_offset > 0)
-				printbuf_memappend(pb, str + start_offset, pos - start_offset);
-
-			if(c == '\b') printbuf_memappend(pb, "\\b", 2);
-			else if(c == '\n') printbuf_memappend(pb, "\\n", 2);
-			else if(c == '\r') printbuf_memappend(pb, "\\r", 2);
-			else if(c == '\t') printbuf_memappend(pb, "\\t", 2);
-			else if(c == '\f') printbuf_memappend(pb, "\\f", 2);
-			else if(c == '"') printbuf_memappend(pb, "\\\"", 2);
-			else if(c == '\\') printbuf_memappend(pb, "\\\\", 2);
-			else if(c == '/') printbuf_memappend(pb, "\\/", 2);
-
-			start_offset = ++pos;
-			break;
-		default:
-			if(c < ' ')
+				printbuf_memappend_no_nul(pb, str + start_offset, pos - start_offset);
+			switch(c)
 			{
-				if(pos - start_offset > 0)
-				printbuf_memappend(pb, str + start_offset, pos - start_offset);
-				sprintbuf(pb, "\\u00%c%c",
+			case '\b': printbuf_memappend_no_nul(pb, "\\b", 2);
+				break;
+			case '\n': printbuf_memappend_no_nul(pb, "\\n", 2);
+				break;
+			case '\r': printbuf_memappend_no_nul(pb, "\\r", 2);
+				break;
+			case '\t': printbuf_memappend_no_nul(pb, "\\t", 2);
+				break;
+			case '\f': printbuf_memappend_no_nul(pb, "\\f", 2);
+				break;
+			case '"': printbuf_memappend_no_nul(pb, "\\\"", 2);
+				break;
+			case '\\': printbuf_memappend_no_nul(pb, "\\\\", 2);
+				break;
+			case '/': printbuf_memappend_no_nul(pb, "\\/", 2);
+				break;
+			default: sprintbuf(pb, "\\u00%c%c",
 				json_hex_chars[c >> 4],
 				json_hex_chars[c & 0xf]);
-				start_offset = ++pos;
-			} else
-				pos++;
-		}
+				break;
+			}
+			start_offset = ++pos;
+		} else
+			pos++;
 	}
 	if (pos - start_offset > 0)
-		printbuf_memappend(pb, str + start_offset, pos - start_offset);
-	return 0;
+		printbuf_memappend_no_nul(pb, str + start_offset, pos - start_offset);
 }
 
 
@@ -292,9 +347,9 @@ const char* json_object_to_json_string_ext(struct json_object *jso, int flags)
 
 	printbuf_reset(jso->_pb);
 
-	if(jso->_to_json_string(jso, jso->_pb, 0, flags) < 0)
-		return NULL;
+	jso->_to_json_string(jso, jso->_pb, 0, flags);
 
+	printbuf_terminate_string(jso->_pb);
 	return jso->_pb->buf;
 }
 
@@ -330,42 +385,43 @@ static int json_object_object_to_json_string(struct json_object* jso,
 	int had_children = 0;
 	struct json_object_iter iter;
 
-	sprintbuf(pb, "{" /*}*/);
+	printbuf_memappend_no_nul(pb, "{" /*}*/, 1);
 	if (flags & JSON_C_TO_STRING_PRETTY)
-		sprintbuf(pb, "\n");
+		printbuf_memappend_no_nul(pb, "\n", 1);
 	json_object_object_foreachC(jso, iter)
 	{
 		if (had_children)
 		{
-			sprintbuf(pb, ",");
+			printbuf_memappend_no_nul(pb, ",", 1);
 			if (flags & JSON_C_TO_STRING_PRETTY)
-				sprintbuf(pb, "\n");
+				printbuf_memappend_no_nul(pb, "\n", 1);
 		}
 		had_children = 1;
 		if (flags & JSON_C_TO_STRING_SPACED)
-			sprintbuf(pb, " ");
+			printbuf_memappend_no_nul(pb, " ", 1);
 		indent(pb, level+1, flags);
-		sprintbuf(pb, "\"");
+		printbuf_memappend_no_nul(pb, "\"", 1);
 		json_escape_str(pb, iter.key, strlen(iter.key));
 		if (flags & JSON_C_TO_STRING_SPACED)
-			sprintbuf(pb, "\": ");
+			printbuf_memappend_no_nul(pb, "\": ", 3);
 		else
-			sprintbuf(pb, "\":");
+			printbuf_memappend_no_nul(pb, "\":", 2);
 		if(iter.val == NULL)
-			sprintbuf(pb, "null");
+			printbuf_memappend_no_nul(pb, "null", 4);
 		else
 			iter.val->_to_json_string(iter.val, pb, level+1,flags);
 	}
 	if (flags & JSON_C_TO_STRING_PRETTY)
 	{
 		if (had_children)
-			sprintbuf(pb, "\n");
+			printbuf_memappend_no_nul(pb, "\n",1);
 		indent(pb,level,flags);
 	}
 	if (flags & JSON_C_TO_STRING_SPACED)
-		return sprintbuf(pb, /*{*/ " }");
+		printbuf_memappend_no_nul(pb, /*{*/ " }", 2);
 	else
-		return sprintbuf(pb, /*{*/ "}");
+		printbuf_memappend_no_nul(pb, /*{*/ "}", 1);
+	return 0; /* we need to keep compatible with the API */
 }
 
 
@@ -504,9 +560,10 @@ static int json_object_boolean_to_json_string(struct json_object* jso,
 						  int flags)
 {
 	if (jso->o.c_boolean)
-		return sprintbuf(pb, "true");
+		printbuf_memappend_no_nul(pb, "true", 4);
 	else
-		return sprintbuf(pb, "false");
+		printbuf_memappend_no_nul(pb, "false", 5);
+	return 0; /* we need to keep compatible with the API */
 }
 
 struct json_object* json_object_new_boolean(json_bool b)
@@ -546,7 +603,8 @@ static int json_object_int_to_json_string(struct json_object* jso,
 					  int level,
 					  int flags)
 {
-	return sprintbuf(pb, "%" PRId64, jso->o.c_int64);
+	sprintbuf(pb, "%" PRId64, jso->o.c_int64);
+	return 0; /* we need to keep compatible with the API */
 }
 
 struct json_object* json_object_new_int(int32_t i)
@@ -670,8 +728,8 @@ static int json_object_double_to_json_string(struct json_object* jso,
     *(++p) = 0;
     size = p-buf;
   }
-  printbuf_memappend(pb, buf, size);
-  return size;
+  printbuf_memappend_no_nul(pb, buf, size);
+  return 0; /* we need to keep compatible with the API */
 }
 
 struct json_object* json_object_new_double(double d)
@@ -706,8 +764,8 @@ int json_object_userdata_to_json_string(struct json_object *jso,
 	struct printbuf *pb, int level, int flags)
 {
 	int userdata_len = strlen((const char *)jso->_userdata);
-	printbuf_memappend(pb, (const char *)jso->_userdata, userdata_len);
-	return userdata_len;
+	printbuf_memappend_no_nul(pb, (const char *)jso->_userdata, userdata_len);
+	return 0; /* we need to keep compatible with the API */
 }
 
 void json_object_free_userdata(struct json_object *jso, void *userdata)
@@ -772,10 +830,10 @@ static int json_object_string_to_json_string(struct json_object* jso,
 					     int level,
 						 int flags)
 {
-	sprintbuf(pb, "\"");
+	printbuf_memappend_no_nul(pb, "\"", 1);
 	json_escape_str(pb, get_string_component(jso), jso->o.c_string.len);
-	sprintbuf(pb, "\"");
-	return 0;
+	printbuf_memappend_no_nul(pb, "\"", 1);
+	return 0; /* we need to keep compatible with the API */
 }
 
 static void json_object_string_delete(struct json_object* jso)
@@ -869,39 +927,40 @@ static int json_object_array_to_json_string(struct json_object* jso,
 {
 	int had_children = 0;
 	int ii;
-	sprintbuf(pb, "[");
+	printbuf_memappend_no_nul(pb, "[", 1);
 	if (flags & JSON_C_TO_STRING_PRETTY)
-		sprintbuf(pb, "\n");
+		printbuf_memappend_no_nul(pb, "\n", 1);
 	for(ii=0; ii < json_object_array_length(jso); ii++)
 	{
 		struct json_object *val;
 		if (had_children)
 		{
-			sprintbuf(pb, ",");
+			printbuf_memappend_no_nul(pb, ",", 1);
 			if (flags & JSON_C_TO_STRING_PRETTY)
-				sprintbuf(pb, "\n");
+				printbuf_memappend_no_nul(pb, "\n", 1);
 		}
 		had_children = 1;
 		if (flags & JSON_C_TO_STRING_SPACED)
-			sprintbuf(pb, " ");
+			printbuf_memappend_no_nul(pb, " ", 1);
 		indent(pb, level + 1, flags);
 		val = json_object_array_get_idx(jso, ii);
 		if(val == NULL)
-			sprintbuf(pb, "null");
+			printbuf_memappend_no_nul(pb, "null", 4);
 		else
 			val->_to_json_string(val, pb, level+1, flags);
 	}
 	if (flags & JSON_C_TO_STRING_PRETTY)
 	{
 		if (had_children)
-			sprintbuf(pb, "\n");
+			printbuf_memappend_no_nul(pb, "\n", 1);
 		indent(pb,level,flags);
 	}
 
 	if (flags & JSON_C_TO_STRING_SPACED)
-		return sprintbuf(pb, " ]");
+		printbuf_memappend_no_nul(pb, " ]", 2);
 	else
-		return sprintbuf(pb, "]");
+		printbuf_memappend_no_nul(pb, "]", 1);
+	return 0; /* we need to keep compatible with the API */
 }
 
 static void json_object_array_entry_free(void *data)
