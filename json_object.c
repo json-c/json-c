@@ -176,7 +176,7 @@ int json_object_put(struct json_object *jso)
 	if(!jso) return 0;
 
 #if defined __GNUC__
-	if (__sync_fetch_and_sub(&jso->_ref_count, 1) > 0) return 0;
+	if (__sync_sub_and_fetch(&jso->_ref_count, 1) > 0) return 0;
 #else
 	if (--jso->_ref_count > 0) return 0;
 #endif
