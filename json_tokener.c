@@ -131,7 +131,7 @@ void json_tokener_free(struct json_tokener *tok)
 {
   json_tokener_reset(tok);
   if (tok->pb) printbuf_free(tok->pb);
-  if (tok->stack) free(tok->stack);
+  free(tok->stack);
   free(tok);
 }
 
@@ -253,6 +253,9 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
      the string length is less than INT32_MAX (2GB) */
   if ((len < -1) || (len == -1 && strlen(str) > INT32_MAX)) {
     tok->err = json_tokener_error_size;
+#ifdef HAVE_SETLOCALE
+  free(oldlocale);
+#endif
     return NULL;
   }
 
@@ -898,7 +901,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 
 #ifdef HAVE_SETLOCALE
   setlocale(LC_NUMERIC, oldlocale);
-  if (oldlocale) free(oldlocale);
+  free(oldlocale);
 #endif
 
   if (tok->err == json_tokener_success)
