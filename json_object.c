@@ -106,7 +106,7 @@ get_string_component(struct json_object *jso)
 
 /* string escaping */
 
-static int json_escape_str(struct printbuf *pb, const char *str, int len)
+static int json_escape_str(struct printbuf *pb, const char *str, int len, int flags)
 {
 	int pos = 0, start_offset = 0;
 	unsigned char c;
@@ -133,6 +133,12 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len)
 			else if(c == '\f') printbuf_memappend(pb, "\\f", 2);
 			else if(c == '"') printbuf_memappend(pb, "\\\"", 2);
 			else if(c == '\\') printbuf_memappend(pb, "\\\\", 2);
+			else if(c == '/' &&
+			        (flags & JSON_C_TO_STRING_NOSLASHESCAPE))
+			{
+				pos++;
+				break;
+			}
 			else if(c == '/') printbuf_memappend(pb, "\\/", 2);
 
 			start_offset = ++pos;
@@ -346,7 +352,7 @@ static int json_object_object_to_json_string(struct json_object* jso,
 			sprintbuf(pb, " ");
 		indent(pb, level+1, flags);
 		sprintbuf(pb, "\"");
-		json_escape_str(pb, iter.key, strlen(iter.key));
+		json_escape_str(pb, iter.key, strlen(iter.key), flags);
 		if (flags & JSON_C_TO_STRING_SPACED)
 			sprintbuf(pb, "\": ");
 		else
@@ -773,7 +779,7 @@ static int json_object_string_to_json_string(struct json_object* jso,
 						 int flags)
 {
 	sprintbuf(pb, "\"");
-	json_escape_str(pb, get_string_component(jso), jso->o.c_string.len);
+	json_escape_str(pb, get_string_component(jso), jso->o.c_string.len, flags);
 	sprintbuf(pb, "\"");
 	return 0;
 }

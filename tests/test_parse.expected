@@ -61,10 +61,12 @@ json_tokener_parse_ex(tok, "\f"        ,   4) ... OK: got object of type [string
 json_tokener_parse_ex(tok, "\n"        ,   4) ... OK: got object of type [string]: "\n"
 json_tokener_parse_ex(tok, "\r"        ,   4) ... OK: got object of type [string]: "\r"
 json_tokener_parse_ex(tok, "\t"        ,   4) ... OK: got object of type [string]: "\t"
+json_tokener_parse_ex(tok, "\/"        ,   4) ... OK: got object of type [string]: "\/"
+json_tokener_parse_ex(tok, "/"         ,   3) ... OK: got object of type [string]: "\/"
 json_tokener_parse_ex(tok, [1,2,3]     ,   7) ... OK: got object of type [array]: [ 1, 2, 3 ]
 json_tokener_parse_ex(tok, [1,2,3,]    ,   8) ... OK: got object of type [array]: [ 1, 2, 3 ]
 json_tokener_parse_ex(tok, [1,2,,3,]   ,   9) ... OK: got correct error: unexpected character
 json_tokener_parse_ex(tok, [1,2,3,]    ,   8) ... OK: got correct error: unexpected character
 json_tokener_parse_ex(tok, {"a":1,}    ,   8) ... OK: got correct error: unexpected character
-End Incremental Tests OK=30 ERROR=0
+End Incremental Tests OK=32 ERROR=0
 ==================================

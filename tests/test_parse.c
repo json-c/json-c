@@ -226,6 +226,9 @@ struct incremental_step {
 	{ "\"\\n\"",         -1, -1, json_tokener_success, 0 },
 	{ "\"\\r\"",         -1, -1, json_tokener_success, 0 },
 	{ "\"\\t\"",         -1, -1, json_tokener_success, 0 },
+	{ "\"\\/\"",         -1, -1, json_tokener_success, 0 },
+	// Escaping a forward slash is optional
+	{ "\"/\"",           -1, -1, json_tokener_success, 0 },
 
 	{ "[1,2,3]",          -1, -1, json_tokener_success, 0 },
 

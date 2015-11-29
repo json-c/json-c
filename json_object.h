@@ -64,6 +64,11 @@ extern "C" {
 #define JSON_C_TO_STRING_NOZERO     (1<<2)
 
 /**
+ * Don't escape forward slashes.
+ */
+#define JSON_C_TO_STRING_NOSLASHESCAPE (1<<4)
+
+/**
  * A flag for the json_object_object_add_ex function which
  * causes the value to be added without a check if it already exists.
  * Note: it is the responsibilty of the caller to ensure that no

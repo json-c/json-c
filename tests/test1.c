@@ -57,6 +57,12 @@ int main(int argc, char **argv)
 	printf("my_string.to_string()=%s\n", json_object_to_json_string(my_string));
 	json_object_put(my_string);
 
+	my_string = json_object_new_string("/");
+	printf("my_string=%s\n", json_object_get_string(my_string));
+	printf("my_string.to_string()=%s\n", json_object_to_json_string(my_string));
+	printf("my_string.to_string(NOSLASHESCAPE)=%s\n", json_object_to_json_string_ext(my_string, JSON_C_TO_STRING_NOSLASHESCAPE));
+	json_object_put(my_string);
+
 	my_string = json_object_new_string("foo");
 	printf("my_string=%s\n", json_object_get_string(my_string));
 	printf("my_string.to_string()=%s\n", json_object_to_json_string(my_string));
