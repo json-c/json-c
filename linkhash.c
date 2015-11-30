@@ -506,7 +506,9 @@ void lh_table_resize(struct lh_table *t, int new_size)
 	new_t = lh_table_new(new_size, NULL, t->hash_fn, t->equal_fn);
 	ent = t->head;
 	while(ent) {
-		lh_table_insert(new_t, ent->k, ent->v);
+		lh_table_insert_w_hash(new_t, ent->k, ent->v,
+			lh_get_hash(new_t, ent->k),
+			(ent->k_is_constant) ? JSON_C_OBJECT_KEY_IS_CONSTANT : 0 );
 		ent = ent->next;
 	}
 	free(t->table);
