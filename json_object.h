@@ -688,6 +688,17 @@ extern const char* json_object_get_string(struct json_object *obj);
  */
 extern int json_object_get_string_len(struct json_object *obj);
 
+/** Check if two json_object's are equal
+ *
+ * If the passed objects are equal 1 will be returned.
+ *
+ * @param obj1 the first json_object instance
+ * @param obj2 the second json_object instance
+ * @returns whether both objects are equal or not
+ */
+extern json_bool json_object_equal(struct json_object *obj1,
+				   struct json_object *obj2);
+
 #ifdef __cplusplus
 }
 #endif
