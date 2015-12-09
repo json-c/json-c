@@ -31,7 +31,7 @@ Update the libjson_la_LDFLAGS line in Makefile.am to the new version.
 
 Generate the configure script and other files:
   sh autogen.sh
-  git add -f Makefile.in aclocal.m4 config.guess \
+  git add -f Makefile.in aclocal.m4 config.guess config.h.in \
        config.sub configure depcomp install-sh \
        ltmain.sh missing tests/Makefile.in \
        INSTALL
