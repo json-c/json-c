@@ -474,11 +474,17 @@ struct lh_table* lh_table_new(int size,
 	struct lh_table *t;
 
 	t = (struct lh_table*)calloc(1, sizeof(struct lh_table));
-	if(!t) lh_abort("lh_table_new: calloc failed\n");
+	if (!t)
+		return NULL;
+
 	t->count = 0;
 	t->size = size;
 	t->table = (struct lh_entry*)calloc(size, sizeof(struct lh_entry));
-	if(!t->table) lh_abort("lh_table_new: calloc failed\n");
+	if (!t->table)
+	{
+		free(t);
+		return NULL;
+	}
 	t->free_fn = free_fn;
 	t->hash_fn = hash_fn;
 	t->equal_fn = equal_fn;
@@ -498,18 +504,25 @@ struct lh_table* lh_kptr_table_new(int size,
 	return lh_table_new(size, free_fn, lh_ptr_hash, lh_ptr_equal);
 }
 
-void lh_table_resize(struct lh_table *t, int new_size)
+int lh_table_resize(struct lh_table *t, int new_size)
 {
 	struct lh_table *new_t;
-	struct lh_entry *ent;
 
 	new_t = lh_table_new(new_size, NULL, t->hash_fn, t->equal_fn);
-	ent = t->head;
-	while(ent) {
-		lh_table_insert_w_hash(new_t, ent->k, ent->v,
-			lh_get_hash(new_t, ent->k),
-			(ent->k_is_constant) ? JSON_C_OBJECT_KEY_IS_CONSTANT : 0 );
-		ent = ent->next;
+	if (new_t == NULL)
+		return -1;
+
+	for (struct lh_entry *ent = t->head; ent != NULL; ent = ent->next)
+	{
+		unsigned long h = lh_get_hash(new_t, ent->k);
+		unsigned int opts = 0;
+		if (ent->k_is_constant)
+			opts = JSON_C_OBJECT_KEY_IS_CONSTANT;
+		if (lh_table_insert_w_hash(new_t, ent->k, ent->v, h, opts) != 0)
+		{
+			lh_table_free(new_t);
+			return -1;
+		}
 	}
 	free(t->table);
 	t->table = new_t->table;
@@ -517,6 +530,8 @@ void lh_table_resize(struct lh_table *t, int new_size)
 	t->head = new_t->head;
 	t->tail = new_t->tail;
 	free(new_t);
+
+	return 0;
 }
 
 void lh_table_free(struct lh_table *t)
@@ -536,7 +551,9 @@ int lh_table_insert_w_hash(struct lh_table *t, void *k, const void *v, const uns
 {
 	unsigned long n;
 
-	if(t->count >= t->size * LH_LOAD_FACTOR) lh_table_resize(t, t->size * 2);
+	if (t->count >= t->size * LH_LOAD_FACTOR)
+		if (lh_table_resize(t, t->size * 2) != 0)
+			return -1;
 
 	n = h % t->size;
 

@@ -314,8 +314,11 @@ extern int json_object_object_length(struct json_object* obj);
  * @param obj the json_object instance
  * @param key the object field name (a private copy will be duplicated)
  * @param val a json_object or NULL member to associate with the given field
+ *
+ * @return On success, <code>0</code> is returned.
+ * 	On error, a negative value is returned.
  */
-extern void json_object_object_add(struct json_object* obj, const char *key,
+extern int json_object_object_add(struct json_object* obj, const char *key,
 				   struct json_object *val);
 
 /** Add an object field to a json_object of type json_type_object

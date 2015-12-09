@@ -159,7 +159,8 @@ for(entry = table->head; entry && ((tmp = entry->next) || 1); entry = tmp)
  * @param equal_fn comparison function to compare keys. 2 standard ones defined:
  * lh_ptr_hash and lh_char_hash for comparing pointer values
  * and C strings respectively.
- * @return a pointer onto the linkhash table.
+ * @return On success, a pointer to the new linkhash table is returned.
+ * 	On error, a null pointer is returned.
  */
 extern struct lh_table* lh_table_new(int size,
 				     lh_entry_free_fn *free_fn,
@@ -172,7 +173,8 @@ extern struct lh_table* lh_table_new(int size,
  * @param size initial table size.
  * @param name table name.
  * @param free_fn callback function used to free memory for entries.
- * @return a pointer onto the linkhash table.
+ * @return On success, a pointer to the new linkhash table is returned.
+ * 	On error, a null pointer is returned.
  */
 extern struct lh_table* lh_kchar_table_new(int size,
 					   lh_entry_free_fn *free_fn);
@@ -184,7 +186,8 @@ extern struct lh_table* lh_kchar_table_new(int size,
  * @param size initial table size.
  * @param name table name.
  * @param free_fn callback function used to free memory for entries.
- * @return a pointer onto the linkhash table.
+ * @return On success, a pointer to the new linkhash table is returned.
+ * 	On error, a null pointer is returned.
  */
 extern struct lh_table* lh_kptr_table_new(int size,
 					  lh_entry_free_fn *free_fn);
@@ -204,6 +207,9 @@ extern void lh_table_free(struct lh_table *t);
  * @param t the table to insert into.
  * @param k a pointer to the key to insert.
  * @param v a pointer to the value to insert.
+ *
+ * @return On success, <code>0</code> is returned.
+ * 	On error, a negative value is returned.
  */
 extern int lh_table_insert(struct lh_table *t, void *k, const void *v);
 
@@ -287,8 +293,31 @@ extern int lh_table_delete(struct lh_table *t, const void *k);
 
 extern int lh_table_length(struct lh_table *t);
 
+/**
+ * Prints a message to <code>stdout</code>,
+ * then exits the program with an exit code of <code>1</code>.
+ *
+ * @param msg Message format string, like for <code>printf</code>.
+ * @param ... Format args.
+ *
+ * @deprecated Since it is not a good idea to exit the entire program
+ * 	because of an internal library failure, json-c will no longer
+ * 	use this function internally.
+ * 	However, because its interface is public, it will remain part of
+ * 	the API on the off chance of legacy software using it externally.
+ */
 void lh_abort(const char *msg, ...);
-void lh_table_resize(struct lh_table *t, int new_size);
+
+/**
+ * Resizes the specified table.
+ *
+ * @param t Pointer to table to resize.
+ * @param new_size New table size. Must be positive.
+ *
+ * @return On success, <code>0</code> is returned.
+ * 	On error, a negative value is returned.
+ */
+int lh_table_resize(struct lh_table *t, int new_size);
 
 
 /**

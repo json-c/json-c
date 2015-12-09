@@ -444,7 +444,7 @@ void json_object_object_add_ex(struct json_object* jso,
 	existing_entry->v = val;
 }
 
-void json_object_object_add(struct json_object* jso, const char *key,
+int json_object_object_add(struct json_object* jso, const char *key,
 			    struct json_object *val)
 {
 	// We lookup the entry and replace the value, rather than just deleting
@@ -455,13 +455,18 @@ void json_object_object_add(struct json_object* jso, const char *key,
 	existing_entry = lh_table_lookup_entry_w_hash(jso->o.c_object, (void*)key, hash);
 	if (!existing_entry)
 	{
-		lh_table_insert_w_hash(jso->o.c_object, strdup(key), val, hash, 0);
-		return;
+		char *keydup = strdup(key);
+		if (keydup == NULL)
+			return -1;
+
+		return lh_table_insert_w_hash(jso->o.c_object, keydup, val, hash, 0);
 	}
 	existing_value = (json_object  *)existing_entry->v;
 	if (existing_value)
 		json_object_put(existing_value);
 	existing_entry->v = val;
+
+	return 0;
 }
 
 
