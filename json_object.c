@@ -98,7 +98,7 @@ static void json_object_fini(void)
 /* helper for accessing the optimized string data component in json_object
  */
 static const char *
-get_string_component(struct json_object *jso)
+get_string_component(const struct json_object *jso)
 {
 	return (jso->o.c_string.len < LEN_DIRECT_STRING_DATA) ?
 		   jso->o.c_string.str.data : jso->o.c_string.str.ptr;
@@ -221,14 +221,14 @@ static struct json_object* json_object_new(enum json_type o_type)
 
 /* type checking functions */
 
-int json_object_is_type(struct json_object *jso, enum json_type type)
+int json_object_is_type(const struct json_object *jso, enum json_type type)
 {
 	if (!jso)
 		return (type == json_type_null);
 	return (jso->o_type == type);
 }
 
-enum json_type json_object_get_type(struct json_object *jso)
+enum json_type json_object_get_type(const struct json_object *jso)
 {
 	if (!jso)
 		return json_type_null;
@@ -406,7 +406,7 @@ struct json_object* json_object_new_object(void)
 	return jso;
 }
 
-struct lh_table* json_object_get_object(struct json_object *jso)
+struct lh_table* json_object_get_object(const struct json_object *jso)
 {
 	if (!jso)
 		return NULL;
@@ -470,19 +470,19 @@ int json_object_object_add(struct json_object* jso, const char *key,
 }
 
 
-int json_object_object_length(struct json_object *jso)
+int json_object_object_length(const struct json_object *jso)
 {
 	return lh_table_length(jso->o.c_object);
 }
 
-struct json_object* json_object_object_get(struct json_object* jso, const char *key)
+struct json_object* json_object_object_get(const struct json_object* jso, const char *key)
 {
 	struct json_object *result = NULL;
 	json_object_object_get_ex(jso, key, &result);
 	return result;
 }
 
-json_bool json_object_object_get_ex(struct json_object* jso, const char *key, struct json_object **value)
+json_bool json_object_object_get_ex(const struct json_object* jso, const char *key, struct json_object **value)
 {
 	if (value != NULL)
 		*value = NULL;
@@ -530,7 +530,7 @@ struct json_object* json_object_new_boolean(json_bool b)
 	return jso;
 }
 
-json_bool json_object_get_boolean(struct json_object *jso)
+json_bool json_object_get_boolean(const struct json_object *jso)
 {
 	if (!jso)
 		return FALSE;
@@ -570,7 +570,7 @@ struct json_object* json_object_new_int(int32_t i)
 	return jso;
 }
 
-int32_t json_object_get_int(struct json_object *jso)
+int32_t json_object_get_int(const struct json_object *jso)
 {
   int64_t cint64;
   enum json_type o_type;
@@ -619,7 +619,7 @@ struct json_object* json_object_new_int64(int64_t i)
 	return jso;
 }
 
-int64_t json_object_get_int64(struct json_object *jso)
+int64_t json_object_get_int64(const struct json_object *jso)
 {
 	int64_t cint;
 
@@ -726,7 +726,7 @@ void json_object_free_userdata(struct json_object *jso, void *userdata)
 	free(userdata);
 }
 
-double json_object_get_double(struct json_object *jso)
+double json_object_get_double(const struct json_object *jso)
 {
   double cdouble;
   char *errPtr = NULL;
@@ -857,7 +857,7 @@ const char* json_object_get_string(struct json_object *jso)
 	}
 }
 
-int json_object_get_string_len(struct json_object *jso)
+int json_object_get_string_len(const struct json_object *jso)
 {
 	if (!jso)
 		return 0;
@@ -937,7 +937,7 @@ struct json_object* json_object_new_array(void)
 	return jso;
 }
 
-struct array_list* json_object_get_array(struct json_object *jso)
+struct array_list* json_object_get_array(const struct json_object *jso)
 {
 	if (!jso)
 		return NULL;
@@ -970,7 +970,7 @@ struct json_object* json_object_array_bsearch(
 	return *result;
 }
 
-int json_object_array_length(struct json_object *jso)
+int json_object_array_length(const struct json_object *jso)
 {
 	return array_list_length(jso->o.c_array);
 }
@@ -986,7 +986,7 @@ int json_object_array_put_idx(struct json_object *jso, int idx,
 	return array_list_put_idx(jso->o.c_array, idx, val);
 }
 
-struct json_object* json_object_array_get_idx(struct json_object *jso,
+struct json_object* json_object_array_get_idx(const struct json_object *jso,
 					      int idx)
 {
 	return (struct json_object*)array_list_get_idx(jso->o.c_array, idx);
