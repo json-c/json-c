@@ -43,7 +43,7 @@ AC_TYPE_SIZE_T
 # Checks for library functions.
 AC_FUNC_VPRINTF
 AC_FUNC_MEMCMP
-AC_FUNC_REALLOC
+AC_CHECK_FUNCS([realloc])
 AC_CHECK_FUNCS(strcasecmp strdup strerror snprintf vsnprintf vasprintf open vsyslog strncasecmp setlocale)
 AC_CHECK_DECLS([INFINITY], [], [], [[#include <math.h>]])
 AC_CHECK_DECLS([nan], [], [], [[#include <math.h>]])
