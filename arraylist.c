@@ -11,6 +11,8 @@
 
 #include "config.h"
 
+#include <limits.h>
+
 #ifdef STDC_HEADERS
 # include <stdlib.h>
 # include <string.h>
@@ -62,10 +64,17 @@ static int array_list_expand_internal(struct array_list *arr, int max)
   int new_size;
 
   if(max < arr->size) return 0;
-  new_size = arr->size << 1;
-  if (new_size < max)
+  /* Avoid undefined behaviour on int32 overflow */
+  if( arr->size >= INT_MAX / 2 )
     new_size = max;
-  if(!(t = realloc(arr->array, new_size*sizeof(void*)))) return -1;
+  else
+  {
+    new_size = arr->size << 1;
+    if (new_size < max)
+      new_size = max;
+  }
+  if((size_t)new_size > (~((size_t)0)) / sizeof(void*)) return -1;
+  if(!(t = realloc(arr->array, ((size_t)new_size)*sizeof(void*)))) return -1;
   arr->array = (void**)t;
   (void)memset(arr->array + arr->size, 0, (new_size-arr->size)*sizeof(void*));
   arr->size = new_size;
@@ -75,6 +84,7 @@ static int array_list_expand_internal(struct array_list *arr, int max)
 int
 array_list_put_idx(struct array_list *arr, int idx, void *data)
 {
+  if( idx < 0 || idx > INT_MAX - 1 ) return -1;
   if(array_list_expand_internal(arr, idx+1)) return -1;
   if(arr->array[idx]) arr->free_fn(arr->array[idx]);
   arr->array[idx] = data;
