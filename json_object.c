@@ -992,3 +992,84 @@ struct json_object* json_object_array_get_idx(const struct json_object *jso,
 	return (struct json_object*)array_list_get_idx(jso->o.c_array, idx);
 }
 
+static int json_array_equal(struct json_object* jso1,
+			    struct json_object* jso2)
+{
+	int len, i;
+
+	len = json_object_array_length(jso1);
+	if (len != json_object_array_length(jso2))
+		return 0;
+
+	for (i = 0; i < len; i++) {
+		if (!json_object_equal(json_object_array_get_idx(jso1, i),
+				       json_object_array_get_idx(jso2, i)))
+			return 0;
+	}
+	return 1;
+}
+
+static int json_object_all_values_equal(struct json_object* jso1,
+					struct json_object* jso2)
+{
+	struct json_object_iter iter;
+	struct json_object *sub;
+
+	/* Iterate over jso1 keys and see if they exist and are equal in jso2 */
+        json_object_object_foreachC(jso1, iter) {
+		if (!lh_table_lookup_ex(jso1->o.c_object, (void*)iter.key,
+					(void**)&sub))
+			return 0;
+		if (!json_object_equal(iter.val, sub))
+			return 0;
+        }
+
+	/* Iterate over jso2 keys to see if any exist that are not in jso1 */
+        json_object_object_foreachC(jso2, iter) {
+		if (!lh_table_lookup_ex(jso1->o.c_object, (void*)iter.key,
+					(void**)&sub))
+			return 0;
+        }
+
+	return 1;
+}
+
+int json_object_equal(struct json_object* jso1, struct json_object* jso2)
+{
+	if (jso1 == jso2)
+		return 1;
+
+	if (!jso1 || !jso2)
+		return 0;
+
+	if (jso1->o_type != jso2->o_type)
+		return 0;
+
+	switch(jso1->o_type) {
+		case json_type_boolean:
+			return (jso1->o.c_boolean == jso2->o.c_boolean);
+
+		case json_type_double:
+			return (jso1->o.c_double == jso2->o.c_double);
+
+		case json_type_int:
+			return (jso1->o.c_int64 == jso2->o.c_int64);
+
+		case json_type_string:
+			return (jso1->o.c_string.len == jso2->o.c_string.len &&
+				memcmp(get_string_component(jso1),
+				       get_string_component(jso2),
+				       jso1->o.c_string.len) == 0);
+
+		case json_type_object:
+			return json_object_all_values_equal(jso1, jso2);
+
+		case json_type_array:
+			return json_array_equal(jso1, jso2);
+
+		case json_type_null:
+			return 1;
+	};
+
+	return 0;
+}
