@@ -1078,3 +1078,8 @@ int json_object_equal(struct json_object* jso1, struct json_object* jso2)
 
 	return 0;
 }
+
+int json_object_array_del_idx(struct json_object *jso, int idx, int count)
+{
+	return array_list_del_idx(jso->o.c_array, idx, count);
+}
