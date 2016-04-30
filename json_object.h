@@ -670,14 +670,19 @@ extern struct json_object* json_object_new_string_len(const char *s, int len);
 
 /** Get the string value of a json_object
  *
- * If the passed object is not of type json_type_string then the JSON
- * representation of the object is returned.
+ * If the passed object is of type json_type_null (i.e. obj == NULL),
+ * NULL is returned.
+ *
+ * If the passed object of type json_type_string, the string contents
+ * are returned.
+ *
+ * Otherwise the JSON representation of the object is returned.
  *
  * The returned string memory is managed by the json_object and will
  * be freed when the reference count of the json_object drops to zero.
  *
  * @param obj the json_object instance
- * @returns a string
+ * @returns a string or NULL
  */
 extern const char* json_object_get_string(struct json_object *obj);
 
