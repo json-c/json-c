@@ -30,6 +30,7 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # Checks for header files.
 AM_PROG_CC_C_O
+AC_PROG_CC_C99
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_HEADER(json_config.h)
 AC_HEADER_STDC
@@ -104,7 +105,6 @@ AC_SUBST(JSON_BSYMBOLIC_LDFLAGS)
 
 AX_APPEND_COMPILE_FLAGS([-Wall -Werror -Wno-error=deprecated-declarations])
 AX_APPEND_COMPILE_FLAGS([-Wextra -Wwrite-string -Wno-unused-parameter])
-AX_APPEND_COMPILE_FLAGS([-std=gnu99])
 AX_APPEND_COMPILE_FLAGS([-D_GNU_SOURCE -D_REENTRANT])
 
 AC_CONFIG_FILES([
