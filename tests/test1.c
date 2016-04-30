@@ -33,6 +33,75 @@ static int sort_fn (const void *j1, const void *j2)
 /* no special define */
 #endif
 
+json_object *make_array(void);
+json_object *make_array()
+{
+	json_object *my_array;
+
+	my_array = json_object_new_array();
+	json_object_array_add(my_array, json_object_new_int(1));
+	json_object_array_add(my_array, json_object_new_int(2));
+	json_object_array_add(my_array, json_object_new_int(3));
+	json_object_array_put_idx(my_array, 4, json_object_new_int(5));
+	json_object_array_put_idx(my_array, 3, json_object_new_int(4));
+	json_object_array_put_idx(my_array, 6, json_object_new_int(7));
+
+	return my_array;
+}
+
+void test_array_del_idx(void);
+void test_array_del_idx()
+{
+	int rc;
+	int ii;
+	int orig_array_len;
+	json_object *my_array;
+#ifdef TEST_FORMATTED
+	int sflags = 0;
+#endif
+
+	my_array = make_array();
+	orig_array_len = json_object_array_length(my_array);
+
+	printf("my_array=\n");
+	for(ii = 0; ii < json_object_array_length(my_array); ii++)
+	{
+		json_object *obj = json_object_array_get_idx(my_array, ii);
+		printf("\t[%d]=%s\n", ii, json_object_to_json_string(obj));
+	}
+	printf("my_array.to_string()=%s\n", json_object_to_json_string(my_array));
+
+	for (ii = 0; ii < orig_array_len; ii++)
+	{
+		rc = json_object_array_del_idx(my_array, 0, 1);
+		printf("after del_idx(0,1)=%d, my_array.to_string()=%s\n",
+		       rc, json_object_to_json_string(my_array));
+	}
+
+	// One more time, with the empty array:
+	rc = json_object_array_del_idx(my_array, 0, 1);
+	printf("after del_idx(0,1)=%d, my_array.to_string()=%s\n",
+	       rc, json_object_to_json_string(my_array));
+
+	json_object_put(my_array);
+
+	// Delete all array indexes at once
+	my_array = make_array();
+	rc = json_object_array_del_idx(my_array, 0, orig_array_len);
+	printf("after del_idx(0,%d)=%d, my_array.to_string()=%s\n",
+	       orig_array_len, rc, json_object_to_json_string(my_array));
+
+	json_object_put(my_array);
+
+	// Delete *more* than all array indexes at once
+	my_array = make_array();
+	rc = json_object_array_del_idx(my_array, 0, orig_array_len + 1);
+	printf("after del_idx(0,%d)=%d, my_array.to_string()=%s\n",
+	       orig_array_len + 1, rc, json_object_to_json_string(my_array));
+
+	json_object_put(my_array);
+}
+
 int main(int argc, char **argv)
 {
 	json_object *my_string, *my_int, *my_object, *my_array;
@@ -91,6 +160,8 @@ int main(int argc, char **argv)
 	printf("my_array.to_string()=%s\n", json_object_to_json_string(my_array));
 
 	json_object_put(my_array);
+
+	test_array_del_idx();
 
 	my_array = json_object_new_array();
 	json_object_array_add(my_array, json_object_new_int(3));

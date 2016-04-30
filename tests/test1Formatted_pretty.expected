@@ -26,6 +26,25 @@ my_array.to_string()=[
   5
 ]
 my_array=
+	[0]=1
+	[1]=2
+	[2]=3
+	[3]=4
+	[4]=5
+	[5]=null
+	[6]=7
+my_array.to_string()=[1,2,3,4,5,null,7]
+after del_idx(0,1)=0, my_array.to_string()=[2,3,4,5,null,7]
+after del_idx(0,1)=0, my_array.to_string()=[3,4,5,null,7]
+after del_idx(0,1)=0, my_array.to_string()=[4,5,null,7]
+after del_idx(0,1)=0, my_array.to_string()=[5,null,7]
+after del_idx(0,1)=0, my_array.to_string()=[null,7]
+after del_idx(0,1)=0, my_array.to_string()=[7]
+after del_idx(0,1)=0, my_array.to_string()=[]
+after del_idx(0,1)=-1, my_array.to_string()=[]
+after del_idx(0,7)=0, my_array.to_string()=[]
+after del_idx(0,8)=-1, my_array.to_string()=[1,2,3,4,5,null,7]
+my_array=
 	[0]=3
 	[1]=1
 	[2]=2
