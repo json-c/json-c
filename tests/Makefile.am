@@ -16,6 +16,7 @@ TESTS+= test_locale.test
 TESTS+= test_charcase.test
 TESTS+= test_printbuf.test
 TESTS+= test_set_serializer.test
+TESTS+= test_compare.test
 
 check_PROGRAMS=
 check_PROGRAMS += $(TESTS:.test=)
