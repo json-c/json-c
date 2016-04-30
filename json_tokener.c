@@ -286,11 +286,15 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	state = json_tokener_state_eatws;
 	saved_state = json_tokener_state_object_field_start;
 	current = json_object_new_object();
+	if(current == NULL)
+		goto out;
 	break;
       case '[':
 	state = json_tokener_state_eatws;
 	saved_state = json_tokener_state_array;
 	current = json_object_new_array();
+	if(current == NULL)
+		goto out;
 	break;
       case 'I':
       case 'i':
@@ -376,6 +380,8 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 		if (tok->st_pos == json_inf_str_len)
 		{
 			current = json_object_new_double(is_negative ? -INFINITY : INFINITY);
+			if(current == NULL)
+			    goto out;
 			saved_state = json_tokener_state_finish;
 			state = json_tokener_state_eatws;
 			goto redo_char;
@@ -413,6 +419,8 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 		if (tok->st_pos == json_nan_str_len)
 		{
 			current = json_object_new_double(NAN);
+			if (current == NULL)
+			    goto out;
 			saved_state = json_tokener_state_finish;
 			state = json_tokener_state_eatws;
 			goto redo_char;
@@ -486,6 +494,8 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	  if(c == tok->quote_char) {
 	    printbuf_memappend_fast(tok->pb, case_start, str-case_start);
 	    current = json_object_new_string_len(tok->pb->buf, tok->pb->bpos);
+	    if(current == NULL)
+		goto out;
 	    saved_state = json_tokener_state_finish;
 	    state = json_tokener_state_eatws;
 	    break;
@@ -646,6 +656,8 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	  ) {
 	  if(tok->st_pos == json_true_str_len) {
 	    current = json_object_new_boolean(1);
+	    if(current == NULL)
+		goto out;
 	    saved_state = json_tokener_state_finish;
 	    state = json_tokener_state_eatws;
 	    goto redo_char;
@@ -655,6 +667,8 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	  || (strncmp(json_false_str, tok->pb->buf, size2) == 0)) {
 	  if(tok->st_pos == json_false_str_len) {
 	    current = json_object_new_boolean(0);
+	    if(current == NULL)
+		goto out;
 	    saved_state = json_tokener_state_finish;
 	    state = json_tokener_state_eatws;
 	    goto redo_char;
@@ -737,10 +751,14 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 			goto out;
 		}
 		current = json_object_new_int64(num64);
+		if(current == NULL)
+		    goto out;
 	}
 	else if(tok->is_double && json_parse_double(tok->pb->buf, &numd) == 0)
 	{
           current = json_object_new_double_s(numd, tok->pb->buf);
+	  if(current == NULL)
+		goto out;
         } else {
           tok->err = json_tokener_error_parse_number;
           goto out;
@@ -775,7 +793,8 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
       break;
 
     case json_tokener_state_array_add:
-      json_object_array_add(current, obj);
+      if( json_object_array_add(current, obj) != 0 )
+        goto out;
       saved_state = json_tokener_state_array_sep;
       state = json_tokener_state_eatws;
       goto redo_char;
