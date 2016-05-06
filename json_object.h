@@ -633,8 +633,8 @@ extern struct json_object* json_object_new_double(double d);
  * An equivalent sequence of calls is:
  * @code
  *   jso = json_object_new_double(d);
- *   json_object_set_serializer(d, json_object_userdata_to_json_string,
- *       strdup(ds), json_object_free_userdata)
+ *   json_object_set_serializer(jso, json_object_userdata_to_json_string,
+ *       strdup(ds), json_object_free_userdata);
  * @endcode
  *
  * @param d the numeric value of the double.
