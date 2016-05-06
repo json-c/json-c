@@ -55,7 +55,6 @@ static struct json_object* json_object_new(enum json_type o_type);
 static json_object_to_json_string_fn json_object_object_to_json_string;
 static json_object_to_json_string_fn json_object_boolean_to_json_string;
 static json_object_to_json_string_fn json_object_int_to_json_string;
-static json_object_to_json_string_fn json_object_double_to_json_string;
 static json_object_to_json_string_fn json_object_string_to_json_string;
 static json_object_to_json_string_fn json_object_array_to_json_string;
 
@@ -644,10 +643,10 @@ int64_t json_object_get_int64(const struct json_object *jso)
 
 /* json_object_double */
 
-static int json_object_double_to_json_string(struct json_object* jso,
-					     struct printbuf *pb,
-					     int level,
-						 int flags)
+int json_object_double_to_json_string(struct json_object* jso,
+				      struct printbuf *pb,
+				      int level,
+				      int flags)
 {
   char buf[128], *p, *q;
   int size;
@@ -663,7 +662,8 @@ static int json_object_double_to_json_string(struct json_object* jso,
     else
       size = snprintf(buf, sizeof(buf), "-Infinity");
   else
-    size = snprintf(buf, sizeof(buf), "%.17g", jso->o.c_double);
+    size = snprintf(buf, sizeof(buf),
+        jso->_userdata ? (const char*) jso->_userdata : "%.17g", jso->o.c_double);
 
   p = strchr(buf, ',');
   if (p) {

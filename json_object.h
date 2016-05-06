@@ -614,6 +614,9 @@ extern int64_t json_object_get_int64(const struct json_object *obj);
 /* double type methods */
 
 /** Create a new empty json_object of type json_type_double
+ *
+ * @see json_object_double_to_json_string() for how to set a custom format string.
+ *
  * @param d the double
  * @returns a json_object of type json_type_double
  */
@@ -641,6 +644,31 @@ extern struct json_object* json_object_new_double(double d);
  * @param ds the string representation of the double.  This will be copied.
  */
 extern struct json_object* json_object_new_double_s(double d, const char *ds);
+
+
+/** Serialize a json_object of type json_type_double to a string.
+ *
+ * This function isn't meant to be called directly. Instead, you can set a
+ * custom format string for the serialization of this double using the
+ * following call (where "%.17g" actually is the default):
+ *
+ * @code
+ *   jso = json_object_new_double(d);
+ *   json_object_set_serializer(jso, json_object_double_to_json_string,
+ *       "%.17g", NULL);
+ * @endcode
+ *
+ * @see printf(3) man page for format strings
+ *
+ * @param jso The json_type_double object that is serialized.
+ * @param pb The destination buffer.
+ * @param level Ignored.
+ * @param flags Ignored.
+ */
+extern int json_object_double_to_json_string(struct json_object* jso,
+					     struct printbuf *pb,
+					     int level,
+					     int flags);
 
 /** Get the double floating point value of a json_object
  *
