@@ -22,6 +22,14 @@
 # include <strings.h>
 #endif /* HAVE_STRINGS_H */
 
+#if SIZEOF_SIZE_T == SIZEOF_INT
+#define SIZE_T_MAX UINT_MAX
+#elif SIZEOF_SIZE_T == SIZEOF_LONG
+#define SIZE_T_MAX ULONG_MAX
+#else
+#error Unable to determine size of size_t
+#endif
+
 #include "arraylist.h"
 
 struct array_list*
@@ -44,7 +52,7 @@ array_list_new(array_list_free_fn *free_fn)
 extern void
 array_list_free(struct array_list *arr)
 {
-  int i;
+  size_t i;
   for(i = 0; i < arr->length; i++)
     if(arr->array[i]) arr->free_fn(arr->array[i]);
   free(arr->array);
@@ -52,20 +60,20 @@ array_list_free(struct array_list *arr)
 }
 
 void*
-array_list_get_idx(struct array_list *arr, int i)
+array_list_get_idx(struct array_list *arr, size_t i)
 {
   if(i >= arr->length) return NULL;
   return arr->array[i];
 }
 
-static int array_list_expand_internal(struct array_list *arr, int max)
+static int array_list_expand_internal(struct array_list *arr, size_t max)
 {
   void *t;
-  int new_size;
+  size_t new_size;
 
   if(max < arr->size) return 0;
-  /* Avoid undefined behaviour on int32 overflow */
-  if( arr->size >= INT_MAX / 2 )
+  /* Avoid undefined behaviour on size_t overflow */
+  if( arr->size >= SIZE_T_MAX / 2 )
     new_size = max;
   else
   {
@@ -73,8 +81,8 @@ static int array_list_expand_internal(struct array_list *arr, int max)
     if (new_size < max)
       new_size = max;
   }
-  if((size_t)new_size > (~((size_t)0)) / sizeof(void*)) return -1;
-  if(!(t = realloc(arr->array, ((size_t)new_size)*sizeof(void*)))) return -1;
+  if (new_size > (~((size_t)0)) / sizeof(void*)) return -1;
+  if (!(t = realloc(arr->array, new_size*sizeof(void*)))) return -1;
   arr->array = (void**)t;
   (void)memset(arr->array + arr->size, 0, (new_size-arr->size)*sizeof(void*));
   arr->size = new_size;
@@ -82,9 +90,9 @@ static int array_list_expand_internal(struct array_list *arr, int max)
 }
 
 int
-array_list_put_idx(struct array_list *arr, int idx, void *data)
+array_list_put_idx(struct array_list *arr, size_t idx, void *data)
 {
-  if( idx < 0 || idx > INT_MAX - 1 ) return -1;
+  if (idx > SIZE_T_MAX - 1 ) return -1;
   if(array_list_expand_internal(arr, idx+1)) return -1;
   if(arr->array[idx]) arr->free_fn(arr->array[idx]);
   arr->array[idx] = data;
@@ -111,16 +119,16 @@ void* array_list_bsearch(const void **key, struct array_list *arr,
 			sort_fn);
 }
 
-int
+size_t
 array_list_length(struct array_list *arr)
 {
   return arr->length;
 }
 
 int
-array_list_del_idx( struct array_list *arr, int idx, int count )
+array_list_del_idx( struct array_list *arr, size_t idx, size_t count )
 {
-	int i, stop;
+	size_t i, stop;
 
 	stop = idx + count;
 	if ( idx >= arr->length || stop > arr->length ) return -1;

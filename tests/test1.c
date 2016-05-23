@@ -53,8 +53,8 @@ void test_array_del_idx(void);
 void test_array_del_idx()
 {
 	int rc;
-	int ii;
-	int orig_array_len;
+	size_t ii;
+	size_t orig_array_len;
 	json_object *my_array;
 #ifdef TEST_FORMATTED
 	int sflags = 0;
@@ -105,7 +105,7 @@ void test_array_del_idx()
 int main(int argc, char **argv)
 {
 	json_object *my_string, *my_int, *my_object, *my_array;
-	int i;
+	size_t i;
 #ifdef TEST_FORMATTED
 	int sflags = 0;
 #endif

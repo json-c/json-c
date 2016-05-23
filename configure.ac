@@ -107,6 +107,10 @@ AX_APPEND_COMPILE_FLAGS([-Wall -Werror -Wno-error=deprecated-declarations])
 AX_APPEND_COMPILE_FLAGS([-Wextra -Wwrite-string -Wno-unused-parameter])
 AX_APPEND_COMPILE_FLAGS([-D_GNU_SOURCE -D_REENTRANT])
 
+AX_COMPILE_CHECK_SIZEOF(int)
+AX_COMPILE_CHECK_SIZEOF(long)
+AX_COMPILE_CHECK_SIZEOF(size_t, [#include "json_inttypes.h"])
+
 AC_CONFIG_FILES([
 Makefile
 json-c.pc

@@ -879,7 +879,7 @@ static int json_object_array_to_json_string(struct json_object* jso,
                                             int flags)
 {
 	int had_children = 0;
-	int ii;
+	size_t ii;
 	sprintbuf(pb, "[");
 	if (flags & JSON_C_TO_STRING_PRETTY)
 		sprintbuf(pb, "\n");
@@ -975,7 +975,7 @@ struct json_object* json_object_array_bsearch(
 	return *result;
 }
 
-int json_object_array_length(const struct json_object *jso)
+size_t json_object_array_length(const struct json_object *jso)
 {
 	return array_list_length(jso->o.c_array);
 }
@@ -985,14 +985,14 @@ int json_object_array_add(struct json_object *jso,struct json_object *val)
 	return array_list_add(jso->o.c_array, val);
 }
 
-int json_object_array_put_idx(struct json_object *jso, int idx,
+int json_object_array_put_idx(struct json_object *jso, size_t idx,
 			      struct json_object *val)
 {
 	return array_list_put_idx(jso->o.c_array, idx, val);
 }
 
 struct json_object* json_object_array_get_idx(const struct json_object *jso,
-					      int idx)
+					      size_t idx)
 {
 	return (struct json_object*)array_list_get_idx(jso->o.c_array, idx);
 }
@@ -1000,7 +1000,7 @@ struct json_object* json_object_array_get_idx(const struct json_object *jso,
 static int json_array_equal(struct json_object* jso1,
 			    struct json_object* jso2)
 {
-	int len, i;
+	size_t len, i;
 
 	len = json_object_array_length(jso1);
 	if (len != json_object_array_length(jso2))
@@ -1079,7 +1079,7 @@ int json_object_equal(struct json_object* jso1, struct json_object* jso2)
 	return 0;
 }
 
-int json_object_array_del_idx(struct json_object *jso, int idx, int count)
+int json_object_array_del_idx(struct json_object *jso, size_t idx, size_t count)
 {
 	return array_list_del_idx(jso->o.c_array, idx, count);
 }

@@ -457,7 +457,7 @@ extern struct array_list* json_object_get_array(const struct json_object *obj);
  * @param obj the json_object instance
  * @returns an int
  */
-extern int json_object_array_length(const struct json_object *obj);
+extern size_t json_object_array_length(const struct json_object *obj);
 
 /** Sorts the elements of jso of type json_type_array
 *
@@ -515,7 +515,7 @@ extern int json_object_array_add(struct json_object *obj,
  * @param idx the index to insert the element at
  * @param val the json_object to be added
  */
-extern int json_object_array_put_idx(struct json_object *obj, int idx,
+extern int json_object_array_put_idx(struct json_object *obj, size_t idx,
 				     struct json_object *val);
 
 /** Get the element at specificed index of the array (a json_object of type json_type_array)
@@ -524,7 +524,7 @@ extern int json_object_array_put_idx(struct json_object *obj, int idx,
  * @returns the json_object at the specified index (or NULL)
  */
 extern struct json_object* json_object_array_get_idx(const struct json_object *obj,
-						     int idx);
+						     size_t idx);
 
 /** Delete an elements from a specified index in an array (a json_object of type json_type_array)
  *
@@ -537,7 +537,7 @@ extern struct json_object* json_object_array_get_idx(const struct json_object *o
  * @param count the number of elements to delete
  * @returns 0 if the elements were successfully deleted
  */
-extern int json_object_array_del_idx(struct json_object *obj, int idx, int count);
+extern int json_object_array_del_idx(struct json_object *obj, size_t idx, size_t count);
 
 /* json_bool type methods */
 
