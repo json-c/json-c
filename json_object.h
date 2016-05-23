@@ -337,7 +337,11 @@ extern int json_object_object_add(struct json_object* obj, const char *key,
 extern void json_object_object_add_ex(struct json_object* obj, const char *key,
 				   struct json_object *val, const unsigned opts);
 
-/** Get the json_object associate with a given object field
+/** Get the json_object associate with a given object field.
+ *
+ * This returns NULL if the field is found but its value is null, or if
+ *  the field is not found, or if obj is not a json_type_object.  If you
+ *  need to distinguis between these cases, use json_object_object_get_ex().
  *
  * *No* reference counts will be changed.  There is no need to manually adjust
  * reference counts through the json_object_put/json_object_get methods unless
@@ -354,8 +358,8 @@ extern void json_object_object_add_ex(struct json_object* obj, const char *key,
  * @returns the json_object associated with the given field name
  * @deprecated Please use json_object_object_get_ex
  */
-THIS_FUNCTION_IS_DEPRECATED(extern struct json_object* json_object_object_get(const struct json_object* obj,
-						  const char *key));
+extern struct json_object* json_object_object_get(const struct json_object* obj,
+						  const char *key);
 
 /** Get the json_object associated with a given object field.
  *
