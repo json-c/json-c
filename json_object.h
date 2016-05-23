@@ -537,7 +537,7 @@ extern struct json_object* json_object_array_get_idx(const struct json_object *o
  * @param count the number of elements to delete
  * @returns 0 if the elements were successfully deleted
  */
-extern int json_object_array_del_idx(struct json_object *obj, int idx, int count);
+extern int json_object_array_del_idx(struct json_object *obj, size_t idx, size_t count);
 
 /* json_bool type methods */
 

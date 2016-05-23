@@ -54,7 +54,7 @@ extern void* array_list_bsearch(const void **key,
 		int (*sort_fn)(const void *, const void *));
 
 extern int 
-array_list_del_idx(struct array_list *arr, int i, int count);
+array_list_del_idx(struct array_list *arr, size_t idx, size_t count);
 
 #ifdef __cplusplus
 }

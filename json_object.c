@@ -1000,7 +1000,7 @@ struct json_object* json_object_array_get_idx(const struct json_object *jso,
 static int json_array_equal(struct json_object* jso1,
 			    struct json_object* jso2)
 {
-	int len, i;
+	size_t len, i;
 
 	len = json_object_array_length(jso1);
 	if (len != json_object_array_length(jso2))
@@ -1079,7 +1079,7 @@ int json_object_equal(struct json_object* jso1, struct json_object* jso2)
 	return 0;
 }
 
-int json_object_array_del_idx(struct json_object *jso, int idx, int count)
+int json_object_array_del_idx(struct json_object *jso, size_t idx, size_t count)
 {
 	return array_list_del_idx(jso->o.c_array, idx, count);
 }
