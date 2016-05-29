@@ -223,18 +223,20 @@ extern const char* json_object_to_json_string_ext(struct json_object *obj, int
 flags);
 
 /**
- * Set a custom serialization function to be used when this particular object
- * is converted to a string by json_object_to_json_string.
+ * Returns the userdata set by json_object_set_userdata() or
+ * json_object_set_serializer()
  *
- * If a custom serializer is already set on this object, any existing
- * user_delete function is called before the new one is set.
+ * @param jso the object to return the userdata for
+ */
+extern void* json_object_get_userdata(json_object *jso);
+
+/**
+ * Set an opaque userdata value for an object
  *
- * If to_string_func is NULL, the other parameters are ignored
- * and the default behaviour is reset.
+ * The userdata can be retrieved using json_object_get_userdata().
  *
- * The userdata parameter is optional and may be passed as NULL.  If provided,
- * it is passed to to_string_func as-is.  This parameter may be NULL even
- * if user_delete is non-NULL.
+ * If custom userdata is already set on this object, any existing user_delete
+ * function is called before the new one is set.
  *
  * The user_delete parameter is optional and may be passed as NULL, even if
  * the userdata parameter is non-NULL.  It will be called just before the
@@ -242,6 +244,44 @@ flags);
  * (see json_object_put()).
  * If this is not provided, it is up to the caller to free the userdata at
  * an appropriate time. (i.e. after the json_object is deleted)
+ *
+ * Note: Objects created by parsing strings may have custom serializers set
+ * which expect the userdata to contain specific data (due to use of
+ * json_object_new_double_s()). In this case, json_object_set_serialiser() with
+ * NULL as to_string_func should be used instead to set the userdata and reset
+ * the serializer to its default value.
+ *
+ * @param jso the object to set the userdata for
+ * @param userdata an optional opaque cookie
+ * @param user_delete an optional function from freeing userdata
+ */
+extern void json_object_set_userdata(json_object *jso, void *userdata,
+				     json_object_delete_fn *user_delete);
+
+/**
+ * Set a custom serialization function to be used when this particular object
+ * is converted to a string by json_object_to_json_string.
+ *
+ * If custom userdata is already set on this object, any existing user_delete
+ * function is called before the new one is set.
+ *
+ * If to_string_func is NULL the default behaviour is reset (but the userdata
+ * and user_delete fields are still set).
+ *
+ * The userdata parameter is optional and may be passed as NULL. It can be used
+ * to provide additional data for to_string_func to use. This parameter may
+ * be NULL even if user_delete is non-NULL.
+ *
+ * The user_delete parameter is optional and may be passed as NULL, even if
+ * the userdata parameter is non-NULL.  It will be called just before the
+ * json_object is deleted, after it's reference count goes to zero
+ * (see json_object_put()).
+ * If this is not provided, it is up to the caller to free the userdata at
+ * an appropriate time. (i.e. after the json_object is deleted)
+ *
+ * Note that the userdata is the same as set by json_object_set_userdata(), so
+ * care must be taken not to overwrite the value when both a custom serializer
+ * and json_object_set_userdata() are used.
  *
  * @param jso the object to customize
  * @param to_string_func the custom serialization function
@@ -634,8 +674,13 @@ extern struct json_object* json_object_new_double(double d);
  * inefficiently (e.g. 12.3 => "12.300000000000001") to be
  * serialized with the more convenient form.
  *
- * Note: this is used by json_tokener_parse_ex() to allow for
- *   an exact re-serialization of a parsed object.
+ * Notes:
+ *
+ * This is used by json_tokener_parse_ex() to allow for
+ * an exact re-serialization of a parsed object.
+ *
+ * The userdata field is used to store the string representation, so it
+ * can't be used for other data if this function is used.
  *
  * An equivalent sequence of calls is:
  * @code

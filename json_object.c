@@ -235,6 +235,21 @@ enum json_type json_object_get_type(const struct json_object *jso)
 	return jso->o_type;
 }
 
+void* json_object_get_userdata(json_object *jso) {
+	return jso->_userdata;
+}
+
+void json_object_set_userdata(json_object *jso, void *userdata,
+			      json_object_delete_fn *user_delete)
+{
+	// First, clean up any previously existing user info
+	if (jso->_user_delete)
+		jso->_user_delete(jso, jso->_userdata);
+
+	jso->_userdata = userdata;
+	jso->_user_delete = user_delete;
+}
+
 /* set a custom conversion to string */
 
 void json_object_set_serializer(json_object *jso,
@@ -242,13 +257,7 @@ void json_object_set_serializer(json_object *jso,
 	void *userdata,
 	json_object_delete_fn *user_delete)
 {
-	// First, clean up any previously existing user info
-	if (jso->_user_delete)
-	{
-		jso->_user_delete(jso, jso->_userdata);
-	}
-	jso->_userdata = NULL;
-	jso->_user_delete = NULL;
+	json_object_set_userdata(jso, userdata, user_delete);
 
 	if (to_string_func == NULL)
 	{
@@ -281,8 +290,6 @@ void json_object_set_serializer(json_object *jso,
 	}
 
 	jso->_to_json_string = to_string_func;
-	jso->_userdata = userdata;
-	jso->_user_delete = user_delete;
 }
 
 
