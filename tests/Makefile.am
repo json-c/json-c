@@ -11,6 +11,7 @@ TESTS+= testReplaceExisting.test
 TESTS+= test_parse_int64.test
 TESTS+= test_null.test
 TESTS+= test_cast.test
+TESTS+= test_double_serializer.test
 TESTS+= test_parse.test
 TESTS+= test_locale.test
 TESTS+= test_charcase.test
@@ -22,7 +23,7 @@ check_PROGRAMS=
 check_PROGRAMS += $(TESTS:.test=)
 
 # Note: handled by test1.test
-check_PROGRAMS += test1Formatted 
+check_PROGRAMS += test1Formatted
 test1Formatted_SOURCES = test1.c parse_flags.c
 test1Formatted_CPPFLAGS = -DTEST_FORMATTED
 

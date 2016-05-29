@@ -1,0 +1,8 @@
+Test default serializer:
+obj.to_string(standard)=0.5
+Test default serializer with custom userdata:
+obj.to_string(userdata)=0.5
+Test explicit serializer with custom userdata:
+obj.to_string(custom)=test
+Test reset serializer:
+obj.to_string(reset)=0.5
