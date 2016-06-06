@@ -6,9 +6,6 @@ Building on Unix with `git`, `gcc` and `autotools`
 
 Home page for json-c: https://github.com/json-c/json-c/wiki
 
-Caution: do **NOT** use sources from svn.metaparadigm.com,
-they are old.
-
 Prerequisites:
 
  - `gcc`, `clang`, or another C compiler
