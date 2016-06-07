@@ -21,6 +21,7 @@
 #define THIS_FUNCTION_IS_DEPRECATED(func) func
 #endif
 
+#include <stddef.h>
 #include "json_inttypes.h"
 
 #ifdef __cplusplus
