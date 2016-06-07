@@ -54,6 +54,7 @@ static struct json_object* json_object_new(enum json_type o_type);
 
 static json_object_to_json_string_fn json_object_object_to_json_string;
 static json_object_to_json_string_fn json_object_boolean_to_json_string;
+static json_object_to_json_string_fn json_object_double_to_json_string_default;
 static json_object_to_json_string_fn json_object_int_to_json_string;
 static json_object_to_json_string_fn json_object_string_to_json_string;
 static json_object_to_json_string_fn json_object_array_to_json_string;
@@ -234,6 +235,21 @@ enum json_type json_object_get_type(const struct json_object *jso)
 	return jso->o_type;
 }
 
+void* json_object_get_userdata(json_object *jso) {
+	return jso->_userdata;
+}
+
+void json_object_set_userdata(json_object *jso, void *userdata,
+			      json_object_delete_fn *user_delete)
+{
+	// First, clean up any previously existing user info
+	if (jso->_user_delete)
+		jso->_user_delete(jso, jso->_userdata);
+
+	jso->_userdata = userdata;
+	jso->_user_delete = user_delete;
+}
+
 /* set a custom conversion to string */
 
 void json_object_set_serializer(json_object *jso,
@@ -241,13 +257,7 @@ void json_object_set_serializer(json_object *jso,
 	void *userdata,
 	json_object_delete_fn *user_delete)
 {
-	// First, clean up any previously existing user info
-	if (jso->_user_delete)
-	{
-		jso->_user_delete(jso, jso->_userdata);
-	}
-	jso->_userdata = NULL;
-	jso->_user_delete = NULL;
+	json_object_set_userdata(jso, userdata, user_delete);
 
 	if (to_string_func == NULL)
 	{
@@ -261,7 +271,7 @@ void json_object_set_serializer(json_object *jso,
 			jso->_to_json_string = &json_object_boolean_to_json_string;
 			break;
 		case json_type_double:
-			jso->_to_json_string = &json_object_double_to_json_string;
+			jso->_to_json_string = &json_object_double_to_json_string_default;
 			break;
 		case json_type_int:
 			jso->_to_json_string = &json_object_int_to_json_string;
@@ -280,8 +290,6 @@ void json_object_set_serializer(json_object *jso,
 	}
 
 	jso->_to_json_string = to_string_func;
-	jso->_userdata = userdata;
-	jso->_user_delete = user_delete;
 }
 
 
@@ -643,10 +651,11 @@ int64_t json_object_get_int64(const struct json_object *jso)
 
 /* json_object_double */
 
-int json_object_double_to_json_string(struct json_object* jso,
-				      struct printbuf *pb,
-				      int level,
-				      int flags)
+static int json_object_double_to_json_string_format(struct json_object* jso,
+						    struct printbuf *pb,
+						    int level,
+						    int flags,
+						    const char *format)
 {
   char buf[128], *p, *q;
   int size;
@@ -663,7 +672,7 @@ int json_object_double_to_json_string(struct json_object* jso,
       size = snprintf(buf, sizeof(buf), "-Infinity");
   else
     size = snprintf(buf, sizeof(buf),
-        jso->_userdata ? (const char*) jso->_userdata : "%.17g", jso->o.c_double);
+        format ? format : "%.17g", jso->o.c_double);
 
   p = strchr(buf, ',');
   if (p) {
@@ -685,12 +694,30 @@ int json_object_double_to_json_string(struct json_object* jso,
   return size;
 }
 
+static int json_object_double_to_json_string_default(struct json_object* jso,
+						     struct printbuf *pb,
+						     int level,
+						     int flags)
+{
+	return json_object_double_to_json_string_format(jso, pb, level, flags,
+							NULL);
+}
+
+int json_object_double_to_json_string(struct json_object* jso,
+				      struct printbuf *pb,
+				      int level,
+				      int flags)
+{
+	return json_object_double_to_json_string_format(jso, pb, level, flags,
+							jso->_userdata);
+}
+
 struct json_object* json_object_new_double(double d)
 {
 	struct json_object *jso = json_object_new(json_type_double);
 	if (!jso)
 		return NULL;
-	jso->_to_json_string = &json_object_double_to_json_string;
+	jso->_to_json_string = &json_object_double_to_json_string_default;
 	jso->o.c_double = d;
 	return jso;
 }

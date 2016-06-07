@@ -41,6 +41,7 @@
 /tests/test_parse
 /tests/test_cast
 /tests/test_charcase
+/tests/test_double_serializer
 /tests/test_locale
 /tests/test_null
 /tests/test_printbuf
