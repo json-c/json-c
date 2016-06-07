@@ -3,6 +3,10 @@ NEXT.VERSION
 
   ...nothing yet...
 
+0.12.1
+
+  * Minimal changes to address compile issues.
+
 0.12
 
   * Address security issues:
