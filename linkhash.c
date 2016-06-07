@@ -441,16 +441,30 @@ static unsigned long lh_perllike_str_hash(const void *k)
 
 static unsigned long lh_char_hash(const void *k)
 {
-	static volatile int random_seed = -1;
+#if defined _MSC_VER
+#define RANDOM_SEED_TYPE LONG
+#else
+#define RANDOM_SEED_TYPE int
+#endif
+	static volatile RANDOM_SEED_TYPE random_seed = -1;
 
 	if (random_seed == -1) {
-		int seed;
+		RANDOM_SEED_TYPE seed;
 		/* we can't use -1 as it is the unitialized sentinel */
 		while ((seed = json_c_get_random_seed()) == -1);
-#if defined __GNUC__
+#if SIZEOF_INT == 8 && defined __GCC_HAVE_SYNC_COMPARE_AND_SWAP_8
+#define USE_SYNC_COMPARE_AND_SWAP 1
+#endif
+#if SIZEOF_INT == 4 && defined __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+#define USE_SYNC_COMPARE_AND_SWAP 1
+#endif
+#if SIZEOF_INT == 2 && defined __GCC_HAVE_SYNC_COMPARE_AND_SWAP_2
+#define USE_SYNC_COMPARE_AND_SWAP 1
+#endif
+#if defined USE_SYNC_COMPARE_AND_SWAP
 		(void)__sync_val_compare_and_swap(&random_seed, -1, seed);
 #elif defined _MSC_VER
-		InterlockedCompareExchange((LONG *)&random_seed, seed, -1);
+		InterlockedCompareExchange(&random_seed, seed, -1);
 #else
 #warning "racy random seed initializtion if used by multiple threads"
 		random_seed = seed; /* potentially racy */
