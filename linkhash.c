@@ -289,8 +289,19 @@ static uint32_t hashlittle( const void *key, size_t length, uint32_t initval)
      * does it on word boundaries, so is OK with this.  But VALGRIND will
      * still catch it and complain.  The masking trick does make the hash
      * noticably faster for short strings (like English words).
+     * AddressSanitizer is similarly picky about overrunning
+	 * the buffer. (http://clang.llvm.org/docs/AddressSanitizer.html
      */
-#ifndef VALGRIND
+#ifdef VALGRIND
+#    define PRECISE_MEMORY_ACCESS 1
+#elif defined(__SANITIZE_ADDRESS__) /* GCC's ASAN */
+#    define PRECISE_MEMORY_ACCESS 1
+#elif defined(__has_feature)
+#  if __has_feature(address_sanitizer) /* Clang's ASAN */
+#    define PRECISE_MEMORY_ACCESS 1
+#  endif
+#endif
+#ifndef PRECISE_MEMORY_ACCESS
 
     switch(length)
     {
