@@ -441,7 +441,7 @@ static uint32_t hashlittle( const void *key, size_t length, uint32_t initval)
  */
 static unsigned long lh_perllike_str_hash(const void *k) 
 {
-    const char *rkey = (char*) k;
+    const char *rkey = (const char *)k;
     unsigned hashval = 1;
 
     while (*rkey)
@@ -572,7 +572,7 @@ void lh_table_free(struct lh_table *t)
 }
 
 
-int lh_table_insert_w_hash(struct lh_table *t, void *k, const void *v, const unsigned long h, const unsigned opts)
+int lh_table_insert_w_hash(struct lh_table *t, const void *k, const void *v, const unsigned long h, const unsigned opts)
 {
 	unsigned long n;
 
@@ -604,7 +604,7 @@ int lh_table_insert_w_hash(struct lh_table *t, void *k, const void *v, const uns
 
 	return 0;
 }
-int lh_table_insert(struct lh_table *t, void *k, const void *v)
+int lh_table_insert(struct lh_table *t, const void *k, const void *v)
 {
 	return lh_table_insert_w_hash(t, k, v, lh_get_hash(t, k), 0);
 }
@@ -641,11 +641,11 @@ json_bool lh_table_lookup_ex(struct lh_table* t, const void* k, void **v)
 {
 	struct lh_entry *e = lh_table_lookup_entry(t, k);
 	if (e != NULL) {
-		if (v != NULL) *v = (void *)e->v;
+		if (v != NULL) *v = lh_entry_v(e);
 		return TRUE; /* key found */
 	}
 	if (v != NULL) *v = NULL;
-	return FALSE; /* key not found */
+		return FALSE; /* key not found */
 }
 
 int lh_table_delete_entry(struct lh_table *t, struct lh_entry *e)

@@ -78,12 +78,16 @@ typedef int (lh_equal_fn) (const void *k1, const void *k2);
  */
 struct lh_entry {
 	/**
-	 * The key.
+	 * The key.  Use lh_entry_k() instead of accessing this directly.
 	 */
-	void *k;
+	const void *k;
+	/**
+	 * A flag for users of linkhash to know whether or not they
+	 * need to free k.
+	 */
 	int k_is_constant;
 	/**
-	 * The value.
+	 * The value.  Use lh_entry_v() instead of accessing this directly.
 	 */
 	const void *v;
 	/**
@@ -211,7 +215,7 @@ extern void lh_table_free(struct lh_table *t);
  * @return On success, <code>0</code> is returned.
  * 	On error, a negative value is returned.
  */
-extern int lh_table_insert(struct lh_table *t, void *k, const void *v);
+extern int lh_table_insert(struct lh_table *t, const void *k, const void *v);
 
 
 /**
@@ -226,7 +230,7 @@ extern int lh_table_insert(struct lh_table *t, void *k, const void *v);
  * @param h hash value of the key to insert
  * @param opts opts, a subset of JSON_OBJECT_ADD_* flags is supported
  */
-extern int lh_table_insert_w_hash(struct lh_table *t, void *k, const void *v, const unsigned long h, const unsigned opts);
+extern int lh_table_insert_w_hash(struct lh_table *t, const void *k, const void *v, const unsigned long h, const unsigned opts);
 
 
 /**
@@ -334,6 +338,28 @@ static inline unsigned long lh_get_hash(const struct lh_table *t, const void *k)
 {
 	return t->hash_fn(k);
 }
+
+/* Don't use this outside of linkhash.h: */
+#ifdef __UNCONST
+#define _LH_UNCONST(a) __UNCONST(a)
+#else
+#define _LH_UNCONST(a) ((void *)(unsigned long)(const void *)(a))
+#endif
+
+/**
+ * Return a non-const version of lh_entry->k.
+ * k is const to indicate and help ensure that linkhash itself doesn't modify
+ * it, but callers are allowed to do what they want with it.
+ * See also lh_entry->k_is_constant
+ */
+#define lh_entry_k(entry) _LH_UNCONST((entry)->k)
+
+/**
+ * Return a non-const version of lh_entry->v.
+ * v is const to indicate and help ensure that linkhash itself doesn't modify
+ * it, but callers are allowed to do what they want with it.
+ */
+#define lh_entry_v(entry) _LH_UNCONST((entry)->v)
 
 #ifdef __cplusplus
 }

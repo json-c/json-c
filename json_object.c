@@ -84,7 +84,7 @@ static void json_object_fini(void)
 			   json_object_table->count);
 			lh_foreach(json_object_table, ent)
 			{
-				struct json_object* obj = (struct json_object*)ent->v;
+				struct json_object* obj = (struct json_object*)lh_entry_v(ent);
 				MC_DEBUG("\t%s:%p\n", json_type_to_name(obj->o_type), obj);
 			}
 		}
@@ -385,8 +385,8 @@ static int json_object_object_to_json_string(struct json_object* jso,
 static void json_object_lh_entry_free(struct lh_entry *ent)
 {
 	if (!ent->k_is_constant)
-		free(ent->k);
-	json_object_put((struct json_object*)ent->v);
+		free(lh_entry_k(ent));
+	json_object_put((struct json_object*)lh_entry_v(ent));
 }
 
 static void json_object_object_delete(struct json_object* jso)
@@ -435,17 +435,17 @@ void json_object_object_add_ex(struct json_object* jso,
 	// and re-adding it, so the existing key remains valid.
 	json_object *existing_value = NULL;
 	struct lh_entry *existing_entry;
-	const unsigned long hash = lh_get_hash(jso->o.c_object, (void*)key);
+	const unsigned long hash = lh_get_hash(jso->o.c_object, (const void *)key);
 	existing_entry = (opts & JSON_C_OBJECT_ADD_KEY_IS_NEW) ? NULL : 
-			      lh_table_lookup_entry_w_hash(jso->o.c_object, (void*)key, hash);
+			      lh_table_lookup_entry_w_hash(jso->o.c_object, (const void *)key, hash);
 	if (!existing_entry)
 	{
-		void *const k = (opts & JSON_C_OBJECT_KEY_IS_CONSTANT) ?
-					(void*)key : strdup(key);
+		const void *const k = (opts & JSON_C_OBJECT_KEY_IS_CONSTANT) ?
+					(const void *)key : strdup(key);
 		lh_table_insert_w_hash(jso->o.c_object, k, val, hash, opts);
 		return;
 	}
-	existing_value = (json_object *)existing_entry->v;
+	existing_value = (json_object *)lh_entry_v(existing_entry);
 	if (existing_value)
 		json_object_put(existing_value);
 	existing_entry->v = val;
@@ -458,8 +458,8 @@ int json_object_object_add(struct json_object* jso, const char *key,
 	// and re-adding it, so the existing key remains valid.
 	json_object *existing_value = NULL;
 	struct lh_entry *existing_entry;
-	const unsigned long hash = lh_get_hash(jso->o.c_object, (void*)key);
-	existing_entry = lh_table_lookup_entry_w_hash(jso->o.c_object, (void*)key, hash);
+	const unsigned long hash = lh_get_hash(jso->o.c_object, (const void *)key);
+	existing_entry = lh_table_lookup_entry_w_hash(jso->o.c_object, (const void *)key, hash);
 	if (!existing_entry)
 	{
 		char *keydup = strdup(key);
@@ -468,7 +468,7 @@ int json_object_object_add(struct json_object* jso, const char *key,
 
 		return lh_table_insert_w_hash(jso->o.c_object, keydup, val, hash, 0);
 	}
-	existing_value = (json_object  *)existing_entry->v;
+	existing_value = (json_object *)lh_entry_v(existing_entry);
 	if (existing_value)
 		json_object_put(existing_value);
 	existing_entry->v = val;
@@ -500,7 +500,7 @@ json_bool json_object_object_get_ex(const struct json_object* jso, const char *k
 	switch(jso->o_type)
 	{
 	case json_type_object:
-		return lh_table_lookup_ex(jso->o.c_object, (void*)key, (void**)value);
+		return lh_table_lookup_ex(jso->o.c_object, (const void *)key, (void**)value);
 	default:
 		if (value != NULL)
 			*value = NULL;
@@ -865,7 +865,7 @@ struct json_object* json_object_new_string_len(const char *s, int len)
 		}
 		dstbuf = jso->o.c_string.str.ptr;
 	}
-	memcpy(dstbuf, (void *)s, len);
+	memcpy(dstbuf, (const void *)s, len);
 	dstbuf[len] = '\0';
 	jso->o.c_string.len = len;
 	return jso;

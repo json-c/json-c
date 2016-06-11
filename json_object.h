@@ -455,8 +455,8 @@ extern void json_object_object_del(struct json_object* obj, const char *key);
 	struct json_object *val __attribute__((__unused__)) = NULL; \
 	for(struct lh_entry *entry ## key = json_object_get_object(obj)->head, *entry_next ## key = NULL; \
 		({ if(entry ## key) { \
-			key = (char*)entry ## key->k; \
-			val = (struct json_object*)entry ## key->v; \
+			key = (char*)lh_entry_k(entry ## key); \
+			val = (struct json_object*)lh_entry_v(entry ## key); \
 			entry_next ## key = entry ## key->next; \
 		} ; entry ## key; }); \
 		entry ## key = entry_next ## key )
@@ -470,8 +470,8 @@ extern void json_object_object_del(struct json_object* obj, const char *key);
 	struct lh_entry *entry_next ## key = NULL; \
 	for(entry ## key = json_object_get_object(obj)->head; \
 		(entry ## key ? ( \
-			key = (char*)entry ## key->k, \
-			val = (struct json_object*)entry ## key->v, \
+			key = (char*)lh_entry_k(entry ## key), \
+			val = (struct json_object*)lh_entry_v(entry ## key), \
 			entry_next ## key = entry ## key->next, \
 			entry ## key) : 0); \
 		entry ## key = entry_next ## key)
@@ -483,7 +483,9 @@ extern void json_object_object_del(struct json_object* obj, const char *key);
  * @param iter the object iterator
  */
 #define json_object_object_foreachC(obj,iter) \
- for(iter.entry = json_object_get_object(obj)->head; (iter.entry ? (iter.key = (char*)iter.entry->k, iter.val = (struct json_object*)iter.entry->v, iter.entry) : 0); iter.entry = iter.entry->next)
+ for(iter.entry = json_object_get_object(obj)->head; \
+     (iter.entry ? (iter.key = (char*)lh_entry_k(iter.entry), iter.val = (struct json_object*)lh_entry_v(iter.entry), iter.entry) : 0); \
+     iter.entry = iter.entry->next)
 
 /* Array type methods */
 
