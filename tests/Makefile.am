@@ -4,6 +4,7 @@ LDADD= $(LIBJSON_LA)
 LIBJSON_LA=$(top_builddir)/libjson-c.la
 
 TESTS=
+TESTS+= test_util_file.test
 TESTS+= test1.test
 TESTS+= test2.test
 TESTS+= test4.test
@@ -31,6 +32,8 @@ test1Formatted_CPPFLAGS = -DTEST_FORMATTED
 check_PROGRAMS += test2Formatted
 test2Formatted_SOURCES = test2.c parse_flags.c
 test2Formatted_CPPFLAGS = -DTEST_FORMATTED
+
+test_util_file_SOURCES = test_util_file.c strerror_override.c
 
 EXTRA_DIST=
 EXTRA_DIST += $(TESTS)

@@ -12,6 +12,7 @@
 #include "config.h"
 #undef realloc
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -63,15 +64,26 @@
 static int sscanf_is_broken = 0;
 static int sscanf_is_broken_testdone = 0;
 static void sscanf_is_broken_test(void);
+static void _set_last_err(const char *err_fmt, ...);
 
-/*
- * Create a JSON object from already opened file descriptor.
- *
- * This function can be helpful, when you opened the file already,
- * e.g. when you have a temp file.
- * Note, that the fd must be readable at the actual position, i.e.
- * use lseek(fd, 0, SEEK_SET) before.
- */
+static char _last_err[256] = "";
+
+const char *json_util_get_last_err()
+{
+	if (_last_err[0] == '\0')
+		return NULL;
+	return _last_err;
+}
+
+static void _set_last_err(const char *err_fmt, ...)
+{
+	va_list ap;
+	va_start(ap, err_fmt);
+	// Ignore (attempted) overruns from snprintf
+	(void)vsnprintf(_last_err, sizeof(_last_err), err_fmt, ap);
+	va_end(ap);
+}
+
 struct json_object* json_object_from_fd(int fd)
 {
   struct printbuf *pb;
@@ -80,14 +92,14 @@ struct json_object* json_object_from_fd(int fd)
   int ret;
 
   if(!(pb = printbuf_new())) {
-    MC_ERROR("json_object_from_file: printbuf_new failed\n");
+    _set_last_err("json_object_from_file: printbuf_new failed\n");
     return NULL;
   }
   while((ret = read(fd, buf, JSON_FILE_BUF_SIZE)) > 0) {
     printbuf_memappend(pb, buf, ret);
   }
   if(ret < 0) {
-    MC_ERROR("json_object_from_fd: error reading fd %d: %s\n", fd, strerror(errno));
+    _set_last_err("json_object_from_fd: error reading fd %d: %s\n", fd, strerror(errno));
     printbuf_free(pb);
     return NULL;
   }
@@ -102,7 +114,7 @@ struct json_object* json_object_from_file(const char *filename)
   int fd;
 
   if((fd = open(filename, O_RDONLY)) < 0) {
-    MC_ERROR("json_object_from_file: error opening file %s: %s\n",
+    _set_last_err("json_object_from_file: error opening file %s: %s\n",
 	     filename, strerror(errno));
     return NULL;
   }
@@ -120,12 +132,12 @@ int json_object_to_file_ext(const char *filename, struct json_object *obj, int f
   unsigned int wpos, wsize;
 
   if(!obj) {
-    MC_ERROR("json_object_to_file: object is null\n");
+    _set_last_err("json_object_to_file: object is null\n");
     return -1;
   }
 
   if((fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT, 0644)) < 0) {
-    MC_ERROR("json_object_to_file: error opening file %s: %s\n",
+    _set_last_err("json_object_to_file: error opening file %s: %s\n",
 	     filename, strerror(errno));
     return -1;
   }
@@ -140,7 +152,7 @@ int json_object_to_file_ext(const char *filename, struct json_object *obj, int f
   while(wpos < wsize) {
     if((ret = write(fd, json_str + wpos, wsize-wpos)) < 0) {
       close(fd);
-      MC_ERROR("json_object_to_file: error writing file %s: %s\n",
+      _set_last_err("json_object_to_file: error writing file %s: %s\n",
 	     filename, strerror(errno));
       return -1;
     }
@@ -306,7 +318,7 @@ const char *json_type_to_name(enum json_type o_type)
 	int o_type_int = (int)o_type;
 	if (o_type_int < 0 || o_type_int >= (int)NELEM(json_type_name))
 	{
-		MC_ERROR("json_type_to_name: type %d is out of range [0,%d]\n", o_type, NELEM(json_type_name));
+		_set_last_err("json_type_to_name: type %d is out of range [0,%d]\n", o_type, NELEM(json_type_name));
 		return NULL;
 	}
 	return json_type_name[o_type];

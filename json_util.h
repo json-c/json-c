@@ -30,13 +30,51 @@ extern "C" {
 #define JSON_FILE_BUF_SIZE 4096
 
 /* utility functions */
+/**
+ * Read the full contents of the given file, then convert it to a
+ * json_object using json_tokener_parse().
+ *
+ * Returns -1 if something fails.  See json_util_get_last_err() for details.
+ */
 extern struct json_object* json_object_from_file(const char *filename);
+
+/**
+ * Create a JSON object from already opened file descriptor.
+ *
+ * This function can be helpful, when you opened the file already,
+ * e.g. when you have a temp file.
+ * Note, that the fd must be readable at the actual position, i.e.
+ * use lseek(fd, 0, SEEK_SET) before.
+ *
+ * Returns -1 if something fails.  See json_util_get_last_err() for details.
+ */
 extern struct json_object* json_object_from_fd(int fd);
+
+/**
+ * Equivalent to:
+ *   json_object_to_file_ext(filename, obj, JSON_C_TO_STRING_PLAIN);
+ *
+ * Returns -1 if something fails.  See json_util_get_last_err() for details.
+ */
 extern int json_object_to_file(const char *filename, struct json_object *obj);
+
+/**
+ * Open and truncate the given file, creating it if necessary, then
+ * convert the json_object to a string and write it to the file.
+ *
+ * Returns -1 if something fails.  See json_util_get_last_err() for details.
+ */
 extern int json_object_to_file_ext(const char *filename, struct json_object *obj, int flags);
+
+/**
+ * Return the last error from json_object_to_file{,_ext} or
+ * json_object_from_{file,fd}, or NULL if there is none.
+ */
+const char *json_util_get_last_err(void);
+
+
 extern int json_parse_int64(const char *buf, int64_t *retval);
 extern int json_parse_double(const char *buf, double *retval);
-
 
 /**
  * Return a string describing the type of the object.
