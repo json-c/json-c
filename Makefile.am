@@ -1,5 +1,13 @@
 
-EXTRA_DIST = README.html README-WIN32.html config.h.win32 doc json-c.vcproj
+EXTRA_DIST = README.md README.html README-WIN32.html 
+EXTRA_DIST += config.h.win32 json-c.vcproj json-c.vcxproj json-c.vcxproj.filters
+EXTRA_DIST += Doxyfile doc
+
+dist-hook:
+	test -d "$(distdir)/doc" || mkdir "$(distdir)/doc"
+	chmod -R u+w "$(distdir)/doc"
+	cd "$(distdir)" && doxygen
+
 SUBDIRS = . tests
 
 lib_LTLIBRARIES = libjson-c.la 
