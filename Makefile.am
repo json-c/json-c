@@ -13,8 +13,8 @@ libjson_cinclude_HEADERS = \
 	bits.h \
 	debug.h \
 	json.h \
-	json_config.h \
 	json_c_version.h \
+	json_config.h \
 	json_inttypes.h \
 	json_object.h \
 	json_object_iterator.h \
@@ -22,13 +22,9 @@ libjson_cinclude_HEADERS = \
 	json_tokener.h \
 	json_util.h \
 	linkhash.h \
+	math_compat.h \
 	printbuf.h \
 	random_seed.h
-
-#libjsonx_includedir = $(libdir)/json-c-@VERSION@
-#
-#libjsonx_include_HEADERS = \
-#	json_config.h
 
 libjson_c_la_LDFLAGS = -version-info 3:0:0 -no-undefined @JSON_BSYMBOLIC_LDFLAGS@
 

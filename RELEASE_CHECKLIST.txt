@@ -8,6 +8,8 @@ cd json-c-${release}
 Check that the compile works on Linux
 Check that the compile works on NetBSD
 Check that the compile works on Windows
+Run "make distcheck" and fix any problems
+	 (e.g. adding new files to SOURCES variables in Makefile.am)
 Check ChangeLog to see if anything should be added.
 Make any fixes/changes *before* branching.
 

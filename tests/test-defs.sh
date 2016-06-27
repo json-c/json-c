@@ -114,10 +114,10 @@ run_output_test()
 		fi
 	fi
 
-	if ! "$CMP" -s "${top_builddir}/${TEST_OUTPUT}.expected" "${TEST_OUTPUT}.out" ; then
+	if ! "$CMP" -s "${srcdir}/${TEST_OUTPUT}.expected" "${TEST_OUTPUT}.out" ; then
 		echo "ERROR: \"${TEST_COMMAND} $@\" (${TEST_OUTPUT}) failed (set VERBOSE=1 to see full output):" 1>&2
-		(cd "${CURDIR}" ; set -x ; diff "${top_builddir}/${TEST_OUTPUT}.expected" "$testsubdir/${TEST_OUTPUT}.out")
-		echo "cp \"$testsubdir/${TEST_OUTPUT}.out\" \"${top_builddir}/${TEST_OUTPUT}.expected\"" 1>&2
+		(cd "${CURDIR}" ; set -x ; diff "${srcdir}/${TEST_OUTPUT}.expected" "$testsubdir/${TEST_OUTPUT}.out")
+		echo "cp \"$testsubdir/${TEST_OUTPUT}.out\" \"${srcdir}/${TEST_OUTPUT}.expected\"" 1>&2
 
 		err=1
 	fi

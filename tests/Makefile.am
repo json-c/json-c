@@ -1,4 +1,6 @@
 
+AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/tests
+
 LDADD= $(LIBJSON_LA)
 
 LIBJSON_LA=$(top_builddir)/libjson-c.la
@@ -23,20 +25,30 @@ TESTS+= test_compare.test
 check_PROGRAMS=
 check_PROGRAMS += $(TESTS:.test=)
 
+EXTRA_DIST=
+EXTRA_DIST += $(TESTS)
+EXTRA_DIST += $(TESTS:.test=.expected)
+EXTRA_DIST += test-defs.sh
+EXTRA_DIST += valid.json
+
+
 # Note: handled by test1.test
 check_PROGRAMS += test1Formatted
-test1Formatted_SOURCES = test1.c parse_flags.c
-test1Formatted_CPPFLAGS = -DTEST_FORMATTED
+test1Formatted_SOURCES = test1.c parse_flags.c parse_flags.h
+test1Formatted_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_FORMATTED
+EXTRA_DIST+= test1Formatted_plain.expected
+EXTRA_DIST+= test1Formatted_pretty.expected
+EXTRA_DIST+= test1Formatted_spaced.expected
 
 # Note: handled by test2.test
 check_PROGRAMS += test2Formatted
-test2Formatted_SOURCES = test2.c parse_flags.c
-test2Formatted_CPPFLAGS = -DTEST_FORMATTED
+test2Formatted_SOURCES = test2.c parse_flags.c parse_flags.h
+test2Formatted_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_FORMATTED
+EXTRA_DIST+= test2Formatted_plain.expected
+EXTRA_DIST+= test2Formatted_pretty.expected
+EXTRA_DIST+= test2Formatted_spaced.expected
 
 test_util_file_SOURCES = test_util_file.c strerror_override.c
-
-EXTRA_DIST=
-EXTRA_DIST += $(TESTS)
 
 testsubdir=testSubDir
 TESTS_ENVIRONMENT       = top_builddir=$(top_builddir)
