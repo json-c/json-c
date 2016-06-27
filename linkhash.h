@@ -175,7 +175,6 @@ extern struct lh_table* lh_table_new(int size,
  * Convenience function to create a new linkhash
  * table with char keys.
  * @param size initial table size.
- * @param name table name.
  * @param free_fn callback function used to free memory for entries.
  * @return On success, a pointer to the new linkhash table is returned.
  * 	On error, a null pointer is returned.
@@ -188,7 +187,6 @@ extern struct lh_table* lh_kchar_table_new(int size,
  * Convenience function to create a new linkhash
  * table with ptr keys.
  * @param size initial table size.
- * @param name table name.
  * @param free_fn callback function used to free memory for entries.
  * @return On success, a pointer to the new linkhash table is returned.
  * 	On error, a null pointer is returned.
