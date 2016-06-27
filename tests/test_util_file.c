@@ -10,7 +10,7 @@
 #include "json_util.h"
 
 static void test_read_valid_with_fd(const char *testdir);
-static void test_read_nonexistant(const char *testdir);
+static void test_read_nonexistant();
 static void test_read_closed(void);
 
 static void test_write_to_file();
@@ -89,42 +89,39 @@ int main(int argc, char **argv)
 	testdir = argv[1];
 
 	test_read_valid_with_fd(testdir);
-	test_read_nonexistant(testdir);
+	test_read_nonexistant();
 	test_read_closed();
 	test_write_to_file();
 }
 
 static void test_read_valid_with_fd(const char *testdir)
 {
-	char file_buf[4096];
-	(void)snprintf(file_buf, sizeof(file_buf), "%s/valid.json", testdir);
+	const char *filename = "./valid.json";
 
-	int d = open(file_buf, O_RDONLY, 0);
+	int d = open(filename, O_RDONLY, 0);
 	if (d < 0)
 	{
-		fprintf(stderr, "FAIL: unable to open %s: %s\n", file_buf, strerror(errno));
+		fprintf(stderr, "FAIL: unable to open %s: %s\n", filename, strerror(errno));
 		exit(1);
 	}
 	json_object *jso = json_object_from_fd(d);
 	if (jso != NULL)
 	{
-		printf("OK: json_object_from_fd(%s)=%s\n", file_buf, json_object_to_json_string(jso));
+		printf("OK: json_object_from_fd(%s)=%s\n", filename, json_object_to_json_string(jso));
 		json_object_put(jso);
 	}
 	else
 	{
-		fprintf(stderr, "FAIL: unable to parse contents of %s: %s\n", file_buf, json_util_get_last_err());
+		fprintf(stderr, "FAIL: unable to parse contents of %s: %s\n", filename, json_util_get_last_err());
 	}
 	close(d);
 }
 
-static void test_read_nonexistant(const char *testdir)
+static void test_read_nonexistant()
 {
-	char file_buf[4096];
-	const char *filename = "not_present.json";
-	(void)snprintf(file_buf, sizeof(file_buf), "%s/%s", testdir, filename);
+	const char *filename = "./not_present.json";
 
-	json_object *jso = json_object_from_file(file_buf);
+	json_object *jso = json_object_from_file(filename);
 	if (jso != NULL)
 	{
 		printf("FAIL: json_object_from_file(%s) returned %p when NULL expected\n", filename, jso);

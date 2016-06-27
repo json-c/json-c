@@ -8,6 +8,7 @@ if test -z "$srcdir"; then
 fi
 . "$srcdir/test-defs.sh"
 
+cp -f "$srcdir/valid.json" .
 run_output_test test_util_file "$srcdir"
 _err=$?
 
