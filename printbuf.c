@@ -42,6 +42,7 @@ struct printbuf* printbuf_new(void)
     free(p);
     return NULL;
   }
+  p->buf[0]= '\0';
   return p;
 }
 
