@@ -139,7 +139,7 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 			else if(c == '\f') printbuf_memappend(pb, "\\f", 2);
 			else if(c == '"') printbuf_memappend(pb, "\\\"", 2);
 			else if(c == '\\') printbuf_memappend(pb, "\\\\", 2);
-			else if(c == '/') printbuf_memappend(pb, "\\/", 2);
+			else if(c == '/') printbuf_memappend(pb, "/", 1);
 
 			start_offset = ++pos;
 			break;
