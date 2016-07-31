@@ -235,12 +235,11 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 {
   struct json_object *obj = NULL;
   char c = '\1';
-#ifdef HAVE_SETLOCALE
-  char *oldlocale=NULL, *tmplocale;
-
-  tmplocale = setlocale(LC_NUMERIC, NULL);
-  if (tmplocale) oldlocale = strdup(tmplocale);
-  setlocale(LC_NUMERIC, "C");
+#ifdef HAVE_USELOCALE
+  locale_t oldlocale = uselocale(NULL);
+  locale_t newloc;
+#elif defined(HAVE_SETLOCALE)
+  char *oldlocale = NULL;
 #endif
 
   tok->char_offset = 0;
@@ -253,11 +252,31 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
      the string length is less than INT32_MAX (2GB) */
   if ((len < -1) || (len == -1 && strlen(str) > INT32_MAX)) {
     tok->err = json_tokener_error_size;
-#ifdef HAVE_SETLOCALE
-  free(oldlocale);
-#endif
     return NULL;
   }
+
+#ifdef HAVE_USELOCALE
+  {
+    locale_t duploc = duplocale(oldlocale);
+    newloc = newlocale(LC_NUMERIC, "C", duploc);
+    // XXX at least Debian 8.4 has a bug in newlocale where it doesn't
+    //  change the decimal separator unless you set LC_TIME!
+    if (newloc)
+      newloc = newlocale(LC_TIME, "C", newloc);
+    if (newloc == NULL)
+    {
+      freelocale(duploc);
+      return NULL;
+    }
+  }
+#elif defined(HAVE_SETLOCALE)
+  {
+    char *tmplocale;
+    tmplocale = setlocale(LC_NUMERIC, NULL);
+    if (tmplocale) oldlocale = strdup(tmplocale);
+    setlocale(LC_NUMERIC, "C");
+  }
+#endif
 
   while (PEEK_CHAR(c, tok)) {
 
@@ -887,6 +906,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
       goto redo_char;
 
     case json_tokener_state_object_sep:
+      /* { */
       if(c == '}') {
 	saved_state = json_tokener_state_finish;
 	state = json_tokener_state_eatws;
@@ -918,7 +938,10 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
       tok->err = json_tokener_error_parse_eof;
   }
 
-#ifdef HAVE_SETLOCALE
+#ifdef HAVE_USELOCALE
+  uselocale(oldlocale);
+  freelocale(newloc); 
+#elif defined(HAVE_SETLOCALE)
   setlocale(LC_NUMERIC, oldlocale);
   free(oldlocale);
 #endif
