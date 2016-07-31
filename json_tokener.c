@@ -262,12 +262,16 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
     // XXX at least Debian 8.4 has a bug in newlocale where it doesn't
     //  change the decimal separator unless you set LC_TIME!
     if (newloc)
-      newloc = newlocale(LC_TIME, "C", newloc);
+    {
+      duploc = newloc; // original duploc has been freed by newlocale()
+      newloc = newlocale(LC_TIME, "C", duploc);
+    }
     if (newloc == NULL)
     {
       freelocale(duploc);
       return NULL;
     }
+    uselocale(newloc);
   }
 #elif defined(HAVE_SETLOCALE)
   {
