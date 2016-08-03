@@ -11,6 +11,9 @@
 #ifdef HAVE_LOCALE_H
 #include <locale.h>
 #endif /* HAVE_LOCALE_H */
+#ifdef HAVE_XLOCALE_H
+#include <xlocale.h>
+#endif
 
 int main(int argc, char **argv)
 {

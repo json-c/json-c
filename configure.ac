@@ -34,7 +34,7 @@ AC_PROG_CC_C99
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_HEADER(json_config.h)
 AC_HEADER_STDC
-AC_CHECK_HEADERS(fcntl.h limits.h strings.h syslog.h unistd.h [sys/cdefs.h] [sys/param.h] stdarg.h locale.h endian.h)
+AC_CHECK_HEADERS(fcntl.h limits.h strings.h syslog.h unistd.h [sys/cdefs.h] [sys/param.h] stdarg.h locale.h xlocale.h endian.h)
 AC_CHECK_HEADER(inttypes.h,[AC_DEFINE([JSON_C_HAVE_INTTYPES_H],[1],[Public define for json_inttypes.h])])
 
 # Checks for typedefs, structures, and compiler characteristics.

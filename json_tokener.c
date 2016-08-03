@@ -35,6 +35,9 @@
 #ifdef HAVE_LOCALE_H
 #include <locale.h>
 #endif /* HAVE_LOCALE_H */
+#ifdef HAVE_XLOCALE_H
+#include <xlocale.h>
+#endif
 
 #define jt_hexdigit(x) (((x) <= '9') ? (x) - '0' : ((x) & 7) + 9)
 
