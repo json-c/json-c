@@ -7,7 +7,7 @@ JSON-C - A JSON implementation in C
 JSON-C implements a reference counting object model that allows you to easily 
 construct JSON objects in C, output them as JSON formatted strings and parse 
 JSON formatted strings back into the C representation of JSON objects.
-It aims to conform to <a href="https://tools.ietf.org/html/rfc7159">RFC 7159</a>
+It aims to conform to [RFC 7159](https://tools.ietf.org/html/rfc7159).
 
 Building on Unix with `git`, `gcc` and `autotools`
 --------------------------------------------------
@@ -28,7 +28,7 @@ Make sure you have a complete `libtool` install, including `libtoolize`.
 
 `json-c` GitHub repo: https://github.com/json-c/json-c
 
-```bash
+```sh
 $ git clone https://github.com/json-c/json-c.git
 $ cd json-c
 $ sh autogen.sh
@@ -36,7 +36,7 @@ $ sh autogen.sh
 
 followed by
 
-```bash
+```sh
 $ ./configure
 $ make
 $ make install
@@ -44,7 +44,7 @@ $ make install
 
 To build and run the test programs:
 
-```bash
+```sh
 $ make check
 ```
 
