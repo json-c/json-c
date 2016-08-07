@@ -4,10 +4,10 @@
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
  * Copyright (c) 2009 Hewlett-Packard Development Company, L.P.
+ * Copyright (C) 2016 Nicola Spanti (RyDroid) <dev@nicola-spanti.info>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the MIT license. See COPYING for details.
- *
  */
 
 #include "config.h"
@@ -192,20 +192,23 @@ int json_object_put(struct json_object *jso)
 
 static void json_object_generic_delete(struct json_object* jso)
 {
+	if(jso != NULL)
+	{
 #ifdef REFCOUNT_DEBUG
-	MC_DEBUG("json_object_delete_%s: %p\n",
-	   json_type_to_name(jso->o_type), jso);
-	lh_table_delete(json_object_table, jso);
+		MC_DEBUG("json_object_delete_%s: %p\n",
+		   json_type_to_name(jso->o_type), jso);
+		lh_table_delete(json_object_table, jso);
 #endif /* REFCOUNT_DEBUG */
-	printbuf_free(jso->_pb);
-	free(jso);
+		printbuf_free(jso->_pb);
+		free(jso);
+	}
 }
 
 static struct json_object* json_object_new(enum json_type o_type)
 {
 	struct json_object *jso;
 
-	jso = (struct json_object*)calloc(sizeof(struct json_object), 1);
+	jso = (struct json_object*) calloc(sizeof(struct json_object), 1);
 	if (!jso)
 		return NULL;
 	jso->o_type = o_type;
@@ -236,12 +239,15 @@ enum json_type json_object_get_type(const struct json_object *jso)
 }
 
 void* json_object_get_userdata(json_object *jso) {
-	return jso->_userdata;
+	return jso == NULL ? NULL : jso->_userdata;
 }
 
 void json_object_set_userdata(json_object *jso, void *userdata,
 			      json_object_delete_fn *user_delete)
 {
+	if (!jso)
+		return;
+
 	// First, clean up any previously existing user info
 	if (jso->_user_delete)
 		jso->_user_delete(jso, jso->_userdata);
@@ -377,8 +383,7 @@ static int json_object_object_to_json_string(struct json_object* jso,
 	}
 	if (flags & JSON_C_TO_STRING_SPACED)
 		return sprintbuf(pb, /*{*/ " }");
-	else
-		return sprintbuf(pb, /*{*/ "}");
+	return sprintbuf(pb, /*{*/ "}");
 }
 
 
@@ -391,8 +396,11 @@ static void json_object_lh_entry_free(struct lh_entry *ent)
 
 static void json_object_object_delete(struct json_object* jso)
 {
-	lh_table_free(jso->o.c_object);
-	json_object_generic_delete(jso);
+	if(jso)
+	{
+		lh_table_free(jso->o.c_object);
+		json_object_generic_delete(jso);
+	}
 }
 
 struct json_object* json_object_new_object(void)
@@ -510,7 +518,8 @@ json_bool json_object_object_get_ex(const struct json_object* jso, const char *k
 
 void json_object_object_del(struct json_object* jso, const char *key)
 {
-	lh_table_delete(jso->o.c_object, key);
+	if(jso)
+		lh_table_delete(jso->o.c_object, key);
 }
 
 
@@ -519,12 +528,11 @@ void json_object_object_del(struct json_object* jso, const char *key)
 static int json_object_boolean_to_json_string(struct json_object* jso,
 					      struct printbuf *pb,
 					      int level,
-						  int flags)
+					      int flags)
 {
-	if (jso->o.c_boolean)
+	if (jso && jso->o.c_boolean)
 		return sprintbuf(pb, "true");
-	else
-		return sprintbuf(pb, "false");
+	return sprintbuf(pb, "false");
 }
 
 struct json_object* json_object_new_boolean(json_bool b)
@@ -564,6 +572,8 @@ static int json_object_int_to_json_string(struct json_object* jso,
 					  int level,
 					  int flags)
 {
+	if(!jso)
+		return -1;
 	return sprintbuf(pb, "%" PRId64, jso->o.c_int64);
 }
 
@@ -750,7 +760,7 @@ int json_object_userdata_to_json_string(struct json_object *jso,
 
 void json_object_free_userdata(struct json_object *jso, void *userdata)
 {
-	free(userdata);
+	if(userdata) free(userdata);
 }
 
 double json_object_get_double(const struct json_object *jso)
