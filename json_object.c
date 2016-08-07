@@ -4,10 +4,10 @@
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
  * Copyright (c) 2009 Hewlett-Packard Development Company, L.P.
+ * Copyright (c) 2016 Nicola Spanti (RyDroid) <dev@nicola-spanti.info>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the MIT license. See COPYING for details.
- *
  */
 
 #include "config.h"
@@ -81,11 +81,12 @@ static void json_object_fini(void)
 		if (json_object_table->count)
 		{
 			MC_DEBUG("json_object_fini: %d referenced objects at exit\n",
-			   json_object_table->count);
+			         json_object_table->count);
 			lh_foreach(json_object_table, ent)
 			{
 				struct json_object* obj = (struct json_object*)lh_entry_v(ent);
-				MC_DEBUG("\t%s:%p\n", json_type_to_name(obj->o_type), obj);
+				MC_DEBUG("\t%s:%p\n",
+				         json_type_to_name(obj->o_type), obj);
 			}
 		}
 	}
@@ -106,7 +107,8 @@ get_string_component(const struct json_object *jso)
 
 /* string escaping */
 
-static int json_escape_str(struct printbuf *pb, const char *str, int len, int flags)
+static int json_escape_str(struct printbuf *pb, const char *str,
+                           int len, int flags)
 {
 	int pos = 0, start_offset = 0;
 	unsigned char c;
@@ -167,8 +169,11 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 extern struct json_object* json_object_get(struct json_object *jso)
 {
 	if (jso)
+	{
 		jso->_ref_count++;
-	return jso;
+		return jso;
+	}
+	return NULL;
 }
 
 int json_object_put(struct json_object *jso)
@@ -194,7 +199,7 @@ static void json_object_generic_delete(struct json_object* jso)
 {
 #ifdef REFCOUNT_DEBUG
 	MC_DEBUG("json_object_delete_%s: %p\n",
-	   json_type_to_name(jso->o_type), jso);
+	          json_type_to_name(jso->o_type), jso);
 	lh_table_delete(json_object_table, jso);
 #endif /* REFCOUNT_DEBUG */
 	printbuf_free(jso->_pb);
@@ -205,7 +210,7 @@ static struct json_object* json_object_new(enum json_type o_type)
 {
 	struct json_object *jso;
 
-	jso = (struct json_object*)calloc(sizeof(struct json_object), 1);
+	jso = (struct json_object*) calloc(sizeof(struct json_object), 1);
 	if (!jso)
 		return NULL;
 	jso->o_type = o_type;
@@ -213,7 +218,8 @@ static struct json_object* json_object_new(enum json_type o_type)
 	jso->_delete = &json_object_generic_delete;
 #ifdef REFCOUNT_DEBUG
 	lh_table_insert(json_object_table, jso, jso);
-	MC_DEBUG("json_object_new_%s: %p\n", json_type_to_name(jso->o_type), jso);
+	MC_DEBUG("json_object_new_%s: %p\n",
+	         json_type_to_name(jso->o_type), jso);
 #endif /* REFCOUNT_DEBUG */
 	return jso;
 }
@@ -236,12 +242,15 @@ enum json_type json_object_get_type(const struct json_object *jso)
 }
 
 void* json_object_get_userdata(json_object *jso) {
-	return jso->_userdata;
+	return jso == NULL ? NULL : jso->_userdata;
 }
 
 void json_object_set_userdata(json_object *jso, void *userdata,
 			      json_object_delete_fn *user_delete)
 {
+	if (!jso)
+		return;
+
 	// First, clean up any previously existing user info
 	if (jso->_user_delete)
 		jso->_user_delete(jso, jso->_userdata);
@@ -360,10 +369,8 @@ static int json_object_object_to_json_string(struct json_object* jso,
 		indent(pb, level+1, flags);
 		sprintbuf(pb, "\"");
 		json_escape_str(pb, iter.key, strlen(iter.key), flags);
-		if (flags & JSON_C_TO_STRING_SPACED)
-			sprintbuf(pb, "\": ");
-		else
-			sprintbuf(pb, "\":");
+		sprintbuf(pb,
+			  (flags & JSON_C_TO_STRING_SPACED) ? "\": " : "\":");
 		if(iter.val == NULL)
 			sprintbuf(pb, "null");
 		else
@@ -375,10 +382,8 @@ static int json_object_object_to_json_string(struct json_object* jso,
 			sprintbuf(pb, "\n");
 		indent(pb,level,flags);
 	}
-	if (flags & JSON_C_TO_STRING_SPACED)
-		return sprintbuf(pb, /*{*/ " }");
-	else
-		return sprintbuf(pb, /*{*/ "}");
+	return sprintbuf(pb,
+			 /*{*/ (flags & JSON_C_TO_STRING_SPACED) ? " }" : "}");
 }
 
 
@@ -510,7 +515,8 @@ json_bool json_object_object_get_ex(const struct json_object* jso, const char *k
 
 void json_object_object_del(struct json_object* jso, const char *key)
 {
-	lh_table_delete(jso->o.c_object, key);
+	if(jso)
+		lh_table_delete(jso->o.c_object, key);
 }
 
 
@@ -519,12 +525,9 @@ void json_object_object_del(struct json_object* jso, const char *key)
 static int json_object_boolean_to_json_string(struct json_object* jso,
 					      struct printbuf *pb,
 					      int level,
-						  int flags)
+					      int flags)
 {
-	if (jso->o.c_boolean)
-		return sprintbuf(pb, "true");
-	else
-		return sprintbuf(pb, "false");
+	return sprintbuf(pb, jso->o.c_boolean ? "true" : "false");
 }
 
 struct json_object* json_object_new_boolean(json_bool b)
@@ -603,12 +606,11 @@ int32_t json_object_get_int(const struct json_object *jso)
 	/* Make sure we return the correct values for out of range numbers. */
 	if (cint64 <= INT32_MIN)
 		return INT32_MIN;
-	else if (cint64 >= INT32_MAX)
+	if (cint64 >= INT32_MAX)
 		return INT32_MAX;
-	else
-		return (int32_t)cint64;
+	return (int32_t) cint64;
   case json_type_double:
-    return (int32_t)jso->o.c_double;
+    return (int32_t) jso->o.c_double;
   case json_type_boolean:
     return jso->o.c_boolean;
   default:
@@ -936,10 +938,7 @@ static int json_object_array_to_json_string(struct json_object* jso,
 		indent(pb,level,flags);
 	}
 
-	if (flags & JSON_C_TO_STRING_SPACED)
-		return sprintbuf(pb, " ]");
-	else
-		return sprintbuf(pb, "]");
+	return sprintbuf(pb, (flags & JSON_C_TO_STRING_SPACED) ? " ]" : "]");
 }
 
 static void json_object_array_entry_free(void *data)
