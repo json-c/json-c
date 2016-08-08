@@ -70,11 +70,13 @@ static void stat_and_cat(const char *file)
 	if (read(d, buf, sb.st_size) < sb.st_size)
 	{
 		printf("FAIL: unable to read all of %s: %s\n", file, strerror(errno));
+		free(buf);
 		close(d);
 		return;
 	}
 	buf[sb.st_size] = '\0';
 	printf("file[%s], size=%d, contents=%s\n", file, (int)sb.st_size, buf);
+	free(buf);
 }
 
 int main(int argc, char **argv)
