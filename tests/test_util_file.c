@@ -41,12 +41,12 @@ static void test_write_to_file()
 	if (rv == 0)
 		stat_and_cat(outfile);
 
-	printf("\n");
+	putchar('\n');
 
 	const char *outfile2 = "json2.out";
 	rv = json_object_to_file_ext(outfile2, jso, JSON_C_TO_STRING_PRETTY);
 	printf("%s: json_object_to_file_ext(%s, jso, JSON_C_TO_STRING_PRETTY)=%d\n",
-	     (rv == 0) ? "OK" : "FAIL", outfile2, rv);
+	       (rv == 0) ? "OK" : "FAIL", outfile2, rv);
 	if (rv == 0)
 		stat_and_cat(outfile2);
 }
@@ -57,24 +57,35 @@ static void stat_and_cat(const char *file)
 	int d = open(file, O_RDONLY, 0600);
 	if (d < 0)
 	{
-		printf("FAIL: unable to open %s: %s\n", file, strerror(errno));
+		printf("FAIL: unable to open %s: %s\n",
+		       file, strerror(errno));
 		return;
 	}
 	if (fstat(d, &sb) < 0)
 	{
-		printf("FAIL: unable to stat %s: %s\n", file, strerror(errno));
+		printf("FAIL: unable to stat %s: %s\n",
+		       file, strerror(errno));
 		close(d);
 		return;
 	}
 	char *buf = malloc(sb.st_size + 1);
+	if(!buf)
+	{
+		printf("FAIL: unable to allocate memory\n");
+		close(d);
+		return;
+	}
 	if (read(d, buf, sb.st_size) < sb.st_size)
 	{
-		printf("FAIL: unable to read all of %s: %s\n", file, strerror(errno));
+		printf("FAIL: unable to read all of %s: %s\n",
+		       file, strerror(errno));
+		free(buf);
 		close(d);
 		return;
 	}
 	buf[sb.st_size] = '\0';
 	printf("file[%s], size=%d, contents=%s\n", file, (int)sb.st_size, buf);
+	free(buf);
 }
 
 int main(int argc, char **argv)
@@ -85,8 +96,11 @@ int main(int argc, char **argv)
 	const char *testdir;
 	if (argc < 2)
 	{
-		fprintf(stderr, "Usage: %s <testdir>\n  <testdir> is the location of input files\n", argv[0]);
-		exit(1);
+		fprintf(stderr,
+			"Usage: %s <testdir>\n"
+			"  <testdir> is the location of input files\n",
+			argv[0]);
+		return EXIT_FAILURE;
 	}
 	testdir = argv[1];
 
@@ -94,6 +108,7 @@ int main(int argc, char **argv)
 	test_read_nonexistant();
 	test_read_closed();
 	test_write_to_file();
+	return EXIT_SUCCESS;
 }
 
 static void test_read_valid_with_fd(const char *testdir)
@@ -103,18 +118,23 @@ static void test_read_valid_with_fd(const char *testdir)
 	int d = open(filename, O_RDONLY, 0);
 	if (d < 0)
 	{
-		fprintf(stderr, "FAIL: unable to open %s: %s\n", filename, strerror(errno));
-		exit(1);
+		fprintf(stderr,
+			"FAIL: unable to open %s: %s\n",
+			filename, strerror(errno));
+		exit(EXIT_FAILURE);
 	}
 	json_object *jso = json_object_from_fd(d);
 	if (jso != NULL)
 	{
-		printf("OK: json_object_from_fd(%s)=%s\n", filename, json_object_to_json_string(jso));
+		printf("OK: json_object_from_fd(%s)=%s\n",
+		       filename, json_object_to_json_string(jso));
 		json_object_put(jso);
 	}
 	else
 	{
-		fprintf(stderr, "FAIL: unable to parse contents of %s: %s\n", filename, json_util_get_last_err());
+		fprintf(stderr,
+		        "FAIL: unable to parse contents of %s: %s\n",
+		        filename, json_util_get_last_err());
 	}
 	close(d);
 }
@@ -126,7 +146,8 @@ static void test_read_nonexistant()
 	json_object *jso = json_object_from_file(filename);
 	if (jso != NULL)
 	{
-		printf("FAIL: json_object_from_file(%s) returned 0x%lx when NULL expected\n", filename, (unsigned long)jso);
+		printf("FAIL: json_object_from_file(%s) returned 0x%lx when NULL expected\n",
+		       filename, (unsigned long)jso);
 		json_object_put(jso);
 	}
 	else
@@ -140,15 +161,23 @@ static void test_read_closed()
 {
 	// Test reading from a closed fd
 	int d = open("/dev/null", O_RDONLY, 0);
+	if(d < 0)
+	{
+	  puts("FAIL: unable to open");
+	}
 	close(d);
+
 	json_object *jso = json_object_from_fd(d);
 	if (jso != NULL)
 	{
-		printf("FAIL: read from closed fd returning non-NULL: 0x%lx\n", (unsigned long)jso);
+		printf("FAIL: read from closed fd returning non-NULL: 0x%lx\n",
+		       (unsigned long) jso);
 		fflush(stdout);
 		printf("  jso=%s\n", json_object_to_json_string(jso));
 		json_object_put(jso);
 		return;
 	}
-	printf("OK: json_object_from_fd(closed_fd), expecting NULL, EBADF, got:0x%lx, %s\n", (unsigned long)jso, json_util_get_last_err());
+	printf("OK: json_object_from_fd(closed_fd), "
+	       "expecting NULL, EBADF, got:0x%lx, %s\n",
+	       (unsigned long)jso, json_util_get_last_err());
 }

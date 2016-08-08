@@ -1,6 +1,6 @@
 /*
-* Tests if binary strings are supported.
-*/
+ * Tests if binary strings are supported.
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -10,9 +10,9 @@
 #include "json_object.h"
 #include "json_tokener.h"
 
-int main()
+int main(void)
 {
-	// this test has a space after the null character. check that it's still included
+	/* this test has a space after the null character. check that it's still included */
 	const char *input = " \0 ";
 	const char *expected = "\" \\u0000 \"";
 	struct json_object *string = json_object_new_string_len(input, 3);
@@ -23,14 +23,14 @@ int main()
 	if (strings_match)
 	{
 		printf("JSON write result is correct: %s\n", json);
-		printf("PASS\n");
+		puts("PASS");
 	} else {
-		printf("JSON write result doesn't match expected string\n");
+		puts("JSON write result doesn't match expected string");
 		printf("expected string: ");
-		printf("%s\n", expected);
+		puts(expected);
 		printf("parsed string:   ");
-		printf("%s\n", json);
-		printf("FAIL\n");
+		puts(json);
+		puts("FAIL");
 		retval=1;
 	}
 	json_object_put(string);
@@ -46,12 +46,12 @@ int main()
 		{
 			printf("%s%d", (ii ? ", " : ""), (int)parsed_cstr[ii]);
 		}
-		printf("]\n");
+		puts("]");
 		json_object_put(parsed_str);
 	}
 	else
 	{
-		printf("ERROR: failed to parse\n");
+		puts("ERROR: failed to parse");
 	}
 	return retval;
 }

@@ -124,5 +124,3 @@ run_output_test()
 
 	return $err
 }
-
-

@@ -10,7 +10,7 @@
 #include "json_object.h"
 #include "json_tokener.h"
 
-void print_hex( const char* s)
+void print_hex(const char* s)
 {
 	const char *iter = s;
 	unsigned char ch;
@@ -21,10 +21,10 @@ void print_hex( const char* s)
 		else
 			printf( ",");
 	}
-	printf("\n");
+	putchar('\n');
 }
 
-int main()
+int main(void)
 {
 	const char *input = "\"\\ud840\\udd26,\\ud840\\udd27,\\ud800\\udd26,\\ud800\\udd27\"";
 	const char *expected = "\xF0\xA0\x84\xA6,\xF0\xA0\x84\xA7,\xF0\x90\x84\xA6,\xF0\x90\x84\xA7";
@@ -38,14 +38,14 @@ int main()
 	if (strings_match)
 	{
 		printf("JSON parse result is correct: %s\n", unjson);
-		printf("PASS\n");
+		puts("PASS");
 	} else {
 		printf("JSON parse result doesn't match expected string\n");
 		printf("expected string bytes: ");
-		print_hex( expected);
+		print_hex(expected);
 		printf("parsed string bytes:   ");
-		print_hex( unjson);
-		printf("FAIL\n");
+		print_hex(unjson);
+		puts("FAIL");
 		retval = 1;
 	}
 	json_object_put(parse_result);
