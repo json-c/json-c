@@ -84,8 +84,10 @@ static void json_object_fini(void)
 			   json_object_table->count);
 			lh_foreach(json_object_table, ent)
 			{
-				struct json_object* obj = (struct json_object*)lh_entry_v(ent);
-				MC_DEBUG("\t%s:%p\n", json_type_to_name(obj->o_type), obj);
+				struct json_object* obj =
+				  (struct json_object*) lh_entry_v(ent);
+				MC_DEBUG("\t%s:%p\n",
+					 json_type_to_name(obj->o_type), obj);
 			}
 		}
 	}
@@ -147,7 +149,9 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 			if(c < ' ')
 			{
 				if(pos - start_offset > 0)
-				printbuf_memappend(pb, str + start_offset, pos - start_offset);
+					printbuf_memappend(pb,
+							   str + start_offset,
+							   pos - start_offset);
 				sprintbuf(pb, "\\u00%c%c",
 				json_hex_chars[c >> 4],
 				json_hex_chars[c & 0xf]);
@@ -168,7 +172,7 @@ extern struct json_object* json_object_get(struct json_object *jso)
 {
 	if (jso)
 		jso->_ref_count++;
-	return jso;
+	return NULL;
 }
 
 int json_object_put(struct json_object *jso)
@@ -338,7 +342,7 @@ static void indent(struct printbuf *pb, int level, int flags)
 static int json_object_object_to_json_string(struct json_object* jso,
 					     struct printbuf *pb,
 					     int level,
-						 int flags)
+					     int flags)
 {
 	int had_children = 0;
 	struct json_object_iter iter;
@@ -403,7 +407,7 @@ struct json_object* json_object_new_object(void)
 	jso->_delete = &json_object_object_delete;
 	jso->_to_json_string = &json_object_object_to_json_string;
 	jso->o.c_object = lh_kchar_table_new(JSON_OBJECT_DEF_HASH_ENTRIES,
-					&json_object_lh_entry_free);
+					     &json_object_lh_entry_free);
 	if (!jso->o.c_object)
 	{
 		json_object_generic_delete(jso);
@@ -437,7 +441,8 @@ void json_object_object_add_ex(struct json_object* jso,
 	struct lh_entry *existing_entry;
 	const unsigned long hash = lh_get_hash(jso->o.c_object, (const void *)key);
 	existing_entry = (opts & JSON_C_OBJECT_ADD_KEY_IS_NEW) ? NULL : 
-			      lh_table_lookup_entry_w_hash(jso->o.c_object, (const void *)key, hash);
+			      lh_table_lookup_entry_w_hash(jso->o.c_object,
+							   (const void *)key, hash);
 	if (!existing_entry)
 	{
 		const void *const k = (opts & JSON_C_OBJECT_KEY_IS_CONSTANT) ?
@@ -445,21 +450,22 @@ void json_object_object_add_ex(struct json_object* jso,
 		lh_table_insert_w_hash(jso->o.c_object, k, val, hash, opts);
 		return;
 	}
-	existing_value = (json_object *)lh_entry_v(existing_entry);
+	existing_value = (json_object *) lh_entry_v(existing_entry);
 	if (existing_value)
 		json_object_put(existing_value);
 	existing_entry->v = val;
 }
 
 int json_object_object_add(struct json_object* jso, const char *key,
-			    struct json_object *val)
+                           struct json_object *val)
 {
 	// We lookup the entry and replace the value, rather than just deleting
 	// and re-adding it, so the existing key remains valid.
 	json_object *existing_value = NULL;
 	struct lh_entry *existing_entry;
 	const unsigned long hash = lh_get_hash(jso->o.c_object, (const void *)key);
-	existing_entry = lh_table_lookup_entry_w_hash(jso->o.c_object, (const void *)key, hash);
+	existing_entry = lh_table_lookup_entry_w_hash(jso->o.c_object,
+						      (const void *)key, hash);
 	if (!existing_entry)
 	{
 		char *keydup = strdup(key);
@@ -482,14 +488,16 @@ int json_object_object_length(const struct json_object *jso)
 	return lh_table_length(jso->o.c_object);
 }
 
-struct json_object* json_object_object_get(const struct json_object* jso, const char *key)
+struct json_object* json_object_object_get(const struct json_object* jso,
+					   const char *key)
 {
 	struct json_object *result = NULL;
 	json_object_object_get_ex(jso, key, &result);
 	return result;
 }
 
-json_bool json_object_object_get_ex(const struct json_object* jso, const char *key, struct json_object **value)
+json_bool json_object_object_get_ex(const struct json_object* jso, const char *key,
+				    struct json_object **value)
 {
 	if (value != NULL)
 		*value = NULL;
@@ -500,7 +508,8 @@ json_bool json_object_object_get_ex(const struct json_object* jso, const char *k
 	switch(jso->o_type)
 	{
 	case json_type_object:
-		return lh_table_lookup_ex(jso->o.c_object, (const void *)key, (void**)value);
+		return lh_table_lookup_ex(jso->o.c_object, (const void *) key,
+					  (void**) value);
 	default:
 		if (value != NULL)
 			*value = NULL;
@@ -519,12 +528,11 @@ void json_object_object_del(struct json_object* jso, const char *key)
 static int json_object_boolean_to_json_string(struct json_object* jso,
 					      struct printbuf *pb,
 					      int level,
-						  int flags)
+					      int flags)
 {
 	if (jso->o.c_boolean)
 		return sprintbuf(pb, "true");
-	else
-		return sprintbuf(pb, "false");
+	return sprintbuf(pb, "false");
 }
 
 struct json_object* json_object_new_boolean(json_bool b)
@@ -603,10 +611,9 @@ int32_t json_object_get_int(const struct json_object *jso)
 	/* Make sure we return the correct values for out of range numbers. */
 	if (cint64 <= INT32_MIN)
 		return INT32_MIN;
-	else if (cint64 >= INT32_MAX)
+	if (cint64 >= INT32_MAX)
 		return INT32_MAX;
-	else
-		return (int32_t)cint64;
+	return (int32_t) cint64;
   case json_type_double:
     return (int32_t)jso->o.c_double;
   case json_type_boolean:
@@ -808,7 +815,7 @@ double json_object_get_double(const struct json_object *jso)
 static int json_object_string_to_json_string(struct json_object* jso,
 					     struct printbuf *pb,
 					     int level,
-						 int flags)
+					     int flags)
 {
 	sprintbuf(pb, "\"");
 	json_escape_str(pb, get_string_component(jso), jso->o.c_string.len, flags);
@@ -938,8 +945,7 @@ static int json_object_array_to_json_string(struct json_object* jso,
 
 	if (flags & JSON_C_TO_STRING_SPACED)
 		return sprintbuf(pb, " ]");
-	else
-		return sprintbuf(pb, "]");
+	return sprintbuf(pb, "]");
 }
 
 static void json_object_array_entry_free(void *data)
@@ -982,7 +988,8 @@ struct array_list* json_object_get_array(const struct json_object *jso)
 	}
 }
 
-void json_object_array_sort(struct json_object *jso, int(*sort_fn)(const void *, const void *))
+void json_object_array_sort(struct json_object *jso,
+			    int(*sort_fn)(const void *, const void *))
 {
 	array_list_sort(jso->o.c_array, sort_fn);
 }
