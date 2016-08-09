@@ -295,20 +295,35 @@ void json_object_set_serializer(json_object *jso,
 
 /* extended conversion to string */
 
+const char* json_object_to_json_string_length(struct json_object *jso, int flags, size_t *length)
+{
+	const char *r = NULL;
+	size_t s = 0;
+
+	if (!jso)
+	{
+		s = 4;
+		r = "null";
+	}
+	else if ((jso->_pb) || (jso->_pb = printbuf_new()))
+	{
+		printbuf_reset(jso->_pb);
+
+		if(jso->_to_json_string(jso, jso->_pb, 0, flags) >= 0)
+		{
+			s = (size_t)jso->_pb->bpos;
+			r = jso->_pb->buf;
+		}
+	}
+
+	if (length)
+		*length = s;
+	return r;
+}
+
 const char* json_object_to_json_string_ext(struct json_object *jso, int flags)
 {
-	if (!jso)
-		return "null";
-
-	if ((!jso->_pb) && !(jso->_pb = printbuf_new()))
-		return NULL;
-
-	printbuf_reset(jso->_pb);
-
-	if(jso->_to_json_string(jso, jso->_pb, 0, flags) < 0)
-		return NULL;
-
-	return jso->_pb->buf;
+	return json_object_to_json_string_length(jso, flags, NULL);
 }
 
 /* backwards-compatible conversion to string */
