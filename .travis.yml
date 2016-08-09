@@ -4,6 +4,11 @@ compiler:
   - gcc
   - clang
 
+addons:
+  apt:
+    packages:
+      - cppcheck
+
 os:
   - linux
   - osx
@@ -23,3 +28,4 @@ script:
 
 after_success:
   - make check
+  - cppcheck --quiet *.h *.c tests/
