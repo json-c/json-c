@@ -28,7 +28,27 @@ static int sort_fn (const void *j1, const void *j2)
 }
 
 #ifdef TEST_FORMATTED
-#define json_object_to_json_string(obj) json_object_to_json_string_ext(obj,sflags)
+static const char *to_json_string(json_object *obj, int flags)
+{
+	size_t length;
+	char *copy;
+	const char *result;
+
+	result = json_object_to_json_string_length(obj, flags, &length);
+	copy = strndup(result, length);
+	if (copy == NULL)
+		printf("to_json_string: Allocation failed!\n");
+	else {
+		result = json_object_to_json_string_ext(obj, flags);
+		if (length != strlen(result))
+			printf("to_json_string: Length mismatch!\n");
+		if (strcmp(copy, result) != 0)
+			printf("to_json_string: Comparison Failed!\n");
+		free(copy);
+	}
+	return result;
+}
+#define json_object_to_json_string(obj) to_json_string(obj,sflags)
 #else
 /* no special define */
 #endif

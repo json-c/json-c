@@ -223,6 +223,16 @@ extern const char* json_object_to_json_string(struct json_object *obj);
 extern const char* json_object_to_json_string_ext(struct json_object *obj, int
 flags);
 
+/** Stringify object to json format
+ * @see json_object_to_json_string() for details on how to free string.
+ * @param obj the json_object instance
+ * @param flags formatting options, see JSON_C_TO_STRING_PRETTY and other constants
+ * @param length a pointer where, if not NULL, the length (without null) is stored
+ * @returns a string in JSON format and the length if not NULL
+ */
+extern const char* json_object_to_json_string_length(struct json_object *obj, int
+flags, size_t *length);
+
 /**
  * Returns the userdata set by json_object_set_userdata() or
  * json_object_set_serializer()
