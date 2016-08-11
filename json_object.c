@@ -172,7 +172,7 @@ extern struct json_object* json_object_get(struct json_object *jso)
 {
 	if (jso)
 		jso->_ref_count++;
-	return NULL;
+	return jso;
 }
 
 int json_object_put(struct json_object *jso)

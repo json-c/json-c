@@ -979,5 +979,5 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 
 void json_tokener_set_flags(struct json_tokener *tok, int flags)
 {
-  if(tok) tok->flags = flags;
+	tok->flags = flags;
 }
