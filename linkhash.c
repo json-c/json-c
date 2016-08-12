@@ -4,10 +4,10 @@
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
  * Copyright (c) 2009 Hewlett-Packard Development Company, L.P.
+ * Copyright (C) 2016 Nicola Spanti (RyDroid) <dev@nicola-spanti.info>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the MIT license. See COPYING for details.
- *
  */
 
 #include "config.h"
@@ -561,6 +561,8 @@ int lh_table_resize(struct lh_table *t, int new_size)
 
 void lh_table_free(struct lh_table *t)
 {
+	if(!t) return;
+	
 	struct lh_entry *c;
 	if(t->free_fn) {
 		for(c = t->head; c != NULL; c = c->next)
@@ -611,6 +613,8 @@ int lh_table_insert(struct lh_table *t, const void *k, const void *v)
 
 struct lh_entry* lh_table_lookup_entry_w_hash(struct lh_table *t, const void *k, const unsigned long h)
 {
+	if(!t) return NULL;
+	
 	unsigned long n = h % t->size;
 	int count = 0;
 
@@ -685,5 +689,5 @@ int lh_table_delete(struct lh_table *t, const void *k)
 
 int lh_table_length(struct lh_table *t)
 {
-	return t->count;
+	return t == NULL ? -1 : t->count;
 }
