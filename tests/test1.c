@@ -98,14 +98,14 @@ void test_array_del_idx()
 		       rc, json_object_to_json_string(my_array));
 	}
 
-	// One more time, with the empty array:
+	/* One more time, with the empty array: */
 	rc = json_object_array_del_idx(my_array, 0, 1);
 	printf("after del_idx(0,1)=%d, my_array.to_string()=%s\n",
 	       rc, json_object_to_json_string(my_array));
 
 	json_object_put(my_array);
 
-	// Delete all array indexes at once
+	/* Delete all array indexes at once */
 	my_array = make_array();
 	rc = json_object_array_del_idx(my_array, 0, orig_array_len);
 	printf("after del_idx(0,%llu)=%d, my_array.to_string()=%s\n",
@@ -113,7 +113,7 @@ void test_array_del_idx()
 
 	json_object_put(my_array);
 
-	// Delete *more* than all array indexes at once
+	/* Delete *more* than all array indexes at once */
 	my_array = make_array();
 	rc = json_object_array_del_idx(my_array, 0, orig_array_len + 1);
 	printf("after del_idx(0,%llu)=%d, my_array.to_string()=%s\n",
@@ -233,5 +233,5 @@ int main(int argc, char **argv)
 	json_object_put(my_object);
 	json_object_put(my_array);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
