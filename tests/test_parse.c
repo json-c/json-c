@@ -11,16 +11,17 @@ static void test_basic_parse(void);
 static void test_verbose_parse(void);
 static void test_incremental_parse(void);
 
-int main(int argc, char **argv)
+int main(void)
 {
 	MC_SET_DEBUG(1);
 
+	static const char separator[] = "==================================";
 	test_basic_parse();
-	printf("==================================\n");
+	puts(separator);
 	test_verbose_parse();
-	printf("==================================\n");
+	puts(separator);
 	test_incremental_parse();
-	printf("==================================\n");
+	puts(separator);
 }
 
 static void test_basic_parse()
@@ -173,7 +174,7 @@ static void test_verbose_parse()
 	/* b/c the string starts with 'f' parsing return a boolean error */
 	assert (error == json_tokener_error_parse_boolean);
 
-	printf("json_tokener_parse_versbose() OK\n");
+	puts("json_tokener_parse_versbose() OK");
 }
 
 struct incremental_step {
@@ -263,7 +264,7 @@ static void test_incremental_parse()
 	string_to_parse = "{ \"foo"; /* } */
 	printf("json_tokener_parse(%s) ... ", string_to_parse);
 	new_obj = json_tokener_parse(string_to_parse);
-	if (new_obj == NULL) printf("got error as expected\n");
+	if (new_obj == NULL) puts("got error as expected");
 
 	/* test incremental parsing in various forms */
 	tok = json_tokener_new();
@@ -293,17 +294,18 @@ static void test_incremental_parse()
 		{
 			if (new_obj != NULL)
 				printf("ERROR: invalid object returned: %s\n",
-					json_object_to_json_string(new_obj));
+				       json_object_to_json_string(new_obj));
 			else if (jerr != step->expected_error)
 				printf("ERROR: got wrong error: %s\n",
-					json_tokener_error_desc(jerr));
+				       json_tokener_error_desc(jerr));
 			else if (tok->char_offset != expected_char_offset)
 				printf("ERROR: wrong char_offset %d != expected %d\n",
-					tok->char_offset,
-					expected_char_offset);
+				       tok->char_offset,
+				       expected_char_offset);
 			else
 			{
-				printf("OK: got correct error: %s\n", json_tokener_error_desc(jerr));
+				printf("OK: got correct error: %s\n",
+				       json_tokener_error_desc(jerr));
 				this_step_ok = 1;
 			}
 		}
@@ -311,11 +313,11 @@ static void test_incremental_parse()
 		{
 			if (new_obj == NULL)
 				printf("ERROR: expected valid object, instead: %s\n",
-					json_tokener_error_desc(jerr));
+				       json_tokener_error_desc(jerr));
 			else if (tok->char_offset != expected_char_offset)
 				printf("ERROR: wrong char_offset %d != expected %d\n",
-					tok->char_offset,
-					expected_char_offset);
+				       tok->char_offset,
+				       expected_char_offset);
 			else
 			{
 				printf("OK: got object of type [%s]: %s\n",
@@ -340,6 +342,4 @@ static void test_incremental_parse()
 	json_tokener_free(tok);
 
 	printf("End Incremental Tests OK=%d ERROR=%d\n", num_ok, num_error);
-
-	return;
 }
