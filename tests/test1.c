@@ -205,6 +205,12 @@ int main(int argc, char **argv)
 	printf("my_array.to_string()=%s\n", json_object_to_json_string(my_array));
 
 	my_object = json_object_new_object();
+	int rc = json_object_object_add(my_object, "abc", my_object);
+	if (rc != -1)
+	{
+		printf("ERROR: able to successfully add object to itself!\n");
+		fflush(stdout);
+	}
 	json_object_object_add(my_object, "abc", json_object_new_int(12));
 	json_object_object_add(my_object, "foo", json_object_new_string("bar"));
 	json_object_object_add(my_object, "bool0", json_object_new_boolean(0));

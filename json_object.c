@@ -459,6 +459,12 @@ int json_object_object_add_ex(struct json_object* jso,
 	existing_entry = (opts & JSON_C_OBJECT_ADD_KEY_IS_NEW) ? NULL : 
 			      lh_table_lookup_entry_w_hash(jso->o.c_object,
 							   (const void *)key, hash);
+
+	// The caller must avoid creating loops in the object tree, but do a
+	// quick check anyway to make sure we're not creating a trivial loop.
+	if (jso == val)
+		return -1;
+
 	if (!existing_entry)
 	{
 		const void *const k = (opts & JSON_C_OBJECT_KEY_IS_CONSTANT) ?
