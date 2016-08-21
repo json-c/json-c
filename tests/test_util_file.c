@@ -49,6 +49,7 @@ static void test_write_to_file()
 	       (rv == 0) ? "OK" : "FAIL", outfile2, rv);
 	if (rv == 0)
 		stat_and_cat(outfile2);
+	json_object_put(jso);
 }
 
 static void stat_and_cat(const char *file)
@@ -163,11 +164,18 @@ static void test_read_closed()
 	int d = open("/dev/null", O_RDONLY, 0);
 	if(d < 0)
 	{
-	  puts("FAIL: unable to open");
+		puts("FAIL: unable to open");
+	}
+	// Copy over to a fixed fd number so test output is consistent.
+	int fixed_d = 10;
+	if (dup2(d, fixed_d) < 0)
+	{
+		printf("FAIL: unable to dup to fd %d", fixed_d);
 	}
 	close(d);
+	close(fixed_d);
 
-	json_object *jso = json_object_from_fd(d);
+	json_object *jso = json_object_from_fd(fixed_d);
 	if (jso != NULL)
 	{
 		printf("FAIL: read from closed fd returning non-NULL: 0x%lx\n",
