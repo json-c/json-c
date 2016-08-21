@@ -385,7 +385,7 @@ extern int json_object_object_add(struct json_object* obj, const char *key,
  * @param opts process-modifying options. To specify multiple options, use 
  *             arithmetic or (OPT1|OPT2)
  */
-extern void json_object_object_add_ex(struct json_object* obj, const char *key,
+extern int json_object_object_add_ex(struct json_object* obj, const char *key,
 				   struct json_object *val, const unsigned opts);
 
 /** Get the json_object associate with a given object field.

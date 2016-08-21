@@ -386,7 +386,8 @@ static int json_object_object_to_json_string(struct json_object* jso,
 		if(iter.val == NULL)
 			sprintbuf(pb, "null");
 		else
-			iter.val->_to_json_string(iter.val, pb, level+1,flags);
+			if (iter.val->_to_json_string(iter.val, pb, level+1,flags) < 0)
+				return -1;
 	}
 	if (flags & JSON_C_TO_STRING_PRETTY)
 	{
@@ -445,7 +446,7 @@ struct lh_table* json_object_get_object(const struct json_object *jso)
 	}
 }
 
-void json_object_object_add_ex(struct json_object* jso,
+int json_object_object_add_ex(struct json_object* jso,
 	const char *const key,
 	struct json_object *const val,
 	const unsigned opts)
@@ -462,39 +463,21 @@ void json_object_object_add_ex(struct json_object* jso,
 	{
 		const void *const k = (opts & JSON_C_OBJECT_KEY_IS_CONSTANT) ?
 					(const void *)key : strdup(key);
-		lh_table_insert_w_hash(jso->o.c_object, k, val, hash, opts);
-		return;
+		if (k == NULL)
+			return -1;
+		return lh_table_insert_w_hash(jso->o.c_object, k, val, hash, opts);
 	}
 	existing_value = (json_object *) lh_entry_v(existing_entry);
 	if (existing_value)
 		json_object_put(existing_value);
 	existing_entry->v = val;
+	return 0;
 }
 
 int json_object_object_add(struct json_object* jso, const char *key,
                            struct json_object *val)
 {
-	// We lookup the entry and replace the value, rather than just deleting
-	// and re-adding it, so the existing key remains valid.
-	json_object *existing_value = NULL;
-	struct lh_entry *existing_entry;
-	const unsigned long hash = lh_get_hash(jso->o.c_object, (const void *)key);
-	existing_entry = lh_table_lookup_entry_w_hash(jso->o.c_object,
-						      (const void *)key, hash);
-	if (!existing_entry)
-	{
-		char *keydup = strdup(key);
-		if (keydup == NULL)
-			return -1;
-
-		return lh_table_insert_w_hash(jso->o.c_object, keydup, val, hash, 0);
-	}
-	existing_value = (json_object *)lh_entry_v(existing_entry);
-	if (existing_value)
-		json_object_put(existing_value);
-	existing_entry->v = val;
-
-	return 0;
+	return json_object_object_add_ex(jso, key, val, 0);
 }
 
 
@@ -929,6 +912,7 @@ static int json_object_array_to_json_string(struct json_object* jso,
 {
 	int had_children = 0;
 	size_t ii;
+
 	sprintbuf(pb, "[");
 	if (flags & JSON_C_TO_STRING_PRETTY)
 		sprintbuf(pb, "\n");
@@ -949,7 +933,8 @@ static int json_object_array_to_json_string(struct json_object* jso,
 		if(val == NULL)
 			sprintbuf(pb, "null");
 		else
-			val->_to_json_string(val, pb, level+1, flags);
+			if (val->_to_json_string(val, pb, level+1, flags) < 0)
+				return -1;
 	}
 	if (flags & JSON_C_TO_STRING_PRETTY)
 	{
