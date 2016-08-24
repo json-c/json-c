@@ -447,8 +447,8 @@ struct lh_table* json_object_get_object(const struct json_object *jso)
 }
 
 int json_object_object_add_ex(struct json_object* jso,
-	const char *const key,
-	struct json_object *const val,
+	const char * key,
+	struct json_object * val,
 	const unsigned opts)
 {
 	// We lookup the entry and replace the value, rather than just deleting
