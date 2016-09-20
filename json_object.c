@@ -568,6 +568,13 @@ json_bool json_object_get_boolean(const struct json_object *jso)
 	}
 }
 
+json_bool json_object_set_boolean(struct json_object *jso,json_bool new_value){
+	if (!jso || jso->o_type!=json_type_boolean)
+		return FALSE;
+	jso->o.c_boolean=new_value;
+	return TRUE;
+}
+
 
 /* json_object_int */
 

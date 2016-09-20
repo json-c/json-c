@@ -620,6 +620,19 @@ extern struct json_object* json_object_new_boolean(json_bool b);
 extern json_bool json_object_get_boolean(const struct json_object *obj);
 
 
+/** Set the json_bool value of a json_object
+ * 
+ * The type of obj is checked to be a json_type_boolean and FALSE is returned 
+ * if it is not without any further actions. If type of obj is json_type_boolean
+ * the obect value is chaned to new_value
+ *
+ * @param obj the json_object instance
+ * @param new_value the value to be set
+ * @returns TRUE if value is set correctly
+ */
+extern json_bool json_object_set_boolean(struct json_object *obj,json_bool new_value);
+
+
 /* int type methods */
 
 /** Create a new empty json_object of type json_type_int
