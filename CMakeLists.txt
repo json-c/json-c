@@ -4,20 +4,26 @@ cmake_minimum_required(VERSION 2.8.11)
 project(json-c)
 
 if(MSVC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4100 /wd4996 /wd4244 /wd4706 /wd4702 /wd4127 /wd4701")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4100 /wd4996 /wd4244 /wd4706 /wd4702 /wd4127 /wd4701")
-elseif(LINUX)
+  file(COPY ./config.h.win32 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
+  file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/include/config.h.win32 ${CMAKE_CURRENT_BINARY_DIR}/include/config.h)
+  file(COPY ./json_config.h.win32 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
+  file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h.win32 ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h)
+elseif(APPLE)
+  file(COPY ./config.h.mac DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
+  file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/include/config.h.mac ${CMAKE_CURRENT_BINARY_DIR}/include/config.h)
+  file(COPY ./json_config.h.mac DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
+  file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h.mac ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h)
+endif()
+
+if(UNIX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
+elseif(MSVC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4100 /wd4996 /wd4244 /wd4706 /wd4702 /wd4127 /wd4701")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4100 /wd4996 /wd4244 /wd4706 /wd4702 /wd4127 /wd4701")
 endif()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
-
-file(COPY ./config.h.win32 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
-file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/include/config.h.win32 ${CMAKE_CURRENT_BINARY_DIR}/include/config.h)
-
-file(COPY ./json_config.h.win32 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
-file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h.win32 ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h)
 
 set(JSON_C_HEADERS
     ./json.h
