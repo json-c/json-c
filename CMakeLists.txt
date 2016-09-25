@@ -58,3 +58,9 @@ add_library(json-c
     ${JSON_C_HEADERS}
     )
 
+install(TARGETS json-c
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib)
+
+install(DIRECTORY . DESTINATION ${CMAKE_INSTALL_PREFIX}/include FILES_MATCHING_PATTERN "*.h")
