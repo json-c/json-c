@@ -1,6 +1,6 @@
 #Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 2.8.7)
 project(json-c)
 
 if(MSVC)
@@ -63,5 +63,5 @@ install(TARGETS json-c
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib)
 
-install(DIRECTORY . DESTINATION ${CMAKE_INSTALL_PREFIX}/include FILES_MATCHING PATTERN "*.h")
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include FILES_MATCHING PATTERN "*.h")
+install(DIRECTORY . DESTINATION ${CMAKE_INSTALL_PREFIX}/include/json-c FILES_MATCHING PATTERN "*.h")
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include/json-c FILES_MATCHING PATTERN "*.h")
