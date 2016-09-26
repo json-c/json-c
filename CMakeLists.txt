@@ -54,6 +54,8 @@ add_library(json-c
     ${JSON_C_HEADERS}
 )
 
+set_property(TARGET json-c PROPERTY C_STANDARD 99)
+
 install(TARGETS json-c
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
