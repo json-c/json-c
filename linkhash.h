@@ -341,7 +341,7 @@ static inline unsigned long lh_get_hash(const struct lh_table *t, const void *k)
 #ifdef __UNCONST
 #define _LH_UNCONST(a) __UNCONST(a)
 #else
-#define _LH_UNCONST(a) ((void *)(unsigned long)(const void *)(a))
+#define _LH_UNCONST(a) ((void *)(uintptr_t)(const void *)(a))
 #endif
 
 /**
