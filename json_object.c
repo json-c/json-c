@@ -1062,7 +1062,7 @@ static int json_object_all_values_equal(struct json_object* jso1,
 
 	/* Iterate over jso1 keys and see if they exist and are equal in jso2 */
         json_object_object_foreachC(jso1, iter) {
-		if (!lh_table_lookup_ex(jso1->o.c_object, (void*)iter.key,
+		if (!lh_table_lookup_ex(jso2->o.c_object, (void*)iter.key,
 					(void**)&sub))
 			return 0;
 		if (!json_object_equal(iter.val, sub))
