@@ -622,15 +622,15 @@ extern json_bool json_object_get_boolean(const struct json_object *obj);
 
 /** Set the json_bool value of a json_object
  * 
- * The type of obj is checked to be a json_type_boolean and FALSE is returned 
+ * The type of obj is checked to be a json_type_boolean and 0 is returned 
  * if it is not without any further actions. If type of obj is json_type_boolean
  * the obect value is chaned to new_value
  *
  * @param obj the json_object instance
  * @param new_value the value to be set
- * @returns TRUE if value is set correctly
+ * @returns 1 if value is set correctly, 0 otherwise
  */
-extern json_bool json_object_set_boolean(struct json_object *obj,json_bool new_value);
+extern int json_object_set_boolean(struct json_object *obj,json_bool new_value);
 
 
 /* int type methods */
@@ -667,6 +667,19 @@ extern struct json_object* json_object_new_int64(int64_t i);
  */
 extern int32_t json_object_get_int(const struct json_object *obj);
 
+/** Set the int value of a json_object
+ * 
+ * The type of obj is checked to be a json_type_int and 0 is returned 
+ * if it is not without any further actions. If type of obj is json_type_int
+ * the obect value is chaned to new_value
+ *
+ * @param obj the json_object instance
+ * @param new_value the value to be set
+ * @returns 1 if value is set correctly, 0 otherwise
+ */
+extern int json_object_set_int(struct json_object *obj,int new_value);
+
+
 /** Get the int value of a json_object
  *
  * The type is coerced to a int64 if the passed object is not a int64.
@@ -681,6 +694,19 @@ extern int32_t json_object_get_int(const struct json_object *obj);
  * @returns an int64
  */
 extern int64_t json_object_get_int64(const struct json_object *obj);
+
+
+/** Set the int64_t value of a json_object
+ * 
+ * The type of obj is checked to be a json_type_int and 0 is returned 
+ * if it is not without any further actions. If type of obj is json_type_int
+ * the obect value is chaned to new_value
+ *
+ * @param obj the json_object instance
+ * @param new_value the value to be set
+ * @returns 1 if value is set correctly, 0 otherwise
+ */
+extern int json_object_set_int64(struct json_object *obj,int64_t new_value);
 
 
 /* double type methods */
@@ -771,6 +797,20 @@ extern int json_object_double_to_json_string(struct json_object* jso,
  * @returns a double floating point number
  */
 extern double json_object_get_double(const struct json_object *obj);
+
+
+/** Set the double value of a json_object
+ * 
+ * The type of obj is checked to be a json_type_double and 0 is returned 
+ * if it is not without any further actions. If type of obj is json_type_double
+ * the obect value is chaned to new_value
+ *
+ * @param obj the json_object instance
+ * @param new_value the value to be set
+ * @returns 1 if value is set correctly, 0 otherwise
+ */
+extern int json_object_set_double(struct json_object *obj,double new_value);
+
 
 
 /* string type methods */

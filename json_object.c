@@ -568,11 +568,11 @@ json_bool json_object_get_boolean(const struct json_object *jso)
 	}
 }
 
-json_bool json_object_set_boolean(struct json_object *jso,json_bool new_value){
+int json_object_set_boolean(struct json_object *jso,json_bool new_value){
 	if (!jso || jso->o_type!=json_type_boolean)
-		return FALSE;
+		return 0;
 	jso->o.c_boolean=new_value;
-	return TRUE;
+	return 1;
 }
 
 
@@ -634,6 +634,14 @@ int32_t json_object_get_int(const struct json_object *jso)
   }
 }
 
+int json_object_set_int(struct json_object *jso,int new_value){
+	if (!jso || jso->o_type!=json_type_int)
+		return 0;
+	jso->o.c_int64=new_value;
+	return 1;
+}
+
+
 struct json_object* json_object_new_int64(int64_t i)
 {
 	struct json_object *jso = json_object_new(json_type_int);
@@ -666,6 +674,12 @@ int64_t json_object_get_int64(const struct json_object *jso)
 	}
 }
 
+int json_object_set_int64(struct json_object *jso,int64_t new_value){
+	if (!jso || jso->o_type!=json_type_int)
+		return 0;
+	jso->o.c_int64=new_value;
+	return 1;
+}
 
 /* json_object_double */
 
@@ -820,6 +834,12 @@ double json_object_get_double(const struct json_object *jso)
   }
 }
 
+int json_object_set_double(struct json_object *jso,double new_value){
+	if (!jso || jso->o_type!=json_type_double)
+		return 0;
+	jso->o.c_double=new_value;
+	return 1;
+}
 
 /* json_object_string */
 
