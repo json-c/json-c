@@ -936,7 +936,7 @@ int json_object_get_string_len(const struct json_object *jso)
 }
 
 int json_object_set_string(json_object* jso, const char* s) {
-	return json_object_set_string_len(jso, s, strlen(s));
+	return json_object_set_string_len(jso, s, (int)(strlen(s)));
 }
 
 int json_object_set_string_len(json_object* jso, const char* s, int len){
