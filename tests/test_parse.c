@@ -44,6 +44,11 @@ static void test_basic_parse()
 	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
 	json_object_put(new_obj);
 
+	// Test with a "short" high surrogate
+	new_obj = json_tokener_parse("[9,'\\uDAD");
+	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
+	json_object_put(new_obj);
+
 	new_obj = json_tokener_parse("null");
 	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
 	json_object_put(new_obj);

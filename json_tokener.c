@@ -580,7 +580,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 
 	  /* Handle a 4-byte sequence, or two sequences if a surrogate pair */
 	  while(1) {
-	    if(strchr(json_hex_chars, c)) {
+	    if (c && strchr(json_hex_chars, c)) {
 	      tok->ucs_char += ((unsigned int)jt_hexdigit(c) << ((3-tok->st_pos++)*4));
 	      if(tok->st_pos == 4) {
 		unsigned char unescaped_utf[4];
@@ -611,8 +611,8 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
                    */
                   got_hi_surrogate = tok->ucs_char;
                   /* Not at end, and the next two chars should be "\u" */
-                  if ((tok->char_offset+1 != len) &&
-                      (tok->char_offset+2 != len) &&
+                  if ((len == -1 || len > (tok->char_offset + 2)) &&
+                      // str[0] != '0' &&  // implied by json_hex_chars, above.
                       (str[1] == '\\') &&
                       (str[2] == 'u'))
                   {
