@@ -23,8 +23,14 @@ int main(int argc, char **argv)
 	assert (json_object_get_boolean(tmp)==TRUE); 
 	json_object_put(tmp);
 	printf("BOOL PASSED\n");
-	
-	
+	tmp=json_object_new_double(12.34);
+	assert (json_object_get_double(tmp)==12.34); 
+	json_object_set_double(tmp,34.56);
+	assert (json_object_get_double(tmp)==34.56); 
+	json_object_set_double(tmp,6435.34);
+	assert (json_object_get_double(tmp)==6435.34); 
+	json_object_put(tmp);
+	printf("DOUBLE PASSED\n");
 	printf("PASSED\n");
 	return 0;
 }

@@ -33,6 +33,7 @@
 /tests/test_set_serializer
 /tests/test_compare
 /tests/test_util_file
+/tests/test_set_value
 /tests/*.vg.out
 /tests/*.log
 /tests/*.trs
