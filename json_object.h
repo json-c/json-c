@@ -854,6 +854,26 @@ extern const char* json_object_get_string(struct json_object *obj);
  */
 extern int json_object_get_string_len(const struct json_object *obj);
 
+
+/** Set the string value of a json_object with zero terminated strings
+ * equivalent to json_object_set_string_len (obj, new_value, strlen(new_value))
+ * @returns 1 if value is set correctly, 0 otherwise
+ */
+extern int json_object_set_string(json_object* obj, const char* new_value);
+
+/** Set the string value of a json_object str
+ * 
+ * The type of obj is checked to be a json_type_string and 0 is returned 
+ * if it is not without any further actions. If type of obj is json_type_string
+ * the obect value is chaned to new_value
+ *
+ * @param obj the json_object instance
+ * @param new_value the value to be set; Since string legth is given in len this need not be zero terminated
+ * @param len the length of new_value
+ * @returns 1 if value is set correctly, 0 otherwise
+ */
+extern int json_object_set_string_len(json_object* obj, const char* new_value, int len);
+
 /** Check if two json_object's are equal
  *
  * If the passed objects are equal 1 will be returned.

@@ -31,6 +31,22 @@ int main(int argc, char **argv)
 	assert (json_object_get_double(tmp)==6435.34); 
 	json_object_put(tmp);
 	printf("DOUBLE PASSED\n");
+	#define SHORT "SHORT"
+	#define MID   "A MID STRING"
+	//             12345678901234567890123456789012....
+	#define HUGE  "A string longer than 32 chars as to check non local buf codepath"
+	tmp=json_object_new_string(SHORT);
+	assert (strcmp(json_object_get_string(tmp),SHORT)==0); 
+	json_object_set_string(tmp,MID);
+	assert (strcmp(json_object_get_string(tmp),MID)==0); 
+	json_object_set_string(tmp,HUGE);
+	assert (strcmp(json_object_get_string(tmp),HUGE)==0); 
+	json_object_set_string(tmp,SHORT);
+	assert (strcmp(json_object_get_string(tmp),SHORT)==0); 
+	json_object_put(tmp);
+	printf("STRING PASSED\n");
+	
+	
 	printf("PASSED\n");
 	return 0;
 }

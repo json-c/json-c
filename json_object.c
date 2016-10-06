@@ -935,6 +935,27 @@ int json_object_get_string_len(const struct json_object *jso)
 	}
 }
 
+int json_object_set_string(json_object* jso, const char* s) {
+	return json_object_set_string_len(jso, s, strlen(s));
+}
+
+int json_object_set_string_len(json_object* jso, const char* s, int len){
+	if (jso==NULL || jso->o_type!=json_type_string) return 0; 	
+	char *dstbuf; 
+	if (len<LEN_DIRECT_STRING_DATA) {
+		dstbuf=jso->o.c_string.str.data;
+		if (jso->o.c_string.len>=LEN_DIRECT_STRING_DATA) free(jso->o.c_string.str.ptr); 
+	} else {
+		dstbuf=(char *)malloc(len+1);
+		if (dstbuf==NULL) return 0;
+		if (jso->o.c_string.len>=LEN_DIRECT_STRING_DATA) free(jso->o.c_string.str.ptr);
+		jso->o.c_string.str.ptr=dstbuf;
+	}
+	jso->o.c_string.len=len;
+	memcpy(dstbuf, (const void *)s, len);
+	dstbuf[len] = '\0';
+	return 1; 
+}
 
 /* json_object_array */
 
