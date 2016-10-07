@@ -741,7 +741,7 @@ int json_object_double_to_json_string(struct json_object* jso,
 				      int flags)
 {
 	return json_object_double_to_json_string_format(jso, pb, level, flags,
-							jso->_userdata);
+							(const char *)jso->_userdata);
 }
 
 struct json_object* json_object_new_double(double d)
