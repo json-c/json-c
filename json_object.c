@@ -568,6 +568,13 @@ json_bool json_object_get_boolean(const struct json_object *jso)
 	}
 }
 
+int json_object_set_boolean(struct json_object *jso,json_bool new_value){
+	if (!jso || jso->o_type!=json_type_boolean)
+		return 0;
+	jso->o.c_boolean=new_value;
+	return 1;
+}
+
 
 /* json_object_int */
 
@@ -627,6 +634,14 @@ int32_t json_object_get_int(const struct json_object *jso)
   }
 }
 
+int json_object_set_int(struct json_object *jso,int new_value){
+	if (!jso || jso->o_type!=json_type_int)
+		return 0;
+	jso->o.c_int64=new_value;
+	return 1;
+}
+
+
 struct json_object* json_object_new_int64(int64_t i)
 {
 	struct json_object *jso = json_object_new(json_type_int);
@@ -659,6 +674,12 @@ int64_t json_object_get_int64(const struct json_object *jso)
 	}
 }
 
+int json_object_set_int64(struct json_object *jso,int64_t new_value){
+	if (!jso || jso->o_type!=json_type_int)
+		return 0;
+	jso->o.c_int64=new_value;
+	return 1;
+}
 
 /* json_object_double */
 
@@ -720,7 +741,7 @@ int json_object_double_to_json_string(struct json_object* jso,
 				      int flags)
 {
 	return json_object_double_to_json_string_format(jso, pb, level, flags,
-							jso->_userdata);
+							(const char *)jso->_userdata);
 }
 
 struct json_object* json_object_new_double(double d)
@@ -813,6 +834,12 @@ double json_object_get_double(const struct json_object *jso)
   }
 }
 
+int json_object_set_double(struct json_object *jso,double new_value){
+	if (!jso || jso->o_type!=json_type_double)
+		return 0;
+	jso->o.c_double=new_value;
+	return 1;
+}
 
 /* json_object_string */
 
@@ -908,6 +935,27 @@ int json_object_get_string_len(const struct json_object *jso)
 	}
 }
 
+int json_object_set_string(json_object* jso, const char* s) {
+	return json_object_set_string_len(jso, s, (int)(strlen(s)));
+}
+
+int json_object_set_string_len(json_object* jso, const char* s, int len){
+	if (jso==NULL || jso->o_type!=json_type_string) return 0; 	
+	char *dstbuf; 
+	if (len<LEN_DIRECT_STRING_DATA) {
+		dstbuf=jso->o.c_string.str.data;
+		if (jso->o.c_string.len>=LEN_DIRECT_STRING_DATA) free(jso->o.c_string.str.ptr); 
+	} else {
+		dstbuf=(char *)malloc(len+1);
+		if (dstbuf==NULL) return 0;
+		if (jso->o.c_string.len>=LEN_DIRECT_STRING_DATA) free(jso->o.c_string.str.ptr);
+		jso->o.c_string.str.ptr=dstbuf;
+	}
+	jso->o.c_string.len=len;
+	memcpy(dstbuf, (const void *)s, len);
+	dstbuf[len] = '\0';
+	return 1; 
+}
 
 /* json_object_array */
 
