@@ -121,9 +121,15 @@ int main()
 
 	json_object_object_add(obj1, "test1", json_object_new_int(123));
 	json_object_object_add(obj1, "test2", json_object_new_int(321));
+	json_object_object_add(obj1, "test3", json_object_new_int(320));
+	json_object_object_add(obj1, "test4", json_object_new_int(319));
+	json_object_object_add(obj1, "test5", json_object_new_int(318));
 
-	json_object_object_add(obj2, "test2", json_object_new_int(123));
-	json_object_object_add(obj2, "test1", json_object_new_int(321));
+	json_object_object_add(obj2, "test5", json_object_new_int(318));
+	json_object_object_add(obj2, "test4", json_object_new_int(319));
+	json_object_object_add(obj2, "test3", json_object_new_int(320));
+	json_object_object_add(obj2, "test2", json_object_new_int(321));
+	json_object_object_add(obj2, "test1", json_object_new_int(123));
 
 	/* key-order is different between obj1 and obj2, should still be equal */
 	if (json_object_equal(obj1, obj2))
