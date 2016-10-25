@@ -27,6 +27,9 @@
     <ClCompile Include="json_object.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="json_pointer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="json_tokener.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -57,6 +60,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="json_object_private.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="json_pointer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="json_tokener.h">

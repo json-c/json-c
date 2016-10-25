@@ -27,6 +27,7 @@ libjson_cinclude_HEADERS = \
 	json_object.h \
 	json_object_iterator.h \
 	json_object_private.h \
+	json_pointer.h \
 	json_tokener.h \
 	json_util.h \
 	json_visit.h \
@@ -43,6 +44,7 @@ libjson_c_la_SOURCES = \
 	json_c_version.c \
 	json_object.c \
 	json_object_iterator.c \
+	json_pointer.c \
 	json_tokener.c \
 	json_util.c \
 	json_visit.c \

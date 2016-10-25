@@ -133,6 +133,7 @@ copy json_config.h.win32 json_config.h
     <ClCompile Include="arraylist.c" />
     <ClCompile Include="debug.c" />
     <ClCompile Include="json_object.c" />
+    <ClCompile Include="json_pointer.c" />
     <ClCompile Include="json_tokener.c" />
     <ClCompile Include="json_util.c" />
     <ClCompile Include="linkhash.c" />
@@ -146,6 +147,7 @@ copy json_config.h.win32 json_config.h
     <ClInclude Include="json_inttypes.h" />
     <ClInclude Include="json_object.h" />
     <ClInclude Include="json_object_private.h" />
+    <ClInclude Include="json_pointer.h" />
     <ClInclude Include="json_tokener.h" />
     <ClInclude Include="json_util.h" />
     <ClInclude Include="linkhash.h" />

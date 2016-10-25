@@ -32,6 +32,7 @@ set(JSON_C_HEADERS
     ./json_inttypes.h
     ./json_object.h
     ./json_object_private.h
+    ./json_pointer.h
     ./json_tokener.h
     ./json_util.h
     ./linkhash.h
@@ -44,6 +45,7 @@ set(JSON_C_SOURCES
     ./arraylist.c
     ./debug.c
     ./json_object.c
+    ./json_pointer.c
     ./json_tokener.c
     ./json_util.c
     ./linkhash.c

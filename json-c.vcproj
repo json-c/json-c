@@ -109,6 +109,9 @@ copy json_config.h.win32 json_config.h"/>
 				RelativePath=".\json_object.c">
 			</File>
 			<File
+				RelativePath=".\json_pointer.c">
+			</File>
+			<File
 				RelativePath=".\json_tokener.c">
 			</File>
 			<File
@@ -142,6 +145,9 @@ copy json_config.h.win32 json_config.h"/>
 			</File>
 			<File
 				RelativePath=".\json_object_private.h">
+			</File>
+			<File
+				RelativePath=".\json_pointer.h">
 			</File>
 			<File
 				RelativePath=".\json_tokener.h">
