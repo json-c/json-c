@@ -18,6 +18,7 @@ libjson_cincludedir = $(includedir)/json-c
 libjson_cinclude_HEADERS = \
 	arraylist.h \
 	bits.h \
+	compat/strdup.h \
 	debug.h \
 	json.h \
 	json_c_version.h \

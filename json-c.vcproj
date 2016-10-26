@@ -132,6 +132,9 @@ copy json_config.h.win32 json_config.h"/>
 				RelativePath=".\bits.h">
 			</File>
 			<File
+				RelativePath=".\compat\strdup.h">
+			</File>
+			<File
 				RelativePath=".\debug.h">
 			</File>
 			<File

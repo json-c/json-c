@@ -141,6 +141,7 @@ copy json_config.h.win32 json_config.h
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arraylist.h" />
+    <ClInclude Include="compat\strdup.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="json_inttypes.h" />
     <ClInclude Include="json_object.h" />

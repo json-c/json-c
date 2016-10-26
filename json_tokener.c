@@ -31,6 +31,7 @@
 #include "json_object.h"
 #include "json_tokener.h"
 #include "json_util.h"
+#include "compat/strdup.h"
 
 #ifdef HAVE_LOCALE_H
 #include <locale.h>
@@ -40,13 +41,6 @@
 #endif
 
 #define jt_hexdigit(x) (((x) <= '9') ? (x) - '0' : ((x) & 7) + 9)
-
-#if !HAVE_STRDUP && defined(_MSC_VER)
-  /* MSC has the version as _strdup */
-# define strdup _strdup
-#elif !HAVE_STRDUP
-# error You do not have strdup on your system.
-#endif /* HAVE_STRDUP */
 
 #if !HAVE_STRNCASECMP && defined(_MSC_VER)
   /* MSC has the version as _strnicmp */

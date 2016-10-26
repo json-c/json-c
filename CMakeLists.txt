@@ -23,6 +23,7 @@ endif()
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 
 set(JSON_C_HEADERS
+    ./compat/strdup.h
     ./json.h
     ${CMAKE_CURRENT_BINARY_DIR}/include/config.h
     ./json_config.h
