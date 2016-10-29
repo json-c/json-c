@@ -12,6 +12,7 @@
 
 #include "config.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -451,6 +452,8 @@ int json_object_object_add_ex(struct json_object* jso,
 	struct json_object *const val,
 	const unsigned opts)
 {
+	assert(json_object_get_type(jso) == json_type_object);
+
 	// We lookup the entry and replace the value, rather than just deleting
 	// and re-adding it, so the existing key remains valid.
 	json_object *existing_value = NULL;
@@ -489,6 +492,7 @@ int json_object_object_add(struct json_object* jso, const char *key,
 
 int json_object_object_length(const struct json_object *jso)
 {
+	assert(json_object_get_type(jso) == json_type_object);
 	return lh_table_length(jso->o.c_object);
 }
 
@@ -523,6 +527,7 @@ json_bool json_object_object_get_ex(const struct json_object* jso, const char *k
 
 void json_object_object_del(struct json_object* jso, const char *key)
 {
+	assert(json_object_get_type(jso) == json_type_object);
 	lh_table_delete(jso->o.c_object, key);
 }
 
@@ -1045,6 +1050,7 @@ struct array_list* json_object_get_array(const struct json_object *jso)
 void json_object_array_sort(struct json_object *jso,
 			    int(*sort_fn)(const void *, const void *))
 {
+	assert(json_object_get_type(jso) == json_type_array);
 	array_list_sort(jso->o.c_array, sort_fn);
 }
 
@@ -1055,6 +1061,7 @@ struct json_object* json_object_array_bsearch(
 {
 	struct json_object **result;
 
+	assert(json_object_get_type(jso) == json_type_array);
 	result = (struct json_object **)array_list_bsearch(
 			(const void **)&key, jso->o.c_array, sort_fn);
 
@@ -1065,23 +1072,33 @@ struct json_object* json_object_array_bsearch(
 
 size_t json_object_array_length(const struct json_object *jso)
 {
+	assert(json_object_get_type(jso) == json_type_array);
 	return array_list_length(jso->o.c_array);
 }
 
 int json_object_array_add(struct json_object *jso,struct json_object *val)
 {
+	assert(json_object_get_type(jso) == json_type_array);
 	return array_list_add(jso->o.c_array, val);
 }
 
 int json_object_array_put_idx(struct json_object *jso, size_t idx,
 			      struct json_object *val)
 {
+	assert(json_object_get_type(jso) == json_type_array);
 	return array_list_put_idx(jso->o.c_array, idx, val);
+}
+
+int json_object_array_del_idx(struct json_object *jso, size_t idx, size_t count)
+{
+	assert(json_object_get_type(jso) == json_type_array);
+	return array_list_del_idx(jso->o.c_array, idx, count);
 }
 
 struct json_object* json_object_array_get_idx(const struct json_object *jso,
 					      size_t idx)
 {
+	assert(json_object_get_type(jso) == json_type_array);
 	return (struct json_object*)array_list_get_idx(jso->o.c_array, idx);
 }
 
@@ -1108,6 +1125,8 @@ static int json_object_all_values_equal(struct json_object* jso1,
 	struct json_object_iter iter;
 	struct json_object *sub;
 
+	assert(json_object_get_type(jso1) == json_type_object);
+	assert(json_object_get_type(jso2) == json_type_object);
 	/* Iterate over jso1 keys and see if they exist and are equal in jso2 */
         json_object_object_foreachC(jso1, iter) {
 		if (!lh_table_lookup_ex(jso2->o.c_object, (void*)iter.key,
@@ -1167,7 +1186,3 @@ int json_object_equal(struct json_object* jso1, struct json_object* jso2)
 	return 0;
 }
 
-int json_object_array_del_idx(struct json_object *jso, size_t idx, size_t count)
-{
-	return array_list_del_idx(jso->o.c_array, idx, count);
-}
