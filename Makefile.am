@@ -28,6 +28,7 @@ libjson_cinclude_HEADERS = \
 	json_object_private.h \
 	json_tokener.h \
 	json_util.h \
+	json_visit.h \
 	linkhash.h \
 	math_compat.h \
 	printbuf.h \
@@ -43,6 +44,7 @@ libjson_c_la_SOURCES = \
 	json_object_iterator.c \
 	json_tokener.c \
 	json_util.c \
+	json_visit.c \
 	linkhash.c \
 	printbuf.c \
 	random_seed.c
