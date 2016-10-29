@@ -241,12 +241,15 @@ enum json_type json_object_get_type(const struct json_object *jso)
 }
 
 void* json_object_get_userdata(json_object *jso) {
-	return jso->_userdata;
+	return jso ? jso->_userdata : NULL;
 }
 
 void json_object_set_userdata(json_object *jso, void *userdata,
 			      json_object_delete_fn *user_delete)
 {
+	// Can't return failure, so abort if we can't perform the operation.
+	assert(jso != NULL);
+
 	// First, clean up any previously existing user info
 	if (jso->_user_delete)
 		jso->_user_delete(jso, jso->_userdata);
