@@ -6,6 +6,7 @@
 
 #include "json.h"
 #include "json_tokener.h"
+#include "json_visit.h"
 
 static void test_basic_parse(void);
 static void test_verbose_parse(void);
@@ -23,6 +24,9 @@ int main(void)
 	test_incremental_parse();
 	puts(separator);
 }
+
+static json_c_visit_userfunc clear_serializer;
+static void do_clear_serializer(json_object *jso);
 
 static void test_basic_parse()
 {
@@ -157,6 +161,48 @@ static void test_basic_parse()
 	new_obj = json_tokener_parse("{ \"abc\": 12, \"foo\": \"bar\", \"bool0\": false, \"bool1\": true, \"arr\": [ 1, 2, 3, null, 5 ] }");
 	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
 	json_object_put(new_obj);
+
+	new_obj = json_tokener_parse("{ \"abc\": \"blue\nred\\ngreen\" }");
+	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
+	json_object_put(new_obj);
+
+	new_obj = json_tokener_parse("[0e]");
+	do_clear_serializer(new_obj);
+	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
+	json_object_put(new_obj);
+
+	new_obj = json_tokener_parse("[0e+]");
+	do_clear_serializer(new_obj);
+	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
+	json_object_put(new_obj);
+
+	new_obj = json_tokener_parse("[0e+-1]");
+	do_clear_serializer(new_obj);
+	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
+	json_object_put(new_obj);
+
+	new_obj = json_tokener_parse("[18446744073709551616]");
+	do_clear_serializer(new_obj);
+	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
+	json_object_put(new_obj);
+}
+
+// Clear the re-serialization information that the tokener
+// saves to ensure that the output reflects the actual
+// values we parsed, rather than just the original input.
+static void do_clear_serializer(json_object *jso)
+{
+	json_c_visit(jso, 0, clear_serializer, NULL);
+}
+
+static int clear_serializer(json_object *jso, int flags,
+                     json_object *parent_jso,
+                     const char *jso_key,
+                     size_t *jso_index, void *userarg)
+{
+	if (jso)
+		json_object_set_serializer(jso, NULL, NULL, NULL);
+	return JSON_C_VISIT_RETURN_CONTINUE;
 }
 
 static void test_verbose_parse()
