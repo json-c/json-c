@@ -29,13 +29,7 @@
 #include "json_object_private.h"
 #include "json_util.h"
 #include "math_compat.h"
-
-#if !defined(HAVE_STRDUP) && defined(_MSC_VER)
-  /* MSC has the version as _strdup */
-# define strdup _strdup
-#elif !defined(HAVE_STRDUP)
-# error You do not have strdup on your system.
-#endif /* HAVE_STRDUP */
+#include "compat/strdup.h"
 
 #if !defined(HAVE_SNPRINTF) && defined(_MSC_VER)
   /* MSC has the version as _snprintf */

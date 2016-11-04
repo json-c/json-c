@@ -50,7 +50,7 @@ static struct {
 
 #define PREFIX "ERRNO="
 static char errno_buf[128] = PREFIX;
-const char *strerror(int errno_in)
+char *strerror(int errno_in)
 {
 	int start_idx;
 	char digbuf[20];
