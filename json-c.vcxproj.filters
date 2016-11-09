@@ -50,9 +50,6 @@
     <ClInclude Include="arraylist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="compat\strdup.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
