@@ -159,7 +159,7 @@ static int json_pointer_get_recursive(
 	}
 
 	/* We should be at the end of the recursion here */
-    if (value)
+	if (value)
 		*value = obj;
 
 	return 0;
