@@ -17,6 +17,7 @@
 
 #include "json_pointer.h"
 #include "strdup_compat.h"
+#include "vasprintf_compat.h"
 
 /**
  * JavaScript Object Notation (JSON) Pointer

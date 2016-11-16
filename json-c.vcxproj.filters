@@ -83,6 +83,9 @@
     <ClInclude Include="strdup_compat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="vasprintf_compat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="random_seed.h">
       <Filter>Header Files</Filter>
     </ClInclude>

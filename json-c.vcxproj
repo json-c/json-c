@@ -152,6 +152,7 @@ copy json_config.h.win32 json_config.h
     <ClInclude Include="linkhash.h" />
     <ClInclude Include="math_compat.h" />
     <ClInclude Include="strdup_compat.h" />
+    <ClInclude Include="vasprintf_compat.h" />
     <ClInclude Include="printbuf.h" />
     <ClInclude Include="random_seed.h" />
   </ItemGroup>

@@ -37,6 +37,7 @@ set(JSON_C_HEADERS
     ./linkhash.h
     ./math_compat.h
     ./strdup_compat.h
+    ./vasprintf_compat.h
     ./printbuf.h
     ./random_seed.h
 )
