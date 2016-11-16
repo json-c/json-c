@@ -132,6 +132,10 @@ static void test_recursion_get()
 	assert(json_object_is_type(jo2, json_type_string));
 	assert(0 == strcmp("1", json_object_get_string(jo2)));
 
+	assert(0 == json_pointer_getf(jo1, &jo2, "/%s/%d/%s/%d/%s", "arr", 0, "obj", 2, "obj2"));
+	assert(json_object_is_type(jo2, json_type_string));
+	assert(0 == strcmp("1", json_object_get_string(jo2)));
+
 	assert(jo1 != NULL);
 	assert(0 == json_pointer_get(jo1, "/obj/obj/obj/0/obj1", &jo2));
 	assert(json_object_is_type(jo2, json_type_int));
@@ -180,6 +184,9 @@ static void test_wrong_inputs_get()
 	assert(0 != json_pointer_get(jo1, "/foo/a", NULL));
 	assert(errno == EINVAL);
 	errno = 0;
+	assert(0 != json_pointer_getf(jo1, NULL, "/%s/a", "foo"));
+	assert(errno == EINVAL);
+	errno = 0;
 	assert(0 != json_pointer_get(jo1, "/foo/-", NULL));
 	assert(errno == EINVAL);
 	errno = 0;
@@ -188,7 +195,10 @@ static void test_wrong_inputs_get()
 	assert(errno == ENOENT);
 	errno = 0;
 	/* Test non-optimized array path */
-	assert(0 != json_pointer_get(jo1, "/foo/22", NULL));
+	assert(0 != json_pointer_getf(jo1, NULL, "%s", "/foo/22"));
+	assert(errno == ENOENT);
+	errno = 0;
+	assert(0 != json_pointer_getf(jo1, NULL, "/%s/%d", "foo", 22));
 	assert(errno == ENOENT);
 	errno = 0;
 	assert(0 != json_pointer_get(jo1, "/foo/-1", NULL));
@@ -220,6 +230,7 @@ static void test_example_set()
 	assert(0 == json_pointer_set(&jo1, "/fud/gaw", jo2)); /* re-using jo2 from above */
 	printf("PASSED - SET - /fug/gaw == [1,2,3]\n");
 	assert(0 == json_pointer_set(&jo1, "/fud/gaw/0", json_object_new_int(0)));
+	assert(0 == json_pointer_setf(&jo1, json_object_new_int(0), "%s%s/%d", "/fud", "/gaw", 0));
 	printf("PASSED - SET - /fug/gaw == [0,2,3]\n");
 	assert(0 == json_pointer_set(&jo1, "/fud/gaw/-", json_object_new_int(4)));
 	printf("PASSED - SET - /fug/gaw == [0,2,3,4]\n");
