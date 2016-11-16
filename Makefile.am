@@ -32,6 +32,7 @@ libjson_cinclude_HEADERS = \
 	json_visit.h \
 	linkhash.h \
 	math_compat.h \
+	strdup_compat.h \
 	printbuf.h \
 	random_seed.h
 

@@ -16,6 +16,7 @@
 #include <ctype.h>
 
 #include "json_pointer.h"
+#include "strdup_compat.h"
 
 /**
  * JavaScript Object Notation (JSON) Pointer

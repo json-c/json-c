@@ -80,6 +80,9 @@
     <ClInclude Include="math_compat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="strdup_compat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="random_seed.h">
       <Filter>Header Files</Filter>
     </ClInclude>
