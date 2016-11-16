@@ -8,6 +8,7 @@
 
 #include "config.h"
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -192,6 +193,37 @@ int json_pointer_get(struct json_object *obj, const char *path, struct json_obje
 	return rc;
 }
 
+int json_pointer_getf(struct json_object *obj, struct json_object **res, const char *path_fmt, ...)
+{
+	char *path_copy = NULL;
+	int rc = 0;
+	va_list args;
+
+	if (!obj || !path_fmt) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	va_start(args, path_fmt);
+	rc = vasprintf(&path_copy, path_fmt, args);
+	va_end(args);
+
+	if (rc < 0)
+		return rc;
+
+	if (path_copy[0] == '\0') {
+		if (res)
+			*res = obj;
+		goto out;
+	}
+
+	rc = json_pointer_get_recursive(obj, path_copy, res);
+out:
+	free(path_copy);
+
+	return rc;
+}
+
 int json_pointer_set(struct json_object **obj, const char *path, struct json_object *value)
 {
 	const char *endp;
@@ -235,5 +267,58 @@ int json_pointer_set(struct json_object **obj, const char *path, struct json_obj
 
 	endp++;
 	return json_pointer_set_single_path(set, endp, value);
+}
+
+int json_pointer_setf(struct json_object **obj, struct json_object *value, const char *path_fmt, ...)
+{
+	char *endp;
+	char *path_copy = NULL;
+	struct json_object *set = NULL;
+	va_list args;
+	int rc = 0;
+
+	if (!obj || !path_fmt) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	/* pass a working copy to the recursive call */
+	va_start(args, path_fmt);
+	rc = vasprintf(&path_copy, path_fmt, args);
+	va_end(args);
+
+	if (rc < 0)
+		return rc;
+
+	if (path_copy[0] == '\0') {
+		json_object_put(*obj);
+		*obj = value;
+		goto out;
+	}
+
+	if (path_copy[0] != '/') {
+		errno = EINVAL;
+		rc = -1;
+		goto out;
+	}
+
+	/* If there's only 1 level to set, stop here */
+	if ((endp = strrchr(path_copy, '/')) == path_copy) {
+		set = *obj;
+		goto set_single_path;
+	}
+
+	*endp = '\0';
+	rc = json_pointer_get_recursive(*obj, path_copy, &set);
+
+	if (rc)
+		goto out;
+
+set_single_path:
+	endp++;
+	rc = json_pointer_set_single_path(set, endp, value);
+out:
+	free(path_copy);
+	return rc;
 }
 
