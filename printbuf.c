@@ -13,6 +13,7 @@
  * (http://www.opensource.org/licenses/mit-license.php)
  */
 
+#define _GNU_SOURCE
 #include "config.h"
 
 #include <stdio.h>
