@@ -324,3 +324,16 @@ const char *json_type_to_name(enum json_type o_type)
 	return json_type_name[o_type];
 }
 
+struct json_object* json_object_duplicate(struct json_object* pObj)
+{
+	/*we could also duplicate by iterate json_object;
+		but this code is easy to read and write.
+	*/
+	const char* pTxt = json_object_to_json_string(pObj);
+	if (pTxt) 
+	{
+		json_object* newObject = json_tokener_parse(pTxt);
+		return newObject;
+	}
+	return NULL;
+}
