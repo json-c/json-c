@@ -693,6 +693,7 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
 {
   char buf[128], *p, *q;
   int size;
+  double dummy; /* needed for modf() */
   /* Although JSON RFC does not support
      NaN or Infinity as numeric values
      ECMA 262 section 9.8.1 defines
@@ -706,7 +707,9 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
       size = snprintf(buf, sizeof(buf), "-Infinity");
   else
     size = snprintf(buf, sizeof(buf),
-        format ? format : "%.17g", jso->o.c_double);
+        format ? format : 
+          (modf(jso->o.c_double, &dummy) == 0) ? "%.17g.0" : "%.17g",
+          jso->o.c_double);
 
   p = strchr(buf, ',');
   if (p) {

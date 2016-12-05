@@ -7,6 +7,7 @@ LIBJSON_LA=$(top_builddir)/libjson-c.la
 
 TESTS=
 TESTS+= test_util_file.test
+TESTS+= test_float.test
 TESTS+= test1.test
 TESTS+= test2.test
 TESTS+= test4.test
