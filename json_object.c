@@ -105,13 +105,30 @@ get_string_component(const struct json_object *jso)
 
 static int json_escape_str(struct printbuf *pb, const char *str, int len, int flags)
 {
-	int pos = 0, start_offset = 0;
+	int pos = 0, start_offset = 0, utf8_start = 0, utf8_end = 0;
 	unsigned char c;
 	while (len--)
 	{
 		c = str[pos];
-		switch(c)
-		{
+		if (utf8_end > pos) {
+			// Expecting a continuation byte.
+			if (c >= 0x80 && c <= 0xBf) {
+				// Found the continuation byte.
+				goto utf8_loop_end;
+			} else {
+				// Invalid byte.
+				if(utf8_start - start_offset > 0)
+					printbuf_memappend(pb, str + start_offset, utf8_start - start_offset);
+				printbuf_memappend(pb, "\xEF\xBF\xBD", 3);
+				start_offset = pos;
+				utf8_end = pos; // get out of the UTF-8 state
+				goto utf8_reset;
+			}
+		}
+
+utf8_reset:
+		switch(c) {
+
 		case '\b':
 		case '\n':
 		case '\r':
@@ -122,7 +139,6 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 		case '/':
 			if((flags & JSON_C_TO_STRING_NOSLASHESCAPE) && c == '/')
 			{
-				pos++;
 				break;
 			}
 
@@ -138,7 +154,7 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 			else if(c == '\\') printbuf_memappend(pb, "\\\\", 2);
 			else if(c == '/') printbuf_memappend(pb, "\\/", 2);
 
-			start_offset = ++pos;
+			start_offset = pos + 1;
 			break;
 		default:
 			if(c < ' ')
@@ -150,12 +166,45 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 				sprintbuf(pb, "\\u00%c%c",
 				json_hex_chars[c >> 4],
 				json_hex_chars[c & 0xf]);
-				start_offset = ++pos;
-			} else
-				pos++;
+				start_offset = pos + 1;
+			} else if (c >= 0x80) {
+				// Expecting a start byte.
+				if (c >= 0xC2 && c <= 0xDF) {
+					// 2-byte start byte.
+					utf8_start = pos;
+					utf8_end = pos + 2;
+				} else if (c >= 0xE0 && c <= 0xEF) {
+					// 3-byte start byte.
+					utf8_start = pos;
+					utf8_end = pos + 3;
+				} else if (c >= 0xF0 && c <= 0xF4) {
+					// 4-byte start byte.
+					utf8_start = pos;
+					utf8_end = pos + 4;
+				} else {
+					// Invalid byte.
+					if(pos - start_offset > 0)
+						printbuf_memappend(pb,
+								   str + start_offset,
+								   pos - start_offset);
+					printbuf_memappend(pb, "\xEF\xBF\xBD", 3);
+					start_offset = pos + 1;
+				}
+			} else {
+				// Some other valid ASCII character.
+			}
+			break;
 		}
+
+utf8_loop_end:
+		pos++;
 	}
-	if (pos - start_offset > 0)
+	if (utf8_end > pos) {
+		if(utf8_start - start_offset > 0)
+			printbuf_memappend(pb, str + start_offset, utf8_start - start_offset);
+		printbuf_memappend(pb, "\xEF\xBF\xBD", 3);
+	}
+	else if (pos - start_offset > 0)
 		printbuf_memappend(pb, str + start_offset, pos - start_offset);
 	return 0;
 }
