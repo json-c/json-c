@@ -17,12 +17,12 @@ Home page for json-c: https://github.com/json-c/json-c/wiki
 Prerequisites:
 
  - `gcc`, `clang`, or another C compiler
- - `libtool`
+ - `libtool>=2.2.6b`
 
 If you're not using a release tarball, you'll also need:
 
- - `autoconf` (`autoreconf`)
- - `automake`
+ - `autoconf>=2.64` (`autoreconf`)
+ - `automake>=1.10.3`
 
 Make sure you have a complete `libtool` install, including `libtoolize`.
 
