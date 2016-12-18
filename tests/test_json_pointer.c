@@ -261,15 +261,21 @@ static void test_wrong_inputs_set()
 	printf("PASSED - SET - failed 'cod' with path 'foo/bar'\n");
 	json_object_put(jo2);
 
-	assert(0 != json_pointer_set(&jo1, "/fud/gaw", (jo2 = json_object_new_string("whatever"))));
+	jo2 = json_object_new_string("whatever");
+	assert(0 != json_pointer_set(&jo1, "/fud/gaw", jo2));
 	assert(0 == json_pointer_set(&jo1, "/fud", json_object_new_object()));
 	assert(0 == json_pointer_set(&jo1, "/fud/gaw", jo2)); /* re-using jo2 from above */
-	assert(0 != json_pointer_set(&jo1, "/fud/gaw/0", json_object_new_int(0)));
-	assert(0 != json_pointer_set(&jo1, "/fud/gaw/", json_object_new_int(0)));
+	// ownership of jo2 transferred into jo1
+
+	jo2 = json_object_new_int(0);
+	assert(0 != json_pointer_set(&jo1, "/fud/gaw/0", jo2));
+	json_object_put(jo2);
+	jo2 = json_object_new_int(0);
+	assert(0 != json_pointer_set(&jo1, "/fud/gaw/", jo2));
+	json_object_put(jo2);
 	printf("PASSED - SET - failed to set index to non-array\n");
 
 	json_object_put(jo1);
-	json_object_put(jo2);
 }
 
 int main(int argc, char **argv)

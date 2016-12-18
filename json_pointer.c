@@ -33,7 +33,7 @@ static void string_replace_all_occurrences_with_char(char *s, const char *occur,
 		*p = repl_char;
 		p++;
 		slen -= skip;
-		memcpy(p, (p + skip), slen - (p - s) + 1); /* includes null char too */
+		memmove(p, (p + skip), slen - (p - s) + 1); /* includes null char too */
 	}
 }
 
