@@ -26,6 +26,8 @@
 /tests/test_charcase
 /tests/test_compare
 /tests/test_double_serializer
+/tests/test_float
+/tests/test_json_pointer
 /tests/test_locale
 /tests/test_null
 /tests/test_parse
@@ -35,7 +37,6 @@
 /tests/test_set_value
 /tests/test_util_file
 /tests/test_visit
-/tests/test_json_pointer
 /tests/*.vg.out
 /tests/*.log
 /tests/*.trs
