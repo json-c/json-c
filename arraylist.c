@@ -26,6 +26,8 @@
 #define SIZE_T_MAX UINT_MAX
 #elif SIZEOF_SIZE_T == SIZEOF_LONG
 #define SIZE_T_MAX ULONG_MAX
+#elif SIZEOF_SIZE_T == SIZEOF_LONG_LONG
+#define SIZE_T_MAX ULLONG_MAX
 #else
 #error Unable to determine size of size_t
 #endif
