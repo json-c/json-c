@@ -147,9 +147,13 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 					printbuf_memappend(pb,
 							   str + start_offset,
 							   pos - start_offset);
-				sprintbuf(pb, "\\u00%c%c",
-				json_hex_chars[c >> 4],
-				json_hex_chars[c & 0xf]);
+				static char sbuf[7];
+				snprintf(sbuf, sizeof(sbuf),
+                                        "\\u00%c%c",
+                                        json_hex_chars[c >> 4],
+                                        json_hex_chars[c & 0xf]);
+				printbuf_memappend (pb, sbuf, sizeof(sbuf) - 1);
+
 				start_offset = ++pos;
 			} else
 				pos++;
@@ -585,7 +589,10 @@ static int json_object_int_to_json_string(struct json_object* jso,
 					  int level,
 					  int flags)
 {
-	return sprintbuf(pb, "%" PRId64, jso->o.c_int64);
+	/* room for 19 digits, the sign char, and a null term */
+	static char sbuf[21];
+	snprintf(sbuf, sizeof(sbuf), "%"PRId64, jso->o.c_int64);
+	return sprintbuf(pb, sbuf);
 }
 
 struct json_object* json_object_new_int(int32_t i)

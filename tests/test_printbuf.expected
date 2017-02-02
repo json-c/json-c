@@ -20,13 +20,3 @@ Append to just before resize: 31, [XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX]
 Append to just after resize: 32, [XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX]
 test_printbuf_memappend: end test
 ========================================
-test_sprintbuf: starting test
-Buffer length: 0
-sprintbuf to just after resize(31+1): 32, [XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX], strlen(buf)=32
-5, [plain]
-6, [plain1]
-16, [plain12147483647]
-27, [plain12147483647-2147483648]
-29, [plain12147483647-2147483648%s]
-test_sprintbuf: end test
-========================================

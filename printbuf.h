@@ -62,7 +62,7 @@ extern int
 printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len);
 
 extern int
-sprintbuf(struct printbuf *p, const char *msg, ...);
+sprintbuf(struct printbuf *p, const char *msg);
 
 extern void
 printbuf_reset(struct printbuf *p);
