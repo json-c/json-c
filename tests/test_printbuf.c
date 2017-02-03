@@ -17,7 +17,7 @@ static void test_basic_printbuf_memset()
 
 	printf("%s: starting test\n", __func__);
 	pb = printbuf_new();
-	sprintbuf(pb, "blue:1");
+	sprintbuf(pb, "blue:%d", 1);
 	printbuf_memset(pb, -1, 'x', 52);
 	printf("Buffer contents:%.*s\n", printbuf_length(pb), pb->buf);
 	printbuf_free(pb);
@@ -106,6 +106,49 @@ static void test_printbuf_memappend(int *before_resize)
 	printf("Append to just after resize: %d, [%s]\n", printbuf_length(pb), pb->buf);
 
 	free(data);
+	printbuf_free(pb);
+
+#define SA_TEST_STR "XXXXXXXXXXXXXXXX"
+	pb = printbuf_new();
+	printbuf_strappend(pb, SA_TEST_STR);
+	printf("Buffer size after printbuf_strappend(): %d, [%s]\n", printbuf_length(pb), pb->buf);
+	printbuf_free(pb);
+#undef  SA_TEST_STR
+
+	printf("%s: end test\n", __func__);
+}
+
+static void test_sprintbuf(int before_resize);
+static void test_sprintbuf(int before_resize)
+{
+	struct printbuf *pb;
+
+	printf("%s: starting test\n", __func__);
+	pb = printbuf_new();
+	printf("Buffer length: %d\n", printbuf_length(pb));
+
+	char *data = malloc(before_resize + 1 + 1);
+	memset(data, 'X', before_resize + 1 + 1);
+	data[before_resize + 1] = '\0';
+	sprintbuf(pb, "%s", data);
+	free(data);
+	printf("sprintbuf to just after resize(%d+1): %d, [%s], strlen(buf)=%d\n", before_resize, printbuf_length(pb), pb->buf, (int)strlen(pb->buf));
+
+	printbuf_reset(pb);
+	sprintbuf(pb, "plain");
+	printf("%d, [%s]\n", printbuf_length(pb), pb->buf);
+
+	sprintbuf(pb, "%d", 1);
+	printf("%d, [%s]\n", printbuf_length(pb), pb->buf);
+
+	sprintbuf(pb, "%d", INT_MAX);
+	printf("%d, [%s]\n", printbuf_length(pb), pb->buf);
+
+	sprintbuf(pb, "%d", INT_MIN);
+	printf("%d, [%s]\n", printbuf_length(pb), pb->buf);
+
+	sprintbuf(pb, "%s", "%s");
+	printf("%d, [%s]\n", printbuf_length(pb), pb->buf);
 
 	printbuf_free(pb);
 	printf("%s: end test\n", __func__);
@@ -122,6 +165,8 @@ int main(int argc, char **argv)
 	test_printbuf_memset_length();
 	printf("========================================\n");
 	test_printbuf_memappend(&before_resize);
+	printf("========================================\n");
+	test_sprintbuf(before_resize);
 	printf("========================================\n");
 
 	return 0;
