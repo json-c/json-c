@@ -35,7 +35,7 @@ static const char *to_json_string(json_object *obj, int flags)
 	const char *result;
 
 	result = json_object_to_json_string_length(obj, flags, &length);
-	copy = strndup(result, length);
+	copy = strdup(result);
 	if (copy == NULL)
 		printf("to_json_string: Allocation failed!\n");
 	else {
