@@ -18,6 +18,7 @@ Partial append: 3, [blu]
 With embedded \0 character: 4, [ab]
 Append to just before resize: 31, [XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX]
 Append to just after resize: 32, [XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX]
+Buffer size after printbuf_strappend(): 16, [XXXXXXXXXXXXXXXX]
 test_printbuf_memappend: end test
 ========================================
 test_sprintbuf: starting test

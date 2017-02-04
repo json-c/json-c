@@ -106,8 +106,15 @@ static void test_printbuf_memappend(int *before_resize)
 	printf("Append to just after resize: %d, [%s]\n", printbuf_length(pb), pb->buf);
 
 	free(data);
-
 	printbuf_free(pb);
+
+#define SA_TEST_STR "XXXXXXXXXXXXXXXX"
+	pb = printbuf_new();
+	printbuf_strappend(pb, SA_TEST_STR);
+	printf("Buffer size after printbuf_strappend(): %d, [%s]\n", printbuf_length(pb), pb->buf);
+	printbuf_free(pb);
+#undef  SA_TEST_STR
+
 	printf("%s: end test\n", __func__);
 }
 
