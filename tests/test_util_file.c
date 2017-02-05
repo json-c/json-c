@@ -147,8 +147,8 @@ static void test_read_nonexistant()
 	json_object *jso = json_object_from_file(filename);
 	if (jso != NULL)
 	{
-		printf("FAIL: json_object_from_file(%s) returned 0x%lx when NULL expected\n",
-		       filename, (unsigned long)jso);
+		printf("FAIL: json_object_from_file(%s) returned %p when NULL expected\n",
+		       filename, (void *)jso);
 		json_object_put(jso);
 	}
 	else
@@ -178,14 +178,14 @@ static void test_read_closed()
 	json_object *jso = json_object_from_fd(fixed_d);
 	if (jso != NULL)
 	{
-		printf("FAIL: read from closed fd returning non-NULL: 0x%lx\n",
-		       (unsigned long) jso);
+		printf("FAIL: read from closed fd returning non-NULL: %p\n",
+		       (void *)jso);
 		fflush(stdout);
 		printf("  jso=%s\n", json_object_to_json_string(jso));
 		json_object_put(jso);
 		return;
 	}
 	printf("OK: json_object_from_fd(closed_fd), "
-	       "expecting NULL, EBADF, got:0x%lx, %s\n",
-	       (unsigned long)jso, json_util_get_last_err());
+	       "expecting NULL, EBADF, got:NULL, %s\n",
+	       json_util_get_last_err());
 }
