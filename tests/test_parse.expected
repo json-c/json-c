@@ -58,6 +58,22 @@ json_tokener_parse_ex(tok, {"x": 123 }"X",  14) ... OK: got object of type [obje
 json_tokener_parse_ex(tok, "Y"         ,   3) ... OK: got object of type [string]: "Y"
 json_tokener_parse_ex(tok, 1           ,   1) ... OK: got correct error: continue
 json_tokener_parse_ex(tok, 2           ,   2) ... OK: got object of type [int]: 12
+json_tokener_parse_ex(tok, 12{         ,   3) ... OK: got object of type [int]: 12
+json_tokener_parse_ex(tok, false       ,   5) ... OK: got correct error: continue
+json_tokener_parse_ex(tok, false       ,   6) ... OK: got object of type [boolean]: false
+json_tokener_parse_ex(tok, true        ,   4) ... OK: got correct error: continue
+json_tokener_parse_ex(tok, true        ,   5) ... OK: got object of type [boolean]: true
+json_tokener_parse_ex(tok, null        ,   4) ... OK: got correct error: continue
+json_tokener_parse_ex(tok, null        ,   5) ... OK: got object of type [null]: null
+json_tokener_parse_ex(tok, noodle      ,   7) ... OK: got correct error: null expected
+json_tokener_parse_ex(tok, naodle      ,   7) ... OK: got correct error: null expected
+json_tokener_parse_ex(tok, track       ,   6) ... OK: got correct error: boolean expected
+json_tokener_parse_ex(tok, null123     ,   9) ... OK: got object of type [null]: null
+json_tokener_parse_ex(tok, 123         ,   4) ... OK: got object of type [int]: 123
+json_tokener_parse_ex(tok, nullx       ,   5) ... OK: got object of type [null]: null
+json_tokener_parse_ex(tok, x           ,   2) ... OK: got correct error: unexpected character
+json_tokener_parse_ex(tok, {"a":1}{"b":2},  15) ... OK: got object of type [object]: { "a": 1 }
+json_tokener_parse_ex(tok, {"b":2}     ,   8) ... OK: got object of type [object]: { "b": 2 }
 json_tokener_parse_ex(tok, 2015-01-15  ,  10) ... OK: got correct error: number expected
 json_tokener_parse_ex(tok, "blue"      ,   6) ... OK: got object of type [string]: "blue"
 json_tokener_parse_ex(tok, "\""        ,   4) ... OK: got object of type [string]: "\""
@@ -74,5 +90,5 @@ json_tokener_parse_ex(tok, [1,2,3,]    ,   8) ... OK: got object of type [array]
 json_tokener_parse_ex(tok, [1,2,,3,]   ,   9) ... OK: got correct error: unexpected character
 json_tokener_parse_ex(tok, [1,2,3,]    ,   8) ... OK: got correct error: unexpected character
 json_tokener_parse_ex(tok, {"a":1,}    ,   8) ... OK: got correct error: unexpected character
-End Incremental Tests OK=32 ERROR=0
+End Incremental Tests OK=48 ERROR=0
 ==================================

@@ -262,7 +262,38 @@ struct incremental_step {
 
 	/* To stop parsing a number we need to reach a non-digit, e.g. a \0 */
 	{ "1",                 1, 1, json_tokener_continue, 0 },
+	/* This should parse as the number 12, since it continues the "1" */
 	{ "2",                 2, 1, json_tokener_success, 0 },
+	{ "12{",               3, 2, json_tokener_success, 1 },
+
+	/* Similar tests for other kinds of objects: */
+	/* These could all return success immediately, since regardless of
+	   what follows the false/true/null token we *will* return a json object,
+       but it currently doesn't work that way.  hmm... */
+	{ "false",             5, 5, json_tokener_continue, 1 },
+	{ "false",             6, 5, json_tokener_success, 1 },
+	{ "true",              4, 4, json_tokener_continue, 1 },
+	{ "true",              5, 4, json_tokener_success, 1 },
+	{ "null",              4, 4, json_tokener_continue, 1 },
+	{ "null",              5, 4, json_tokener_success, 1 },
+
+	/* offset=1 because "n" is the start of "null".  hmm... */
+	{ "noodle",            7, 1, json_tokener_error_parse_null, 1 },
+	/* offset=2 because "na" is the start of "nan".  hmm... */
+	{ "naodle",            7, 2, json_tokener_error_parse_null, 1 },
+	/* offset=2 because "tr" is the start of "true".  hmm... */
+	{ "track",             6, 2, json_tokener_error_parse_boolean, 1 },
+
+	/* Although they may initially look like they should fail,
+	   the next few tests check that parsing multiple sequential
+       json objects in the input works as expected */
+	{ "null123",           9, 4, json_tokener_success, 0 },
+	{ "null123" + 4,       4, 3, json_tokener_success, 1 },
+	{ "nullx",             5, 4, json_tokener_success, 0 },
+	{ "nullx" + 4,         2, 0, json_tokener_error_parse_unexpected, 1 },
+	{ "{\"a\":1}{\"b\":2}",15, 7, json_tokener_success, 0 },
+	{ "{\"a\":1}{\"b\":2}" + 7,
+	                       8, 7, json_tokener_success, 1 },
 
 	/* Some bad formatting. Check we get the correct error status */
 	{ "2015-01-15",       10, 4, json_tokener_error_parse_number, 1 },
@@ -362,7 +393,9 @@ static void test_incremental_parse()
 		}
 		else
 		{
-			if (new_obj == NULL)
+			if (new_obj == NULL &&
+			    !(step->length >= 4 &&
+			      strncmp(step->string_to_parse, "null", 4) == 0))
 				printf("ERROR: expected valid object, instead: %s\n",
 				       json_tokener_error_desc(jerr));
 			else if (tok->char_offset != expected_char_offset)
