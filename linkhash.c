@@ -532,12 +532,13 @@ struct lh_table* lh_kptr_table_new(int size,
 int lh_table_resize(struct lh_table *t, int new_size)
 {
 	struct lh_table *new_t;
+	struct lh_entry *ent;
 
 	new_t = lh_table_new(new_size, NULL, t->hash_fn, t->equal_fn);
 	if (new_t == NULL)
 		return -1;
 
-	for (struct lh_entry *ent = t->head; ent != NULL; ent = ent->next)
+	for (ent = t->head; ent != NULL; ent = ent->next)
 	{
 		unsigned long h = lh_get_hash(new_t, ent->k);
 		unsigned int opts = 0;
