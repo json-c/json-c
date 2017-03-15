@@ -151,6 +151,8 @@ static void test_sprintbuf(int before_resize)
 	printf("%d, [%s]\n", printbuf_length(pb), pb->buf);
 
 	printbuf_free(pb);
+	free(data);
+
 	printf("%s: end test\n", __func__);
 }
 
