@@ -677,6 +677,7 @@ int64_t json_object_get_int64(const struct json_object *jso)
 	case json_type_string:
 		if (json_parse_int64(get_string_component(jso), &cint) == 0)
 			return cint;
+		/* FALLTHRU */
 	default:
 		return 0;
 	}
