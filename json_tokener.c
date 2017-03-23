@@ -341,6 +341,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
             tok->err = json_tokener_error_parse_unexpected;
             goto out;
         }
+	/* FALLTHRU */
       case '"':
 	state = json_tokener_state_string;
 	printbuf_reset(tok->pb);
