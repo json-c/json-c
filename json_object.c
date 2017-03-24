@@ -590,7 +590,7 @@ static int json_object_int_to_json_string(struct json_object* jso,
 {
 	/* room for 19 digits, the sign char, and a null term */
 	static char sbuf[21];
-	snprintf(sbuf, sizeof(sbuf), "%"PRId64, jso->o.c_int64);
+	snprintf(sbuf, sizeof(sbuf), "%" PRId64, jso->o.c_int64);
 	return printbuf_memappend (pb, sbuf, strlen(sbuf));
 }
 
