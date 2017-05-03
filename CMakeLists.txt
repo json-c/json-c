@@ -55,13 +55,20 @@ set(JSON_C_SOURCES
 )
 
 add_library(json-c
+    SHARED
+    ${JSON_C_SOURCES}
+    ${JSON_C_HEADERS}
+)
+
+add_library(json-c-static
+    STATIC
     ${JSON_C_SOURCES}
     ${JSON_C_HEADERS}
 )
 
 set_property(TARGET json-c PROPERTY C_STANDARD 99)
 
-install(TARGETS json-c
+install(TARGETS json-c json-c-static
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
