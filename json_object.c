@@ -717,6 +717,8 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
         format ? format : 
           (modf(jso->o.c_double, &dummy) == 0) ? "%.17g.0" : "%.17g",
           jso->o.c_double);
+  if(size < 0 || size >= (int)sizeof(buf))
+    size = (int)sizeof(buf);
 
   p = strchr(buf, ',');
   if (p) {
