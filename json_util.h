@@ -82,6 +82,13 @@ extern int json_parse_double(const char *buf, double *retval);
  */
 extern const char *json_type_to_name(enum json_type o_type);
 
+/** duplilcate a json_object.
+* Not thread safe, because of obj need to convert to string first
+* @param obj the json_object instance
+* @returns a new json object, remember when you newjson object should release by yourself
+*/
+extern struct json_object* json_object_duplicate(const struct json_object* obj);
+
 #ifdef __cplusplus
 }
 #endif
