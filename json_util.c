@@ -64,7 +64,6 @@
 static int sscanf_is_broken = 0;
 static int sscanf_is_broken_testdone = 0;
 static void sscanf_is_broken_test(void);
-static void _set_last_err(const char *err_fmt, ...);
 
 static char _last_err[256] = "";
 
@@ -75,7 +74,7 @@ const char *json_util_get_last_err()
 	return _last_err;
 }
 
-static void _set_last_err(const char *err_fmt, ...)
+void _set_last_err(const char *err_fmt, ...)
 {
 	va_list ap;
 	va_start(ap, err_fmt);

@@ -48,6 +48,8 @@ struct json_object
   void *_userdata;
 };
 
+void _set_last_err(const char *err_fmt, ...);
+
 #ifdef __cplusplus
 }
 #endif
