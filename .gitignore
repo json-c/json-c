@@ -25,6 +25,7 @@
 /tests/test_cast
 /tests/test_charcase
 /tests/test_compare
+/tests/test_deep_copy
 /tests/test_double_serializer
 /tests/test_float
 /tests/test_json_pointer

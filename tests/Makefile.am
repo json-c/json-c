@@ -13,6 +13,7 @@ TESTS+= test2.test
 TESTS+= test4.test
 TESTS+= testReplaceExisting.test
 TESTS+= test_parse_int64.test
+TESTS+= test_deep_copy.test
 TESTS+= test_null.test
 TESTS+= test_cast.test
 TESTS+= test_double_serializer.test
