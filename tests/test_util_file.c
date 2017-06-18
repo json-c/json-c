@@ -49,6 +49,25 @@ static void test_write_to_file()
 	       (rv == 0) ? "OK" : "FAIL", outfile2, rv);
 	if (rv == 0)
 		stat_and_cat(outfile2);
+
+	const char *outfile3 = "json3.out";
+	int d = open(outfile3, O_WRONLY|O_CREAT, 0600);
+	if (d < 0)
+	{
+		printf("FAIL: unable to open %s %s\n", outfile3, strerror(errno));
+		return;
+	}
+	rv = json_object_to_fd(d, jso, JSON_C_TO_STRING_PRETTY);
+	printf("%s: json_object_to_fd(%s, jso, JSON_C_TO_STRING_PRETTY)=%d\n",
+	       (rv == 0) ? "OK" : "FAIL", outfile3, rv);
+	// Write the same object twice
+	rv = json_object_to_fd(d, jso, JSON_C_TO_STRING_PLAIN);
+	printf("%s: json_object_to_fd(%s, jso, JSON_C_TO_STRING_PLAIN)=%d\n",
+	       (rv == 0) ? "OK" : "FAIL", outfile3, rv);
+	close(d);
+	if (rv == 0)
+		stat_and_cat(outfile3);
+
 	json_object_put(jso);
 }
 

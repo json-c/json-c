@@ -19,3 +19,17 @@ file[json2.out], size=367, contents={
   "foo8":"abcdefghijklmnopqrstuvwxyz",
   "foo9":"abcdefghijklmnopqrstuvwxyz"
 }
+OK: json_object_to_fd(json3.out, jso, JSON_C_TO_STRING_PRETTY)=0
+OK: json_object_to_fd(json3.out, jso, JSON_C_TO_STRING_PLAIN)=0
+file[json3.out], size=703, contents={
+  "foo":1234,
+  "foo1":"abcdefghijklmnopqrstuvwxyz",
+  "foo2":"abcdefghijklmnopqrstuvwxyz",
+  "foo3":"abcdefghijklmnopqrstuvwxyz",
+  "foo4":"abcdefghijklmnopqrstuvwxyz",
+  "foo5":"abcdefghijklmnopqrstuvwxyz",
+  "foo6":"abcdefghijklmnopqrstuvwxyz",
+  "foo7":"abcdefghijklmnopqrstuvwxyz",
+  "foo8":"abcdefghijklmnopqrstuvwxyz",
+  "foo9":"abcdefghijklmnopqrstuvwxyz"
+}{"foo":1234,"foo1":"abcdefghijklmnopqrstuvwxyz","foo2":"abcdefghijklmnopqrstuvwxyz","foo3":"abcdefghijklmnopqrstuvwxyz","foo4":"abcdefghijklmnopqrstuvwxyz","foo5":"abcdefghijklmnopqrstuvwxyz","foo6":"abcdefghijklmnopqrstuvwxyz","foo7":"abcdefghijklmnopqrstuvwxyz","foo8":"abcdefghijklmnopqrstuvwxyz","foo9":"abcdefghijklmnopqrstuvwxyz"}
