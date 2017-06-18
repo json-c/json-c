@@ -105,6 +105,22 @@ extern "C" {
 #undef TRUE
 #define TRUE ((json_bool)1)
 
+/**
+ * Set the global value of an option, which will apply to all
+ * current and future threads that have not set a thread-local value.
+ *
+ * @see json_c_set_serialization_double_format
+ */
+#define JSON_C_OPTION_GLOBAL (0)
+/**
+ * Set a thread-local value of an option, overriding the global value.
+ * This will fail if json-c is not compiled with threading enabled, and
+ * with the __thread specifier (or equivalent) available.
+ *
+ * @see json_c_set_serialization_double_format
+ */
+#define JSON_C_OPTION_THREAD (1)
+
 extern const char *json_number_chars;
 extern const char *json_hex_chars;
 
@@ -747,6 +763,21 @@ extern struct json_object* json_object_new_double(double d);
  * @param ds the string representation of the double.  This will be copied.
  */
 extern struct json_object* json_object_new_double_s(double d, const char *ds);
+
+/**
+ * Set a global or thread-local json-c option, depending on whether
+ *  JSON_C_OPTION_GLOBAL or JSON_C_OPTION_THREAD is passed.
+ * Thread-local options default to undefined, and inherit from the global
+ *  value, even if the global value is changed after the thread is created.
+ * Attempting to set thread-local options when threading is not compiled in
+ *  will result in an error.  Be sure to check the return value.
+ *
+ * double_format is a "%g" printf format, such as "%.20g"
+ *
+ * @return -1 on errors, 0 on success.
+ */
+int json_c_set_serialization_double_format(const char *double_format, int global_or_thread);
+
 
 
 /** Serialize a json_object of type json_type_double to a string.

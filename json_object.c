@@ -692,6 +692,50 @@ int json_object_set_int64(struct json_object *jso,int64_t new_value){
 
 /* json_object_double */
 
+#ifdef HAVE___THREAD
+// i.e. __thread or __declspec(thread)
+static SPEC___THREAD char *tls_serialization_float_format = NULL;
+#endif
+static char *global_serialization_float_format = NULL;
+
+int json_c_set_serialization_double_format(const char *double_format, int global_or_thread)
+{
+	if (global_or_thread == JSON_C_OPTION_GLOBAL)
+	{
+#ifdef HAVE___THREAD
+		if (tls_serialization_float_format)
+		{
+			free(tls_serialization_float_format);
+			tls_serialization_float_format = NULL;
+		}
+#endif
+		if (global_serialization_float_format)
+			free(global_serialization_float_format);
+		global_serialization_float_format = double_format ? strdup(double_format) : NULL;
+	}
+	else if (global_or_thread == JSON_C_OPTION_THREAD)
+	{
+#ifdef HAVE___THREAD
+		if (tls_serialization_float_format)
+		{
+			free(tls_serialization_float_format);
+			tls_serialization_float_format = NULL;
+		}
+		tls_serialization_float_format = double_format ? strdup(double_format) : NULL;
+#else
+		_set_last_err("json_c_set_option: not compiled with __thread support\n");
+		return -1;
+#endif
+	}
+	else
+	{
+		_set_last_err("json_c_set_option: invalid global_or_thread value: %d\n", global_or_thread);
+		return -1;
+	}
+	return 0;
+}
+
+
 static int json_object_double_to_json_string_format(struct json_object* jso,
 						    struct printbuf *pb,
 						    int level,
@@ -712,13 +756,31 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
       size = snprintf(buf, sizeof(buf), "Infinity");
     else
       size = snprintf(buf, sizeof(buf), "-Infinity");
-  else
-    size = snprintf(buf, sizeof(buf),
-        format ? format : 
-          (modf(jso->o.c_double, &dummy) == 0) ? "%.17g.0" : "%.17g",
-          jso->o.c_double);
-  if(size < 0 || size >= (int)sizeof(buf))
-    size = (int)sizeof(buf);
+	else
+	{
+		const char *std_format = "%.17g";
+
+#ifdef HAVE___THREAD
+		if (tls_serialization_float_format)
+			std_format = tls_serialization_float_format;
+		else
+#endif
+		if (global_serialization_float_format)
+			std_format = global_serialization_float_format;
+		if (!format)
+			format = std_format;
+		size = snprintf(buf, sizeof(buf), format, jso->o.c_double);
+		if (modf(jso->o.c_double, &dummy) == 0)
+		{
+			// Ensure it looks like a float, even if snprintf didn't.
+			strncat(buf, ".0", sizeof(buf) - 1);
+			if (size >= 0)
+				size += 2; // yes, even if strncat ran out of room
+		}
+	}
+	// although unlikely, snprintf can fail
+	if (size < 0)
+		return -1;
 
   p = strchr(buf, ',');
   if (p) {
@@ -736,8 +798,13 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
     *(++p) = 0;
     size = p-buf;
   }
-  printbuf_memappend(pb, buf, size);
-  return size;
+
+	if (size >= (int)sizeof(buf))
+		// The standard formats are guaranteed not to overrun the buffer,
+		// but if a custom one happens to do so, just silently truncate.
+		size = sizeof(buf) - 1;
+	printbuf_memappend(pb, buf, size);
+	return size;
 }
 
 static int json_object_double_to_json_string_default(struct json_object* jso,

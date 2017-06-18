@@ -41,6 +41,18 @@ AC_CHECK_HEADER(inttypes.h,[AC_DEFINE([JSON_C_HAVE_INTTYPES_H],[1],[Public defin
 AC_C_CONST
 AC_TYPE_SIZE_T
 
+AC_CACHE_CHECK([for __thread support], ac_cv___thread, [dnl
+AC_LINK_IFELSE([dnl
+AC_LANG_PROGRAM([[#undef __thread
+static __thread int a; int foo (int b) { return a + b; }]],
+		[[exit (foo (0));]])],
+	       ac_cv___thread=yes, ac_cv___thread=no)
+])
+AS_IF([test "x$ac_cv___thread" != xno],
+[AC_DEFINE(HAVE___THREAD, 1, [Have __thread]),
+ AC_DEFINE(SPEC___THREAD, [__thread], [Specifier for __thread])]
+)
+
 # Checks for library functions.
 AC_FUNC_VPRINTF
 AC_FUNC_MEMCMP
