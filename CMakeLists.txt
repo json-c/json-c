@@ -67,6 +67,7 @@ add_library(json-c-static
 )
 
 set_property(TARGET json-c PROPERTY C_STANDARD 99)
+set_property(TARGET json-c-static PROPERTY C_STANDARD 99)
 set_target_properties(json-c-static PROPERTIES OUTPUT_NAME json-c)
 
 install(TARGETS json-c json-c-static
