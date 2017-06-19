@@ -12,7 +12,7 @@ if(MSVC)
   file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h.win32 ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h)
 elseif(UNIX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror -D_GNU_SOURCE")
   execute_process(COMMAND echo ${CMAKE_CURRENT_SOURCE_DIR} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
   execute_process(COMMAND sh autogen.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
   execute_process(COMMAND ./configure WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
@@ -55,13 +55,20 @@ set(JSON_C_SOURCES
 )
 
 add_library(json-c
+    SHARED
+    ${JSON_C_SOURCES}
+    ${JSON_C_HEADERS}
+)
+
+add_library(json-c-static
+    STATIC
     ${JSON_C_SOURCES}
     ${JSON_C_HEADERS}
 )
 
 set_property(TARGET json-c PROPERTY C_STANDARD 99)
 
-install(TARGETS json-c
+install(TARGETS json-c json-c-static
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
