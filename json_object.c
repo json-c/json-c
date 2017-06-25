@@ -143,15 +143,16 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 		default:
 			if(c < ' ')
 			{
+				char sbuf[7];
 				if(pos - start_offset > 0)
 					printbuf_memappend(pb,
 							   str + start_offset,
 							   pos - start_offset);
-				static char sbuf[7];
 				snprintf(sbuf, sizeof(sbuf),
 					 "\\u00%c%c",
 					 json_hex_chars[c >> 4],
 					 json_hex_chars[c & 0xf]);
+				sbuf[sizeof(sbuf)-1] = '\0';
 				printbuf_memappend_fast(pb, sbuf, (int) sizeof(sbuf) - 1);
 				start_offset = ++pos;
 			} else
@@ -589,8 +590,9 @@ static int json_object_int_to_json_string(struct json_object* jso,
 					  int flags)
 {
 	/* room for 19 digits, the sign char, and a null term */
-	static char sbuf[21];
+	char sbuf[21];
 	snprintf(sbuf, sizeof(sbuf), "%" PRId64, jso->o.c_int64);
+	sbuf[sizeof(sbuf)-1] = '\0';
 	return printbuf_memappend (pb, sbuf, strlen(sbuf));
 }
 
@@ -749,6 +751,7 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
      NaN or Infinity as numeric values
      ECMA 262 section 9.8.1 defines
      how to handle these cases as strings */
+  buf[sizeof(buf)-1] = '\0';
   if(isnan(jso->o.c_double))
     size = snprintf(buf, sizeof(buf), "NaN");
   else if(isinf(jso->o.c_double))
