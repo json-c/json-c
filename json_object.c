@@ -751,7 +751,6 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
      NaN or Infinity as numeric values
      ECMA 262 section 9.8.1 defines
      how to handle these cases as strings */
-  buf[sizeof(buf)-1] = '\0';
   if(isnan(jso->o.c_double))
     size = snprintf(buf, sizeof(buf), "NaN");
   else if(isinf(jso->o.c_double))
@@ -773,6 +772,8 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
 		if (!format)
 			format = std_format;
 		size = snprintf(buf, sizeof(buf), format, jso->o.c_double);
+		buf[sizeof(buf)-1] = '\0';
+
 		if (modf(jso->o.c_double, &dummy) == 0)
 		{
 			// Ensure it looks like a float, even if snprintf didn't.
@@ -781,6 +782,7 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
 				size += 2; // yes, even if strncat ran out of room
 		}
 	}
+	buf[sizeof(buf)-1] = '\0';
 	// although unlikely, snprintf can fail
 	if (size < 0)
 		return -1;
