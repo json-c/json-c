@@ -774,17 +774,16 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
 		size = snprintf(buf, sizeof(buf), format, jso->o.c_double);
 		buf[sizeof(buf)-1] = '\0';
 
-		if (modf(jso->o.c_double, &dummy) == 0)
+		if (modf(jso->o.c_double, &dummy) == 0 && size >= 0 && size < (int)sizeof(buf) - 2 )
 		{
 			// Ensure it looks like a float, even if snprintf didn't.
-			strncat(buf, ".0", sizeof(buf) - 1);
-			if (size >= 0)
-				size += 2; // yes, even if strncat ran out of room
+			strcat(buf, ".0");
+			size += 2;
 		}
 	}
 	buf[sizeof(buf)-1] = '\0';
 	// although unlikely, snprintf can fail
-	if (size < 0)
+	if (size < 0 || size >= (int)sizeof(buf) )
 		return -1;
 
   p = strchr(buf, ',');
