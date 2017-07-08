@@ -87,7 +87,7 @@ int main(int c,char* v) {return 0;}
 
 AC_LANG_POP([C])
 
-AM_PROG_LIBTOOL
+LT_INIT
 
 # Check for the -Bsymbolic-functions linker flag
 AC_ARG_ENABLE([Bsymbolic],
