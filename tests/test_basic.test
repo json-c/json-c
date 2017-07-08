@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir="${0%/*}"
+    test "$srcdir" = "$0" && srcdir=.
+    test -z "$srcdir" && srcdir=.
+fi
+. "$srcdir/test-defs.sh"
+
+filename=$(basename "$0")
+filename="${filename%.*}"
+
+run_output_test $filename
+exit $?
