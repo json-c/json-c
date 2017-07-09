@@ -742,20 +742,24 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
 						    int flags,
 						    const char *format)
 {
-  char buf[128], *p, *q;
-  int size;
-  double dummy; /* needed for modf() */
-  /* Although JSON RFC does not support
-     NaN or Infinity as numeric values
-     ECMA 262 section 9.8.1 defines
-     how to handle these cases as strings */
-  if(isnan(jso->o.c_double))
-    size = snprintf(buf, sizeof(buf), "NaN");
-  else if(isinf(jso->o.c_double))
-    if(jso->o.c_double > 0)
-      size = snprintf(buf, sizeof(buf), "Infinity");
-    else
-      size = snprintf(buf, sizeof(buf), "-Infinity");
+	char buf[128], *p, *q;
+	int size;
+	double dummy; /* needed for modf() */
+	/* Although JSON RFC does not support
+	NaN or Infinity as numeric values
+	ECMA 262 section 9.8.1 defines
+	how to handle these cases as strings */
+	if (isnan(jso->o.c_double))
+	{
+		size = snprintf(buf, sizeof(buf), "NaN");
+	}
+	else if (isinf(jso->o.c_double))
+	{
+		if(jso->o.c_double > 0)
+			size = snprintf(buf, sizeof(buf), "Infinity");
+		else
+			size = snprintf(buf, sizeof(buf), "-Infinity");
+	}
 	else
 	{
 		const char *std_format = "%.17g";
@@ -782,22 +786,22 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
 	if (size < 0)
 		return -1;
 
-  p = strchr(buf, ',');
-  if (p) {
-    *p = '.';
-  } else {
-    p = strchr(buf, '.');
-  }
-  if (p && (flags & JSON_C_TO_STRING_NOZERO)) {
-    /* last useful digit, always keep 1 zero */
-    p++;
-    for (q=p ; *q ; q++) {
-      if (*q!='0') p=q;
-    }
-    /* drop trailing zeroes */
-    *(++p) = 0;
-    size = p-buf;
-  }
+	p = strchr(buf, ',');
+	if (p)
+		*p = '.';
+	else
+		p = strchr(buf, '.');
+	if (p && (flags & JSON_C_TO_STRING_NOZERO))
+	{
+		/* last useful digit, always keep 1 zero */
+		p++;
+		for (q=p ; *q ; q++) {
+			if (*q!='0') p=q;
+		}
+		/* drop trailing zeroes */
+		*(++p) = 0;
+		size = p-buf;
+	}
 
 	if (size >= (int)sizeof(buf))
 		// The standard formats are guaranteed not to overrun the buffer,
