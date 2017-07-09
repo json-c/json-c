@@ -72,7 +72,6 @@
 *.dmg
 *.ipa
 
-/INSTALL
 .deps/
 .libs/
 /aclocal.m4
