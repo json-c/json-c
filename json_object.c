@@ -1142,7 +1142,7 @@ struct json_object* json_object_array_bsearch(
 
 	assert(json_object_get_type(jso) == json_type_array);
 	result = (struct json_object **)array_list_bsearch(
-			(const void **)&key, jso->o.c_array, sort_fn);
+			(const void **)(void *)&key, jso->o.c_array, sort_fn);
 
 	if (!result)
 		return NULL;
@@ -1209,7 +1209,7 @@ static int json_object_all_values_equal(struct json_object* jso1,
 	/* Iterate over jso1 keys and see if they exist and are equal in jso2 */
         json_object_object_foreachC(jso1, iter) {
 		if (!lh_table_lookup_ex(jso2->o.c_object, (void*)iter.key,
-					(void**)&sub))
+					(void**)(void *)&sub))
 			return 0;
 		if (!json_object_equal(iter.val, sub))
 			return 0;
@@ -1218,7 +1218,7 @@ static int json_object_all_values_equal(struct json_object* jso1,
 	/* Iterate over jso2 keys to see if any exist that are not in jso1 */
         json_object_object_foreachC(jso2, iter) {
 		if (!lh_table_lookup_ex(jso1->o.c_object, (void*)iter.key,
-					(void**)&sub))
+					(void**)(void *)&sub))
 			return 0;
         }
 
