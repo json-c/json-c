@@ -49,7 +49,7 @@ static __thread int a; int foo (int b) { return a + b; }]],
 	       ac_cv___thread=yes, ac_cv___thread=no)
 ])
 AS_IF([test "x$ac_cv___thread" != xno],
-[AC_DEFINE(HAVE___THREAD, 1, [Have __thread]),
+[AC_DEFINE(HAVE___THREAD, 1, [Have __thread])
  AC_DEFINE(SPEC___THREAD, [__thread], [Specifier for __thread])]
 )
 
