@@ -147,7 +147,7 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 					printbuf_memappend(pb,
 							   str + start_offset,
 							   pos - start_offset);
-				static char sbuf[7];
+				char sbuf[7];
 				snprintf(sbuf, sizeof(sbuf),
 					 "\\u00%c%c",
 					 json_hex_chars[c >> 4],
@@ -589,7 +589,7 @@ static int json_object_int_to_json_string(struct json_object* jso,
 					  int flags)
 {
 	/* room for 19 digits, the sign char, and a null term */
-	static char sbuf[21];
+	char sbuf[21];
 	snprintf(sbuf, sizeof(sbuf), "%" PRId64, jso->o.c_int64);
 	return printbuf_memappend (pb, sbuf, strlen(sbuf));
 }
