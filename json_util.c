@@ -82,6 +82,7 @@ void _set_last_err(const char *err_fmt, ...)
 	va_start(ap, err_fmt);
 	// Ignore (attempted) overruns from snprintf
 	(void)vsnprintf(_last_err, sizeof(_last_err), err_fmt, ap);
+        _last_err[sizeof(_last_err)-1] = '\0';
 	va_end(ap);
 }
 
@@ -270,7 +271,8 @@ int json_parse_int64(const char *buf, int64_t *retval)
 		if (num64 == 0) // assume all sscanf impl's will parse -0 to 0
 			orig_has_neg = 0; // "-0" is the same as just plain "0"
 
-		snprintf(buf_cmp_start, sizeof(buf_cmp), "%" PRId64, num64);
+		snprintf(buf_cmp, sizeof(buf_cmp), "%" PRId64, num64);
+		buf_cmp[sizeof(buf_cmp)-1] = '\0';
 		if (*buf_cmp_start == '-')
 		{
 			recheck_has_neg = 1;
