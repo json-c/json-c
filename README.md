@@ -4,6 +4,10 @@
 JSON-C - A JSON implementation in C
 -----------------------------------
 
+Build Status
+* [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/json-c/json-c?branch=master&svg=true)](https://ci.appveyor.com/project/hawicz/json-c)
+* [![Travis Build Status](https://travis-ci.org/json-c/json-c.svg?branch=master)](https://travis-ci.org/json-c/json-c)
+
 JSON-C implements a reference counting object model that allows you to easily 
 construct JSON objects in C, output them as JSON formatted strings and parse 
 JSON formatted strings back into the C representation of JSON objects.
