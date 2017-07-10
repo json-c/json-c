@@ -16,6 +16,7 @@ os:
 before_install:
   - echo $LANG
   - echo $LC_ALL
+  - set -e
 
 install:
   - sh autogen.sh
