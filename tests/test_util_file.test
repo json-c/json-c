@@ -1,15 +1,1 @@
-#!/bin/sh
-
-# Common definitions
-if test -z "$srcdir"; then
-    srcdir="${0%/*}"
-    test "$srcdir" = "$0" && srcdir=.
-    test -z "$srcdir" && srcdir=.
-fi
-. "$srcdir/test-defs.sh"
-
-cp -f "$srcdir/valid.json" .
-run_output_test test_util_file "$srcdir"
-_err=$?
-
-exit $_err
+test_basic.test
