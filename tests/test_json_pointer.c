@@ -1,4 +1,4 @@
-#include <errno.h>
+#include "strerror_override.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>

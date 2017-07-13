@@ -23,6 +23,22 @@ else
   AC_MSG_RESULT([RDRAND Hardware RNG Hash Seed disabled. Use --enable-rdrand to enable])
 fi
 
+AC_ARG_ENABLE(strerror-override,
+ AS_HELP_STRING([--enable-strerror-override],
+   [Override strerror() function with internal version.]),
+[if test x$enableval = xyes; then
+  enable_strerror_override=yes
+  AC_DEFINE(ENABLE_STRERROR_OVERRIDE, 1, [Override strerror() with internal version])
+fi])
+
+AM_CONDITIONAL([ENABLE_STRERROR_OVERRIDE], [test "x$enable_strerror_override" = "xyes"])
+
+if test "x$enable_strerror_override" = "xyes"; then
+  AC_MSG_RESULT([Overriding `strerror()` function with internal version])
+else
+  AC_MSG_RESULT([Using libc's `strerror()` function])
+fi
+
 # enable silent build by default
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 

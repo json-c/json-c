@@ -12,13 +12,14 @@
 #include "config.h"
 #undef realloc
 
+#include "strerror_override.h"
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <limits.h>
 #include <string.h>
-#include <errno.h>
 #include <ctype.h>
 
 #ifdef HAVE_SYS_TYPES_H

@@ -1,4 +1,4 @@
-#include <errno.h>
+#include "strerror_override.h"
 
 /*
  * Override strerror() to get consistent output across platforms.
@@ -54,7 +54,7 @@ static struct {
 
 #define PREFIX "ERRNO="
 static char errno_buf[128] = PREFIX;
-char *strerror(int errno_in)
+char *_json_c_strerror(int errno_in)
 {
 	int start_idx;
 	char digbuf[20];

@@ -12,13 +12,14 @@
 
 #include "config.h"
 
+#include "strerror_override.h"
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
 #include <math.h>
-#include <errno.h>
 
 #include "debug.h"
 #include "printbuf.h"
