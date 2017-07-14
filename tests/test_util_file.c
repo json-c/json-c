@@ -1,4 +1,4 @@
-#include <errno.h>
+#include "strerror_override.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -106,6 +106,7 @@ static void stat_and_cat(const char *file)
 	buf[sb.st_size] = '\0';
 	printf("file[%s], size=%d, contents=%s\n", file, (int)sb.st_size, buf);
 	free(buf);
+	close(d);
 }
 
 int main(int argc, char **argv)

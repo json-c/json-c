@@ -7,6 +7,8 @@ AM_INIT_AUTOMAKE
 
 AC_PROG_MAKE_SET
 
+AC_CANONICAL_HOST
+
 AC_ARG_ENABLE(rdrand,
  AS_HELP_STRING([--enable-rdrand],
    [Enable RDRAND Hardware RNG Hash Seed generation on supported x86/x64 platforms.]),
@@ -19,6 +21,22 @@ if test "x$enable_rdrand" = "xyes"; then
   AC_MSG_RESULT([RDRAND Hardware RNG Hash Seed enabled on supported x86/x64 platforms])
 else
   AC_MSG_RESULT([RDRAND Hardware RNG Hash Seed disabled. Use --enable-rdrand to enable])
+fi
+
+AC_ARG_ENABLE(strerror-override,
+ AS_HELP_STRING([--enable-strerror-override],
+   [Override strerror() function with internal version.]),
+[if test x$enableval = xyes; then
+  enable_strerror_override=yes
+  AC_DEFINE(ENABLE_STRERROR_OVERRIDE, 1, [Override strerror() with internal version])
+fi])
+
+AM_CONDITIONAL([ENABLE_STRERROR_OVERRIDE], [test "x$enable_strerror_override" = "xyes"])
+
+if test "x$enable_strerror_override" = "xyes"; then
+  AC_MSG_RESULT([Overriding `strerror()` function with internal version])
+else
+  AC_MSG_RESULT([Using libc's `strerror()` function])
 fi
 
 # enable silent build by default
@@ -57,13 +75,21 @@ AS_IF([test "x$ac_cv___thread" != xno],
 AC_FUNC_VPRINTF
 AC_FUNC_MEMCMP
 AC_CHECK_FUNCS([realloc])
-AC_CHECK_FUNCS(strcasecmp strdup strerror snprintf vsnprintf vasprintf open vsyslog strncasecmp setlocale uselocale)
+AC_CHECK_FUNCS(strcasecmp strdup strerror snprintf vsnprintf vasprintf open vsyslog strncasecmp setlocale)
 AC_CHECK_DECLS([INFINITY], [], [], [[#include <math.h>]])
 AC_CHECK_DECLS([nan], [], [], [[#include <math.h>]])
 AC_CHECK_DECLS([isnan], [], [], [[#include <math.h>]])
 AC_CHECK_DECLS([isinf], [], [], [[#include <math.h>]])
 AC_CHECK_DECLS([_isnan], [], [], [[#include <float.h>]])
 AC_CHECK_DECLS([_finite], [], [], [[#include <float.h>]])
+
+case "${host_os}" in
+	linux*)
+		AC_CHECK_FUNCS([uselocale])
+		;;
+	*)	# Nothing
+		;;
+esac
 
 if test "$ac_cv_have_decl_isnan" = "yes" ; then
    AC_TRY_LINK([#include <math.h>], [float f = 0.0; return isnan(f)], [], [LIBS="$LIBS -lm"])

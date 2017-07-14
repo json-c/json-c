@@ -16,16 +16,17 @@ os:
 before_install:
   - echo $LANG
   - echo $LC_ALL
+  - set -e
 
 install:
   - sh autogen.sh
 
 before_script:
-  - ./configure
+  - ./configure --enable-strerror-override
 
 script:
   - make
 
 after_success:
   - make check
-  - cppcheck --quiet *.h *.c tests/
+  - if type cppcheck &> /dev/null ; then cppcheck --error-exitcode=1 --quiet *.h *.c tests/ ; fi
