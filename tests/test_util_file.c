@@ -1,4 +1,5 @@
 #include "strerror_override.h"
+#include "strerror_override_private.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -113,6 +114,8 @@ int main(int argc, char **argv)
 {
 //	json_object_to_file(file, obj);
 //	json_object_to_file_ext(file, obj, flags);
+
+	_json_c_strerror_enable = 1;
 
 	const char *testdir;
 	if (argc < 2)

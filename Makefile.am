@@ -51,14 +51,8 @@ libjson_c_la_SOURCES = \
 	json_visit.c \
 	linkhash.c \
 	printbuf.c \
-	random_seed.c
-
-if ENABLE_STRERROR_OVERRIDE
-libjson_cinclude_HEADERS+= \
-	strerror_override.h
-libjson_c_la_SOURCES+= \
+	random_seed.c \
 	strerror_override.c
-endif
 
 distclean-local:
 	-rm -rf $(testsubdir)
