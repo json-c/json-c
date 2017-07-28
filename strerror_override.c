@@ -1,4 +1,4 @@
-#define STERROR_OVERRIDE_IMPL 1
+#define STRERROR_OVERRIDE_IMPL 1
 #include "strerror_override.h"
 
 /*
