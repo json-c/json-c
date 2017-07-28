@@ -14,6 +14,8 @@ JSON_EXPORT char *_json_c_strerror(int errno_in);
 
 #ifndef STRERROR_OVERRIDE_IMPL
 #define strerror	_json_c_strerror
+#else
+#include <string.h>
 #endif
 
 #ifdef __cplusplus
