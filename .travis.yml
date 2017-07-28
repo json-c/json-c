@@ -22,7 +22,7 @@ install:
   - sh autogen.sh
 
 before_script:
-  - ./configure --enable-strerror-override
+  - ./configure
 
 script:
   - make
