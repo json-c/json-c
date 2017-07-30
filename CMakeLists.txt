@@ -67,6 +67,7 @@ set(JSON_C_SOURCES
     ./linkhash.c
     ./printbuf.c
     ./random_seed.c
+    ./strerror_override.c
 )
 
 add_library(json-c
