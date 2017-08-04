@@ -1,6 +1,6 @@
 EXTRA_DIST = README.md README.html README-WIN32.html 
 EXTRA_DIST += config.h.win32 json-c.vcproj json-c.vcxproj json-c.vcxproj.filters
-EXTRA_DIST += Doxyfile doc
+EXTRA_DIST += Doxyfile
 
 dist-hook:
 	test -d "$(distdir)/doc" || mkdir "$(distdir)/doc"
