@@ -35,7 +35,8 @@ libjson_cinclude_HEADERS = \
 	strdup_compat.h \
 	vasprintf_compat.h \
 	printbuf.h \
-	random_seed.h
+	random_seed.h \
+	strerror_override.h
 
 libjson_c_la_LDFLAGS = -version-info 3:0:0 -no-undefined @JSON_BSYMBOLIC_LDFLAGS@
 
@@ -52,7 +53,8 @@ libjson_c_la_SOURCES = \
 	linkhash.c \
 	printbuf.c \
 	random_seed.c \
-	strerror_override.c
+	strerror_override.c \
+	strerror_override_private.h
 
 distclean-local:
 	-rm -rf $(testsubdir)
