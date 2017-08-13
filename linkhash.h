@@ -308,7 +308,7 @@ extern int lh_table_length(struct lh_table *t);
  * 	However, because its interface is public, it will remain part of
  * 	the API on the off chance of legacy software using it externally.
  */
-void lh_abort(const char *msg, ...);
+void lh_abort(const char *msg, ...) __deprecated;
 
 /**
  * Resizes the specified table.

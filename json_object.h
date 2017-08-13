@@ -329,20 +329,12 @@ JSON_EXPORT void json_object_set_serializer(json_object *jso,
 /**
  * Simply call free on the userdata pointer.
  * Can be used with json_object_set_serializer().
- *
- * @param jso unused
- * @param userdata the pointer that is passed to free().
  */
 json_object_delete_fn json_object_free_userdata;
 
 /**
  * Copy the jso->_userdata string over to pb as-is.
  * Can be used with json_object_set_serializer().
- *
- * @param jso The object whose _userdata is used.
- * @param pb The destination buffer.
- * @param level Ignored.
- * @param flags Ignored.
  */
 json_object_to_json_string_fn json_object_userdata_to_json_string;
 
@@ -434,7 +426,7 @@ JSON_EXPORT int json_object_object_add_ex(struct json_object* obj,
  * @deprecated Please use json_object_object_get_ex
  */
 JSON_EXPORT struct json_object* json_object_object_get(const struct json_object* obj,
-						  const char *key);
+						  const char *key) __deprecated;
 
 /** Get the json_object associated with a given object field.
  *
@@ -545,7 +537,7 @@ JSON_EXPORT size_t json_object_array_length(const struct json_object *obj);
 * Pointers to the json_object pointers will be passed as the two arguments
 * to @sort_fn
 *
-* @param obj the json_object instance
+* @param jso the json_object instance
 * @param sort_fn a sorting function
 */
 JSON_EXPORT void json_object_array_sort(struct json_object *jso, int(*sort_fn)(const void *, const void *));
