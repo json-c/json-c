@@ -167,14 +167,14 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 
 /* reference counting */
 
-extern struct json_object* json_object_get(struct json_object *jso)
+extern struct json_object* json_object_retain(struct json_object *jso)
 {
 	if (jso)
 		jso->_ref_count++;
 	return jso;
 }
 
-int json_object_put(struct json_object *jso)
+int json_object_release(struct json_object *jso)
 {
 	if(jso)
 	{
@@ -408,7 +408,7 @@ static void json_object_lh_entry_free(struct lh_entry *ent)
 {
 	if (!ent->k_is_constant)
 		free(lh_entry_k(ent));
-	json_object_put((struct json_object*)lh_entry_v(ent));
+	json_object_release((struct json_object*)lh_entry_v(ent));
 }
 
 static void json_object_object_delete(struct json_object* jso)
@@ -453,13 +453,15 @@ int json_object_object_add_ex(struct json_object* jso,
 	struct json_object *const val,
 	const unsigned opts)
 {
+	struct json_object *existing_value = NULL;
+	struct lh_entry *existing_entry;
+	unsigned long hash;
+
 	assert(json_object_get_type(jso) == json_type_object);
 
 	// We lookup the entry and replace the value, rather than just deleting
 	// and re-adding it, so the existing key remains valid.
-	json_object *existing_value = NULL;
-	struct lh_entry *existing_entry;
-	const unsigned long hash = lh_get_hash(jso->o.c_object, (const void *)key);
+	hash = lh_get_hash(jso->o.c_object, (const void *)key);
 	existing_entry = (opts & JSON_C_OBJECT_ADD_KEY_IS_NEW) ? NULL : 
 			      lh_table_lookup_entry_w_hash(jso->o.c_object,
 							   (const void *)key, hash);
@@ -479,7 +481,7 @@ int json_object_object_add_ex(struct json_object* jso,
 	}
 	existing_value = (json_object *) lh_entry_v(existing_entry);
 	if (existing_value)
-		json_object_put(existing_value);
+		json_object_release(existing_value);
 	existing_entry->v = val;
 	return 0;
 }
@@ -841,11 +843,12 @@ struct json_object* json_object_new_double(double d)
 
 struct json_object* json_object_new_double_s(double d, const char *ds)
 {
+	char *new_ds;
 	struct json_object *jso = json_object_new_double(d);
 	if (!jso)
 		return NULL;
 
-	char *new_ds = strdup(ds);
+	new_ds = strdup(ds);
 	if (!new_ds)
 	{
 		json_object_generic_delete(jso);
@@ -1025,8 +1028,8 @@ int json_object_set_string(json_object* jso, const char* s) {
 }
 
 int json_object_set_string_len(json_object* jso, const char* s, int len){
-	if (jso==NULL || jso->o_type!=json_type_string) return 0; 	
 	char *dstbuf; 
+	if (jso==NULL || jso->o_type!=json_type_string) return 0; 	
 	if (len<LEN_DIRECT_STRING_DATA) {
 		dstbuf=jso->o.c_string.str.data;
 		if (jso->o.c_string.len>=LEN_DIRECT_STRING_DATA) free(jso->o.c_string.str.ptr); 
@@ -1089,7 +1092,7 @@ static int json_object_array_to_json_string(struct json_object* jso,
 
 static void json_object_array_entry_free(void *data)
 {
-	json_object_put((struct json_object*)data);
+	json_object_release((struct json_object*)data);
 }
 
 static void json_object_array_delete(struct json_object* jso)
@@ -1166,7 +1169,7 @@ int json_object_array_put_idx(struct json_object *jso, size_t idx,
 			      struct json_object *val)
 {
 	assert(json_object_get_type(jso) == json_type_array);
-	return array_list_put_idx(jso->o.c_array, idx, val);
+	return array_list_insert(jso->o.c_array, idx, val);
 }
 
 int json_object_array_del_idx(struct json_object *jso, size_t idx, size_t count)
@@ -1179,7 +1182,7 @@ struct json_object* json_object_array_get_idx(const struct json_object *jso,
 					      size_t idx)
 {
 	assert(json_object_get_type(jso) == json_type_array);
-	return (struct json_object*)array_list_get_idx(jso->o.c_array, idx);
+	return (struct json_object*)array_list_get(jso->o.c_array, idx);
 }
 
 static int json_array_equal(struct json_object* jso1,
