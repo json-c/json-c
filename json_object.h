@@ -182,7 +182,7 @@ typedef enum json_type {
  *
  * @param obj the json_object instance
  */
-JSON_EXPORT struct json_object* json_object_get(struct json_object *obj);
+JSON_EXPORT struct json_object* json_object_retain(struct json_object *obj);
 
 /**
  * Decrement the reference count of json_object and free if it reaches zero.
@@ -192,7 +192,7 @@ JSON_EXPORT struct json_object* json_object_get(struct json_object *obj);
  * @param obj the json_object instance
  * @returns 1 if the object was freed.
  */
-JSON_EXPORT int json_object_put(struct json_object *obj);
+JSON_EXPORT int json_object_release(struct json_object *obj);
 
 /**
  * Check if the json_object is of a given type

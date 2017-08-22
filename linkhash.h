@@ -332,10 +332,7 @@ int lh_table_resize(struct lh_table *t, int new_size);
  * @param k a pointer to the key to lookup
  * @return the key's hash
  */
-static inline unsigned long lh_get_hash(const struct lh_table *t, const void *k)
-{
-	return t->hash_fn(k);
-}
+unsigned long lh_get_hash(const struct lh_table *t, const void *k);
 
 /* Don't use this outside of linkhash.h: */
 #ifdef __UNCONST

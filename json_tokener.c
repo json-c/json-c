@@ -139,7 +139,7 @@ static void json_tokener_reset_level(struct json_tokener *tok, int depth)
 {
   tok->stack[depth].state = json_tokener_state_eatws;
   tok->stack[depth].saved_state = json_tokener_state_start;
-  json_object_put(tok->stack[depth].current);
+  json_object_release(tok->stack[depth].current);
   tok->stack[depth].current = NULL;
   free(tok->stack[depth].obj_field_name);
   tok->stack[depth].obj_field_name = NULL;
@@ -178,7 +178,7 @@ struct json_object* json_tokener_parse_verbose(const char *str,
     *error = tok->err;
     if(tok->err != json_tokener_success) {
 		if (obj != NULL)
-			json_object_put(obj);
+			json_object_release(obj);
         obj = NULL;
     }
 
@@ -378,7 +378,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 
     case json_tokener_state_finish:
       if(tok->depth == 0) goto out;
-      obj = json_object_get(current);
+      obj = json_object_retain(current);
       json_tokener_reset_level(tok, tok->depth);
       tok->depth--;
       goto redo_char;
@@ -387,10 +387,11 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
       {
 	size_t size_inf;
 	int is_negative = 0;
+	char *infbuf;
 
 	printbuf_memappend_fast(tok->pb, &c, 1);
 	size_inf = json_min(tok->st_pos+1, json_inf_str_len);
-	char *infbuf = tok->pb->buf;
+	infbuf = tok->pb->buf;
 	if (*infbuf == '-')
 	{
 		infbuf++;
@@ -958,7 +959,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 
   if (tok->err == json_tokener_success)
   {
-    json_object *ret = json_object_get(current);
+    json_object *ret = json_object_retain(current);
 	int ii;
 
 	/* Partially reset, so we parse additional objects on subsequent calls. */

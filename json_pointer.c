@@ -240,7 +240,7 @@ int json_pointer_set(struct json_object **obj, const char *path, struct json_obj
 	}
 
 	if (path[0] == '\0') {
-		json_object_put(*obj);
+		json_object_release(*obj);
 		*obj = value;
 		return 0;
 	}
@@ -294,7 +294,7 @@ int json_pointer_setf(struct json_object **obj, struct json_object *value, const
 		return rc;
 
 	if (path_copy[0] == '\0') {
-		json_object_put(*obj);
+		json_object_release(*obj);
 		*obj = value;
 		goto out;
 	}

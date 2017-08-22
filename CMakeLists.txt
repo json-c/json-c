@@ -52,6 +52,8 @@ set(JSON_C_HEADERS
     ./linkhash.h
     ./math_compat.h
     ./strdup_compat.h
+	./strerror_override.h
+	./strerror_override_private
     ./vasprintf_compat.h
     ./printbuf.h
     ./random_seed.h
@@ -66,6 +68,7 @@ set(JSON_C_SOURCES
     ./json_util.c
     ./linkhash.c
     ./printbuf.c
+	./strerror_override.c
     ./random_seed.c
     ./strerror_override.c
 )
