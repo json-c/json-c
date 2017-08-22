@@ -195,7 +195,9 @@ int json_object_to_file(const char *filename, struct json_object *obj)
 
 int json_parse_double(const char *buf, double *retval)
 {
-  return (sscanf(buf, "%lf", retval)==1 ? 0 : 1);
+  char *end;
+  *retval = strtod(buf, &end);
+  return end == buf ? 1 : 0;
 }
 
 /*
