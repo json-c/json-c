@@ -48,12 +48,7 @@
 # define open _open
 #endif
 
-#if !defined(HAVE_SNPRINTF) && defined(_MSC_VER)
-  /* MSC has the version as _snprintf */
-# define snprintf _snprintf
-#elif !defined(HAVE_SNPRINTF)
-# error You do not have snprintf on your system.
-#endif /* HAVE_SNPRINTF */
+#include "snprintf_compat.h"
 
 #include "debug.h"
 #include "printbuf.h"
