@@ -70,6 +70,7 @@ set(JSON_C_SOURCES
     ./printbuf.c
 	./strerror_override.c
     ./random_seed.c
+    ./strerror_override.c
 )
 
 add_library(json-c

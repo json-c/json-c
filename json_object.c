@@ -31,13 +31,7 @@
 #include "json_util.h"
 #include "math_compat.h"
 #include "strdup_compat.h"
-
-#if !defined(HAVE_SNPRINTF) && defined(_MSC_VER)
-  /* MSC has the version as _snprintf */
-# define snprintf _snprintf
-#elif !defined(HAVE_SNPRINTF)
-# error You do not have snprintf on your system.
-#endif /* HAVE_SNPRINTF */
+#include "snprintf_compat.h"
 
 // Don't define this.  It's not thread-safe.
 /* #define REFCOUNT_DEBUG 1 */
@@ -637,6 +631,10 @@ int32_t json_object_get_int(const struct json_object *jso)
 		return INT32_MAX;
 	return (int32_t) cint64;
   case json_type_double:
+    if (jso->o.c_double <= INT32_MIN)
+      return INT32_MIN;
+    if (jso->o.c_double >= INT32_MAX)
+      return INT32_MAX;
     return (int32_t)jso->o.c_double;
   case json_type_boolean:
     return jso->o.c_boolean;
