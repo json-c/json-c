@@ -48,12 +48,7 @@
 # define open _open
 #endif
 
-#if !defined(HAVE_SNPRINTF) && defined(_MSC_VER)
-  /* MSC has the version as _snprintf */
-# define snprintf _snprintf
-#elif !defined(HAVE_SNPRINTF)
-# error You do not have snprintf on your system.
-#endif /* HAVE_SNPRINTF */
+#include "snprintf_compat.h"
 
 #include "debug.h"
 #include "printbuf.h"
@@ -195,7 +190,9 @@ int json_object_to_file(const char *filename, struct json_object *obj)
 
 int json_parse_double(const char *buf, double *retval)
 {
-  return (sscanf(buf, "%lf", retval)==1 ? 0 : 1);
+  char *end;
+  *retval = strtod(buf, &end);
+  return end == buf ? 1 : 0;
 }
 
 /*

@@ -1,6 +1,6 @@
 EXTRA_DIST = README.md README.html README-WIN32.html 
 EXTRA_DIST += config.h.win32 json-c.vcproj json-c.vcxproj json-c.vcxproj.filters
-EXTRA_DIST += Doxyfile doc
+EXTRA_DIST += Doxyfile
 
 dist-hook:
 	test -d "$(distdir)/doc" || mkdir "$(distdir)/doc"
@@ -35,7 +35,8 @@ libjson_cinclude_HEADERS = \
 	strdup_compat.h \
 	vasprintf_compat.h \
 	printbuf.h \
-	random_seed.h
+	random_seed.h \
+	strerror_override.h
 
 libjson_c_la_LDFLAGS = -version-info 3:0:0 -no-undefined @JSON_BSYMBOLIC_LDFLAGS@
 
@@ -52,15 +53,46 @@ libjson_c_la_SOURCES = \
 	linkhash.c \
 	printbuf.c \
 	random_seed.c \
-	strerror_override.c
+	strerror_override.c \
+	strerror_override_private.h
+
+
+DISTCLEANFILES=
+DISTCLEANFILES+= \
+	config.h \
+	json-c-uninstalled.pc \
+	json-c.pc \
+	json_config.h
 
 distclean-local:
 	-rm -rf $(testsubdir)
-	-rm -rf config.h.in~ Makefile.in aclocal.m4 autom4te.cache/ config.guess config.sub depcomp install-sh ltmain.sh missing
-	-rm -f INSTALL test-driver tests/Makefile.in compile
 
-maintainer-clean-local:
-	-rm -rf configure
+JSON_CLEANFILES=
+JSON_CLEANFILES+= \
+	Makefile.in \
+	aclocal.m4 \
+	autom4te.cache/ \
+	compile \
+	config.guess \
+	config.h.in \
+	config.sub \
+	configure \
+	depcomp \
+	install-sh \
+	ltmain.sh \
+	missing \
+	test-driver \
+	tests/Makefile.in
+JSON_CLEANFILES+= \
+	libtool \
+	stamp-h1 \
+	stamp-h2
+
+# There's no built-in way to remove these after all the other
+# maintainer-clean steps happen, so do it explicitly here.
+really-clean:
+	$(MAKE) maintainer-clean
+	rm -rf ${JSON_CLEANFILES}
 
 uninstall-local:
 	rm -rf "$(DESTDIR)@includedir@/json-c"

@@ -1,11 +1,7 @@
 #ifndef __vasprintf_compat_h
 #define __vasprintf_compat_h
 
-#if !defined(HAVE_VSNPRINTF) && defined(_MSC_VER)
-# define vsnprintf _vsnprintf
-#elif !defined(HAVE_VSNPRINTF) /* !HAVE_VSNPRINTF */
-# error Need vsnprintf!
-#endif /* !HAVE_VSNPRINTF && defined(WIN32) */
+#include "snprintf_compat.h"
 
 #if !defined(HAVE_VASPRINTF)
 /* CAW: compliant version of vasprintf */
