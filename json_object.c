@@ -163,25 +163,31 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 
 extern struct json_object* json_object_get(struct json_object *jso)
 {
-	if (jso)
-		jso->_ref_count++;
+	if (!jso) return jso;
+
+#if defined __GNUC__
+	__sync_add_and_fetch(&jso->_ref_count, 1);
+#else
+	++jso->_ref_count;
+#endif        
+
 	return jso;
 }
 
 int json_object_put(struct json_object *jso)
 {
-	if(jso)
-	{
-		jso->_ref_count--;
-		if(!jso->_ref_count)
-		{
-			if (jso->_user_delete)
-				jso->_user_delete(jso, jso->_userdata);
-			jso->_delete(jso);
-			return 1;
-		}
-	}
-	return 0;
+	if(!jso) return 0;
+
+#if defined __GNUC__
+	if (__sync_sub_and_fetch(&jso->_ref_count, 1) > 0) return 0;
+#else
+	if (--jso->_ref_count > 0) return 0;
+#endif
+
+	if (jso->_user_delete)
+		jso->_user_delete(jso, jso->_userdata);
+	jso->_delete(jso);
+	return 1;
 }
 
 
