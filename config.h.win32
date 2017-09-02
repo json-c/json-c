@@ -8,24 +8,24 @@
 
 /* Define to 1 if you have the declaration of `INFINITY', and to 0 if you
    don't. */
-#if defined(_MSC_VER) && _MSC_VER >= 1800
+#if (defined(_MSC_VER) && _MSC_VER >= 1800) || defined(__MINGW32__)
 #define HAVE_DECL_INFINITY 1
 #endif
 
 /* Define to 1 if you have the declaration of `isinf', and to 0 if you don't.
    */
-#if defined(_MSC_VER) && _MSC_VER >= 1800
+#if (defined(_MSC_VER) && _MSC_VER >= 1800) || defined(__MINGW32__)
 #define HAVE_DECL_ISINF 1
 #endif
 
 /* Define to 1 if you have the declaration of `isnan', and to 0 if you don't.
    */
-#if defined(_MSC_VER) && _MSC_VER >= 1800
+#if (defined(_MSC_VER) && _MSC_VER >= 1800) || defined(__MINGW32__)
 #define HAVE_DECL_ISNAN 1
 #endif
 
 /* Define to 1 if you have the declaration of `nan', and to 0 if you don't. */
-#if defined(_MSC_VER) && _MSC_VER >= 1800
+#if (defined(_MSC_VER) && _MSC_VER >= 1800) || defined(__MINGW32__)
 #define HAVE_DECL_NAN 1
 #endif
 
@@ -76,7 +76,11 @@
 #define HAVE_SETLOCALE 1
 
 /* Define to 1 if you have the `snprintf' function. */
+#if defined(__MINGW32__)
+#define HAVE_SNPRINTF 1
+#else
 #undef HAVE_SNPRINTF
+#endif
 
 /* Define to 1 if you have the <stdarg.h> header file. */
 #define HAVE_STDARG_H 1
@@ -103,7 +107,11 @@
 #define HAVE_STRING_H 1
 
 /* Define to 1 if you have the `strncasecmp' function. */
+#if defined(__MINGW32__)
+#define HAVE_STRNCASECMP 1
+#else
 #undef HAVE_STRNCASECMP
+#endif
 
 /* Define to 1 if you have the <syslog.h> header file. */
 #undef HAVE_SYSLOG_H
@@ -112,7 +120,11 @@
 #define HAVE_SYS_CDEFS_H 1
 
 /* Define to 1 if you have the <sys/param.h> header file. */
+#if defined(__MINGW32__)
+#define HAVE_SYS_PARAM_H 1
+#else
 #undef HAVE_SYS_PARAM_H
+#endif
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #define HAVE_SYS_STAT_H 1
@@ -121,10 +133,18 @@
 #define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
+#if defined(__MINGW32__)
+#define HAVE_UNISTD_H 1
+#else
 #undef HAVE_UNISTD_H
+#endif
 
 /* Define to 1 if you have the `vasprintf' function. */
+#if defined(__MINGW32__)
+#define HAVE_VASPRINTF 1
+#else
 #undef HAVE_VASPRINTF
+#endif
 
 /* Define to 1 if you have the `vprintf' function. */
 #define HAVE_VPRINTF 1

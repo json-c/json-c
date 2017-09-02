@@ -9,6 +9,7 @@
  *
  */
 
+#include "strerror_override.h"
 #include <stdio.h>
 #include "config.h"
 #include "random_seed.h"
@@ -128,7 +129,6 @@ retry:
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <errno.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 

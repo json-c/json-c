@@ -72,7 +72,6 @@
 *.dmg
 *.ipa
 
-/INSTALL
 .deps/
 .libs/
 /aclocal.m4
@@ -99,3 +98,11 @@
 /missing
 /stamp-h1
 /stamp-h2
+
+# cmake auto-generated files
+/CMakeCache.txt
+/CMakeFiles
+/cmake_install.cmake
+/include
+/libjson-c.a
+/libjson-c.so

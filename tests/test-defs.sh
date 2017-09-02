@@ -50,6 +50,14 @@ echo "=== Running test $progname"
 CMP="${CMP-cmp}"
 
 use_valgrind=${USE_VALGRIND-1}
+case "${use_valgrind}" in
+	[0Nn]*)
+		use_valgrind=0
+		;;
+	*)
+		use_valgrind=1
+		;;
+esac
 valgrind_path=$(which valgrind 2> /dev/null)
 if [ -z "${valgrind_path}" -o ! -x "${valgrind_path}" ] ; then
 	use_valgrind=0

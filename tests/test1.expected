@@ -38,6 +38,8 @@ after del_idx(0,1)=0, my_array.to_string()=[ ]
 after del_idx(0,1)=-1, my_array.to_string()=[ ]
 after del_idx(0,7)=0, my_array.to_string()=[ ]
 after del_idx(0,8)=-1, my_array.to_string()=[ 1, 2, 3, 4, 5, null, 7 ]
+after del_idx(0,6)=0, my_array.to_string()=[ 7 ]
+after adding more entries, my_array.to_string()=[ 7, "s1", "s2", "s3" ]
 my_array=
 	[0]=3
 	[1]=1

@@ -12,13 +12,14 @@
 
 #include "config.h"
 
+#include "strerror_override.h"
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
 #include <math.h>
-#include <errno.h>
 
 #include "debug.h"
 #include "printbuf.h"
@@ -30,13 +31,7 @@
 #include "json_util.h"
 #include "math_compat.h"
 #include "strdup_compat.h"
-
-#if !defined(HAVE_SNPRINTF) && defined(_MSC_VER)
-  /* MSC has the version as _snprintf */
-# define snprintf _snprintf
-#elif !defined(HAVE_SNPRINTF)
-# error You do not have snprintf on your system.
-#endif /* HAVE_SNPRINTF */
+#include "snprintf_compat.h"
 
 // Don't define this.  It's not thread-safe.
 /* #define REFCOUNT_DEBUG 1 */
@@ -143,11 +138,11 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 		default:
 			if(c < ' ')
 			{
+				char sbuf[7];
 				if(pos - start_offset > 0)
 					printbuf_memappend(pb,
 							   str + start_offset,
 							   pos - start_offset);
-				static char sbuf[7];
 				snprintf(sbuf, sizeof(sbuf),
 					 "\\u00%c%c",
 					 json_hex_chars[c >> 4],
@@ -589,7 +584,7 @@ static int json_object_int_to_json_string(struct json_object* jso,
 					  int flags)
 {
 	/* room for 19 digits, the sign char, and a null term */
-	static char sbuf[21];
+	char sbuf[21];
 	snprintf(sbuf, sizeof(sbuf), "%" PRId64, jso->o.c_int64);
 	return printbuf_memappend (pb, sbuf, strlen(sbuf));
 }
@@ -634,6 +629,10 @@ int32_t json_object_get_int(const struct json_object *jso)
 		return INT32_MAX;
 	return (int32_t) cint64;
   case json_type_double:
+    if (jso->o.c_double <= INT32_MIN)
+      return INT32_MIN;
+    if (jso->o.c_double >= INT32_MAX)
+      return INT32_MAX;
     return (int32_t)jso->o.c_double;
   case json_type_boolean:
     return jso->o.c_boolean;
@@ -692,52 +691,122 @@ int json_object_set_int64(struct json_object *jso,int64_t new_value){
 
 /* json_object_double */
 
+#ifdef HAVE___THREAD
+// i.e. __thread or __declspec(thread)
+static SPEC___THREAD char *tls_serialization_float_format = NULL;
+#endif
+static char *global_serialization_float_format = NULL;
+
+int json_c_set_serialization_double_format(const char *double_format, int global_or_thread)
+{
+	if (global_or_thread == JSON_C_OPTION_GLOBAL)
+	{
+#ifdef HAVE___THREAD
+		if (tls_serialization_float_format)
+		{
+			free(tls_serialization_float_format);
+			tls_serialization_float_format = NULL;
+		}
+#endif
+		if (global_serialization_float_format)
+			free(global_serialization_float_format);
+		global_serialization_float_format = double_format ? strdup(double_format) : NULL;
+	}
+	else if (global_or_thread == JSON_C_OPTION_THREAD)
+	{
+#ifdef HAVE___THREAD
+		if (tls_serialization_float_format)
+		{
+			free(tls_serialization_float_format);
+			tls_serialization_float_format = NULL;
+		}
+		tls_serialization_float_format = double_format ? strdup(double_format) : NULL;
+#else
+		_set_last_err("json_c_set_option: not compiled with __thread support\n");
+		return -1;
+#endif
+	}
+	else
+	{
+		_set_last_err("json_c_set_option: invalid global_or_thread value: %d\n", global_or_thread);
+		return -1;
+	}
+	return 0;
+}
+
+
 static int json_object_double_to_json_string_format(struct json_object* jso,
 						    struct printbuf *pb,
 						    int level,
 						    int flags,
 						    const char *format)
 {
-  char buf[128], *p, *q;
-  int size;
-  double dummy; /* needed for modf() */
-  /* Although JSON RFC does not support
-     NaN or Infinity as numeric values
-     ECMA 262 section 9.8.1 defines
-     how to handle these cases as strings */
-  if(isnan(jso->o.c_double))
-    size = snprintf(buf, sizeof(buf), "NaN");
-  else if(isinf(jso->o.c_double))
-    if(jso->o.c_double > 0)
-      size = snprintf(buf, sizeof(buf), "Infinity");
-    else
-      size = snprintf(buf, sizeof(buf), "-Infinity");
-  else
-    size = snprintf(buf, sizeof(buf),
-        format ? format : 
-          (modf(jso->o.c_double, &dummy) == 0) ? "%.17g.0" : "%.17g",
-          jso->o.c_double);
-  if(size < 0 || size >= (int)sizeof(buf))
-    size = (int)sizeof(buf);
+	char buf[128], *p, *q;
+	int size;
+	double dummy; /* needed for modf() */
+	/* Although JSON RFC does not support
+	NaN or Infinity as numeric values
+	ECMA 262 section 9.8.1 defines
+	how to handle these cases as strings */
+	if (isnan(jso->o.c_double))
+	{
+		size = snprintf(buf, sizeof(buf), "NaN");
+	}
+	else if (isinf(jso->o.c_double))
+	{
+		if(jso->o.c_double > 0)
+			size = snprintf(buf, sizeof(buf), "Infinity");
+		else
+			size = snprintf(buf, sizeof(buf), "-Infinity");
+	}
+	else
+	{
+		const char *std_format = "%.17g";
 
-  p = strchr(buf, ',');
-  if (p) {
-    *p = '.';
-  } else {
-    p = strchr(buf, '.');
-  }
-  if (p && (flags & JSON_C_TO_STRING_NOZERO)) {
-    /* last useful digit, always keep 1 zero */
-    p++;
-    for (q=p ; *q ; q++) {
-      if (*q!='0') p=q;
-    }
-    /* drop trailing zeroes */
-    *(++p) = 0;
-    size = p-buf;
-  }
-  printbuf_memappend(pb, buf, size);
-  return size;
+#ifdef HAVE___THREAD
+		if (tls_serialization_float_format)
+			std_format = tls_serialization_float_format;
+		else
+#endif
+		if (global_serialization_float_format)
+			std_format = global_serialization_float_format;
+		if (!format)
+			format = std_format;
+		size = snprintf(buf, sizeof(buf), format, jso->o.c_double);
+		if (modf(jso->o.c_double, &dummy) == 0  && size >= 0 && size < (int)sizeof(buf) - 2)
+		{
+			// Ensure it looks like a float, even if snprintf didn't.
+			strcat(buf, ".0");
+			size += 2;
+		}
+	}
+	// although unlikely, snprintf can fail
+	if (size < 0)
+		return -1;
+
+	p = strchr(buf, ',');
+	if (p)
+		*p = '.';
+	else
+		p = strchr(buf, '.');
+	if (p && (flags & JSON_C_TO_STRING_NOZERO))
+	{
+		/* last useful digit, always keep 1 zero */
+		p++;
+		for (q=p ; *q ; q++) {
+			if (*q!='0') p=q;
+		}
+		/* drop trailing zeroes */
+		*(++p) = 0;
+		size = p-buf;
+	}
+
+	if (size >= (int)sizeof(buf))
+		// The standard formats are guaranteed not to overrun the buffer,
+		// but if a custom one happens to do so, just silently truncate.
+		size = sizeof(buf) - 1;
+	printbuf_memappend(pb, buf, size);
+	return size;
 }
 
 static int json_object_double_to_json_string_default(struct json_object* jso,
@@ -1072,7 +1141,7 @@ struct json_object* json_object_array_bsearch(
 
 	assert(json_object_get_type(jso) == json_type_array);
 	result = (struct json_object **)array_list_bsearch(
-			(const void **)&key, jso->o.c_array, sort_fn);
+			(const void **)(void *)&key, jso->o.c_array, sort_fn);
 
 	if (!result)
 		return NULL;
@@ -1139,7 +1208,7 @@ static int json_object_all_values_equal(struct json_object* jso1,
 	/* Iterate over jso1 keys and see if they exist and are equal in jso2 */
         json_object_object_foreachC(jso1, iter) {
 		if (!lh_table_lookup_ex(jso2->o.c_object, (void*)iter.key,
-					(void**)&sub))
+					(void**)(void *)&sub))
 			return 0;
 		if (!json_object_equal(iter.val, sub))
 			return 0;
@@ -1148,7 +1217,7 @@ static int json_object_all_values_equal(struct json_object* jso1,
 	/* Iterate over jso2 keys to see if any exist that are not in jso1 */
         json_object_object_foreachC(jso2, iter) {
 		if (!lh_table_lookup_ex(jso1->o.c_object, (void*)iter.key,
-					(void**)&sub))
+					(void**)(void *)&sub))
 			return 0;
         }
 

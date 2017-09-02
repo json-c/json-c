@@ -1,4 +1,5 @@
-#include <errno.h>
+#define STRERROR_OVERRIDE_IMPL 1
+#include "strerror_override.h"
 
 /*
  * Override strerror() to get consistent output across platforms.
@@ -52,13 +53,19 @@ static struct {
 	{ 0, (char *)0 }
 };
 
+// Enabled during tests
+int _json_c_strerror_enable = 0;
+
 #define PREFIX "ERRNO="
 static char errno_buf[128] = PREFIX;
-char *strerror(int errno_in)
+char *_json_c_strerror(int errno_in)
 {
 	int start_idx;
 	char digbuf[20];
 	int ii, jj;
+
+	if (!_json_c_strerror_enable)
+		return strerror(errno_in);
 
 	// Avoid standard functions, so we don't need to include any
 	// headers, or guess at signatures.

@@ -120,6 +120,19 @@ void test_array_del_idx()
 	       (int)(orig_array_len + 1), rc, json_object_to_json_string(my_array));
 
 	json_object_put(my_array);
+	
+	/* Delete some array indexes, then add more */
+	my_array = make_array();
+	rc = json_object_array_del_idx(my_array, 0, orig_array_len - 1);
+	printf("after del_idx(0,%d)=%d, my_array.to_string()=%s\n",
+	       (int)(orig_array_len - 1), rc, json_object_to_json_string(my_array));
+	json_object_array_add(my_array, json_object_new_string("s1"));
+	json_object_array_add(my_array, json_object_new_string("s2"));
+	json_object_array_add(my_array, json_object_new_string("s3"));
+
+	printf("after adding more entries, my_array.to_string()=%s\n",
+	       json_object_to_json_string(my_array));
+	json_object_put(my_array);
 }
 
 int main(int argc, char **argv)

@@ -52,7 +52,7 @@ EXTRA_DIST+= test2Formatted_plain.expected
 EXTRA_DIST+= test2Formatted_pretty.expected
 EXTRA_DIST+= test2Formatted_spaced.expected
 
-test_util_file_SOURCES = test_util_file.c strerror_override.c
+test_util_file_SOURCES = test_util_file.c
 
 testsubdir=testSubDir
 TESTS_ENVIRONMENT       = top_builddir=$(top_builddir)

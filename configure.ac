@@ -7,6 +7,8 @@ AM_INIT_AUTOMAKE
 
 AC_PROG_MAKE_SET
 
+AC_CANONICAL_HOST
+
 AC_ARG_ENABLE(rdrand,
  AS_HELP_STRING([--enable-rdrand],
    [Enable RDRAND Hardware RNG Hash Seed generation on supported x86/x64 platforms.]),
@@ -41,6 +43,18 @@ AC_CHECK_HEADER(inttypes.h,[AC_DEFINE([JSON_C_HAVE_INTTYPES_H],[1],[Public defin
 AC_C_CONST
 AC_TYPE_SIZE_T
 
+AC_CACHE_CHECK([for __thread support], ac_cv___thread, [dnl
+AC_LINK_IFELSE([dnl
+AC_LANG_PROGRAM([[#undef __thread
+static __thread int a; int foo (int b) { return a + b; }]],
+		[[exit (foo (0));]])],
+	       ac_cv___thread=yes, ac_cv___thread=no)
+])
+AS_IF([test "x$ac_cv___thread" != xno],
+[AC_DEFINE(HAVE___THREAD, 1, [Have __thread])
+ AC_DEFINE(SPEC___THREAD, [__thread], [Specifier for __thread])]
+)
+
 # Checks for library functions.
 AC_FUNC_VPRINTF
 AC_FUNC_MEMCMP
@@ -52,6 +66,14 @@ AC_CHECK_DECLS([isnan], [], [], [[#include <math.h>]])
 AC_CHECK_DECLS([isinf], [], [], [[#include <math.h>]])
 AC_CHECK_DECLS([_isnan], [], [], [[#include <float.h>]])
 AC_CHECK_DECLS([_finite], [], [], [[#include <float.h>]])
+
+case "${host_os}" in
+	linux*)
+		AC_CHECK_FUNCS([uselocale])
+		;;
+	*)	# Nothing
+		;;
+esac
 
 if test "$ac_cv_have_decl_isnan" = "yes" ; then
    AC_TRY_LINK([#include <math.h>], [float f = 0.0; return isnan(f)], [], [LIBS="$LIBS -lm"])
@@ -75,7 +97,7 @@ int main(int c,char* v) {return 0;}
 
 AC_LANG_POP([C])
 
-AM_PROG_LIBTOOL
+LT_INIT
 
 # Check for the -Bsymbolic-functions linker flag
 AC_ARG_ENABLE([Bsymbolic],

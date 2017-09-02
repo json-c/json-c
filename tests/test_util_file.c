@@ -1,4 +1,5 @@
-#include <errno.h>
+#include "strerror_override.h"
+#include "strerror_override_private.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -49,6 +50,25 @@ static void test_write_to_file()
 	       (rv == 0) ? "OK" : "FAIL", outfile2, rv);
 	if (rv == 0)
 		stat_and_cat(outfile2);
+
+	const char *outfile3 = "json3.out";
+	int d = open(outfile3, O_WRONLY|O_CREAT, 0600);
+	if (d < 0)
+	{
+		printf("FAIL: unable to open %s %s\n", outfile3, strerror(errno));
+		return;
+	}
+	rv = json_object_to_fd(d, jso, JSON_C_TO_STRING_PRETTY);
+	printf("%s: json_object_to_fd(%s, jso, JSON_C_TO_STRING_PRETTY)=%d\n",
+	       (rv == 0) ? "OK" : "FAIL", outfile3, rv);
+	// Write the same object twice
+	rv = json_object_to_fd(d, jso, JSON_C_TO_STRING_PLAIN);
+	printf("%s: json_object_to_fd(%s, jso, JSON_C_TO_STRING_PLAIN)=%d\n",
+	       (rv == 0) ? "OK" : "FAIL", outfile3, rv);
+	close(d);
+	if (rv == 0)
+		stat_and_cat(outfile3);
+
 	json_object_put(jso);
 }
 
@@ -87,12 +107,15 @@ static void stat_and_cat(const char *file)
 	buf[sb.st_size] = '\0';
 	printf("file[%s], size=%d, contents=%s\n", file, (int)sb.st_size, buf);
 	free(buf);
+	close(d);
 }
 
 int main(int argc, char **argv)
 {
 //	json_object_to_file(file, obj);
 //	json_object_to_file_ext(file, obj, flags);
+
+	_json_c_strerror_enable = 1;
 
 	const char *testdir;
 	if (argc < 2)

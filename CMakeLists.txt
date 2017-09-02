@@ -11,12 +11,24 @@ if(MSVC)
   file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/include/config.h.win32 ${CMAKE_CURRENT_BINARY_DIR}/include/config.h)
   file(COPY ./json_config.h.win32 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
   file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h.win32 ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h)
+elseif(MINGW)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -D_GNU_SOURCE=1")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror -D_GNU_SOURCE=1")
+  if (MSYS OR CMAKE_GENERATOR STREQUAL "Unix Makefiles")
+    execute_process(COMMAND echo ${CMAKE_CURRENT_SOURCE_DIR} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    execute_process(COMMAND sh autogen.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    execute_process(COMMAND sh ./configure WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    file(COPY ./config.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
+    file(COPY ./json_config.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
+  else()
+    file(COPY ./config.h.win32 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
+    file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/include/config.h.win32 ${CMAKE_CURRENT_BINARY_DIR}/include/config.h)
+    file(COPY ./json_config.h.win32 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
+    file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h.win32 ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h)
+  endif()
 elseif(UNIX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
-  if(CMAKE_COMPILER_IS_GNUCC)
-    add_definitions(-D_GNU_SOURCE)
-  endif()
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror -D_GNU_SOURCE")
   execute_process(COMMAND echo ${CMAKE_CURRENT_SOURCE_DIR} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
   execute_process(COMMAND sh autogen.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
   execute_process(COMMAND ./configure WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
@@ -56,16 +68,26 @@ set(JSON_C_SOURCES
     ./linkhash.c
     ./printbuf.c
     ./random_seed.c
+    ./strerror_override.c
 )
 
 add_library(json-c
+    SHARED
+    ${JSON_C_SOURCES}
+    ${JSON_C_HEADERS}
+)
+
+add_library(json-c-static
+    STATIC
     ${JSON_C_SOURCES}
     ${JSON_C_HEADERS}
 )
 
 set_property(TARGET json-c PROPERTY C_STANDARD 99)
+set_property(TARGET json-c-static PROPERTY C_STANDARD 99)
+set_target_properties(json-c-static PROPERTIES OUTPUT_NAME json-c)
 
-install(TARGETS json-c
+install(TARGETS json-c json-c-static
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib

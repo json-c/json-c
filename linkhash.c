@@ -23,7 +23,7 @@
 # include <endian.h>    /* attempt to define endianness */
 #endif
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__MINGW32__)
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>   /* Get InterlockedCompareExchange */
 #endif
@@ -452,7 +452,7 @@ static unsigned long lh_perllike_str_hash(const void *k)
 
 static unsigned long lh_char_hash(const void *k)
 {
-#if defined _MSC_VER
+#if defined _MSC_VER || defined __MINGW32__
 #define RANDOM_SEED_TYPE LONG
 #else
 #define RANDOM_SEED_TYPE int
@@ -474,10 +474,10 @@ static unsigned long lh_char_hash(const void *k)
 #endif
 #if defined USE_SYNC_COMPARE_AND_SWAP
 		(void)__sync_val_compare_and_swap(&random_seed, -1, seed);
-#elif defined _MSC_VER
+#elif defined _MSC_VER || defined __MINGW32__
 		InterlockedCompareExchange(&random_seed, seed, -1);
 #else
-#warning "racy random seed initializtion if used by multiple threads"
+//#warning "racy random seed initializtion if used by multiple threads"
 		random_seed = seed; /* potentially racy */
 #endif
 	}
