@@ -66,6 +66,30 @@ AC_CHECK_DECLS([isnan], [], [], [[#include <math.h>]])
 AC_CHECK_DECLS([isinf], [], [], [[#include <math.h>]])
 AC_CHECK_DECLS([_isnan], [], [], [[#include <float.h>]])
 AC_CHECK_DECLS([_finite], [], [], [[#include <float.h>]])
+AC_MSG_CHECKING(for GCC atomic builtins)
+AC_LINK_IFELSE(
+[
+ AC_LANG_SOURCE([[
+   int main() {
+      volatile unsigned int val = 1;
+      /* Note: __sync_val_compare_and_swap isn't checked here
+       * because it's protected by __GCC_HAVE_SYNC_COMPARE_AND_SWAP_<n>,
+       * which is automatically defined by gcc.
+       */
+      __sync_add_and_fetch(&val, 1);
+      __sync_sub_and_fetch(&val, 1);
+      return 0;
+   }
+ ]])
+],
+[
+ AC_MSG_RESULT([yes])
+ AC_DEFINE([HAVE_ATOMIC_BUILTINS],[1],[Has atomic builtins])
+],
+[
+ AC_MSG_RESULT([no])
+ AC_MSG_WARN([json-c will be built without atomic refcounts because atomic builtins are missing])
+])
 
 case "${host_os}" in
 	linux*)
