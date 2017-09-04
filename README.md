@@ -45,7 +45,7 @@ $ sh autogen.sh
 followed by
 
 ```sh
-$ ./configure
+$ ./configure  # --enable-threading
 $ make
 $ make install
 ```
@@ -55,6 +55,25 @@ To build and run the test programs:
 ```sh
 $ make check
 ```
+
+Building with partial threading support
+----------------------------------------
+
+Although json-c does not support fully multi-threaded access to
+object trees, it has some code to help make use in threaded programs
+a bit safer.  Currently, this is limited to using atomic operations for
+json_object_get() and json_object_put().
+
+Since this may have a performance impact, of at least 3x slower
+according to https://stackoverflow.com/a/11609063, it is disabled by
+default.  You may turn it on by adjusting your configure command with:
+   --enable-threading
+
+Separately, the default hash function used for object field keys,
+lh_char_hash, uses a compare-and-swap operation to ensure the randomly
+seed is only generated once.  Because this is a one-time operation, it
+is always compiled in when the compare-and-swap operation is available.
+
 
 Linking to `libjson-c`
 ----------------------

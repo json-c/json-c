@@ -11,12 +11,26 @@ AC_PROG_MAKE_SET
 
 AC_CANONICAL_HOST
 
+AC_ARG_ENABLE(threading,
+ AS_HELP_STRING([--enable-threading],
+   [Enable code to support partly multi-threaded use]),
+[if test x$enableval = xyes; then
+  enable_threading=yes
+  AC_DEFINE(ENABLE_THREADING, 1, [Enable partial threading support])
+fi])
+
+if test "x$enable_threading" = "xyes"; then
+  AC_MSG_RESULT([Partial multi-threaded support enabled.])
+else
+  AC_MSG_RESULT([Multi-threaded support disabled. Use --enable-threading to enable.])
+fi
+
 AC_ARG_ENABLE(rdrand,
  AS_HELP_STRING([--enable-rdrand],
    [Enable RDRAND Hardware RNG Hash Seed generation on supported x86/x64 platforms.]),
 [if test x$enableval = xyes; then
   enable_rdrand=yes
-  AC_DEFINE(ENABLE_RDRAND, 1, [Enable RDRANR Hardware RNG Hash Seed])
+  AC_DEFINE(ENABLE_RDRAND, 1, [Enable RDRAND Hardware RNG Hash Seed])
 fi])
 
 if test "x$enable_rdrand" = "xyes"; then

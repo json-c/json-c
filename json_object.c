@@ -165,7 +165,7 @@ extern struct json_object* json_object_get(struct json_object *jso)
 {
 	if (!jso) return jso;
 
-#ifdef HAVE_ATOMIC_BUILTINS
+#if defined(HAVE_ATOMIC_BUILTINS) && defined(ENABLE_THREADING)
 	__sync_add_and_fetch(&jso->_ref_count, 1);
 #else
 	++jso->_ref_count;
@@ -178,7 +178,7 @@ int json_object_put(struct json_object *jso)
 {
 	if(!jso) return 0;
 
-#ifdef HAVE_ATOMIC_BUILTINS
+#if defined(HAVE_ATOMIC_BUILTINS) && defined(ENABLE_THREADING)
 	/* Note: this only allow the refcount to remain correct
 	 * when multiple threads are adjusting it.  It is still an error 
 	 * for a thread to decrement the refcount if it doesn't "own" it,
@@ -703,7 +703,7 @@ int json_object_set_int64(struct json_object *jso,int64_t new_value){
 
 /* json_object_double */
 
-#ifdef HAVE___THREAD
+#if defined(HAVE___THREAD) && defined(ENABLE_THREADING)
 // i.e. __thread or __declspec(thread)
 static SPEC___THREAD char *tls_serialization_float_format = NULL;
 #endif
@@ -713,7 +713,7 @@ int json_c_set_serialization_double_format(const char *double_format, int global
 {
 	if (global_or_thread == JSON_C_OPTION_GLOBAL)
 	{
-#ifdef HAVE___THREAD
+#if defined(HAVE___THREAD) && defined(ENABLE_THREADING)
 		if (tls_serialization_float_format)
 		{
 			free(tls_serialization_float_format);
@@ -726,7 +726,7 @@ int json_c_set_serialization_double_format(const char *double_format, int global
 	}
 	else if (global_or_thread == JSON_C_OPTION_THREAD)
 	{
-#ifdef HAVE___THREAD
+#if defined(HAVE___THREAD) && defined(ENABLE_THREADING)
 		if (tls_serialization_float_format)
 		{
 			free(tls_serialization_float_format);
@@ -775,7 +775,7 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
 	{
 		const char *std_format = "%.17g";
 
-#ifdef HAVE___THREAD
+#if defined(HAVE___THREAD) && defined(ENABLE_THREADING)
 		if (tls_serialization_float_format)
 			std_format = tls_serialization_float_format;
 		else
