@@ -5,6 +5,8 @@ AC_INIT([json-c], 0.12.99, [json-c@googlegroups.com])
 
 AM_INIT_AUTOMAKE
 
+AC_CONFIG_MACRO_DIRS([autoconf-archive/m4])
+
 AC_PROG_MAKE_SET
 
 AC_CANONICAL_HOST

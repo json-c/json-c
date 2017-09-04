@@ -1,5 +1,5 @@
 #!/bin/sh
-autoreconf -Iautoconf-archive/m4 -v --install || exit 1
+autoreconf -v --install || exit 1
 
 # If there are any options, assume the user wants to run configure.
 # To run configure w/o any options, use ./autogen.sh --configure
