@@ -703,7 +703,7 @@ int json_object_set_int64(struct json_object *jso,int64_t new_value){
 
 /* json_object_double */
 
-#if defined(HAVE___THREAD) && defined(ENABLE_THREADING)
+#if defined(HAVE___THREAD)
 // i.e. __thread or __declspec(thread)
 static SPEC___THREAD char *tls_serialization_float_format = NULL;
 #endif
@@ -713,7 +713,7 @@ int json_c_set_serialization_double_format(const char *double_format, int global
 {
 	if (global_or_thread == JSON_C_OPTION_GLOBAL)
 	{
-#if defined(HAVE___THREAD) && defined(ENABLE_THREADING)
+#if defined(HAVE___THREAD)
 		if (tls_serialization_float_format)
 		{
 			free(tls_serialization_float_format);
@@ -726,7 +726,7 @@ int json_c_set_serialization_double_format(const char *double_format, int global
 	}
 	else if (global_or_thread == JSON_C_OPTION_THREAD)
 	{
-#if defined(HAVE___THREAD) && defined(ENABLE_THREADING)
+#if defined(HAVE___THREAD)
 		if (tls_serialization_float_format)
 		{
 			free(tls_serialization_float_format);
@@ -775,7 +775,7 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
 	{
 		const char *std_format = "%.17g";
 
-#if defined(HAVE___THREAD) && defined(ENABLE_THREADING)
+#if defined(HAVE___THREAD)
 		if (tls_serialization_float_format)
 			std_format = tls_serialization_float_format;
 		else
