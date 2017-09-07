@@ -322,6 +322,13 @@ void lh_abort(const char *msg, ...);
 int lh_table_resize(struct lh_table *t, int new_size);
 
 
+#if !defined(_MSC_VER) || (_MSC_VER > 1800)
+/* VS2010 can't handle inline funcs, so skip it there */
+#define _LH_INLINE inline
+#else
+#define _LH_INLINE
+#endif
+
 /**
  * Calculate the hash of a key for a given table.
  * This is an exension to support functions that need to calculate
@@ -332,14 +339,12 @@ int lh_table_resize(struct lh_table *t, int new_size);
  * @param k a pointer to the key to lookup
  * @return the key's hash
  */
-#if !defined(_MSC_VER) || (_MSC_VER > 1800)
-static inline unsigned long lh_get_hash(const struct lh_table *t, const void *k)
+static _LH_INLINE unsigned long lh_get_hash(const struct lh_table *t, const void *k)
 {
 	return t->hash_fn(k);
 }
-#else
-unsigned long lh_get_hash(const struct lh_table *t, const void *k);
-#endif
+
+#undef _LH_INLINE
 
 /* Don't use this outside of linkhash.h: */
 #ifdef __UNCONST

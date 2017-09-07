@@ -560,13 +560,6 @@ int lh_table_resize(struct lh_table *t, int new_size)
 	return 0;
 }
 
-#if defined(_MSC_VER) && (_MSC_VER < 1900)
-unsigned long lh_get_hash(const struct lh_table *t, const void *k)
-{
-	return t->hash_fn(k);
-}
-#endif
-
 void lh_table_free(struct lh_table *t)
 {
 	struct lh_entry *c;
