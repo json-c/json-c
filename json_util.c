@@ -265,7 +265,9 @@ int json_parse_int64(const char *buf, int64_t *retval)
 		// Skip leading zeros, but keep at least one digit
 		while (buf_sig_digits[0] == '0' && buf_sig_digits[1] != '\0')
 			buf_sig_digits++;
-		if (num64 == 0) // assume all sscanf impl's will parse -0 to 0
+		// Can't check num64==0 because some sscanf impl's parse
+		//  non-zero values to 0.  (e.g. Illumos with UINT64_MAX)
+		if (buf_sig_digits[0] == '0' && buf_sig_digits[1] == '\0')
 			orig_has_neg = 0; // "-0" is the same as just plain "0"
 
 		snprintf(buf_cmp_start, sizeof(buf_cmp), "%" PRId64, num64);

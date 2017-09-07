@@ -163,25 +163,37 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 
 extern struct json_object* json_object_retain(struct json_object *jso)
 {
-	if (jso)
-		jso->_ref_count++;
+	if (!jso) return jso;
+
+#if defined(HAVE_ATOMIC_BUILTINS) && defined(ENABLE_THREADING)
+	__sync_add_and_fetch(&jso->_ref_count, 1);
+#else
+	++jso->_ref_count;
+#endif        
+
 	return jso;
 }
 
 int json_object_release(struct json_object *jso)
 {
-	if(jso)
-	{
-		jso->_ref_count--;
-		if(!jso->_ref_count)
-		{
-			if (jso->_user_delete)
-				jso->_user_delete(jso, jso->_userdata);
-			jso->_delete(jso);
-			return 1;
-		}
-	}
-	return 0;
+	if(!jso) return 0;
+
+#if defined(HAVE_ATOMIC_BUILTINS) && defined(ENABLE_THREADING)
+	/* Note: this only allow the refcount to remain correct
+	 * when multiple threads are adjusting it.  It is still an error 
+	 * for a thread to decrement the refcount if it doesn't "own" it,
+	 * as that can result in the thread that loses the race to 0
+	 * operating on an already-freed object.
+	 */
+	if (__sync_sub_and_fetch(&jso->_ref_count, 1) > 0) return 0;
+#else
+	if (--jso->_ref_count > 0) return 0;
+#endif
+
+	if (jso->_user_delete)
+		jso->_user_delete(jso, jso->_userdata);
+	jso->_delete(jso);
+	return 1;
 }
 
 
@@ -693,7 +705,7 @@ int json_object_set_int64(struct json_object *jso,int64_t new_value){
 
 /* json_object_double */
 
-#ifdef HAVE___THREAD
+#if defined(HAVE___THREAD)
 // i.e. __thread or __declspec(thread)
 static SPEC___THREAD char *tls_serialization_float_format = NULL;
 #endif
@@ -703,7 +715,7 @@ int json_c_set_serialization_double_format(const char *double_format, int global
 {
 	if (global_or_thread == JSON_C_OPTION_GLOBAL)
 	{
-#ifdef HAVE___THREAD
+#if defined(HAVE___THREAD)
 		if (tls_serialization_float_format)
 		{
 			free(tls_serialization_float_format);
@@ -716,7 +728,7 @@ int json_c_set_serialization_double_format(const char *double_format, int global
 	}
 	else if (global_or_thread == JSON_C_OPTION_THREAD)
 	{
-#ifdef HAVE___THREAD
+#if defined(HAVE___THREAD)
 		if (tls_serialization_float_format)
 		{
 			free(tls_serialization_float_format);
@@ -765,7 +777,7 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
 	{
 		const char *std_format = "%.17g";
 
-#ifdef HAVE___THREAD
+#if defined(HAVE___THREAD)
 		if (tls_serialization_float_format)
 			std_format = tls_serialization_float_format;
 		else

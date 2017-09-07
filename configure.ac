@@ -5,16 +5,32 @@ AC_INIT([json-c], 0.12.99, [json-c@googlegroups.com])
 
 AM_INIT_AUTOMAKE
 
+AC_CONFIG_MACRO_DIRS([autoconf-archive/m4])
+
 AC_PROG_MAKE_SET
 
 AC_CANONICAL_HOST
+
+AC_ARG_ENABLE(threading,
+ AS_HELP_STRING([--enable-threading],
+   [Enable code to support partly multi-threaded use]),
+[if test x$enableval = xyes; then
+  enable_threading=yes
+  AC_DEFINE(ENABLE_THREADING, 1, [Enable partial threading support])
+fi])
+
+if test "x$enable_threading" = "xyes"; then
+  AC_MSG_RESULT([Partial multi-threaded support enabled.])
+else
+  AC_MSG_RESULT([Multi-threaded support disabled. Use --enable-threading to enable.])
+fi
 
 AC_ARG_ENABLE(rdrand,
  AS_HELP_STRING([--enable-rdrand],
    [Enable RDRAND Hardware RNG Hash Seed generation on supported x86/x64 platforms.]),
 [if test x$enableval = xyes; then
   enable_rdrand=yes
-  AC_DEFINE(ENABLE_RDRAND, 1, [Enable RDRANR Hardware RNG Hash Seed])
+  AC_DEFINE(ENABLE_RDRAND, 1, [Enable RDRAND Hardware RNG Hash Seed])
 fi])
 
 if test "x$enable_rdrand" = "xyes"; then
@@ -66,6 +82,30 @@ AC_CHECK_DECLS([isnan], [], [], [[#include <math.h>]])
 AC_CHECK_DECLS([isinf], [], [], [[#include <math.h>]])
 AC_CHECK_DECLS([_isnan], [], [], [[#include <float.h>]])
 AC_CHECK_DECLS([_finite], [], [], [[#include <float.h>]])
+AC_MSG_CHECKING(for GCC atomic builtins)
+AC_LINK_IFELSE(
+[
+ AC_LANG_SOURCE([[
+   int main() {
+      volatile unsigned int val = 1;
+      /* Note: __sync_val_compare_and_swap isn't checked here
+       * because it's protected by __GCC_HAVE_SYNC_COMPARE_AND_SWAP_<n>,
+       * which is automatically defined by gcc.
+       */
+      __sync_add_and_fetch(&val, 1);
+      __sync_sub_and_fetch(&val, 1);
+      return 0;
+   }
+ ]])
+],
+[
+ AC_MSG_RESULT([yes])
+ AC_DEFINE([HAVE_ATOMIC_BUILTINS],[1],[Has atomic builtins])
+],
+[
+ AC_MSG_RESULT([no])
+ AC_MSG_WARN([json-c will be built without atomic refcounts because atomic builtins are missing])
+])
 
 case "${host_os}" in
 	linux*)
