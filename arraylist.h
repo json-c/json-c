@@ -35,10 +35,10 @@ extern void
 array_list_free(struct array_list *al);
 
 extern void*
-array_list_get(struct array_list *al, size_t i);
+array_list_get_idx(struct array_list *al, size_t i);
 
 extern int
-array_list_insert(struct array_list *al, size_t i, void *data);
+array_list_put_idx(struct array_list *al, size_t i, void *data);
 
 extern int
 array_list_add(struct array_list *al, void *data);

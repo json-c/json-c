@@ -64,7 +64,7 @@ array_list_free(struct array_list *arr)
 }
 
 void*
-array_list_get(struct array_list *arr, size_t i)
+array_list_get_idx(struct array_list *arr, size_t i)
 {
   if(i >= arr->length) return NULL;
   return arr->array[i];
@@ -94,7 +94,7 @@ static int array_list_expand_internal(struct array_list *arr, size_t max)
 }
 
 int
-array_list_insert(struct array_list *arr, size_t idx, void *data)
+array_list_put_idx(struct array_list *arr, size_t idx, void *data)
 {
   if (idx > SIZE_T_MAX - 1 ) return -1;
   if(array_list_expand_internal(arr, idx+1)) return -1;
@@ -108,7 +108,7 @@ array_list_insert(struct array_list *arr, size_t idx, void *data)
 int
 array_list_add(struct array_list *arr, void *data)
 {
-  return array_list_insert(arr, arr->length, data);
+  return array_list_put_idx(arr, arr->length, data);
 }
 
 void
