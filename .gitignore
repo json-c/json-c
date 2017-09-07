@@ -96,6 +96,7 @@
 /Makefile
 /Makefile.in
 /missing
+/INSTALL
 /stamp-h1
 /stamp-h2
 
@@ -106,3 +107,4 @@
 /include
 /libjson-c.a
 /libjson-c.so
+/libjson-c-*/
