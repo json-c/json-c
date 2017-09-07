@@ -387,10 +387,11 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
       {
 	size_t size_inf;
 	int is_negative = 0;
+	char *infbuf;
 
 	printbuf_memappend_fast(tok->pb, &c, 1);
 	size_inf = json_min(tok->st_pos+1, json_inf_str_len);
-	char *infbuf = tok->pb->buf;
+	infbuf = tok->pb->buf;
 	if (*infbuf == '-')
 	{
 		infbuf++;
