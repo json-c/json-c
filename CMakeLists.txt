@@ -53,7 +53,7 @@ set(JSON_C_HEADERS
     ./math_compat.h
     ./strdup_compat.h
 	./strerror_override.h
-	./strerror_override_private
+	./strerror_override_private.h
     ./vasprintf_compat.h
     ./printbuf.h
     ./random_seed.h
