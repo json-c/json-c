@@ -33,6 +33,10 @@
 #include "strdup_compat.h"
 #include "snprintf_compat.h"
 
+#if SIZEOF_LONG_LONG != SIZEOF_INT64_T
+#error "The long long type isn't 64-bits"
+#endif
+
 // Don't define this.  It's not thread-safe.
 /* #define REFCOUNT_DEBUG 1 */
 
