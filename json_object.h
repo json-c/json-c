@@ -15,6 +15,8 @@
 
 #ifdef __GNUC__
 #define THIS_FUNCTION_IS_DEPRECATED(func) func __attribute__ ((deprecated))
+#elif defined(__clang__)
+#define THIS_FUNCTION_IS_DEPRECATED(func) func __deprecated
 #elif defined(_MSC_VER)
 #define THIS_FUNCTION_IS_DEPRECATED(func) __declspec(deprecated) func
 #else
@@ -326,6 +328,16 @@ JSON_EXPORT void json_object_set_serializer(json_object *jso,
 	void *userdata,
 	json_object_delete_fn *user_delete);
 
+#ifdef __clang__
+/*
+ * Clang doesn't pay attention to the parameters defined in the
+ * function typedefs used here, so turn off spurious doc warnings.
+ * {
+ */
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdocumentation"
+#endif
+
 /**
  * Simply call free on the userdata pointer.
  * Can be used with json_object_set_serializer().
@@ -345,6 +357,11 @@ json_object_delete_fn json_object_free_userdata;
  * @param flags Ignored.
  */
 json_object_to_json_string_fn json_object_userdata_to_json_string;
+
+#ifdef __clang__
+/* } */
+#pragma clang diagnostic pop
+#endif
 
 
 /* object type methods */
@@ -413,6 +430,7 @@ JSON_EXPORT int json_object_object_add_ex(struct json_object* obj,
 				const unsigned opts);
 
 /** Get the json_object associate with a given object field.
+ * Deprecated/discouraged: used json_object_object_get_ex instead.
  *
  * This returns NULL if the field is found but its value is null, or if
  *  the field is not found, or if obj is not a json_type_object.  If you
@@ -431,7 +449,6 @@ JSON_EXPORT int json_object_object_add_ex(struct json_object* obj,
  * @param obj the json_object instance
  * @param key the object field name
  * @returns the json_object associated with the given field name
- * @deprecated Please use json_object_object_get_ex
  */
 JSON_EXPORT struct json_object* json_object_object_get(const struct json_object* obj,
 						  const char *key);
@@ -545,7 +562,7 @@ JSON_EXPORT size_t json_object_array_length(const struct json_object *obj);
 * Pointers to the json_object pointers will be passed as the two arguments
 * to @sort_fn
 *
-* @param obj the json_object instance
+* @param jso the json_object instance
 * @param sort_fn a sorting function
 */
 JSON_EXPORT void json_object_array_sort(struct json_object *jso, int(*sort_fn)(const void *, const void *));
