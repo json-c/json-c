@@ -52,7 +52,7 @@ AC_PROG_CC_C99
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_HEADER(json_config.h)
 AC_HEADER_STDC
-AC_CHECK_HEADERS(fcntl.h limits.h strings.h syslog.h unistd.h [sys/cdefs.h] [sys/param.h] stdarg.h locale.h xlocale.h endian.h)
+AC_CHECK_HEADERS(fcntl.h limits.h strings.h syslog.h unistd.h [sys/cdefs.h] [sys/param.h] stdarg.h endian.h)
 AC_CHECK_HEADER(inttypes.h,[AC_DEFINE([JSON_C_HAVE_INTTYPES_H],[1],[Public define for json_inttypes.h])])
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -75,7 +75,7 @@ AS_IF([test "x$ac_cv___thread" != xno],
 AC_FUNC_VPRINTF
 AC_FUNC_MEMCMP
 AC_CHECK_FUNCS([realloc])
-AC_CHECK_FUNCS(strcasecmp strdup strerror snprintf vsnprintf vasprintf open vsyslog strncasecmp setlocale)
+AC_CHECK_FUNCS(strcasecmp strdup strerror snprintf vsnprintf vasprintf open vsyslog strncasecmp)
 AC_CHECK_DECLS([INFINITY], [], [], [[#include <math.h>]])
 AC_CHECK_DECLS([nan], [], [], [[#include <math.h>]])
 AC_CHECK_DECLS([isnan], [], [], [[#include <math.h>]])
@@ -165,7 +165,7 @@ AS_IF([test "x$enable_Bsymbolic" = "xcheck"],
 AS_IF([test "x$enable_Bsymbolic" = "xyes"], [JSON_BSYMBOLIC_LDFLAGS=-Wl[,]-Bsymbolic-functions])
 AC_SUBST(JSON_BSYMBOLIC_LDFLAGS)
 
-AX_APPEND_COMPILE_FLAGS([-Wall -Werror -Wcast-qual -Wno-error=deprecated-declarations])
+AX_APPEND_COMPILE_FLAGS([-Wall -Wcast-qual -Wno-error=deprecated-declarations])
 AX_APPEND_COMPILE_FLAGS([-Wextra -Wwrite-string -Wno-unused-parameter])
 AX_APPEND_COMPILE_FLAGS([-D_GNU_SOURCE -D_REENTRANT])
 

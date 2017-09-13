@@ -1,7 +1,8 @@
 #Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 cmake_minimum_required(VERSION 2.8.7)
-project(json-c)
+project(json-c C)
+set(VERSION "0.12.99")
 
 if(MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4100 /wd4996 /wd4244 /wd4706 /wd4702 /wd4127 /wd4701")
@@ -97,3 +98,11 @@ install(TARGETS json-c json-c-static
 
 install(DIRECTORY . DESTINATION ${CMAKE_INSTALL_PREFIX}/include/json-c FILES_MATCHING PATTERN "*.h")
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include/json-c FILES_MATCHING PATTERN "*.h")
+
+if(UNIX)
+  set(INSTALL_LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib)
+  set(INSTALL_INC_DIR ${CMAKE_INSTALL_PREFIX}/include)
+  configure_file( json-c.pc.cmake.in libjson-c.pc @ONLY)
+  set(INSTALL_PKGCONFIG_DIR "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" CACHE PATH "Installation directory for pkgconfig (.pc) files")
+  install(FILES ${CMAKE_BINARY_DIR}/libjson-c.pc DESTINATION "${INSTALL_PKGCONFIG_DIR}")
+endif()

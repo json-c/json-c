@@ -1,0 +1,13 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=@CMAKE_INSTALL_PREFIX@
+libdir=@INSTALL_LIB_DIR@
+sharedlibdir=@INSTALL_LIB_DIR@
+includedir=@INSTALL_INC_DIR@
+
+Name: json-c
+Description: A JSON implementation in C
+Version: @VERSION@
+
+Requires:
+Libs: -L${libdir} -L${sharedlibdir} -ljson-c
+Cflags: -I${includedir}/json-c
