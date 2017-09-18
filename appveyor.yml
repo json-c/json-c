@@ -12,6 +12,7 @@ environment:
   - PlatformToolset: Windows7.1SDK
 
 build_script:
+- cmake .
 - >
   msbuild "json-c.vcxproj" /m /verbosity:normal
   /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
