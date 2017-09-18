@@ -37,26 +37,31 @@ endif()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 
-set(JSON_C_HEADERS
+set(JSON_C_PUBLIC_HEADERS
     ./json.h
     ${CMAKE_CURRENT_BINARY_DIR}/include/config.h
-    ./json_config.h
+    ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h
     ./arraylist.h
     ./debug.h
+    ./json_c_version.h
     ./json_inttypes.h
     ./json_object.h
-    ./json_object_private.h
     ./json_pointer.h
     ./json_tokener.h
     ./json_util.h
     ./linkhash.h
-    ./math_compat.h
-    ./strdup_compat.h
+    ./printbuf.h
+)
+set(JSON_C_HEADERS
+    ${JSON_C_PUBLIC_HEADERS}
+    ./json_object_private.h
+    ./random_seed.h
     ./strerror_override.h
     ./strerror_override_private.h
+    ./math_compat.h
+    ./snprintf_compat.h
+    ./strdup_compat.h
     ./vasprintf_compat.h
-    ./printbuf.h
-    ./random_seed.h
 )
 
 set(JSON_C_SOURCES
@@ -95,5 +100,4 @@ install(TARGETS json-c json-c-static
     ARCHIVE DESTINATION lib
 )
 
-install(DIRECTORY . DESTINATION ${CMAKE_INSTALL_PREFIX}/include/json-c FILES_MATCHING PATTERN "*.h")
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include/json-c FILES_MATCHING PATTERN "*.h")
+install(FILES ${JSON_C_PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/json-c )
