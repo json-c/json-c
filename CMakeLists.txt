@@ -3,13 +3,27 @@
 cmake_minimum_required(VERSION 2.8.7)
 project(json-c)
 
+include(CheckSymbolExists)
+
+check_symbol_exists(strtoll "stdlib.h" HAVE_STRTOLL)
+
+set(cmake_strtoll "strtoll")
+if (NOT HAVE_STRTOLL)
+  # Use _strtoi64 if strtoll is not available.
+  check_symbol_exists(_strtoi64 stdlib.h have_strtoi64)
+  if (have_strtoi64)
+    set(HAVE_STRTOLL 1)
+    set(cmake_strtoll "_strtoi64")
+    # could do the same for strtoull, if needed
+  endif ()
+endif ()
+
+
+
 if(MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4100 /wd4996 /wd4244 /wd4706 /wd4702 /wd4127 /wd4701")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4100 /wd4996 /wd4244 /wd4706 /wd4702 /wd4127 /wd4701")
-  file(COPY ./config.h.win32 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
-  file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/include/config.h.win32 ${CMAKE_CURRENT_BINARY_DIR}/include/config.h)
-  file(COPY ./json_config.h.win32 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
-  file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h.win32 ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h)
+  set(cmake_create_config 1)
 elseif(MINGW)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -D_GNU_SOURCE=1")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror -D_GNU_SOURCE=1")
@@ -20,10 +34,7 @@ elseif(MINGW)
     file(COPY ./config.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
     file(COPY ./json_config.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
   else()
-    file(COPY ./config.h.win32 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
-    file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/include/config.h.win32 ${CMAKE_CURRENT_BINARY_DIR}/include/config.h)
-    file(COPY ./json_config.h.win32 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
-    file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h.win32 ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h)
+    set(cmake_create_config 1)
   endif()
 elseif(UNIX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
@@ -34,6 +45,13 @@ elseif(UNIX)
   file(COPY ./config.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
   file(COPY ./json_config.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
 endif()
+
+if (cmake_create_config)
+  file(REMOVE ./config.h)  # make sure any stale one is gone
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.win32 ${CMAKE_CURRENT_BINARY_DIR}/include/config.h)
+  file(COPY ./json_config.h.win32 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
+  file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h.win32 ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h)
+endif ()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 
@@ -67,13 +85,15 @@ set(JSON_C_HEADERS
 set(JSON_C_SOURCES
     ./arraylist.c
     ./debug.c
+    ./json_c_version.c
     ./json_object.c
+    ./json_object_iterator.c
     ./json_pointer.c
     ./json_tokener.c
     ./json_util.c
+    ./json_visit.c
     ./linkhash.c
     ./printbuf.c
-    ./strerror_override.c
     ./random_seed.c
     ./strerror_override.c
 )
