@@ -21,6 +21,7 @@ Make any fixes/changes *before* branching.
 Update the version in json_c_version.h
 Update the version in Doxyfile
 Update the version in configure.ac
+Update the version in CMakeLists.txt
 	Use ${release}.
 
 Update the libjson_la_LDFLAGS line in Makefile.am to the new version.
@@ -88,6 +89,7 @@ Add new section to ChangeLog
 Update the version in json_c_version.h
 Update the version in Doxyfile
 Update the version in configure.ac
+Update the version in CMakeLists.txt
     Use ${release}.99 to indicate a version "newer" than anything on the branch.
 
 Leave the libjson_la_LDFLAGS line in Makefile.am alone.

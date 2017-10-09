@@ -1,7 +1,9 @@
 #Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 cmake_minimum_required(VERSION 2.8.7)
-project(json-c)
+cmake_policy(SET CMP0048 NEW)
+project(json-c VERSION 0.12.99)
+
 
 include(CheckSymbolExists)
 
@@ -121,3 +123,14 @@ install(TARGETS json-c json-c-static
 )
 
 install(FILES ${JSON_C_PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/json-c )
+
+if (UNIX)
+	set(prefix ${CMAKE_INSTALL_PREFIX})
+	set(exec_prefix ${CMAKE_INSTALL_PREFIX}/bin)
+	set(libdir ${CMAKE_INSTALL_PREFIX}/lib)
+	set(includedir ${CMAKE_INSTALL_PREFIX}/include)
+	set(VERSION ${PROJECT_VERSION})
+	configure_file(json-c.pc.in json-c.pc @ONLY)
+	set(INSTALL_PKGCONFIG_DIR "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" CACHE PATH "Installation directory for pkgconfig (.pc) files")
+	install(FILES ${CMAKE_BINARY_DIR}/json-c.pc DESTINATION "${INSTALL_PKGCONFIG_DIR}")
+endif ()
