@@ -1,4 +1,14 @@
 # This file is the top android makefile for all sub-modules.
+#
+# Suggested settings to build for Android:
+#
+# export PATH=$PATH:/opt/android-ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/
+# export SYSROOT=/opt/android-ndk/platforms/android-9/arch-arm/usr/
+# export LD=arm-linux-androideabi-ld
+# export CC="arm-linux-androideabi-gcc --sysroot=/opt/android-ndk/platforms/android-9/arch-arm"
+#
+# Then run autogen.sh, configure and make.
+#
 
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
