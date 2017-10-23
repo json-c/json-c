@@ -16,8 +16,14 @@
 
 		<h3>Building</h3>
 		<p>To setup JSON-C to build on your system please run <tt>configure</tt> and <tt>make</tt>.</p>
-		<p>If you are on Win32 and are not using the VS project file, be sure 
-		to rename <tt>config.h.win32</tt> to <tt>config.h</tt> before building.</p>
+		<p>If you are on Win32 cmake is required, generally:</p>
+		<ul>
+		<li>mkdir build</li>
+		<li>cd build</li>
+		<li>cmake ..</li>
+		<li>msbuild "json-c.vcxproj" /m /verbosity:normal /p:OutDir=lib\</li>
+		<li>Or, open the project in Visual Studio</li>
+		</ul>
 
 		<h3>Documentation</h3>
 		<P>Doxygen generated documentation exists <a href="doc/html/json__object_8h.html">here</a>
