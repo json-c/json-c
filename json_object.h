@@ -15,10 +15,10 @@
 
 #ifdef __GNUC__
 #define THIS_FUNCTION_IS_DEPRECATED(func) func __attribute__ ((deprecated))
-#elif defined(__clang__)
-#define THIS_FUNCTION_IS_DEPRECATED(func) func __deprecated
 #elif defined(_MSC_VER)
 #define THIS_FUNCTION_IS_DEPRECATED(func) __declspec(deprecated) func
+#elif defined(__clang__)
+#define THIS_FUNCTION_IS_DEPRECATED(func) func __deprecated
 #else
 #define THIS_FUNCTION_IS_DEPRECATED(func) func
 #endif
