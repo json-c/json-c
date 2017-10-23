@@ -22,7 +22,7 @@ static struct {
 };
 
 #ifndef NELEM
-#define NELEM(x) (sizeof(x) / sizeof(&x[0]))
+#define NELEM(x) (sizeof(x) / sizeof(x[0]))
 #endif
 
 int parse_flags(int argc, char **argv)
