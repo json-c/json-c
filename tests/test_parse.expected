@@ -24,7 +24,7 @@ new_obj.to_string()={ }
 new_obj.to_string()={ "foo": "bar" }
 new_obj.to_string()={ "foo": "bar", "baz": null, "bool0": true }
 new_obj.to_string()={ "foo": [ null, "foo" ] }
-new_obj.to_string()={ "abc": 12, "foo": "bar", "bool0": false, "bool1": true, "arr": [ 1, 2, 3, null, 5 ] }
+new_obj.to_string()={ "abc": 12, "foo": "bar", "bool0": false, "bool1": true, "arr": [ 1, 2, 3, null, 5 ], "inf": Infinity, "-inf": -Infinity, "nan": NaN, "def": -0.22, "hij": 0.31 }
 ==================================
 json_tokener_parse_versbose() OK
 ==================================
