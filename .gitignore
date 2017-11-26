@@ -75,6 +75,7 @@
 .deps/
 .libs/
 /aclocal.m4
+/autoconf-archive
 /autom4te.cache
 /config.guess
 /config.h.in

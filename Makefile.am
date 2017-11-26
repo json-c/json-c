@@ -1,5 +1,5 @@
-EXTRA_DIST = README.md README.html README-WIN32.html 
-EXTRA_DIST += config.h.win32 json-c.vcproj json-c.vcxproj json-c.vcxproj.filters
+EXTRA_DIST = README.md README.html
+EXTRA_DIST += config.h.win32
 EXTRA_DIST += Doxyfile
 
 dist-hook:
@@ -9,7 +9,7 @@ dist-hook:
 
 SUBDIRS = . tests
 
-lib_LTLIBRARIES = libjson-c.la 
+lib_LTLIBRARIES = libjson-c.la
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = json-c.pc
@@ -33,6 +33,7 @@ libjson_cinclude_HEADERS = \
 	linkhash.h \
 	math_compat.h \
 	strdup_compat.h \
+	snprintf_compat.h \
 	vasprintf_compat.h \
 	printbuf.h \
 	random_seed.h \
