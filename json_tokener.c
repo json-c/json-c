@@ -337,6 +337,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	state = json_tokener_state_number;
 	printbuf_reset(tok->pb);
 	tok->is_double = 0;
+        tok->st_pos = 0;
 	goto redo_char;
       default:
 	tok->err = json_tokener_error_parse_unexpected;

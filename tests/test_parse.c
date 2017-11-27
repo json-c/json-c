@@ -131,7 +131,7 @@ static void test_basic_parse()
 	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
 	json_object_put(new_obj);
 
-	new_obj = json_tokener_parse("{ \"abc\": 12, \"foo\": \"bar\", \"bool0\": false, \"bool1\": true, \"arr\": [ 1, 2, 3, null, 5 ] }");
+	new_obj = json_tokener_parse("{ \"abc\": 12, \"foo\": \"bar\", \"bool0\": false, \"bool1\": true, \"arr\": [ 1, 2, 3, null, 5 ], \"inf\": Infinity, \"-inf\": -Infinity, \"nan\": NaN, \"def\" : -0.22, \"hij\": 0.31 }");
 	printf("new_obj.to_string()=%s\n", json_object_to_json_string(new_obj));
 	json_object_put(new_obj);
 }
