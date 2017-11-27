@@ -24,6 +24,7 @@ Github repo for json-c:
 Then 
 
     $ ./configure
+    $ touch aclocal.m4 Makefile.in   # hack around automake dependencies
     $ make
     $ make install
 
