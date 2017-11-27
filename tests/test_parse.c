@@ -231,6 +231,17 @@ struct incremental_step {
 	{ "-i",                2, 2, json_tokener_continue, 0 },
 	{ "nfinity",           8, 7, json_tokener_success, 1 },
 
+	{ "InfinityX",        10, 8, json_tokener_success, 0 },
+	{ "X",                 1, 0, json_tokener_error_parse_unexpected, 1 },
+
+	{ "Infinity1234",     13, 8, json_tokener_success, 0 },
+	{ "1234",              5, 4, json_tokener_success, 1 },
+
+	{ "Infinity9999",      8, 8, json_tokener_continue, 0 },
+	/* returns the Infinity loaded up by the previous call: */
+	{ "1234",              5, 0, json_tokener_success, 0 },
+	{ "1234",              5, 4, json_tokener_success, 1 },
+
 	/* offset=1 because "n" is the start of "null".  hmm... */
 	{ "noodle",            7, 1, json_tokener_error_parse_null, 1 },
 	/* offset=2 because "na" is the start of "nan".  hmm... */
