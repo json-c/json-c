@@ -767,6 +767,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	    (c == 'i' || c == 'I'))
 	{
 		state = json_tokener_state_inf;
+		tok->st_pos = 0;
 		goto redo_char;
 	}
       }

@@ -14,6 +14,7 @@ new_obj.to_string(Infinity)=Infinity
 new_obj.to_string(infinity)=Infinity
 new_obj.to_string(-Infinity)=-Infinity
 new_obj.to_string(-infinity)=-Infinity
+new_obj.to_string({ "min": Infinity, "max": -Infinity})={ "min": Infinity, "max": -Infinity }
 new_obj.to_string(Infinity!)=Infinity
 new_obj.to_string(Infinitynull)=Infinity
 new_obj.to_string(InfinityXXXX)=Infinity

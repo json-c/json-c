@@ -57,6 +57,7 @@ static void test_basic_parse()
 	single_basic_parse("infinity", 0);
 	single_basic_parse("-Infinity", 0);
 	single_basic_parse("-infinity", 0);
+	single_basic_parse("{ \"min\": Infinity, \"max\": -Infinity}", 0);
 
 	single_basic_parse("Infinity!", 0);
 	single_basic_parse("Infinitynull", 0);
