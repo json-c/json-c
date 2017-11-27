@@ -43,6 +43,7 @@ static void test_basic_parse()
 	single_basic_parse("\"\003\"", 0);
 	single_basic_parse("/* hello */\"foo\"", 0);
 	single_basic_parse("// hello\n\"foo\"", 0);
+	single_basic_parse("\"foo\"blue", 0);
 	single_basic_parse("\"\\u0041\\u0042\\u0043\"", 0);
 	// Test with a "short" high surrogate
 	single_basic_parse("[9,'\\uDAD", 0);
@@ -57,13 +58,31 @@ static void test_basic_parse()
 	single_basic_parse("-Infinity", 0);
 	single_basic_parse("-infinity", 0);
 
+	single_basic_parse("Infinity!", 0);
+	single_basic_parse("Infinitynull", 0);
+	single_basic_parse("InfinityXXXX", 0);
+	single_basic_parse("-Infinitynull", 0);
+	single_basic_parse("-InfinityXXXX", 0);
+	single_basic_parse("Infinoodle", 0);
+	single_basic_parse("InfinAAA", 0);
+	single_basic_parse("-Infinoodle", 0);
+	single_basic_parse("-InfinAAA", 0);
+
 	single_basic_parse("True", 0);
+	single_basic_parse("False", 0);
 
 	single_basic_parse("12", 0);
 	single_basic_parse("12.3", 0);
 	single_basic_parse("12.3.4", 0); /* non-sensical, returns null */
 	/* was returning (int)2015 before patch, should return null */
 	single_basic_parse("2015-01-15", 0);
+
+	/* ...but this works.  It's rather inconsistent, and a future major release
+	 * should change the behavior so it either always returns null when extra
+	 * bytes are present (preferred), or always return object created from as much
+	 * as was able to be parsed.
+	 */
+	single_basic_parse("12.3xxx", 0);
 
 	single_basic_parse("{\"FoO\"  :   -12.3E512}", 0);
 	single_basic_parse("{\"FoO\"  :   -12.3E51.2}", 0); /* non-sensical, returns null */
