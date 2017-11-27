@@ -763,7 +763,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
           printbuf_memappend_fast(tok->pb, case_start, case_len);
 
 	// Check for -Infinity
-	if (tok->pb->buf[0] == '-' && case_len == 1 &&
+	if (tok->pb->buf[0] == '-' && case_len <= 1 &&
 	    (c == 'i' || c == 'I'))
 	{
 		state = json_tokener_state_inf;

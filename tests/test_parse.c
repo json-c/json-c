@@ -197,6 +197,40 @@ struct incremental_step {
 	{ "null",              4, 4, json_tokener_continue, 1 },
 	{ "null",              5, 4, json_tokener_success, 1 },
 
+	{ "Infinity",          9, 8, json_tokener_success, 1 },
+	{ "infinity",          9, 8, json_tokener_success, 1 },
+	{ "-infinity",        10, 9, json_tokener_success, 1 },
+	{ "infinity",          9, 0, json_tokener_error_parse_unexpected, 3 },
+	{ "-infinity",        10, 1, json_tokener_error_parse_unexpected, 3 },
+
+	{ "inf",               3, 3, json_tokener_continue, 0 },
+	{ "inity",             6, 5, json_tokener_success, 1 },
+	{ "-inf",              4, 4, json_tokener_continue, 0 },
+	{ "inity",             6, 5, json_tokener_success, 1 },
+
+	{ "i",                 1, 1, json_tokener_continue, 0 },
+	{ "n",                 1, 1, json_tokener_continue, 0 },
+	{ "f",                 1, 1, json_tokener_continue, 0 },
+	{ "i",                 1, 1, json_tokener_continue, 0 },
+	{ "n",                 1, 1, json_tokener_continue, 0 },
+	{ "i",                 1, 1, json_tokener_continue, 0 },
+	{ "t",                 1, 1, json_tokener_continue, 0 },
+	{ "y",                 1, 1, json_tokener_continue, 0 },
+	{ "",                  1, 0, json_tokener_success, 1 },
+
+	{ "-",                 1, 1, json_tokener_continue, 0 },
+	{ "inf",               3, 3, json_tokener_continue, 0 },
+	{ "ini",               3, 3, json_tokener_continue, 0 },
+	{ "ty",                3, 2, json_tokener_success, 1 },
+
+	{ "-",                 1, 1, json_tokener_continue, 0 },
+	{ "i",                 1, 1, json_tokener_continue, 0 },
+	{ "nfini",             5, 5, json_tokener_continue, 0 },
+	{ "ty",                3, 2, json_tokener_success, 1 },
+
+	{ "-i",                2, 2, json_tokener_continue, 0 },
+	{ "nfinity",           8, 7, json_tokener_success, 1 },
+
 	/* offset=1 because "n" is the start of "null".  hmm... */
 	{ "noodle",            7, 1, json_tokener_error_parse_null, 1 },
 	/* offset=2 because "na" is the start of "nan".  hmm... */
