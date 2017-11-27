@@ -710,7 +710,7 @@ JSON_EXPORT int32_t json_object_get_int(const struct json_object *obj);
  * 
  * The type of obj is checked to be a json_type_int and 0 is returned 
  * if it is not without any further actions. If type of obj is json_type_int
- * the obect value is chaned to new_value
+ * the obect value is changed to new_value
  *
  * @param obj the json_object instance
  * @param new_value the value to be set
@@ -718,21 +718,21 @@ JSON_EXPORT int32_t json_object_get_int(const struct json_object *obj);
  */
 JSON_EXPORT int json_object_set_int(struct json_object *obj,int new_value);
 
-/** Add the int value to the value of a json object
+/** Increment a json_type_int object by the given amount, which may be negative.
  *
- * The type of obj is checked to be a json type int and 0 is returned
- * if it is not without any further actions. If the type of obj is
- * json_type_int the int value is added to the object value.
+ * If the type of obj is not json_type_int then 0 is returned with no further
+ * action taken.
  * If the addition would result in a overflow, the object value
- * is set to INT32_MAX.
+ * is set to INT64_MAX.
  * If the addition would result in a underflow, the object value
- * is set to INT32_MIN.
+ * is set to INT64_MIN.
+ * Neither overflow nor underflow affect the return value.
  *
  * @param obj the json_object instance
  * @param val the value to add
- * @returns 1 if the addition succeded, 0 otherwise
+ * @returns 1 if the increment succeded, 0 otherwise
  */
-JSON_EXPORT int json_object_add_int(struct json_object *obj, int val);
+JSON_EXPORT int json_object_int_inc(struct json_object *obj, int64_t val);
 
 
 /** Get the int value of a json_object
@@ -762,22 +762,6 @@ JSON_EXPORT int64_t json_object_get_int64(const struct json_object *obj);
  * @returns 1 if value is set correctly, 0 otherwise
  */
 JSON_EXPORT int json_object_set_int64(struct json_object *obj,int64_t new_value);
-
-/** Add a int64_t value to the int64_t value of a json_object
- *
- * The type of obj is checked to be a json_type_int and 0 is returned
- * if it is not without any further actions. If the type of obj is
- * json_type_int the int64 value is added to the object value.
- * If the addition to the object would result in a overflow the
- * object value is set to INT64_MAX.
- * If the addition would result in a underflow, the
- * object value is set to INT64_MIN.
- *
- * @param obj the json_object instance
- * @param val the int64_vaule to add
- * @returns 1 if the addition succeeded, 0 otherwise
- */
-JSON_EXPORT int json_object_add_int64(struct json_object *obj, int64_t val);
 
 /* double type methods */
 

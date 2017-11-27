@@ -666,20 +666,6 @@ int json_object_set_int(struct json_object *jso,int new_value){
 	return 1;
 }
 
-int json_object_add_int(struct json_object *jso, int val) {
-	if (!jso || jso->o_type != json_type_int)
-		return 0;
-	if (val > 0 && jso->o.c_int64 > INT32_MAX - val) {
-		jso->o.c_int64 = INT32_MAX;
-	} else if (val < 0 && jso->o.c_int64 < INT32_MIN - val) {
-		jso->o.c_int64 = INT32_MIN;
-	} else {
-		jso->o.c_int64 += val;
-	}
-	return 1;
-}
-
-
 struct json_object* json_object_new_int64(int64_t i)
 {
 	struct json_object *jso = json_object_new(json_type_int);
@@ -724,7 +710,7 @@ int json_object_set_int64(struct json_object *jso,int64_t new_value){
 	return 1;
 }
 
-int json_object_add_int64(struct json_object *jso, int64_t val) {
+int json_object_int_inc(struct json_object *jso, int64_t val) {
 	if (!jso || jso->o_type != json_type_int)
 		return 0;
 	if (val > 0 && jso->o.c_int64 > INT64_MAX - val) {
