@@ -108,6 +108,13 @@ json_tokener_parse_ex(tok, nfini       ,   5) ... OK: got correct error: continu
 json_tokener_parse_ex(tok, ty          ,   3) ... OK: got object of type [double]: -Infinity
 json_tokener_parse_ex(tok, -i          ,   2) ... OK: got correct error: continue
 json_tokener_parse_ex(tok, nfinity     ,   8) ... OK: got object of type [double]: -Infinity
+json_tokener_parse_ex(tok, InfinityX   ,  10) ... OK: got object of type [double]: Infinity
+json_tokener_parse_ex(tok, X           ,   1) ... OK: got correct error: unexpected character
+json_tokener_parse_ex(tok, Infinity1234,  13) ... OK: got object of type [double]: Infinity
+json_tokener_parse_ex(tok, 1234        ,   5) ... OK: got object of type [int]: 1234
+json_tokener_parse_ex(tok, Infinity9999,   8) ... OK: got correct error: continue
+json_tokener_parse_ex(tok, 1234        ,   5) ... OK: got object of type [double]: Infinity
+json_tokener_parse_ex(tok, 1234        ,   5) ... OK: got object of type [int]: 1234
 json_tokener_parse_ex(tok, noodle      ,   7) ... OK: got correct error: null expected
 json_tokener_parse_ex(tok, naodle      ,   7) ... OK: got correct error: null expected
 json_tokener_parse_ex(tok, track       ,   6) ... OK: got correct error: boolean expected
@@ -133,5 +140,5 @@ json_tokener_parse_ex(tok, [1,2,3,]    ,   8) ... OK: got object of type [array]
 json_tokener_parse_ex(tok, [1,2,,3,]   ,   9) ... OK: got correct error: unexpected character
 json_tokener_parse_ex(tok, [1,2,3,]    ,   8) ... OK: got correct error: unexpected character
 json_tokener_parse_ex(tok, {"a":1,}    ,   8) ... OK: got correct error: unexpected character
-End Incremental Tests OK=76 ERROR=0
+End Incremental Tests OK=83 ERROR=0
 ==================================
