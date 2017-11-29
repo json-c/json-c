@@ -1299,3 +1299,106 @@ int json_object_equal(struct json_object* jso1, struct json_object* jso2)
 	return 0;
 }
 
+static int json_object_copy_serializer_data(struct json_object *src, struct json_object *dst)
+{
+	/* FIXME: this is shared between copies ; maybe add a `_user_copy` cb here */
+	dst->_userdata = src->_userdata;
+	dst->_to_json_string = src->_to_json_string;
+	dst->_user_delete = src->_user_delete;
+	return 0;
+}
+
+static int json_object_deep_copy_recursive(struct json_object *src, struct json_object **dst)
+{
+	struct json_object *jso = NULL;
+	struct json_object_iter iter;
+	size_t i;
+
+	if (!src || !dst) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	switch (src->o_type) {
+		case json_type_boolean:
+			*dst = json_object_new_boolean(src->o.c_boolean);
+			break;
+
+		case json_type_double:
+			*dst = json_object_new_double(src->o.c_double);
+			break;
+
+		case json_type_int:
+			*dst = json_object_new_int64(src->o.c_int64);
+			break;
+
+		case json_type_string:
+			*dst = json_object_new_string(get_string_component(src));
+			break;
+
+		case json_type_object:
+			*dst = json_object_new_object();
+			if (!*dst) {
+				errno = ENOMEM;
+				return -1;
+			}
+			json_object_object_foreachC(src, iter) {
+				/* This handles the `json_type_null` case */
+				if (!iter.val)
+					jso = NULL;
+				else if (json_object_deep_copy_recursive(iter.val, &jso) < 0)
+					return -1;
+				if (json_object_object_add(*dst, iter.key, jso) < 0)
+					return -1;
+			}
+			break;
+
+		case json_type_array:
+			*dst = json_object_new_array();
+			if (!*dst) {
+				errno = ENOMEM;
+				return -1;
+			}
+			for (i = 0; i < json_object_array_length(src); i++) {
+				struct json_object *jso1 = json_object_array_get_idx(src, i);
+				/* This handles the `json_type_null` case */
+				if (!jso1)
+					jso = NULL;
+				else if (json_object_deep_copy_recursive(jso1, &jso) < 0)
+						return -1;
+				if (json_object_array_add(*dst, jso) < 0)
+					return -1;
+			}
+			break;
+
+		default:
+			errno = EINVAL;
+			return -1;
+	};
+
+	/* errno should be set by the function that faulted */
+	if (!*dst)
+		return -1;
+
+	return json_object_copy_serializer_data(src, *dst);
+}
+
+int json_object_deep_copy(struct json_object *src, struct json_object **dst)
+{
+	int rc;
+
+	/* Check if arguments are sane ; *dst must not point to a non-NULL object */
+	if (!src || !dst || *dst) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	rc = json_object_deep_copy_recursive(src, dst);
+	if (rc < 0) {
+		json_object_put(*dst);
+		*dst = NULL;
+	}
+
+	return rc;
+}
+

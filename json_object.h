@@ -963,6 +963,24 @@ JSON_EXPORT int json_object_set_string_len(json_object* obj, const char* new_val
 JSON_EXPORT int json_object_equal(struct json_object *obj1,
 			     struct json_object *obj2);
 
+/**
+ * Copy the contents of the JSON object.
+ * The destination object must be initialized to NULL,
+ * to make sure this function won't overwrite an existing JSON object.
+ *
+ * This does roughly the same thing as
+ * `json_tokener_parse(json_object_get_string(src))`.
+ *
+ * @param src source JSON object whose contents will be copied
+ * @param dst pointer to the destination object where the contents of `src`;
+ *            make sure this pointer is initialized to NULL
+ *
+ * @returns 0 if the copy went well, -1 if an error occured during copy
+ *          or if the destination pointer is non-NULL
+ */
+
+extern int json_object_deep_copy(struct json_object *src, struct json_object **dst);
+
 #ifdef __cplusplus
 }
 #endif
