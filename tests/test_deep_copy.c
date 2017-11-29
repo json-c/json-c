@@ -8,6 +8,8 @@
 
 #include "json.h"
 
+static void do_benchmark(json_object *src1);
+
 static const char *json_str1 = 
 "{"
 "    \"glossary\": {"
@@ -79,6 +81,12 @@ int main(int argc, char **argv)
 {
 	struct json_object *src1, *src2, *src3;
 	struct json_object *dst1 = NULL, *dst2 = NULL, *dst3 = NULL;
+	int benchmark = 0;
+
+	if (argc > 1 && strcmp(argv[1], "--benchmark") == 0)
+	{
+		benchmark = 1;
+	}
 
 	src1 = json_tokener_parse(json_str1);
 	src2 = json_tokener_parse(json_str2);
@@ -124,6 +132,7 @@ int main(int argc, char **argv)
 	json_object_get(dst1);
 	assert(-1 == json_object_deep_copy(src1, &dst1));
 	assert(errno == EINVAL);
+	json_object_put(dst1);
 
 	printf("PASSED - trying to overrwrite an object that has refcount > 1");
 
@@ -148,28 +157,46 @@ int main(int argc, char **argv)
 	json_object_put(dst2);
 	json_object_put(dst3);
 
-#if BENCHMARK
+	if (benchmark)
+	{
+		do_benchmark(src2);
+	}
+
+	json_object_put(src1);
+	json_object_put(src2);
+	json_object_put(src3);
+
+	return 0;
+}
+
+static void do_benchmark(json_object *src2)
+{
+	json_object *dst2 = NULL;
+
+	int ii;
 	/**
 	 * The numbers that I got are:
-	 * BENCHMARK - 1000000 iterations of 'dst2 = json_tokener_parse(json_object_get_string(src2))' took 20 seconds
-	 * BENCHMARK - 1000000 iterations of 'dst2 = json_tokener_parse(json_object_get_string(src2))' took 7 seconds
+	 * BENCHMARK - 1000000 iterations of 'dst2 = json_tokener_parse(json_object_get_string(src2))' took 71 seconds
+	 * BENCHMARK - 1000000 iterations of 'json_object_deep_copy(src2, &dst2)' took 29 seconds
 	 */
 
 	int iterations = 1000000;
 	time_t start = time(NULL);
-	for (i = 0; i < iterations; i++) {
+
+	start = time(NULL);
+	for (ii = 0; ii < iterations; ii++) {
 		dst2 = json_tokener_parse(json_object_get_string(src2));
 		json_object_put(dst2);
 	}
 	printf("BENCHMARK - %d iterations of 'dst2 = json_tokener_parse(json_object_get_string(src2))' took %d seconds\n", iterations, (int)(time(NULL) - start));
 
 	start = time(NULL);
-	for (i = 0; i < iterations; i++) {
+	dst2 = NULL;
+	for (ii = 0; ii < iterations; ii++) {
 		json_object_deep_copy(src2, &dst2);
+		json_object_put(dst2);
+		dst2 = NULL;
 	}
-	json_object_put(dst2);
-	printf("BENCHMARK - %d iterations of 'dst2 = json_tokener_parse(json_object_get_string(src2))' took %d seconds\n", iterations, (int)(time(NULL) - start));
-#endif
-
-	return 0;
+	printf("BENCHMARK - %d iterations of 'json_object_deep_copy(src2, &dst2)' took %d seconds\n", iterations, (int)(time(NULL) - start));
 }
+
