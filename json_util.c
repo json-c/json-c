@@ -72,7 +72,7 @@ const char *json_util_get_last_err()
 	return _last_err;
 }
 
-void _set_last_err(const char *err_fmt, ...)
+void _json_c_set_last_err(const char *err_fmt, ...)
 {
 	va_list ap;
 	va_start(ap, err_fmt);
@@ -89,14 +89,14 @@ struct json_object* json_object_from_fd(int fd)
   int ret;
 
   if(!(pb = printbuf_new())) {
-    _set_last_err("json_object_from_file: printbuf_new failed\n");
+    _json_c_set_last_err("json_object_from_file: printbuf_new failed\n");
     return NULL;
   }
   while((ret = read(fd, buf, JSON_FILE_BUF_SIZE)) > 0) {
     printbuf_memappend(pb, buf, ret);
   }
   if(ret < 0) {
-    _set_last_err("json_object_from_fd: error reading fd %d: %s\n", fd, strerror(errno));
+    _json_c_set_last_err("json_object_from_fd: error reading fd %d: %s\n", fd, strerror(errno));
     printbuf_free(pb);
     return NULL;
   }
@@ -111,7 +111,7 @@ struct json_object* json_object_from_file(const char *filename)
   int fd;
 
   if((fd = open(filename, O_RDONLY)) < 0) {
-    _set_last_err("json_object_from_file: error opening file %s: %s\n",
+    _json_c_set_last_err("json_object_from_file: error opening file %s: %s\n",
 	     filename, strerror(errno));
     return NULL;
   }
@@ -128,12 +128,12 @@ int json_object_to_file_ext(const char *filename, struct json_object *obj, int f
 	int saved_errno;
 
 	if (!obj) {
-		_set_last_err("json_object_to_file: object is null\n");
+		_json_c_set_last_err("json_object_to_file: object is null\n");
 		return -1;
 	}
 
 	if ((fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT, 0644)) < 0) {
-		_set_last_err("json_object_to_file: error opening file %s: %s\n",
+		_json_c_set_last_err("json_object_to_file: error opening file %s: %s\n",
 		              filename, strerror(errno));
 		return -1;
 	}
@@ -147,7 +147,7 @@ int json_object_to_file_ext(const char *filename, struct json_object *obj, int f
 int json_object_to_fd(int fd, struct json_object *obj, int flags)
 {
 	if (!obj) {
-		_set_last_err("json_object_to_fd: object is null\n");
+		_json_c_set_last_err("json_object_to_fd: object is null\n");
 		return -1;
 	}
 
@@ -169,7 +169,7 @@ static int _json_object_to_fd(int fd, struct json_object *obj, int flags, const 
 	wpos = 0;
 	while(wpos < wsize) {
 		if((ret = write(fd, json_str + wpos, wsize-wpos)) < 0) {
-		  _set_last_err("json_object_to_file: error writing file %s: %s\n",
+		  _json_c_set_last_err("json_object_to_file: error writing file %s: %s\n",
 			 filename, strerror(errno));
 		  return -1;
 		}
@@ -235,7 +235,7 @@ const char *json_type_to_name(enum json_type o_type)
 	int o_type_int = (int)o_type;
 	if (o_type_int < 0 || o_type_int >= (int)NELEM(json_type_name))
 	{
-		_set_last_err("json_type_to_name: type %d is out of range [0,%d]\n", o_type, NELEM(json_type_name));
+		_json_c_set_last_err("json_type_to_name: type %d is out of range [0,%d]\n", o_type, NELEM(json_type_name));
 		return NULL;
 	}
 	return json_type_name[o_type];

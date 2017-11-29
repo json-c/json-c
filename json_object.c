@@ -756,13 +756,13 @@ int json_c_set_serialization_double_format(const char *double_format, int global
 		}
 		tls_serialization_float_format = double_format ? strdup(double_format) : NULL;
 #else
-		_set_last_err("json_c_set_option: not compiled with __thread support\n");
+		_json_c_set_last_err("json_c_set_option: not compiled with __thread support\n");
 		return -1;
 #endif
 	}
 	else
 	{
-		_set_last_err("json_c_set_option: invalid global_or_thread value: %d\n", global_or_thread);
+		_json_c_set_last_err("json_c_set_option: invalid global_or_thread value: %d\n", global_or_thread);
 		return -1;
 	}
 	return 0;
