@@ -32,7 +32,8 @@ Printing JSON objects for visual inspection
       }
     }
   }
-}------------------------------------------------
+}
+------------------------------------------------
 ------------------------------------------------
  JSON2
 {
@@ -112,7 +113,8 @@ Printing JSON objects for visual inspection
       }
     ]
   }
-}------------------------------------------------
+}
+------------------------------------------------
 ------------------------------------------------
  JSON3
 ------------------------------------------------
@@ -137,4 +139,10 @@ Printing JSON objects for visual inspection
       ]
     }
   }
-}------------------------------------------------
+}
+------------------------------------------------
+
+Testing deep_copy with a custom serializer set
+CALLED: my_shallow_copy on with_serializer object
+
+deep_copy with custom serializer worked OK.

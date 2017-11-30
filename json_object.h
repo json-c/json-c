@@ -964,6 +964,36 @@ JSON_EXPORT int json_object_equal(struct json_object *obj1,
 			     struct json_object *obj2);
 
 /**
+ * Perform a shallow copy of src into *dst as part of an overall json_object_deep_copy().
+ *
+ * If src is part of a containing object or array, parent will be non-NULL,
+ * and key or index will be provided.
+ * When shallow_copy is called *dst will be NULL, and must be non-NULL when it returns.
+ * src will never be NULL.
+ *
+ * If shallow_copy sets the serializer on an object, return 2 to indicate to 
+ *  json_object_deep_copy that it should not attempt to use the standard userdata
+ *  copy function.
+ *
+ * @return On success 1 or 2, -1 on errors
+ */
+typedef int (json_c_shallow_copy_fn)(json_object *src, json_object *parent, const char *key, size_t index, json_object **dst);
+
+/**
+ * The default shallow copy implementation for use with json_object_deep_copy().
+ * This simply calls the appropriate json_object_new_<type>() function and 
+ * copies over the serializer function (_to_json_string internal field of
+ * the json_object structure) but not any _userdata or _user_delete values.
+ *
+ * If you're writing a custom shallow_copy function, perhaps because you're using
+ * your own custom serializer, you can call this first to create the new object
+ * before customizing it with json_object_set_serializer().
+ *
+ * @return 1 on success, -1 on errors, but never 2.
+ */
+json_c_shallow_copy_fn json_c_shallow_copy_default;
+
+/**
  * Copy the contents of the JSON object.
  * The destination object must be initialized to NULL,
  * to make sure this function won't overwrite an existing JSON object.
@@ -979,8 +1009,7 @@ JSON_EXPORT int json_object_equal(struct json_object *obj1,
  *          or if the destination pointer is non-NULL
  */
 
-extern int json_object_deep_copy(struct json_object *src, struct json_object **dst);
-
+JSON_EXPORT int json_object_deep_copy(struct json_object *src, struct json_object **dst, json_c_shallow_copy_fn shallow_copy); 
 #ifdef __cplusplus
 }
 #endif

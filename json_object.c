@@ -1301,89 +1301,149 @@ int json_object_equal(struct json_object* jso1, struct json_object* jso2)
 
 static int json_object_copy_serializer_data(struct json_object *src, struct json_object *dst)
 {
-	/* FIXME: this is shared between copies ; maybe add a `_user_copy` cb here */
-	dst->_userdata = src->_userdata;
-	dst->_to_json_string = src->_to_json_string;
+	if (!src->_userdata && !src->_user_delete)
+		return 0;
+
+	if (dst->_to_json_string == json_object_userdata_to_json_string)
+	{
+		dst->_userdata = strdup(src->_userdata);
+	}
+	// else if ... other supported serializers ...
+	else
+	{
+		_json_c_set_last_err("json_object_deep_copy: unable to copy unknown serializer data: %p\n", dst->_to_json_string);
+		return -1;
+	}
 	dst->_user_delete = src->_user_delete;
 	return 0;
 }
 
-static int json_object_deep_copy_recursive(struct json_object *src, struct json_object **dst)
-{
-	struct json_object *jso = NULL;
-	struct json_object_iter iter;
-	size_t i;
 
-	if (!src || !dst) {
+/**
+ * The default shallow copy implementation.  Simply creates a new object of the same
+ * type but does *not* copy over _userdata nor retain any custom serializer.
+ * If custom serializers are in use, json_object_deep_copy() must be passed a shallow copy
+ * implementation that is aware of how to copy them.
+ *
+ * This always returns -1 or 1.  It will never return 2 since it does not copy the serializer.
+ */
+int json_c_shallow_copy_default(json_object *src, json_object *parent, const char *key, size_t index, json_object **dst)
+{
+	switch (src->o_type) {
+	case json_type_boolean:
+		*dst = json_object_new_boolean(src->o.c_boolean);
+		break;
+
+	case json_type_double:
+		*dst = json_object_new_double(src->o.c_double);
+		break;
+
+	case json_type_int:
+		*dst = json_object_new_int64(src->o.c_int64);
+		break;
+
+	case json_type_string:
+		*dst = json_object_new_string(get_string_component(src));
+		break;
+
+	case json_type_object:
+		*dst = json_object_new_object();
+		break;
+
+	case json_type_array:
+		*dst = json_object_new_array();
+		break;
+
+	default:
 		errno = EINVAL;
 		return -1;
 	}
 
-	switch (src->o_type) {
-		case json_type_boolean:
-			*dst = json_object_new_boolean(src->o.c_boolean);
-			break;
-
-		case json_type_double:
-			*dst = json_object_new_double(src->o.c_double);
-			break;
-
-		case json_type_int:
-			*dst = json_object_new_int64(src->o.c_int64);
-			break;
-
-		case json_type_string:
-			*dst = json_object_new_string(get_string_component(src));
-			break;
-
-		case json_type_object:
-			*dst = json_object_new_object();
-			if (!*dst) {
-				errno = ENOMEM;
-				return -1;
-			}
-			json_object_object_foreachC(src, iter) {
-				/* This handles the `json_type_null` case */
-				if (!iter.val)
-					jso = NULL;
-				else if (json_object_deep_copy_recursive(iter.val, &jso) < 0)
-					return -1;
-				if (json_object_object_add(*dst, iter.key, jso) < 0)
-					return -1;
-			}
-			break;
-
-		case json_type_array:
-			*dst = json_object_new_array();
-			if (!*dst) {
-				errno = ENOMEM;
-				return -1;
-			}
-			for (i = 0; i < json_object_array_length(src); i++) {
-				struct json_object *jso1 = json_object_array_get_idx(src, i);
-				/* This handles the `json_type_null` case */
-				if (!jso1)
-					jso = NULL;
-				else if (json_object_deep_copy_recursive(jso1, &jso) < 0)
-						return -1;
-				if (json_object_array_add(*dst, jso) < 0)
-					return -1;
-			}
-			break;
-
-		default:
-			errno = EINVAL;
-			return -1;
-	};
-
-	/* errno should be set by the function that faulted */
-	if (!*dst)
+	if (!*dst) {
+		errno = ENOMEM;
 		return -1;
-
-	return json_object_copy_serializer_data(src, *dst);
+	}
+	(*dst)->_to_json_string = src->_to_json_string;
+	// _userdata and _user_delete are copied later
+	return 1;
 }
 
-int json_object_deep_copy(struct json_object *src, struct json_object **dst)
+/*
+ * The actual guts of json_object_deep_copy(), with a few additional args
+ * needed so we can keep track of where we are within the object tree.
+ *
+ * Note: caller is responsible for freeing *dst if this fails and returns -1.
+ */
+static int json_object_deep_copy_recursive(struct json_object *src, struct json_object *parent, const char *key_in_parent, size_t index_in_parent, struct json_object **dst, json_c_shallow_copy_fn shallow_copy)
+{
+	struct json_object_iter iter;
+	size_t src_array_len, ii;
+
+	int shallow_copy_rc = 0;
+	shallow_copy_rc = shallow_copy(src, parent, key_in_parent, index_in_parent, dst);
+	/* -1=error, 1=object created ok, 2=userdata set */
+	if (shallow_copy_rc < 1)
+	{
+		errno = EINVAL;
+		return -1;
+	}
+	assert(*dst != NULL);
+
+	switch (src->o_type) {
+	case json_type_object:
+		json_object_object_foreachC(src, iter) {
+			struct json_object *jso = NULL;
+			/* This handles the `json_type_null` case */
+			if (!iter.val)
+				jso = NULL;
+			else if (json_object_deep_copy_recursive(iter.val, src, iter.key, -1, &jso, shallow_copy) < 0)
+			{
+				json_object_put(jso);
+				return -1;
+			}
+
+			if (json_object_object_add(*dst, iter.key, jso) < 0)
+			{
+				json_object_put(jso);
+				return -1;
+			}
+		}
+		break;
+
+	case json_type_array:
+		src_array_len = json_object_array_length(src);
+		for (ii = 0; ii < src_array_len; ii++) {
+			struct json_object *jso = NULL;
+			struct json_object *jso1 = json_object_array_get_idx(src, ii);
+			/* This handles the `json_type_null` case */
+			if (!jso1)
+				jso = NULL;
+			else if (json_object_deep_copy_recursive(jso1, src, NULL, ii, &jso, shallow_copy) < 0)
+			{
+				json_object_put(jso);
+				return -1;
+			}
+
+			if (json_object_array_add(*dst, jso) < 0)
+			{
+				json_object_put(jso);
+				return -1;
+			}
+		}
+		break;
+
+	default:
+		break;
+		/* else, nothing to do, shallow_copy already did. */
+	}
+
+	if (shallow_copy_rc != 2)
+		return json_object_copy_serializer_data(src, *dst);
+
+	return 0;
+}
+
+int json_object_deep_copy(struct json_object *src, struct json_object **dst, json_c_shallow_copy_fn shallow_copy)
 {
 	int rc;
 
@@ -1393,7 +1453,10 @@ int json_object_deep_copy(struct json_object *src, struct json_object **dst)
 		return -1;
 	}
 
-	rc = json_object_deep_copy_recursive(src, dst);
+	if (shallow_copy == NULL)
+		shallow_copy = json_c_shallow_copy_default;
+
+	rc = json_object_deep_copy_recursive(src, NULL, NULL, -1, dst, shallow_copy);
 	if (rc < 0) {
 		json_object_put(*dst);
 		*dst = NULL;

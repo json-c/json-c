@@ -7,6 +7,7 @@
 #include <time.h>
 
 #include "json.h"
+#include "printbuf.h"
 
 static void do_benchmark(json_object *src1);
 
@@ -77,6 +78,31 @@ static const char *json_str3 =
 "  }"
 "}}";
 
+json_object_to_json_string_fn my_custom_serializer;
+int my_custom_serializer(struct json_object *jso, struct printbuf *pb, int level, int flags)
+{
+	sprintbuf(pb, "OTHER");
+	return 0;
+}
+
+json_c_shallow_copy_fn my_shallow_copy;
+int my_shallow_copy(json_object *src, json_object *parent, const char *key, size_t index, json_object **dst)
+{
+	int rc;
+	rc = json_c_shallow_copy_default(src, parent, key, index, dst);
+	if (rc < 0)
+		return rc;
+	if (key != NULL && strcmp(key, "with_serializer") == 0)
+	{
+		printf("CALLED: my_shallow_copy on with_serializer object\n");
+		void *userdata = json_object_get_userdata(src);
+		json_object_set_serializer(*dst, my_custom_serializer, userdata, NULL);
+		return 2;
+	}
+	return rc;
+}
+
+
 int main(int argc, char **argv)
 {
 	struct json_object *src1, *src2, *src3;
@@ -99,17 +125,17 @@ int main(int argc, char **argv)
 	printf("PASSED - loaded input data\n");
 
 	/* do this 3 times to make sure overwriting it works */
-	assert(0 == json_object_deep_copy(src1, &dst1));
-	assert(0 == json_object_deep_copy(src2, &dst2));
-	assert(0 == json_object_deep_copy(src3, &dst3));
+	assert(0 == json_object_deep_copy(src1, &dst1, NULL));
+	assert(0 == json_object_deep_copy(src2, &dst2, NULL));
+	assert(0 == json_object_deep_copy(src3, &dst3, NULL));
 
 	printf("PASSED - all json_object_deep_copy() returned succesful\n");
 
-	assert(-1 == json_object_deep_copy(src1, &dst1));
+	assert(-1 == json_object_deep_copy(src1, &dst1, NULL));
 	assert(errno == EINVAL);
-	assert(-1 == json_object_deep_copy(src2, &dst2));
+	assert(-1 == json_object_deep_copy(src2, &dst2, NULL));
 	assert(errno == EINVAL);
-	assert(-1 == json_object_deep_copy(src3, &dst3));
+	assert(-1 == json_object_deep_copy(src3, &dst3, NULL));
 	assert(errno == EINVAL);
 
 	printf("PASSED - all json_object_deep_copy() returned EINVAL for non-null pointer\n");
@@ -130,7 +156,7 @@ int main(int argc, char **argv)
 	printf("PASSED - comparison of string output\n");
 
 	json_object_get(dst1);
-	assert(-1 == json_object_deep_copy(src1, &dst1));
+	assert(-1 == json_object_deep_copy(src1, &dst1, NULL));
 	assert(errno == EINVAL);
 	json_object_put(dst1);
 
@@ -139,23 +165,43 @@ int main(int argc, char **argv)
 	printf("\nPrinting JSON objects for visual inspection\n");
 	printf("------------------------------------------------\n");
 	printf(" JSON1\n");
-	printf("%s", json_object_to_json_string_ext(dst1, JSON_C_TO_STRING_PRETTY));
+	printf("%s\n", json_object_to_json_string_ext(dst1, JSON_C_TO_STRING_PRETTY));
 	printf("------------------------------------------------\n");
 
 	printf("------------------------------------------------\n");
 	printf(" JSON2\n");
-	printf("%s", json_object_to_json_string_ext(dst2, JSON_C_TO_STRING_PRETTY));
+	printf("%s\n", json_object_to_json_string_ext(dst2, JSON_C_TO_STRING_PRETTY));
 	printf("------------------------------------------------\n");
 
 	printf("------------------------------------------------\n");
 	printf(" JSON3\n");
 	printf("------------------------------------------------\n");
-	printf("%s", json_object_to_json_string_ext(dst3, JSON_C_TO_STRING_PRETTY));
+	printf("%s\n", json_object_to_json_string_ext(dst3, JSON_C_TO_STRING_PRETTY));
 	printf("------------------------------------------------\n");
 
 	json_object_put(dst1);
 	json_object_put(dst2);
 	json_object_put(dst3);
+
+	printf("\nTesting deep_copy with a custom serializer set\n");
+	json_object *with_serializer = json_object_new_string("notemitted");
+
+	json_object_set_serializer(with_serializer, my_custom_serializer, "dummy userdata", NULL);
+	json_object_object_add(src1, "with_serializer", with_serializer);
+	dst1 = NULL;
+	/* With a custom serializer in use, a custom shallow_copy function must also be used */
+	assert(-1 == json_object_deep_copy(src1, &dst1, NULL));
+	assert(0 == json_object_deep_copy(src1, &dst1, my_shallow_copy));
+
+	json_object *dest_with_serializer = json_object_object_get(dst1, "with_serializer");
+	assert(dest_with_serializer != NULL);
+	char *dst_userdata = json_object_get_userdata(dest_with_serializer);
+	assert(strcmp(dst_userdata, "dummy userdata") == 0);
+
+	const char *special_output = json_object_to_json_string(dest_with_serializer);
+	assert(strcmp(special_output, "OTHER") == 0);
+	printf("\ndeep_copy with custom serializer worked OK.\n");
+	json_object_put(dst1);
 
 	if (benchmark)
 	{
@@ -177,7 +223,7 @@ static void do_benchmark(json_object *src2)
 	/**
 	 * The numbers that I got are:
 	 * BENCHMARK - 1000000 iterations of 'dst2 = json_tokener_parse(json_object_get_string(src2))' took 71 seconds
-	 * BENCHMARK - 1000000 iterations of 'json_object_deep_copy(src2, &dst2)' took 29 seconds
+	 * BENCHMARK - 1000000 iterations of 'json_object_deep_copy(src2, &dst2, NULL)' took 29 seconds
 	 */
 
 	int iterations = 1000000;
@@ -193,10 +239,10 @@ static void do_benchmark(json_object *src2)
 	start = time(NULL);
 	dst2 = NULL;
 	for (ii = 0; ii < iterations; ii++) {
-		json_object_deep_copy(src2, &dst2);
+		json_object_deep_copy(src2, &dst2, NULL);
 		json_object_put(dst2);
 		dst2 = NULL;
 	}
-	printf("BENCHMARK - %d iterations of 'json_object_deep_copy(src2, &dst2)' took %d seconds\n", iterations, (int)(time(NULL) - start));
+	printf("BENCHMARK - %d iterations of 'json_object_deep_copy(src2, &dst2, NULL)' took %d seconds\n", iterations, (int)(time(NULL) - start));
 }
 
