@@ -61,3 +61,4 @@ TESTS_ENVIRONMENT       = top_builddir=$(top_builddir)
 
 distclean-local:
 	-rm -rf $(testsubdir)
+	-rm -f *.vg.out
