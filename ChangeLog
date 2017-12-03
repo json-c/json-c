@@ -1,13 +1,149 @@
 
-NEXT.VERSION
+0.13 (up to commit 5dae561, 2017/11/29)
+=================================
 
-  ...nothing yet...
+This release, being three and a half years after the 0.12 branch (f84d9c),
+   has quite a number of changes included.  The following is a sampling of
+   the most significant ones.
+
+Since the 0.12 release, 250 issues and pull requests have been closed.
+See issues_closed_for_0.13.md for a complete list.
+
+
+Deprecated and removed features:
+--------------------------------
+* All internal use of bits.h has been eliminated.  The file will be removed.
+	Do not use: hexdigit(), error_ptr(), error_descrition() and it_error() 
+* lh_abort() is deprecated.  It will be removed.
+
+Behavior changes:
+-----------------
+* Tighten the number parsing algorithm to raise errors instead of truncating
+     the results.  For example 12.3.4 or 2015-01-15, which now return null.
+	 See commit 99d8fc
+
+* Use size_t for array length and size.  Platforms where sizeof(size_t) != sizeof(int) may not be backwards compatible
+	See commits 45c56b, 92e9a5 and others.
+
+* Check for failue when allocating memory, returning NULL and errno=ENOMEM.
+	 See commit 2149a04.
+
+* Change json_object_object_add() return type from void to int, and will return -1 on failures, instead of exiting. (Note: this is not an ABI change)
+
+New features:
+-------------
+* We're aiming to follow RFC 7159 now.
+
+* Add a couple of additional option to json_object_to_json_string_ext:
+	JSON_C_TO_STRING_PRETTY_TAB
+	JSON_C_TO_STRING_NOSLASHESCAPE
+
+* Add a json_object_object_add_ex() function to allow for performance
+	improvements when certain constraints are known to be true.
+
+* Make serialization format of doubles configurable, in two different ways:
+	Call json_object_set_serializer with json_object_double_to_json_string and a custom
+	 format on each double object, or
+	Call json_c_set_serialization_double_format() to set a global or thread-wide format.
+
+* Add utility function for comparing json_objects - json_object_equal()
+
+* Add a way to copy entire object trees: json_object_deep_copy()
+* Add json_object_set_<type> function to modify the value of existing json_object's
+ without the need to recreate them.  Also add a json_object_int_inc function to
+ adjust an int's value.
+* Add support for JSON pointer, RFC 6901.  See json_pointer.h
+* Add a json_util_get_last_err() function to retrieve the string describing the
+ cause of errors, instead of printing to stderr.
+* Add perllike hash function for strings, and json_global_set_string_hash() 8f8d03d
+* Add a json_c_visit() function to provide a way to iterate over a tree of json-c objects.
+
+Notable bug fixes and other improvements:
+-----------------------------------------
+* Make reference increment and decrement atomic to allow passing json objects between threads.
+* Fix json_object_object_foreach to avoid uninitialized variable warnings.
+* Improve performance by removing unneeded data items from hashtable code and reducing duplicate hash computation.
+* Improve performance by storing small strings inside json_object
+* Improve performance of json_object_to_json_string by removing variadic printf. commit 9ff0f49
+* Issue #371: fix parsing of "-Infinity", and avoid needlessly copying the input when doing so.
+* Fix stack buffer overflow in json_object_double_to_json_string_format() - commit 2c2deb87
+* Fix various potential null ptr deref and int32 overflows
+* Issue #332: fix a long-standing bug in array_list_put_idx() where it would attempt to free previously free'd entries due to not checking the current array length.
+* Issue #195: use uselocale() instead of setlocale() in json_tokener to behave better in threaded environments.
+* Issue #275: fix out of bounds read when handling unicode surrogate pairs.
+* Ensure doubles that happen to be a whole number are emitted with ".0" - commit ca7a19
+* PR#331: for Visual Studio, use a snprintf/vsnprintf wrapper that ensures the string is terminated.
+* Fix double to int cast overflow in json_object_get_int64.
+* Clamp double to int32 when narrowing in json_object_get_int.
+* Use strtoll() to parse ints - instead of sscanf
+* Miscellaneous smaller changes, including removing unused variables, fixing warning
+ about uninitialized variables adding const qualifiers, reformatting code, etc...
+
+Build changes:
+--------------
+* Add Appveyor and Travis build support
+* Switch to using CMake when building on Windows with Visual Studio.
+	A dynamic .dll is generated instead of a .lib
+	config.h is now generated, config.h.win32 should no longer be manually copied
+* Add support for MacOS through CMake too.
+* Enable silent build by default
+* Link against libm when needed
+* Add support for building with AddressSanitizer
+* Add support for building with Clang
+* Add a --enable-threading configure option, and only use the (slower) __sync_add_and_fetch()/__sync_sub_and_fetch() function when it is specified.
+
+List of new functions added:
+----------------------------
+### json_object.h
+* array_list_bsearch()
+* array_list_del_idx()
+* json_object_to_json_string_length()
+* json_object_get_userdata()
+* json_object_set_userdata()
+* json_object_object_add_ex()
+* json_object_array_bsearch()
+* json_object_array_del_idx()
+* json_object_set_boolean()
+* json_object_set_int()
+* json_object_int_inc()
+* json_object_set_int64()
+* json_c_set_serialization_double_format()
+* json_object_double_to_json_string()
+* json_object_set_double()
+* json_object_set_string()
+* json_object_set_string_len()
+* json_object_equal()
+* json_object_deep_copy()
+
+### json_pointer.h
+* json_pointer_get()
+* json_pointer_getf()
+* json_pointer_set()
+* json_pointer_setf()
+
+### json_util.h
+* json_object_from_fd()
+* json_object_to_fd()
+* json_util_get_last_err()
+
+### json_visit.h
+* json_c_visit()
+
+### linkhash.h
+* json_global_set_string_hash()
+* lh_table_resize()
+
+### printbuf.h
+* printbuf_strappend()
+
 
 0.12.1
+======
 
   * Minimal changes to address compile issues.
 
 0.12
+====
 
   * Address security issues:
     * CVE-2013-6371: hash collision denial of service
@@ -47,6 +183,7 @@ NEXT.VERSION
 
 
 0.11
+====
 
   * IMPORTANT: the name of the library has changed to libjson-c.so and
      the header files are now in include/json-c.
@@ -70,6 +207,7 @@ NEXT.VERSION
   * Fix a bug (buffer overrun) when expanding arrays to more than 64 entries.
 
 0.10
+====
 
   * Add a json_object_to_json_string_ext() function to allow output to be
      formatted in a more human readable form.
@@ -118,6 +256,7 @@ NEXT.VERSION
     Brent Miller, bdmiller at yahoo dash inc dot com
 
 0.9
+===
   * Add README.html README-WIN32.html config.h.win32 to Makefile.am
     Michael Clark, <michael@metaparadigm.com>
   * Add const qualifier to the json_tokener_parse functions
@@ -148,6 +287,7 @@ NEXT.VERSION
     Gerard Krol, g dot c dot krol at student dot tudelft dot nl
 
 0.8
+===
   * Add va_end for every va_start
     Dotan Barak, dotanba at gmail dot com
   * Add macros to enable compiling out debug code
@@ -160,12 +300,14 @@ NEXT.VERSION
     Geoffrey Young, geoff at modperlcookbook dot org
 
 0.7
+===
   * Add escaping of backslash to json output
   * Add escaping of foward slash on tokenizing and output
   * Changes to internal tokenizer from using recursion to
     using a depth state structure to allow incremental parsing
 
 0.6
+===
   * Fix bug in escaping of control characters
     Johan Björklund, johbjo09 at kth dot se
   * Remove include "config.h" from headers (should only
@@ -173,6 +315,7 @@ NEXT.VERSION
     Michael Clark <michael@metaparadigm.com>
 
 0.5
+===
   * Make headers C++ compatible by change *this to *obj
   * Add ifdef C++ extern "C" to headers
   * Use simpler definition of min and max in bits.h
@@ -185,18 +328,21 @@ NEXT.VERSION
     Michael Clark <michael@metaparadigm.com>
 
 0.4
+===
   * Fix additional error case in object parsing
   * Add back sign reversal in nested object parse as error pointer
     value is negative, while error value is positive.
     Michael Clark <michael@metaparadigm.com>
 
 0.3
+===
   * fix pointer arithmetic bug for error pointer check in is_error() macro
   * fix type passed to printbuf_memappend in json_tokener
   * update autotools bootstrap instructions in README
     Michael Clark <michael@metaparadigm.com>
 
 0.2
+===
   * printbuf.c - C. Watford (christopher.watford@gmail.com)
     Added a Win32/Win64 compliant implementation of vasprintf
   * debug.c - C. Watford (christopher.watford@gmail.com)
@@ -219,4 +365,5 @@ NEXT.VERSION
     Michael Clark <michael@metaparadigm.com>
 	
 0.1
+===
   * initial release

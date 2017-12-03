@@ -1,6 +1,7 @@
 EXTRA_DIST = README.md README.html
 EXTRA_DIST += config.h.win32
 EXTRA_DIST += Doxyfile
+EXTRA_DIST += issues_closed_for_0.13.md
 
 dist-hook:
 	test -d "$(distdir)/doc" || mkdir "$(distdir)/doc"
