@@ -1009,7 +1009,7 @@ json_c_shallow_copy_fn json_c_shallow_copy_default;
  *          or if the destination pointer is non-NULL
  */
 
-JSON_EXPORT int json_object_deep_copy(struct json_object *src, struct json_object **dst, json_c_shallow_copy_fn shallow_copy); 
+JSON_EXPORT int json_object_deep_copy(struct json_object *src, struct json_object **dst, json_c_shallow_copy_fn *shallow_copy); 
 #ifdef __cplusplus
 }
 #endif
