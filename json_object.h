@@ -977,7 +977,7 @@ JSON_EXPORT int json_object_equal(struct json_object *obj1,
  *
  * @return On success 1 or 2, -1 on errors
  */
-typedef int (json_c_shallow_copy_fn)(json_object *src, json_object *parent, const char *key, size_t index, json_object **dst);
+typedef int (*json_c_shallow_copy_fn)(json_object *src, json_object *parent, const char *key, size_t index, json_object **dst);
 
 /**
  * The default shallow copy implementation for use with json_object_deep_copy().
@@ -991,7 +991,7 @@ typedef int (json_c_shallow_copy_fn)(json_object *src, json_object *parent, cons
  *
  * @return 1 on success, -1 on errors, but never 2.
  */
-json_c_shallow_copy_fn json_c_shallow_copy_default;
+int json_c_shallow_copy_default(json_object *src, json_object *parent, const char *key, size_t index, json_object **dst);
 
 /**
  * Copy the contents of the JSON object.
