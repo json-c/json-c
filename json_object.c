@@ -269,7 +269,7 @@ void json_object_set_userdata(json_object *jso, void *userdata,
 /* set a custom conversion to string */
 
 void json_object_set_serializer(json_object *jso,
-	json_object_to_json_string_fn to_string_func,
+	json_object_to_json_string_fn *to_string_func,
 	void *userdata,
 	json_object_delete_fn *user_delete)
 {

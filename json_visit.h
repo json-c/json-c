@@ -28,7 +28,7 @@ typedef int (json_c_visit_userfunc)(json_object *jso, int flags,
  *  userfunc returned JSON_C_VISIT_RETURN_ERROR.
  */
 int json_c_visit(json_object *jso, int future_flags,
-                 json_c_visit_userfunc userfunc, void *userarg);
+                 json_c_visit_userfunc *userfunc, void *userarg);
 
 /**
  * Passed to json_c_visit_userfunc as one of the flags values to indicate
