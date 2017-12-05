@@ -296,7 +296,7 @@ static void test_incremental_parse()
 {
 	json_object *new_obj;
 	enum json_tokener_error jerr;
-	json_tokener *tok;
+	struct json_tokener *tok;
 	const char *string_to_parse;
 	int ii;
 	int num_ok, num_error;

@@ -129,26 +129,35 @@ extern "C" {
  */
 #define JSON_C_OPTION_THREAD (1)
 
-extern const char *json_number_chars;
-extern const char *json_hex_chars;
-
-/* CAW: added for ANSI C iteration correctness */
+/**
+ * A structure to use with json_object_object_foreachC() loops.
+ * Contains key, val and entry members.
+ */
 struct json_object_iter
 {
 	char *key;
 	struct json_object *val;
 	struct lh_entry *entry;
 };
+typedef struct json_object_iter json_object_iter;
 
 /* forward structure definitions */
 
-typedef int json_bool;
+/**
+ * @deprecated Unused in json-c sources
+ */
 typedef struct printbuf printbuf;
+/**
+ * @deprecated Unused in json-c sources
+ */
 typedef struct lh_table lh_table;
+/**
+ * @deprecated Unused in json-c sources
+ */
 typedef struct array_list array_list;
+
+typedef int json_bool;
 typedef struct json_object json_object;
-typedef struct json_object_iter json_object_iter;
-typedef struct json_tokener json_tokener;
 
 /**
  * Type of custom user delete functions.  See json_object_set_serializer.
@@ -531,7 +540,7 @@ JSON_EXPORT void json_object_object_del(struct json_object* obj, const char *key
 
 /** Iterate through all keys and values of an object (ANSI C Safe)
  * @param obj the json_object instance
- * @param iter the object iterator
+ * @param iter the object iterator, use type json_object_iter
  */
 #define json_object_object_foreachC(obj,iter) \
  for(iter.entry = json_object_get_object(obj)->head; \

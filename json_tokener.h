@@ -86,6 +86,10 @@ struct json_tokener
   struct json_tokener_srec *stack;
   int flags;
 };
+/**
+ * @deprecated Unused in json-c code
+ */
+typedef struct json_tokener json_tokener;
 
 /**
  * Be strict when parsing JSON input.  Use caution with
