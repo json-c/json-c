@@ -262,4 +262,6 @@ Issues and Pull Requests closed for the 0.13 release
 [Build on Windows](https://api.github.com/repos/json-c/json-c/issues/380)
 [Fix makedist](https://api.github.com/repos/json-c/json-c/issues/381)
 [Memory leak for json_tokener_parse_ex for version 0.12.1](https://api.github.com/repos/json-c/json-c/issues/382)
+[Fix a compiler warning.](https://api.github.com/repos/json-c/json-c/issues/383)
+[Fix a VS 2015 compiler warnings.](https://api.github.com/repos/json-c/json-c/issues/384)
 
