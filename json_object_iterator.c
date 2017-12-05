@@ -7,11 +7,6 @@
 * This library is free software; you can redistribute it and/or modify
 * it under the terms of the MIT license. See COPYING for details.
 *
-* @brief  json-c forces clients to use its private data
-*         structures for JSON Object iteration.  This API
-*         implementation corrects that by abstracting the
-*         private json-c details.
-*
 *******************************************************************************
 */
 
