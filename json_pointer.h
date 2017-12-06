@@ -6,6 +6,11 @@
  *
  */
 
+/**
+ * @file
+ * @brief JSON Pointer (RFC 6901) implementation for retrieving
+ *        objects from a json-c object tree.
+ */
 #ifndef _json_pointer_h_
 #define _json_pointer_h_
 

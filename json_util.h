@@ -9,6 +9,10 @@
  *
  */
 
+/**
+ * @file
+ * @brief Miscllaneous utility functions and macros.
+ */ 
 #ifndef _json_util_h_
 #define _json_util_h_
 

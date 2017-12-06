@@ -9,6 +9,10 @@
  *
  */
 
+/**
+ * @file
+ * @brief Methods to parse an input string into a tree of json_object objects.
+ */
 #ifndef _json_tokener_h_
 #define _json_tokener_h_
 

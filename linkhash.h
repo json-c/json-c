@@ -10,6 +10,12 @@
  *
  */
 
+/**
+ * @file
+ * @brief Internal methods for working with json_type_object objects.  Although
+ *        this is exposed by the json_object_get_object() function and within the
+ *        json_object_iter type, it is not recommended for direct use.
+ */
 #ifndef _linkhash_h_
 #define _linkhash_h_
 

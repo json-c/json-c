@@ -9,6 +9,10 @@
  *
  */
 
+/**
+ * @file
+ * @brief Do not use, json-c internal, may be changed or removed at any time.
+ */
 #ifndef _json_object_private_h_
 #define _json_object_private_h_
 

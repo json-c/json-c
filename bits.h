@@ -1,5 +1,6 @@
 /**
  * @file
+ * @brief Do not use, only contains deprecated defines.
  * @deprecated Use json_util.h instead.
  *
  * $Id: bits.h,v 1.10 2006/01/30 23:07:57 mclark Exp $

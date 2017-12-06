@@ -9,6 +9,12 @@
  *
  */
 
+/**
+ * @file
+ * @brief Internal methods for working with json_type_array objects.
+ *        Although this is exposed by the json_object_get_array() method,
+ *        it is not recommended for direct use.
+ */
 #ifndef _arraylist_h_
 #define _arraylist_h_
 

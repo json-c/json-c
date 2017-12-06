@@ -1,6 +1,11 @@
 #ifndef __snprintf_compat_h
 #define __snprintf_compat_h
 
+/**
+ * @file
+ * @brief Do not use, json-c internal, may be changed or removed at any time.
+ */
+
 /*
  * Microsoft's _vsnprintf and _snprint don't always terminate
  * the string, so use wrappers that ensure that.

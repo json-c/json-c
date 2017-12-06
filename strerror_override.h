@@ -1,6 +1,11 @@
 #ifndef _json_strerror_override_h_
 #define _json_strerror_override_h_
 
+/**
+ * @file
+ * @brief Do not use, json-c internal, may be changed or removed at any time.
+ */
+
 #include "config.h"
 #include <errno.h>
 

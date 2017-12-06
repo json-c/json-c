@@ -10,6 +10,10 @@
  *
  */
 
+/**
+ * @file
+ * @brief A convenience header that may be included instead of other individual ones.
+ */
 #ifndef _json_h_
 #define _json_h_
 

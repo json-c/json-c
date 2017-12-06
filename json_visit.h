@@ -2,6 +2,10 @@
 #ifndef _json_c_json_visit_h_
 #define _json_c_json_visit_h_
 
+/**
+ * @file
+ * @brief Methods for walking a tree of objects.
+ */
 #include "json_object.h"
 
 typedef int (json_c_visit_userfunc)(json_object *jso, int flags,

@@ -1,6 +1,11 @@
 #ifndef __vasprintf_compat_h
 #define __vasprintf_compat_h
 
+/**
+ * @file
+ * @brief Do not use, json-c internal, may be changed or removed at any time.
+ */
+
 #include "snprintf_compat.h"
 
 #if !defined(HAVE_VASPRINTF)

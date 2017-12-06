@@ -10,6 +10,10 @@
  *
  */
 
+/**
+ * @file
+ * @brief Core json-c API.  Start here, or with json_tokener.h
+ */
 #ifndef _json_object_h_
 #define _json_object_h_
 
