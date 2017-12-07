@@ -26,17 +26,19 @@ libjson_cinclude_HEADERS = \
 	json_inttypes.h \
 	json_object.h \
 	json_object_iterator.h \
-	json_object_private.h \
 	json_pointer.h \
 	json_tokener.h \
 	json_util.h \
 	json_visit.h \
 	linkhash.h \
+	printbuf.h
+
+noinst_HEADERS=\
+	json_object_private.h \
 	math_compat.h \
 	strdup_compat.h \
 	snprintf_compat.h \
 	vasprintf_compat.h \
-	printbuf.h \
 	random_seed.h \
 	strerror_override.h
 
