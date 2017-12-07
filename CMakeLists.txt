@@ -2,7 +2,7 @@
 
 cmake_minimum_required(VERSION 2.8.7)
 cmake_policy(SET CMP0048 NEW)
-project(json-c VERSION 0.12.99)
+project(json-c VERSION 0.13)
 
 
 include(CheckSymbolExists)

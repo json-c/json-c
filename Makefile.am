@@ -40,7 +40,7 @@ libjson_cinclude_HEADERS = \
 	random_seed.h \
 	strerror_override.h
 
-libjson_c_la_LDFLAGS = -version-info 3:0:0 -no-undefined @JSON_BSYMBOLIC_LDFLAGS@
+libjson_c_la_LDFLAGS = -version-info 3:1:0 -no-undefined @JSON_BSYMBOLIC_LDFLAGS@
 
 libjson_c_la_SOURCES = \
 	arraylist.c \
