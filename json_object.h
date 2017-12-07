@@ -161,6 +161,10 @@ typedef struct lh_table lh_table;
 typedef struct array_list array_list;
 
 typedef int json_bool;
+
+/**
+ * @brief The core type for all type of JSON objects handled by json-c
+ */
 typedef struct json_object json_object;
 
 /**
@@ -573,7 +577,7 @@ JSON_EXPORT size_t json_object_array_length(const struct json_object *obj);
 /** Sorts the elements of jso of type json_type_array
 *
 * Pointers to the json_object pointers will be passed as the two arguments
-* to @sort_fn
+* to sort_fn
 *
 * @param jso the json_object instance
 * @param sort_fn a sorting function
@@ -1017,6 +1021,9 @@ json_c_shallow_copy_fn json_c_shallow_copy_default;
  * @param src source JSON object whose contents will be copied
  * @param dst pointer to the destination object where the contents of `src`;
  *            make sure this pointer is initialized to NULL
+ * @param shallow_copy an optional function to copy individual objects, needed
+ *                     when custom serializers are in use.  See also
+ *                     json_object set_serializer.
  *
  * @returns 0 if the copy went well, -1 if an error occured during copy
  *          or if the destination pointer is non-NULL

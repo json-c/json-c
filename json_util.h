@@ -75,6 +75,8 @@ extern int json_object_to_file_ext(const char *filename, struct json_object *obj
  * Handles partial writes and will keep writing until done, or an error
  * occurs.
  *
+ * @param fd an open, writable file descriptor to write to
+ * @param obj the object to serializer and write
  * @param flags flags to pass to json_object_to_json_string_ext()
  * @return -1 if something fails.  See json_util_get_last_err() for details.
  */
