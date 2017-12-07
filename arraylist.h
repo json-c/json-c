@@ -33,6 +33,7 @@ struct array_list
   size_t size;
   array_list_free_fn *free_fn;
 };
+typedef struct array_list array_list;
 
 extern struct array_list*
 array_list_new(array_list_free_fn *free_fn);

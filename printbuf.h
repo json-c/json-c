@@ -32,6 +32,7 @@ struct printbuf {
   int bpos;
   int size;
 };
+typedef struct printbuf printbuf;
 
 extern struct printbuf*
 printbuf_new(void);

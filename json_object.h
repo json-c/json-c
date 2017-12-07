@@ -35,6 +35,7 @@
 
 #include <stddef.h>
 #include "json_inttypes.h"
+#include "printbuf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -144,21 +145,6 @@ struct json_object_iter
 	struct lh_entry *entry;
 };
 typedef struct json_object_iter json_object_iter;
-
-/* forward structure definitions */
-
-/**
- * @deprecated Unused in json-c sources
- */
-typedef struct printbuf printbuf;
-/**
- * @deprecated Unused in json-c sources
- */
-typedef struct lh_table lh_table;
-/**
- * @deprecated Unused in json-c sources
- */
-typedef struct array_list array_list;
 
 typedef int json_bool;
 

@@ -139,6 +139,7 @@ struct lh_table {
 	lh_hash_fn *hash_fn;
 	lh_equal_fn *equal_fn;
 };
+typedef struct lh_table lh_table;
 
 
 /**
