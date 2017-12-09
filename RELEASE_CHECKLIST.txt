@@ -110,7 +110,6 @@ git clone -b gh-pages https://github.com/json-c/json-c json-c-pages
 cd json-c-pages
 mkdir json-c-${release}
 cp -R ../json-c-${release}/doc json-c-${release}/.
-cp ../json-c-${release}/README-WIN32.html json-c-${release}/.
 git add json-c-${release}
 git commit
 
