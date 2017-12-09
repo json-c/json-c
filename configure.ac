@@ -1,7 +1,7 @@
 AC_PREREQ(2.64)
 
 # Process this file with autoconf to produce a configure script.
-AC_INIT([json-c], 0.12.99, [json-c@googlegroups.com])
+AC_INIT([json-c], 0.13.99, [json-c@googlegroups.com])
 
 AM_INIT_AUTOMAKE
 
