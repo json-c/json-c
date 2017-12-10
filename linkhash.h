@@ -319,21 +319,6 @@ extern int lh_table_delete(struct lh_table *t, const void *k);
 extern int lh_table_length(struct lh_table *t);
 
 /**
- * Prints a message to <code>stdout</code>,
- * then exits the program with an exit code of <code>1</code>.
- *
- * @param msg Message format string, like for <code>printf</code>.
- * @param ... Format args.
- *
- * @deprecated Since it is not a good idea to exit the entire program
- * 	because of an internal library failure, json-c will no longer
- * 	use this function internally.
- * 	However, because its interface is public, it will remain part of
- * 	the API on the off chance of legacy software using it externally.
- */
-THIS_FUNCTION_IS_DEPRECATED(void lh_abort(const char *msg, ...));
-
-/**
  * Resizes the specified table.
  *
  * @param t Pointer to table to resize.

@@ -18,7 +18,6 @@ pkgconfig_DATA = json-c.pc
 libjson_cincludedir = $(includedir)/json-c
 libjson_cinclude_HEADERS = \
 	arraylist.h \
-	bits.h \
 	debug.h \
 	json.h \
 	json_c_version.h \

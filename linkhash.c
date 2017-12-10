@@ -52,15 +52,6 @@ json_global_set_string_hash(const int h)
 	return 0;
 }
 
-void lh_abort(const char *msg, ...)
-{
-	va_list ap;
-	va_start(ap, msg);
-	vprintf(msg, ap);
-	va_end(ap);
-	exit(1);
-}
-
 static unsigned long lh_ptr_hash(const void *k)
 {
 	/* CAW: refactored to be 64bit nice */
