@@ -621,13 +621,6 @@ struct lh_entry* lh_table_lookup_entry(struct lh_table *t, const void *k)
 	return lh_table_lookup_entry_w_hash(t, k, lh_get_hash(t, k));
 }
 
-const void* lh_table_lookup(struct lh_table *t, const void *k)
-{
-	void *result;
-	lh_table_lookup_ex(t, k, &result);
-	return result;
-}
-
 json_bool lh_table_lookup_ex(struct lh_table* t, const void* k, void **v)
 {
 	struct lh_entry *e = lh_table_lookup_entry(t, k);

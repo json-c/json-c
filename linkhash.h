@@ -272,16 +272,6 @@ extern struct lh_entry* lh_table_lookup_entry(struct lh_table *t, const void *k)
 extern struct lh_entry* lh_table_lookup_entry_w_hash(struct lh_table *t, const void *k, const unsigned long h);
 
 /**
- * Lookup a record into the table.
- *
- * @param t the table to lookup
- * @param k a pointer to the key to lookup
- * @return a pointer to the found value or NULL if it does not exist.
- * @deprecated Use lh_table_lookup_ex() instead.
- */
-THIS_FUNCTION_IS_DEPRECATED(extern const void* lh_table_lookup(struct lh_table *t, const void *k));
-
-/**
  * Lookup a record in the table.
  *
  * @param t the table to lookup
