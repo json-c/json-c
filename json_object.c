@@ -509,7 +509,7 @@ int json_object_object_length(const struct json_object *jso)
 	return lh_table_length(jso->o.c_object);
 }
 
-size_t json_object_sizeof(void)
+size_t json_c_object_sizeof(void)
 {
 	return sizeof(struct json_object);
 }
