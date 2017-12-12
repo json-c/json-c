@@ -392,6 +392,11 @@ JSON_EXPORT struct lh_table* json_object_get_object(const struct json_object *ob
  */
 JSON_EXPORT int json_object_object_length(const struct json_object* obj);
 
+/** Get the sizeof (struct json_object).
+ * @returns a size_t with the sizeof (struct json_object)
+ */
+JSON_EXPORT size_t json_object_sizeof(void);
+
 /** Add an object field to a json_object of type json_type_object
  *
  * The reference count will *not* be incremented. This is to make adding
