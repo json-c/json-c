@@ -1,4 +1,4 @@
-`json-c`                       {#mainpage}
+`json-c`
 ========
 
 1. [Overview and Build Status](#overview)
