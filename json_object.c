@@ -182,6 +182,11 @@ int json_object_put(struct json_object *jso)
 {
 	if(!jso) return 0;
 
+	/* Avoid invalid free and crash explicitly instead of (silently)
+	 * segfaulting.
+	 */
+	assert(jso->_ref_count > 0);
+
 #if defined(HAVE_ATOMIC_BUILTINS) && defined(ENABLE_THREADING)
 	/* Note: this only allow the refcount to remain correct
 	 * when multiple threads are adjusting it.  It is still an error 
