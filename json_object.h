@@ -30,7 +30,7 @@
 #ifdef __GNUC__
 #define JSON_C_CONST_FUNCTION(func) func __attribute__((const))
 #else
-#define CONST_FUNCTION(func) func
+#define JSON_C_CONST_FUNCTION(func) func
 #endif
 
 #if defined(_MSC_VER) 
