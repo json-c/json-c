@@ -27,6 +27,12 @@
 #define THIS_FUNCTION_IS_DEPRECATED(func) func
 #endif
 
+#ifdef __GNUC__
+#define JSON_C_CONST_FUNCTION(func) func __attribute__((const))
+#else
+#define CONST_FUNCTION(func) func
+#endif
+
 #if defined(_MSC_VER) 
 #define JSON_EXPORT __declspec(dllexport)
 #else
@@ -391,6 +397,11 @@ JSON_EXPORT struct lh_table* json_object_get_object(const struct json_object *ob
  * @param obj the json_object whose length to return
  */
 JSON_EXPORT int json_object_object_length(const struct json_object* obj);
+
+/** Get the sizeof (struct json_object).
+ * @returns a size_t with the sizeof (struct json_object)
+ */
+JSON_C_CONST_FUNCTION(JSON_EXPORT size_t json_c_object_sizeof(void));
 
 /** Add an object field to a json_object of type json_type_object
  *
