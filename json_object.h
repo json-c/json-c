@@ -118,12 +118,6 @@ extern "C" {
  */
 #define JSON_C_OBJECT_KEY_IS_CONSTANT (1<<2)
 
-#undef FALSE
-#define FALSE ((json_bool)0)
-
-#undef TRUE
-#define TRUE ((json_bool)1)
-
 /**
  * Set the global value of an option, which will apply to all
  * current and future threads that have not set a thread-local value.
@@ -654,7 +648,7 @@ JSON_EXPORT int json_object_array_del_idx(struct json_object *obj, size_t idx, s
 /* json_bool type methods */
 
 /** Create a new empty json_object of type json_type_boolean
- * @param b a json_bool TRUE or FALSE (1 or 0)
+ * @param b a json_bool 1 or 0
  * @returns a json_object of type json_type_boolean
  */
 JSON_EXPORT struct json_object* json_object_new_boolean(json_bool b);
@@ -662,10 +656,10 @@ JSON_EXPORT struct json_object* json_object_new_boolean(json_bool b);
 /** Get the json_bool value of a json_object
  *
  * The type is coerced to a json_bool if the passed object is not a json_bool.
- * integer and double objects will return FALSE if there value is zero
- * or TRUE otherwise. If the passed object is a string it will return
- * TRUE if it has a non zero length. If any other object type is passed
- * TRUE will be returned if the object is not NULL.
+ * integer and double objects will return 0 if there value is zero
+ * or 1 otherwise. If the passed object is a string it will return
+ * 1 if it has a non zero length. If any other object type is passed
+ * 1 will be returned if the object is not NULL.
  *
  * @param obj the json_object instance
  * @returns a json_bool

@@ -15,12 +15,12 @@ int main(int argc, char **argv)
 	assert (json_object_get_int64(tmp)==321321321); 
 	json_object_put(tmp);
 	printf("INT64 PASSED\n");
-	tmp=json_object_new_boolean(TRUE);
-	assert (json_object_get_boolean(tmp)==TRUE); 
-	json_object_set_boolean(tmp,FALSE);
-	assert (json_object_get_boolean(tmp)==FALSE); 
-	json_object_set_boolean(tmp,TRUE);
-	assert (json_object_get_boolean(tmp)==TRUE); 
+	tmp=json_object_new_boolean(1);
+	assert (json_object_get_boolean(tmp)==1); 
+	json_object_set_boolean(tmp,0);
+	assert (json_object_get_boolean(tmp)==0); 
+	json_object_set_boolean(tmp,1);
+	assert (json_object_get_boolean(tmp)==1); 
 	json_object_put(tmp);
 	printf("BOOL PASSED\n");
 	tmp=json_object_new_double(12.34);

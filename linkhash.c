@@ -626,10 +626,10 @@ json_bool lh_table_lookup_ex(struct lh_table* t, const void* k, void **v)
 	struct lh_entry *e = lh_table_lookup_entry(t, k);
 	if (e != NULL) {
 		if (v != NULL) *v = lh_entry_v(e);
-		return TRUE; /* key found */
+		return 1; /* key found */
 	}
 	if (v != NULL) *v = NULL;
-		return FALSE; /* key not found */
+		return 0; /* key not found */
 }
 
 int lh_table_delete_entry(struct lh_table *t, struct lh_entry *e)

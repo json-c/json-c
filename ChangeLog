@@ -7,6 +7,7 @@ Deprecated and removed features:
 * bits.h has been removed
 * lh_abort() has been removed
 * lh_table_lookup() has been removed, use lh_table_lookup_ex() instead.
+* Remove TRUE and FALSE defines, use 1 and 0 instead.
 
 
 0.13 (up to commit 5dae561, 2017/11/29)

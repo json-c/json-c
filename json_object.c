@@ -537,7 +537,7 @@ json_bool json_object_object_get_ex(const struct json_object* jso, const char *k
 		*value = NULL;
 
 	if (NULL == jso)
-		return FALSE;
+		return 0;
 
 	switch(jso->o_type)
 	{
@@ -547,7 +547,7 @@ json_bool json_object_object_get_ex(const struct json_object* jso, const char *k
 	default:
 		if (value != NULL)
 			*value = NULL;
-		return FALSE;
+		return 0;
 	}
 }
 
@@ -583,7 +583,7 @@ struct json_object* json_object_new_boolean(json_bool b)
 json_bool json_object_get_boolean(const struct json_object *jso)
 {
 	if (!jso)
-		return FALSE;
+		return 0;
 	switch(jso->o_type)
 	{
 	case json_type_boolean:
@@ -595,7 +595,7 @@ json_bool json_object_get_boolean(const struct json_object *jso)
 	case json_type_string:
 		return (jso->o.c_string.len != 0);
 	default:
-		return FALSE;
+		return 0;
 	}
 }
 
