@@ -15,6 +15,7 @@
 #include "strerror_override.h"
 
 #include <assert.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -790,7 +791,6 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
 {
 	char buf[128], *p, *q;
 	int size;
-	double dummy; /* needed for modf() */
 	/* Although JSON RFC does not support
 	NaN or Infinity as numeric values
 	ECMA 262 section 9.8.1 defines
@@ -810,43 +810,59 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
 	{
 		const char *std_format = "%.17g";
 
-#if defined(HAVE___THREAD)
-		if (tls_serialization_float_format)
-			std_format = tls_serialization_float_format;
-		else
-#endif
-		if (global_serialization_float_format)
-			std_format = global_serialization_float_format;
 		if (!format)
-			format = std_format;
-		size = snprintf(buf, sizeof(buf), format, jso->o.c_double);
-		if (modf(jso->o.c_double, &dummy) == 0  && size >= 0 && size < (int)sizeof(buf) - 2)
 		{
-			// Ensure it looks like a float, even if snprintf didn't.
+#if defined(HAVE___THREAD)
+			if (tls_serialization_float_format)
+				format = tls_serialization_float_format;
+			else
+#endif
+			if (global_serialization_float_format)
+				format = global_serialization_float_format;
+			else
+				format = std_format;
+		}
+		size = snprintf(buf, sizeof(buf), format, jso->o.c_double);
+
+		if (size < 0)
+			return -1;
+
+		p = strchr(buf, ',');
+		if (p)
+			*p = '.';
+		else
+			p = strchr(buf, '.');
+
+		int format_drops_decimals = 0;
+		if (format == std_format || strstr(format, ".0f") == NULL)
+			format_drops_decimals = 1;
+
+		if (size < (int)sizeof(buf) - 2 &&
+		    isdigit((int)buf[0]) && /* Looks like *some* kind of number */
+			!p && /* Has no decimal point */
+		    strchr(buf, 'e') == NULL && /* Not scientific notation */
+			format_drops_decimals)
+		{
+			// Ensure it looks like a float, even if snprintf didn't,
+			//  unless a custom format is set to omit the decimal.
 			strcat(buf, ".0");
 			size += 2;
+		}
+		if (p && (flags & JSON_C_TO_STRING_NOZERO))
+		{
+			/* last useful digit, always keep 1 zero */
+			p++;
+			for (q=p ; *q ; q++) {
+				if (*q!='0') p=q;
+			}
+			/* drop trailing zeroes */
+			*(++p) = 0;
+			size = p-buf;
 		}
 	}
 	// although unlikely, snprintf can fail
 	if (size < 0)
 		return -1;
-
-	p = strchr(buf, ',');
-	if (p)
-		*p = '.';
-	else
-		p = strchr(buf, '.');
-	if (p && (flags & JSON_C_TO_STRING_NOZERO))
-	{
-		/* last useful digit, always keep 1 zero */
-		p++;
-		for (q=p ; *q ; q++) {
-			if (*q!='0') p=q;
-		}
-		/* drop trailing zeroes */
-		*(++p) = 0;
-		size = p-buf;
-	}
 
 	if (size >= (int)sizeof(buf))
 		// The standard formats are guaranteed not to overrun the buffer,
