@@ -809,6 +809,7 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
 	else
 	{
 		const char *std_format = "%.17g";
+		int format_drops_decimals = 0;
 
 		if (!format)
 		{
@@ -833,7 +834,6 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
 		else
 			p = strchr(buf, '.');
 
-		int format_drops_decimals = 0;
 		if (format == std_format || strstr(format, ".0f") == NULL)
 			format_drops_decimals = 1;
 
