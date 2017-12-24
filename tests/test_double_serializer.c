@@ -54,4 +54,24 @@ int main()
 	printf("obj.to_string(back to default format)=%s\n", json_object_to_json_string(obj));
 
 	json_object_put(obj);
+
+	obj = json_object_new_double(12.0);
+	printf("obj(12.0).to_string(default format)=%s\n", json_object_to_json_string(obj));
+	if (json_c_set_serialization_double_format("%.0f", JSON_C_OPTION_GLOBAL) < 0)
+		printf("ERROR: json_c_set_serialization_double_format() failed");
+	printf("obj(12.0).to_string(%%.0f)=%s\n", json_object_to_json_string(obj));
+
+	if (json_c_set_serialization_double_format("%.0g", JSON_C_OPTION_GLOBAL) < 0)
+		printf("ERROR: json_c_set_serialization_double_format() failed");
+	printf("obj(12.0).to_string(%%.0g)=%s\n", json_object_to_json_string(obj));
+
+	if (json_c_set_serialization_double_format("%.2g", JSON_C_OPTION_GLOBAL) < 0)
+		printf("ERROR: json_c_set_serialization_double_format() failed");
+	printf("obj(12.0).to_string(%%.1g)=%s\n", json_object_to_json_string(obj));
+
+	// Reset to default to free memory
+	if (json_c_set_serialization_double_format(NULL, JSON_C_OPTION_GLOBAL) < 0)
+		printf("ERROR: json_c_set_serialization_double_format() failed");
+
+	json_object_put(obj);
 }
