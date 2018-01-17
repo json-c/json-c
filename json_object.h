@@ -529,8 +529,8 @@ JSON_EXPORT void json_object_object_del(struct json_object* obj, const char *key
 #else /* ANSI C or MSC */
 
 # define json_object_object_foreach(obj,key,val) \
-	char *key;\
-	struct json_object *val; \
+	char *key = NULL;\
+	struct json_object *val = NULL; \
 	struct lh_entry *entry ## key; \
 	struct lh_entry *entry_next ## key = NULL; \
 	for(entry ## key = json_object_get_object(obj)->head; \
