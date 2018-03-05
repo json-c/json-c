@@ -167,7 +167,28 @@ AC_SUBST(JSON_BSYMBOLIC_LDFLAGS)
 
 AX_APPEND_COMPILE_FLAGS([-Wall -Werror -Wcast-qual -Wno-error=deprecated-declarations])
 AX_APPEND_COMPILE_FLAGS([-Wextra -Wwrite-string -Wno-unused-parameter])
-AX_APPEND_COMPILE_FLAGS([-D_GNU_SOURCE -D_REENTRANT])
+AX_APPEND_COMPILE_FLAGS([-D_GNU_SOURCE])
+
+AC_LANG_PUSH([C])
+AC_MSG_CHECKING([for compatibility with _REENTRANT and toolchain headers])
+AC_LINK_IFELSE(
+[
+ AC_LANG_SOURCE([[
+/* uClibc toolchains without threading barf when _REENTRANT is defined */
+#define _REENTRANT 1
+#include <sys/types.h>
+int main ()
+{
+  return 0;
+}
+]])], [
+    AC_MSG_RESULT(yes)
+    AX_APPEND_COMPILE_FLAGS([-D_REENTRANT])
+], [
+    AC_MSG_RESULT(no)
+])
+AC_LANG_POP([C])
+
 
 AX_COMPILE_CHECK_SIZEOF(int)
 AX_COMPILE_CHECK_SIZEOF(long)
