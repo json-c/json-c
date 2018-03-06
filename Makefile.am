@@ -1,4 +1,4 @@
-ACLOCAL_AMFLAGS = -I autoconf-archive/m4
+#ACLOCAL_AMFLAGS = -I autoconf-archive/m4
 
 EXTRA_DIST = README.md README.html
 EXTRA_DIST += config.h.win32
