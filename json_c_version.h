@@ -14,11 +14,11 @@
 
 #define JSON_C_MAJOR_VERSION 0
 #define JSON_C_MINOR_VERSION 13
-#define JSON_C_MICRO_VERSION 00
+#define JSON_C_MICRO_VERSION 01
 #define JSON_C_VERSION_NUM ((JSON_C_MAJOR_VERSION << 16) | \
                             (JSON_C_MINOR_VERSION << 8) | \
                             JSON_C_MICRO_VERSION)
-#define JSON_C_VERSION "0.13"
+#define JSON_C_VERSION "0.13.1"
 
 /**
  * @see JSON_C_VERSION
