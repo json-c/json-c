@@ -1,4 +1,17 @@
 
+0.13.1 (up to commit 0f814e5, 2018/03/04)
+=========================================
+
+* Bump the major version of the .so library generated up to 4.0 to avoid 
+  conflicts because some downstream packagers of json-c had already done
+  their own bump to ".so.3" for a much older 0.12 release.
+* Add const size_t json_c_object_sizeof()
+* Avoid invalid free (and thus a segfault) when ref_count gets < 0
+* PR#394: fix handling of custom double formats that include a ".0"
+* Avoid uninitialized variable warnings in json_object_object_foreach
+* Issue #396: fix build for certain uClibc based systems.
+* Add a top level fuzz directory for fuzzers run by OSS-Fuzz
+
 0.13 (up to commit 5dae561, 2017/11/29)
 =================================
 
