@@ -9,6 +9,7 @@
 #include "json_visit.h"
 
 static void test_basic_parse(void);
+static void test_utf8_parse(void);
 static void test_verbose_parse(void);
 static void test_incremental_parse(void);
 
@@ -18,6 +19,8 @@ int main(void)
 
 	static const char separator[] = "==================================";
 	test_basic_parse();
+	puts(separator);
+	test_utf8_parse();
 	puts(separator);
 	test_verbose_parse();
 	puts(separator);
@@ -107,6 +110,17 @@ static void test_basic_parse()
 	single_basic_parse("[18446744073709551616]", 1);
 }
 
+static void test_utf8_parse()
+{
+	// json_tokener_parse doesn't support checking for byte order marks.
+	// It's the responsibility of the caller to detect and skip a BOM.
+	// Both of these checks return null.
+	char utf8_bom[] = { 0xEF, 0xBB, 0xBF, 0x00 };
+	char utf8_bom_and_chars[] = { 0xEF, 0xBB, 0xBF, '{', '}', 0x00 };
+	single_basic_parse(utf8_bom, 0);
+	single_basic_parse(utf8_bom_and_chars, 0);
+}
+
 // Clear the re-serialization information that the tokener
 // saves to ensure that the output reflects the actual
 // values we parsed, rather than just the original input.
@@ -145,7 +159,7 @@ static void test_verbose_parse()
 	/* b/c the string starts with 'f' parsing return a boolean error */
 	assert (error == json_tokener_error_parse_boolean);
 
-	puts("json_tokener_parse_versbose() OK");
+	puts("json_tokener_parse_verbose() OK");
 }
 
 struct incremental_step {

@@ -51,7 +51,10 @@ new_obj.to_string([0e+])=[ 0.0 ]
 new_obj.to_string([0e+-1])=null
 new_obj.to_string([18446744073709551616])=[ 9223372036854775807 ]
 ==================================
-json_tokener_parse_versbose() OK
+new_obj.to_string(﻿)=null
+new_obj.to_string(﻿{})=null
+==================================
+json_tokener_parse_verbose() OK
 ==================================
 Starting incremental tests.
 Note: quotes and backslashes seen in the output here are literal values passed
