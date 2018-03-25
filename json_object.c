@@ -838,7 +838,7 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
 			format_drops_decimals = 1;
 
 		if (size < (int)sizeof(buf) - 2 &&
-		    isdigit((int)buf[0]) && /* Looks like *some* kind of number */
+		    isdigit((unsigned char)buf[0]) && /* Looks like *some* kind of number */
 			!p && /* Has no decimal point */
 		    strchr(buf, 'e') == NULL && /* Not scientific notation */
 			format_drops_decimals)
