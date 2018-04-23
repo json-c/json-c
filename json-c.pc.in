@@ -6,6 +6,7 @@ includedir=@includedir@
 Name: json-c
 Description: JSON implementation in C
 Version: @VERSION@
-Requires: 
+Requires:
+Libs.private: @LIBS@
 Libs:  -L${libdir} -ljson-c
 Cflags: -I${includedir}/json-c
