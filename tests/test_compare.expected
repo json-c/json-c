@@ -1,6 +1,6 @@
-JSON integer comparision is correct
-JSON same object comparision is correct
-JSON same integer comparision is correct
+JSON integer comparison is correct
+JSON same object comparison is correct
+JSON same integer comparison is correct
 Comparing equal strings is correct
 Comparing different strings is correct
 Comparing equal doubles is correct

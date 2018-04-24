@@ -91,7 +91,7 @@ extern "C" {
 /**
  * A flag for the json_object_object_add_ex function which
  * causes the value to be added without a check if it already exists.
- * Note: it is the responsibilty of the caller to ensure that no
+ * Note: it is the responsibility of the caller to ensure that no
  * key is added multiple times. If this is done, results are
  * unpredictable. While this option is somewhat dangerous, it
  * permits potentially large performance savings in code that
@@ -442,7 +442,7 @@ JSON_EXPORT int json_object_object_add_ex(struct json_object* obj,
  *
  * This returns NULL if the field is found but its value is null, or if
  *  the field is not found, or if obj is not a json_type_object.  If you
- *  need to distinguis between these cases, use json_object_object_get_ex().
+ *  need to distinguish between these cases, use json_object_object_get_ex().
  *
  * *No* reference counts will be changed.  There is no need to manually adjust
  * reference counts through the json_object_put/json_object_get methods unless
@@ -624,7 +624,7 @@ JSON_EXPORT int json_object_array_add(struct json_object *obj,
 JSON_EXPORT int json_object_array_put_idx(struct json_object *obj, size_t idx,
 				     struct json_object *val);
 
-/** Get the element at specificed index of the array (a json_object of type json_type_array)
+/** Get the element at specified index of the array (a json_object of type json_type_array)
  * @param obj the json_object instance
  * @param idx the index to get the element at
  * @returns the json_object at the specified index (or NULL)
@@ -671,7 +671,7 @@ JSON_EXPORT json_bool json_object_get_boolean(const struct json_object *obj);
  * 
  * The type of obj is checked to be a json_type_boolean and 0 is returned 
  * if it is not without any further actions. If type of obj is json_type_boolean
- * the obect value is chaned to new_value
+ * the object value is changed to new_value
  *
  * @param obj the json_object instance
  * @param new_value the value to be set
@@ -718,7 +718,7 @@ JSON_EXPORT int32_t json_object_get_int(const struct json_object *obj);
  * 
  * The type of obj is checked to be a json_type_int and 0 is returned 
  * if it is not without any further actions. If type of obj is json_type_int
- * the obect value is changed to new_value
+ * the object value is changed to new_value
  *
  * @param obj the json_object instance
  * @param new_value the value to be set
@@ -763,7 +763,7 @@ JSON_EXPORT int64_t json_object_get_int64(const struct json_object *obj);
  * 
  * The type of obj is checked to be a json_type_int and 0 is returned 
  * if it is not without any further actions. If type of obj is json_type_int
- * the obect value is chaned to new_value
+ * the object value is changed to new_value
  *
  * @param obj the json_object instance
  * @param new_value the value to be set
@@ -880,7 +880,7 @@ JSON_EXPORT double json_object_get_double(const struct json_object *obj);
  * 
  * The type of obj is checked to be a json_type_double and 0 is returned 
  * if it is not without any further actions. If type of obj is json_type_double
- * the obect value is chaned to new_value
+ * the object value is changed to new_value
  *
  * @param obj the json_object instance
  * @param new_value the value to be set
@@ -942,10 +942,10 @@ JSON_EXPORT int json_object_set_string(json_object* obj, const char* new_value);
  * 
  * The type of obj is checked to be a json_type_string and 0 is returned 
  * if it is not without any further actions. If type of obj is json_type_string
- * the obect value is chaned to new_value
+ * the object value is changed to new_value
  *
  * @param obj the json_object instance
- * @param new_value the value to be set; Since string legth is given in len this need not be zero terminated
+ * @param new_value the value to be set; Since string length is given in len this need not be zero terminated
  * @param len the length of new_value
  * @returns 1 if value is set correctly, 0 otherwise
  */

@@ -28,7 +28,7 @@
 static void string_replace_all_occurrences_with_char(char *s, const char *occur, char repl_char)
 {
 	int slen = strlen(s);
-	int skip = strlen(occur) - 1; /* length of the occurence, minus the char we're replacing */
+	int skip = strlen(occur) - 1; /* length of the occurrence, minus the char we're replacing */
 	char *p = s;
 	while ((p = strstr(p, occur))) {
 		*p = repl_char;
