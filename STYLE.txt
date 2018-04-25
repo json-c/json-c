@@ -7,7 +7,7 @@ Official json-c style:
 Aim for readability, not strict conformance to fixed style rules.
 These rules are not comprehensive.  Look to existing code for guidelines.
 Indentation is tab based, with continuations of long lines starting with tabs then spaces for alignment.
-Try to line up components of continuation lines with corresponding part of the line above (i.e. "indent -lp" effect), but avoid excessive identation tha causes extra line wraps. 
+Try to line up components of continuation lines with corresponding part of the line above (i.e. "indent -lp" effect), but avoid excessive indentation tha causes extra line wraps.
  e.g. (T=tab, S=space):
 TTTTsome_long_func_call(arg1, arg2,
 TTTTSSSSSSSSSSSSSSSSSSSarg3, arg4);
