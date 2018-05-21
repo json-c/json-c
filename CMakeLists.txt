@@ -114,7 +114,9 @@ add_library(json-c-static
 
 set_property(TARGET json-c PROPERTY C_STANDARD 99)
 set_property(TARGET json-c-static PROPERTY C_STANDARD 99)
+if (NOT MSVC)
 set_target_properties(json-c-static PROPERTIES OUTPUT_NAME json-c)
+endif()
 
 install(TARGETS json-c json-c-static
     RUNTIME DESTINATION bin
