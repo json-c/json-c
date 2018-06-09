@@ -71,6 +71,7 @@ set(JSON_C_PUBLIC_HEADERS
     ./json_c_version.h
     ./json_inttypes.h
     ./json_object.h
+    ./json_object_iterator.h
     ./json_pointer.h
     ./json_tokener.h
     ./json_util.h
