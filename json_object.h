@@ -193,6 +193,7 @@ JSON_EXPORT struct json_object* json_object_get(struct json_object *obj);
  * Decrement the reference count of json_object and free if it reaches zero.
  * You must have ownership of obj prior to doing this or you will cause an
  * imbalance in the reference count.
+ * An obj of NULL may be passed; in that case this call is a no-op.
  *
  * @param obj the json_object instance
  * @returns 1 if the object was freed.
