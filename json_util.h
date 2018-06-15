@@ -38,7 +38,7 @@ extern "C" {
  * Read the full contents of the given file, then convert it to a
  * json_object using json_tokener_parse().
  *
- * Returns -1 if something fails.  See json_util_get_last_err() for details.
+ * Returns NULL on failure.  See json_util_get_last_err() for details.
  */
 extern struct json_object* json_object_from_file(const char *filename);
 
@@ -50,7 +50,7 @@ extern struct json_object* json_object_from_file(const char *filename);
  * Note, that the fd must be readable at the actual position, i.e.
  * use lseek(fd, 0, SEEK_SET) before.
  *
- * Returns -1 if something fails.  See json_util_get_last_err() for details.
+ * Returns NULL on failure.  See json_util_get_last_err() for details.
  */
 extern struct json_object* json_object_from_fd(int fd);
 
