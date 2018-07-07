@@ -1030,6 +1030,12 @@ struct json_object* json_object_new_string(const char *s)
 	return jso;
 }
 
+struct json_object* json_object_new_null()
+{
+         const char *s=null;
+         return json_object_new_string(s);
+}
+
 struct json_object* json_object_new_string_len(const char *s, int len)
 {
 	char *dstbuf;
