@@ -8,7 +8,7 @@ project(json-c C)
 # If we've got 3.0 then it's good, let's provide support. Otherwise, leave it be.
 if(POLICY CMP0038)
   # Policy CMP0038 introduced was in CMake 3.0
-  cmake_policy(SET CMP0038 OLD)
+  cmake_policy(SET CMP0038)
 endif()
 
 # Set some packaging variables.
@@ -157,7 +157,9 @@ endif()
 
 # Once we've done basic symbol/header searches let's add them in.
 configure_file(${CMAKE_SOURCE_DIR}/cmake/config.h.in        ${CMAKE_BINARY_DIR}/config.h)
+message(STATUS "Written ${CMAKE_BINARY_DIR}/config.h")
 configure_file(${CMAKE_SOURCE_DIR}/cmake/json_config.h.in   ${CMAKE_BINARY_DIR}/json_config.h)
+message(STATUS "Written ${CMAKE_BINARY_DIR}/json_config.h")
 
 configure_package_config_file(
     "cmake/Config.cmake.in"
@@ -168,7 +170,7 @@ configure_package_config_file(
 if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections")
     # There's a catch here.
-    set(CMAKE_C_FLAGS           "-Werror -fPIC")
+    set(CMAKE_C_FLAGS           "-Werror")
 
     add_definitions(-D_GNU_SOURCE)
 elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
