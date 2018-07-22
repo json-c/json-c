@@ -8,7 +8,7 @@ project(json-c C)
 # If we've got 3.0 then it's good, let's provide support. Otherwise, leave it be.
 if(POLICY CMP0038)
   # Policy CMP0038 introduced was in CMake 3.0
-  cmake_policy(SET CMP0038)
+  cmake_policy(SET CMP0038 NEW)
 endif()
 
 # Set some packaging variables.
