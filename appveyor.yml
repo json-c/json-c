@@ -33,7 +33,7 @@ after_build:
 - copy json_config.h include\json-c\*
 - copy config.h include\json-c\*
 - copy json_object_private.h include\json-c\*
-- 7z a json-c.lib.zip %Configuration%\json-c.lib %Configuration%\json-c.exp %Configuration%\json-c.pdb include\json-c\*.h
+- 7z a json-c.lib.zip lib\json-c.lib lib\json-c.pdb include\json-c\*.h
 
 artifacts:
 - path: json-c.lib.zip
