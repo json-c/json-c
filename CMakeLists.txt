@@ -75,7 +75,7 @@ if (HAVE_INTTYPES_H)
 endif()
 
 if (MSVC)
-    check_symbol_exists(isnan       "float.h" HAVE_DECL_ISNAN)
+    check_symbol_exists(isnan       "math.h" HAVE_DECL_ISNAN)
     check_symbol_exists(_isnan      "float.h" HAVE_DECL__ISNAN)
 else()
     check_symbol_exists(isnan       "math.h" HAVE_DECL_ISNAN)
