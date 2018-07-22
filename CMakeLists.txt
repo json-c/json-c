@@ -1,147 +1,248 @@
-#Licensed under the MIT license. See LICENSE file in the project root for full license information.
+# Many projects still are stuck using CMake 2.8 is several places so it's good to provide backward support too. This is
+# specially true in embedded systems (OpenWRT and friends).
+cmake_minimum_required(VERSION 2.8)
 
-cmake_minimum_required(VERSION 3.1)
-cmake_policy(SET CMP0048 NEW)
-project(json-c VERSION 0.13.99)
+# JSON-C library is C only project.
+project(json-c C)
 
-
-include(CheckSymbolExists)
-
-check_symbol_exists(strtoll "stdlib.h" HAVE_STRTOLL)
-
-set(cmake_strtoll "strtoll")
-if (NOT HAVE_STRTOLL)
-  # Use _strtoi64 if strtoll is not available.
-  check_symbol_exists(_strtoi64 stdlib.h have_strtoi64)
-  if (have_strtoi64)
-    set(HAVE_STRTOLL 1)
-    set(cmake_strtoll "_strtoi64")
-    # could do the same for strtoull, if needed
-  endif ()
-endif ()
-
-
-
-if(MSVC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4100 /wd4996 /wd4244 /wd4706 /wd4702 /wd4127 /wd4701")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4100 /wd4996 /wd4244 /wd4706 /wd4702 /wd4127 /wd4701")
-  # Always create debug info (pdb file), even for release builds
-  set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG")
-  set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} /DEBUG")
-  set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG")
-  set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "${CMAKE_STATIC_LINKER_FLAGS_RELEASE} /DEBUG")
-  set(cmake_create_config 1)
-elseif(MINGW)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -D_GNU_SOURCE=1")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror -D_GNU_SOURCE=1")
-  if (MSYS OR CMAKE_GENERATOR STREQUAL "Unix Makefiles")
-    execute_process(COMMAND echo ${CMAKE_CURRENT_SOURCE_DIR} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-    execute_process(COMMAND sh autogen.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-    execute_process(COMMAND sh ./configure WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-    file(COPY ./config.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
-    file(COPY ./json_config.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
-  else()
-    set(cmake_create_config 1)
-  endif()
-elseif(UNIX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror -D_GNU_SOURCE")
-  execute_process(COMMAND echo ${CMAKE_CURRENT_SOURCE_DIR} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-  execute_process(COMMAND sh autogen.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-  execute_process(COMMAND ./configure WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-  file(COPY ./config.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
-  file(COPY ./json_config.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
+# If we've got 3.0 then it's good, let's provide support. Otherwise, leave it be.
+if(POLICY CMP0038)
+  # Policy CMP0038 introduced was in CMake 3.0
+  cmake_policy(SET CMP0038 OLD)
 endif()
 
-if (cmake_create_config)
-  file(REMOVE ./config.h)  # make sure any stale one is gone
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.win32 ${CMAKE_CURRENT_BINARY_DIR}/include/config.h)
-  file(COPY ./json_config.h.win32 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/)
-  file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h.win32 ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h)
-endif ()
+# Set some packaging variables.
+set(CPACK_PACKAGE_NAME              "${PROJECT_NAME}")
+set(CPACK_PACKAGE_VERSION_MAJOR     "0")
+set(CPACK_PACKAGE_VERSION_MINOR     "13")
+set(CPACK_PACKAGE_VERSION_PATCH     "99")
+set(JSON_C_BUGREPORT                "json-c@googlegroups.com")
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
+include(CheckSymbolExists)
+include(CheckIncludeFile)
+include(CheckIncludeFiles)
+include(CheckCSourceCompiles)
+include(CheckTypeSize)
+include(CPack)
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+# Enable or disable features. By default, all features are turned off.
+option(ENABLE_RDRAND                "Enable RDRAND Hardware RNG Hash Seed"          OFF)
+option(ENABLE_THREADING             "Enable partial threading support."             OFF)
+option(HAS_GNU_WARNING_LONG         "Define if .gnu.warning accepts long strings."  OFF)
+
+if (UNIX OR MINGW OR CYGWIN)
+    list(APPEND CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
+endif()
+
+if (UNIX)
+    list(APPEND CMAKE_REQUIRED_LIBRARIES   m)
+endif()
+
+if (MSVC)
+    list(APPEND CMAKE_REQUIRED_DEFINITIONS /D_CRT_SECURE_NO_DEPRECATE)
+    list(APPEND CMAKE_REQUIRED_FLAGS /wd4996)
+endif()
+
+check_include_file("fcntl.h"        HAVE_FCNTL_H)
+check_include_file("inttypes.h"     HAVE_INTTYPES_H)
+check_include_file(stdarg.h         HAVE_STDARG_H)
+check_include_file(strings.h        HAVE_STRINGS_H)
+check_include_file(string.h         HAVE_STRING_H)
+check_include_file(syslog.h         HAVE_SYSLOG_H)
+
+check_include_files("stdlib.h;stdarg.h;string.h;float.h" STDC_HEADERS)
+
+check_include_file(unistd.h         HAVE_UNISTD_H)
+check_include_file(sys/types.h      HAVE_SYS_TYPES_H)
+
+check_include_file("dlfcn.h"        HAVE_DLFCN_H)
+check_include_file("endian.h"       HAVE_ENDIAN_H)
+check_include_file("limits.h"       HAVE_LIMITS_H)
+check_include_file("locale.h"       HAVE_LOCALE_H)
+check_include_file("memory.h"       HAVE_MEMORY_H)
+
+check_include_file(stdint.h         HAVE_STDINT_H)
+check_include_file(stdlib.h         HAVE_STDLIB_H)
+check_include_file(sys/cdefs.h      HAVE_SYS_CDEFS_H)
+check_include_file(sys/param.h      HAVE_SYS_PARAM_H)
+check_include_file(sys/stat.h       HAVE_SYS_STAT_H)
+check_include_file(xlocale.h        HAVE_XLOCALE_H)
+
+if (HAVE_INTTYPES_H)
+    set(JSON_C_HAVE_INTTYPES_H 1)
+endif()
+
+if (MSVC)
+    check_symbol_exists(isnan       "float.h" HAVE_DECL_ISNAN)
+    check_symbol_exists(_isnan      "float.h" HAVE_DECL__ISNAN)
+else()
+    check_symbol_exists(isnan       "math.h" HAVE_DECL_ISNAN)
+    check_symbol_exists(_isnan      "math.h" HAVE_DECL__ISNAN)
+endif()
+
+if (MSVC)
+    check_symbol_exists(_finite     "float.h" HAVE_DECL__FINITE)
+else()
+    check_symbol_exists(_finite     "math.h" HAVE_DECL__FINITE)
+endif()
+
+check_symbol_exists(INFINITY        "math.h" HAVE_DECL_INFINITY)
+check_symbol_exists(isinf           "math.h" HAVE_DECL_ISINF)
+check_symbol_exists(nan             "math.h" HAVE_DECL_NAN)
+
+check_symbol_exists(_doprnt         "stdio.h" HAVE_DOPRNT)
+check_symbol_exists(snprintf        "stdio.h" HAVE_SNPRINTF)
+check_symbol_exists(vasprintf       "stdio.h" HAVE_VASPRINTF)
+check_symbol_exists(vsnprintf       "stdio.h" HAVE_VSNPRINTF)
+check_symbol_exists(vprintf         "stdio.h" HAVE_VPRINTF)
+
+if (HAVE_FCNTL_H)
+    check_symbol_exists(open        "fcntl.h" HAVE_OPEN)
+endif()
+if (HAVE_STDLIB_H)
+    check_symbol_exists(realloc     "stdlib.h" HAVE_REALLOC)
+endif()
+if (HAVE_LOCALE_H)
+    check_symbol_exists(setlocale   "locale.h" HAVE_SETLOCALE)
+    check_symbol_exists(uselocale   "locale.h" HAVE_USELOCALE)
+endif()
+if (HAVE_STRINGS_H)
+    check_symbol_exists(strcasecmp  "strings.h" HAVE_STRCASECMP)
+    check_symbol_exists(strncasecmp "strings.h" HAVE_STRNCASECMP)
+endif()
+if (HAVE_STRING_H)
+    check_symbol_exists(strdup      "string.h" HAVE_STRDUP)
+    check_symbol_exists(strerror    "string.h" HAVE_STRERROR)
+endif()
+if (HAVE_SYSLOG_H)
+    check_symbol_exists(vsyslog     "syslog.h" HAVE_VSYSLOG)
+endif()
+
+if (MSVC)
+    check_symbol_exists(strtoll     "stdlib.h" HAVE_STRTOLL)
+
+    set(json_c_strtoll "strtoll")
+    if (NOT HAVE_STRTOLL)
+        # Use _strtoi64 if strtoll is not available.
+        check_symbol_exists(_strtoi64 "stdlib.h" __have_strtoi64)
+        if (__have_strtoi64)
+            set(HAVE_STRTOLL 1)
+            set(json_c_strtoll "_strtoi64")
+            # could do the same for strtoull, if needed
+        endif()
+    endif()
+endif()
+
+check_type_size(int                 SIZEOF_INT)
+check_type_size(int64_t             SIZEOF_INT64_T)
+check_type_size(long                SIZEOF_LONG)
+check_type_size("long long"         SIZEOF_LONG_LONG)
+check_type_size("size_t"            SIZEOF_SIZE_T)
+
+check_c_source_compiles(
+  "int main() { int i, x = 0; i = __sync_add_and_fetch(&x,1); return x; }"
+  HAVE_ATOMIC_BUILTINS)
+
+check_c_source_compiles(
+  "__thread int x = 0; int main() { return 0; }"
+  HAVE___THREAD)
+
+if (HAVE___THREAD)
+    set(SPEC___THREAD __thread)
+elseif (MSVC)
+    set(SPEC___THREAD __declspec(thread))
+endif()
+
+# Once we've done basic symbol/header searches let's add them in.
+configure_file(${CMAKE_SOURCE_DIR}/cmake/config.h.in        ${CMAKE_BINARY_DIR}/config.h)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/json_config.h.in   ${CMAKE_BINARY_DIR}/json_config.h)
+
+configure_package_config_file(
+    "cmake/Config.cmake.in"
+    ${CMAKE_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+)
+
+if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
+    set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections")
+    # There's a catch here.
+    set(CMAKE_C_FLAGS           "-Werror -fPIC")
+
+    add_definitions(-D_GNU_SOURCE)
+elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
+    set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /DEBUG")
+    set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /wd4100")
+    set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /wd4996")
+    set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /wd4244")
+    set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /wd4706")
+    set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /wd4702")
+    set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /wd4127")
+    set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /wd4701")
+endif()
 
 set(JSON_C_PUBLIC_HEADERS
-    ./json.h
-    ${CMAKE_CURRENT_BINARY_DIR}/include/config.h
-    ${CMAKE_CURRENT_BINARY_DIR}/include/json_config.h
-    ./arraylist.h
-    ./debug.h
-    ./json_c_version.h
-    ./json_inttypes.h
-    ./json_object.h
-    ./json_object_iterator.h
-    ./json_pointer.h
-    ./json_tokener.h
-    ./json_util.h
-    ./linkhash.h
-    ./printbuf.h
+    ${CMAKE_BINARY_DIR}/config.h
+    ${CMAKE_BINARY_DIR}/json_config.h
+
+    ${CMAKE_SOURCE_DIR}/json.h
+    ${CMAKE_SOURCE_DIR}/arraylist.h
+    ${CMAKE_SOURCE_DIR}/debug.h
+    ${CMAKE_SOURCE_DIR}/json_c_version.h
+    ${CMAKE_SOURCE_DIR}/json_inttypes.h
+    ${CMAKE_SOURCE_DIR}/json_object.h
+    ${CMAKE_SOURCE_DIR}/json_object_iterator.h
+    ${CMAKE_SOURCE_DIR}/json_pointer.h
+    ${CMAKE_SOURCE_DIR}/json_tokener.h
+    ${CMAKE_SOURCE_DIR}/json_util.h
+    ${CMAKE_SOURCE_DIR}/linkhash.h
+    ${CMAKE_SOURCE_DIR}/printbuf.h
 )
+
 set(JSON_C_HEADERS
     ${JSON_C_PUBLIC_HEADERS}
-    ./json_object_private.h
-    ./random_seed.h
-    ./strerror_override.h
-    ./strerror_override_private.h
-    ./math_compat.h
-    ./snprintf_compat.h
-    ./strdup_compat.h
-    ./vasprintf_compat.h
+    ${CMAKE_SOURCE_DIR}/json_object_private.h
+    ${CMAKE_SOURCE_DIR}/random_seed.h
+    ${CMAKE_SOURCE_DIR}/strerror_override.h
+    ${CMAKE_SOURCE_DIR}/strerror_override_private.h
+    ${CMAKE_SOURCE_DIR}/math_compat.h
+    ${CMAKE_SOURCE_DIR}/snprintf_compat.h
+    ${CMAKE_SOURCE_DIR}/strdup_compat.h
+    ${CMAKE_SOURCE_DIR}/vasprintf_compat.h
 )
 
 set(JSON_C_SOURCES
-    ./arraylist.c
-    ./debug.c
-    ./json_c_version.c
-    ./json_object.c
-    ./json_object_iterator.c
-    ./json_pointer.c
-    ./json_tokener.c
-    ./json_util.c
-    ./json_visit.c
-    ./linkhash.c
-    ./printbuf.c
-    ./random_seed.c
-    ./strerror_override.c
+    ${CMAKE_SOURCE_DIR}/arraylist.c
+    ${CMAKE_SOURCE_DIR}/debug.c
+    ${CMAKE_SOURCE_DIR}/json_c_version.c
+    ${CMAKE_SOURCE_DIR}/json_object.c
+    ${CMAKE_SOURCE_DIR}/json_object_iterator.c
+    ${CMAKE_SOURCE_DIR}/json_pointer.c
+    ${CMAKE_SOURCE_DIR}/json_tokener.c
+    ${CMAKE_SOURCE_DIR}/json_util.c
+    ${CMAKE_SOURCE_DIR}/json_visit.c
+    ${CMAKE_SOURCE_DIR}/linkhash.c
+    ${CMAKE_SOURCE_DIR}/printbuf.c
+    ${CMAKE_SOURCE_DIR}/random_seed.c
+    ${CMAKE_SOURCE_DIR}/strerror_override.c
 )
 
-add_library(json-c
-    SHARED
+include_directories(${CMAKE_SOURCE_DIR})
+include_directories(${CMAKE_BINARY_DIR})
+
+# If -DBUILD_SHARED_LIBS is set in the CMake command-line, we'll be able to create shared libs, otherwise this would
+# generate static libs. Good enough for most use-cases unless there's some serious requirement to create both
+# simultaneously.
+add_library(${PROJECT_NAME}
     ${JSON_C_SOURCES}
     ${JSON_C_HEADERS}
 )
 
-add_library(json-c-static
-    STATIC
-    ${JSON_C_SOURCES}
-    ${JSON_C_HEADERS}
-)
-
-set_property(TARGET json-c PROPERTY C_STANDARD 99)
-set_property(TARGET json-c-static PROPERTY C_STANDARD 99)
-if (NOT MSVC)
-# Since MS Windows re-uses the .lib suffix for both static libraries
-#  and the "import library" that's needed to actually link against a
-#  dll, we can't use the same name for static and dynamic libs. :(
-set_target_properties(json-c-static PROPERTIES OUTPUT_NAME json-c)
-endif()
-
-install(TARGETS json-c json-c-static
+install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
 )
 
-install(FILES ${JSON_C_PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/json-c )
-
-if (UNIX)
-	set(prefix ${CMAKE_INSTALL_PREFIX})
-	set(exec_prefix ${CMAKE_INSTALL_PREFIX}/bin)
-	set(libdir ${CMAKE_INSTALL_PREFIX}/lib)
-	set(includedir ${CMAKE_INSTALL_PREFIX}/include)
-	set(VERSION ${PROJECT_VERSION})
-	configure_file(json-c.pc.in json-c.pc @ONLY)
-	set(INSTALL_PKGCONFIG_DIR "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" CACHE PATH "Installation directory for pkgconfig (.pc) files")
-	install(FILES ${CMAKE_BINARY_DIR}/json-c.pc DESTINATION "${INSTALL_PKGCONFIG_DIR}")
-endif ()
+install(FILES ${JSON_C_PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/json-c)
