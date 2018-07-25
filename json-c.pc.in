@@ -9,4 +9,4 @@ Version: @VERSION@
 Requires:
 Libs.private: @LIBS@
 Libs: -L${libdir} -ljson-c
-Cflags: -I${includedir}/json-c
+Cflags: -I${includedir} -I${includedir}/json-c
