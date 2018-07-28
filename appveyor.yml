@@ -1,39 +1,37 @@
 version: '{branch}.{build}'
 os: Windows Server 2012 R2
 
-configuration:
-- Debug
-- Release
 platform: x64
+
+# There should be a better way to set-up a build matrix.
 environment:
   matrix:
-  - PlatformToolset: v140
-  - PlatformToolset: v120
-  - PlatformToolset: Windows7.1SDK
+    - b_toolset: Windows7.1SDK
+      b_config: Debug
+
+    - b_toolset: Windows7.1SDK
+      b_config: Release
+
+    - b_toolset: v120
+      b_config: Debug
+
+    - b_toolset: v120
+      b_config: Release
+
+    - b_toolset: v140
+      b_config: Debug
+
+    - b_toolset: v140
+      b_config: Release
 
 build_script:
-- cmake .
-- >
-  msbuild "json-c.vcxproj" /m /verbosity:normal
-  /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
-  /p:PlatformToolset=%PlatformToolset% /p:OutDir=lib\
+- cmake -T %b_toolset% -DCMAKE_BUILD_TYPE=%b_config% -DCMAKE_INSTALL_PREFIX=t_install .
+- cmake --build . --target install
 
 after_build:
-- md include\json-c
-- copy json.h include\json-c\*
-- copy debug.h include\json-c\*
-- copy linkhash.h include\json-c\*
-- copy arraylist.h include\json-c\*
-- copy json_util.h include\json-c\*
-- copy json_object.h include\json-c\*
-- copy json_tokener.h include\json-c\*
-- copy json_object_iterator.h include\json-c\*
-- copy json_c_version.h include\json-c\*
-- copy json_inttypes.h include\json-c\*
-- copy include\json_config.h include\json-c\*
-- copy json_object_private.h include\json-c\*
-- 7z a json-c.lib.zip lib\json-c.dll %Configuration%\json-c.lib %Configuration%\json-c.exp %Configuration%\json-c.pdb include\json-c\*.h
+- cd t_install
+- 7z a ../json-c.win32.%b_toolset%.%b_config%.zip *
 
 artifacts:
-- path: json-c.lib.zip
-  name: json-c.lib.zip
+- path: json-c.win32.%b_toolset%.%b_config%.zip
+  name: json-c.win32.%b_toolset%.%b_config%.zip
