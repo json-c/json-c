@@ -173,7 +173,7 @@ configure_package_config_file(
 if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections")
     # There's a catch here.
-    set(CMAKE_C_FLAGS           "-Werror")
+    set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -Werror")
 
     add_definitions(-D_GNU_SOURCE)
 elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
