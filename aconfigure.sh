@@ -47,7 +47,7 @@ do
             ANDROID_TOOLCHAIN_DIR="toolchain_x86_19"
             COMPILER_PREFIX="i686-linux-android"
             ;;
-	      "x86_64" )
+        "x86_64" )
             ANDROID_TOOLCHAIN_DIR="toolchain_x86_64_21"
             COMPILER_PREFIX="x86_64-linux-android"
             ;;
