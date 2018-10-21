@@ -159,14 +159,14 @@ if (WIN32)
 endif()
 
 # Once we've done basic symbol/header searches let's add them in.
-configure_file(${CMAKE_SOURCE_DIR}/cmake/config.h.in        ${CMAKE_BINARY_DIR}/config.h)
-message(STATUS "Written ${CMAKE_BINARY_DIR}/config.h")
-configure_file(${CMAKE_SOURCE_DIR}/cmake/json_config.h.in   ${CMAKE_BINARY_DIR}/json_config.h)
-message(STATUS "Written ${CMAKE_BINARY_DIR}/json_config.h")
+configure_file(${PROJECT_SOURCE_DIR}/cmake/config.h.in        ${PROJECT_BINARY_DIR}/config.h)
+message(STATUS "Written ${PROJECT_BINARY_DIR}/config.h")
+configure_file(${PROJECT_SOURCE_DIR}/cmake/json_config.h.in   ${PROJECT_BINARY_DIR}/json_config.h)
+message(STATUS "Written ${PROJECT_BINARY_DIR}/json_config.h")
 
 configure_package_config_file(
     "cmake/Config.cmake.in"
-    ${CMAKE_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+    ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
     INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
 )
 
@@ -188,53 +188,53 @@ elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
 endif()
 
 set(JSON_C_PUBLIC_HEADERS
-    ${CMAKE_BINARY_DIR}/config.h
-    ${CMAKE_BINARY_DIR}/json_config.h
+    ${PROJECT_BINARY_DIR}/config.h
+    ${PROJECT_BINARY_DIR}/json_config.h
 
-    ${CMAKE_SOURCE_DIR}/json.h
-    ${CMAKE_SOURCE_DIR}/arraylist.h
-    ${CMAKE_SOURCE_DIR}/debug.h
-    ${CMAKE_SOURCE_DIR}/json_c_version.h
-    ${CMAKE_SOURCE_DIR}/json_inttypes.h
-    ${CMAKE_SOURCE_DIR}/json_object.h
-    ${CMAKE_SOURCE_DIR}/json_object_iterator.h
-    ${CMAKE_SOURCE_DIR}/json_pointer.h
-    ${CMAKE_SOURCE_DIR}/json_tokener.h
-    ${CMAKE_SOURCE_DIR}/json_util.h
-    ${CMAKE_SOURCE_DIR}/linkhash.h
-    ${CMAKE_SOURCE_DIR}/printbuf.h
+    ${PROJECT_SOURCE_DIR}/json.h
+    ${PROJECT_SOURCE_DIR}/arraylist.h
+    ${PROJECT_SOURCE_DIR}/debug.h
+    ${PROJECT_SOURCE_DIR}/json_c_version.h
+    ${PROJECT_SOURCE_DIR}/json_inttypes.h
+    ${PROJECT_SOURCE_DIR}/json_object.h
+    ${PROJECT_SOURCE_DIR}/json_object_iterator.h
+    ${PROJECT_SOURCE_DIR}/json_pointer.h
+    ${PROJECT_SOURCE_DIR}/json_tokener.h
+    ${PROJECT_SOURCE_DIR}/json_util.h
+    ${PROJECT_SOURCE_DIR}/linkhash.h
+    ${PROJECT_SOURCE_DIR}/printbuf.h
 )
 
 set(JSON_C_HEADERS
     ${JSON_C_PUBLIC_HEADERS}
-    ${CMAKE_SOURCE_DIR}/json_object_private.h
-    ${CMAKE_SOURCE_DIR}/random_seed.h
-    ${CMAKE_SOURCE_DIR}/strerror_override.h
-    ${CMAKE_SOURCE_DIR}/strerror_override_private.h
-    ${CMAKE_SOURCE_DIR}/math_compat.h
-    ${CMAKE_SOURCE_DIR}/snprintf_compat.h
-    ${CMAKE_SOURCE_DIR}/strdup_compat.h
-    ${CMAKE_SOURCE_DIR}/vasprintf_compat.h
+    ${PROJECT_SOURCE_DIR}/json_object_private.h
+    ${PROJECT_SOURCE_DIR}/random_seed.h
+    ${PROJECT_SOURCE_DIR}/strerror_override.h
+    ${PROJECT_SOURCE_DIR}/strerror_override_private.h
+    ${PROJECT_SOURCE_DIR}/math_compat.h
+    ${PROJECT_SOURCE_DIR}/snprintf_compat.h
+    ${PROJECT_SOURCE_DIR}/strdup_compat.h
+    ${PROJECT_SOURCE_DIR}/vasprintf_compat.h
 )
 
 set(JSON_C_SOURCES
-    ${CMAKE_SOURCE_DIR}/arraylist.c
-    ${CMAKE_SOURCE_DIR}/debug.c
-    ${CMAKE_SOURCE_DIR}/json_c_version.c
-    ${CMAKE_SOURCE_DIR}/json_object.c
-    ${CMAKE_SOURCE_DIR}/json_object_iterator.c
-    ${CMAKE_SOURCE_DIR}/json_pointer.c
-    ${CMAKE_SOURCE_DIR}/json_tokener.c
-    ${CMAKE_SOURCE_DIR}/json_util.c
-    ${CMAKE_SOURCE_DIR}/json_visit.c
-    ${CMAKE_SOURCE_DIR}/linkhash.c
-    ${CMAKE_SOURCE_DIR}/printbuf.c
-    ${CMAKE_SOURCE_DIR}/random_seed.c
-    ${CMAKE_SOURCE_DIR}/strerror_override.c
+    ${PROJECT_SOURCE_DIR}/arraylist.c
+    ${PROJECT_SOURCE_DIR}/debug.c
+    ${PROJECT_SOURCE_DIR}/json_c_version.c
+    ${PROJECT_SOURCE_DIR}/json_object.c
+    ${PROJECT_SOURCE_DIR}/json_object_iterator.c
+    ${PROJECT_SOURCE_DIR}/json_pointer.c
+    ${PROJECT_SOURCE_DIR}/json_tokener.c
+    ${PROJECT_SOURCE_DIR}/json_util.c
+    ${PROJECT_SOURCE_DIR}/json_visit.c
+    ${PROJECT_SOURCE_DIR}/linkhash.c
+    ${PROJECT_SOURCE_DIR}/printbuf.c
+    ${PROJECT_SOURCE_DIR}/random_seed.c
+    ${PROJECT_SOURCE_DIR}/strerror_override.c
 )
 
-include_directories(${CMAKE_SOURCE_DIR})
-include_directories(${CMAKE_BINARY_DIR})
+include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_BINARY_DIR})
 
 # If -DBUILD_SHARED_LIBS is set in the CMake command-line, we'll be able to create shared libs, otherwise this would
 # generate static libs. Good enough for most use-cases unless there's some serious requirement to create both
@@ -244,6 +244,12 @@ add_library(${PROJECT_NAME}
     ${JSON_C_HEADERS}
 )
 
+# If json-c is used as subroject it set to target correct interface -I flags and allow
+# to build external target without extra include_directories(...)
+set_property(TARGET ${PROJECT_NAME} PROPERTY
+    INTERFACE_INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR}
+)
+
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
@@ -251,9 +257,9 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 if (UNIX OR MINGW OR CYGWIN)
-	configure_file(json-c.pc.in json-c.pc @ONLY)
-	set(INSTALL_PKGCONFIG_DIR "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" CACHE PATH "Installation directory for pkgconfig (.pc) files")
-	install(FILES ${CMAKE_BINARY_DIR}/json-c.pc DESTINATION "${INSTALL_PKGCONFIG_DIR}")
+    configure_file(json-c.pc.in json-c.pc @ONLY)
+    set(INSTALL_PKGCONFIG_DIR "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" CACHE PATH "Installation directory for pkgconfig (.pc) files")
+    install(FILES ${PROJECT_BINARY_DIR}/json-c.pc DESTINATION "${INSTALL_PKGCONFIG_DIR}")
 endif ()
 
 install(FILES ${JSON_C_PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/json-c)
