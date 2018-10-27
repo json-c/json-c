@@ -25,7 +25,7 @@ It aims to conform to [RFC 7159](https://tools.ietf.org/html/rfc7159).
 Building on Unix with `git`, `gcc` and `autotools` <a name="buildunix"></a>
 --------------------------------------------------
 
-Home page for json-c: https://github.com/json-c/json-c/wiki
+Homepage for json-c: https://github.com/json-c/json-c/wiki
 
 ### Prerequisites:
 
@@ -72,7 +72,7 @@ $ make USE_VALGRIND=0 check   # optionally skip using valgrind
 Install prerequisites <a name="installprereq"></a>
 -----------------------
 
-If you are on a relatively modern system, you'll likely be able to install
+If you are in a relatively modern system, you'll likely be able to install
 the prerequisites using your OS's packaging system.
 
 ### Install using apt (e.g. Ubuntu 16.04.2 LTS)
@@ -84,9 +84,9 @@ sudo apt install valgrind # optional
 
 Then start from the "git clone" command, above.
 
-### Manually install and build autoconf, automake and libtool
+### Manually install and build autoconf, automake, and libtool
 
-For older OS's that don't have up-to-date version of the packages will
+For older OS's that don't have an up-to-date version of the packages will
 require a bit more work. For example, CentOS release 5.11, etc...
 
 ```sh
@@ -131,7 +131,7 @@ default.  You may turn it on by adjusting your configure command with:
    --enable-threading
 
 Separately, the default hash function used for object field keys,
-lh_char_hash, uses a compare-and-swap operation to ensure the randomly
+lh_char_hash, uses a compare-and-swap operation to ensure the random
 seed is only generated once.  Because this is a one-time operation, it
 is always compiled in when the compare-and-swap operation is available.
 
@@ -151,7 +151,7 @@ CMake can take a few options.
 
 Variable          | Type | Description
 ------------------|------|--------------
-BUILD_SHARED_LIBS | Bool | The default build generates static library. Enable this to generate shared (dll/so) library.
+BUILD_SHARED_LIBS | Bool | The default build generates a static library. Enable this to generate shared (dll/so) library.
 ENABLE_RDRAND     | Bool | Enable RDRAND Hardware RNG Hash Seed
 ENABLE_THREADING  | Bool | Enable partial threading support
 
