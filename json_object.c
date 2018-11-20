@@ -395,7 +395,7 @@ static int json_object_object_to_json_string(struct json_object* jso,
 				printbuf_strappend(pb, "\n");
 		}
 		had_children = 1;
-		if (flags & JSON_C_TO_STRING_SPACED)
+		if (flags & JSON_C_TO_STRING_SPACED && !(flags & JSON_C_TO_STRING_PRETTY))
 			printbuf_strappend(pb, " ");
 		indent(pb, level+1, flags);
 		printbuf_strappend(pb, "\"");
@@ -416,7 +416,7 @@ static int json_object_object_to_json_string(struct json_object* jso,
 			printbuf_strappend(pb, "\n");
 		indent(pb,level,flags);
 	}
-	if (flags & JSON_C_TO_STRING_SPACED)
+	if (flags & JSON_C_TO_STRING_SPACED && !(flags & JSON_C_TO_STRING_PRETTY))
 		return printbuf_strappend(pb, /*{*/ " }");
 	else
 		return printbuf_strappend(pb, /*{*/ "}");
