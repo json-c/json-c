@@ -1,0 +1,55 @@
+flags = 0:
+{"glossary":{"title":"example glossary","GlossDiv":{"title":"S","GlossList":[{"ID":"SGML","SortAs":"SGML","GlossTerm":"Standard Generalized Markup Language","Acronym":"SGML","Abbrev":"ISO 8879:1986","GlossDef":"A meta-markup language, used to create markup languages such as DocBook.","GlossSeeAlso":["GML","XML","markup"]}]}}}
+
+flags = JSON_C_TO_STRING_SPACED:
+{ "glossary": { "title": "example glossary", "GlossDiv": { "title": "S", "GlossList": [ { "ID": "SGML", "SortAs": "SGML", "GlossTerm": "Standard Generalized Markup Language", "Acronym": "SGML", "Abbrev": "ISO 8879:1986", "GlossDef": "A meta-markup language, used to create markup languages such as DocBook.", "GlossSeeAlso": [ "GML", "XML", "markup" ] } ] } } }
+
+flags = JSON_C_TO_STRING_SPACED|JSON_C_TO_STRING_PRETTY:
+{
+  "glossary": {
+    "title": "example glossary",
+    "GlossDiv": {
+      "title": "S",
+      "GlossList": [
+        {
+          "ID": "SGML",
+          "SortAs": "SGML",
+          "GlossTerm": "Standard Generalized Markup Language",
+          "Acronym": "SGML",
+          "Abbrev": "ISO 8879:1986",
+          "GlossDef": "A meta-markup language, used to create markup languages such as DocBook.",
+          "GlossSeeAlso": [
+            "GML",
+            "XML",
+            "markup"
+          ]
+        }
+      ]
+    }
+  }
+}
+
+flags = JSON_C_TO_STRING_SPACED|JSON_C_TO_STRING_PRETTY|JSON_C_TO_STRING_PRETTY_TAB:
+{
+	"glossary": {
+		"title": "example glossary",
+		"GlossDiv": {
+			"title": "S",
+			"GlossList": [
+				{
+					"ID": "SGML",
+					"SortAs": "SGML",
+					"GlossTerm": "Standard Generalized Markup Language",
+					"Acronym": "SGML",
+					"Abbrev": "ISO 8879:1986",
+					"GlossDef": "A meta-markup language, used to create markup languages such as DocBook.",
+					"GlossSeeAlso": [
+						"GML",
+						"XML",
+						"markup"
+					]
+				}
+			]
+		}
+	}
+}
