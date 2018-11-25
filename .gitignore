@@ -103,6 +103,7 @@
 /stamp-h2
 
 # cmake auto-generated files
+/build
 /CMakeCache.txt
 /CMakeFiles
 /cmake_install.cmake
