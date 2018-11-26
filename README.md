@@ -195,5 +195,5 @@ following more specific header files:
 * json_visit.h   - Methods for walking a tree of json-c objects.
 * json_util.h    - Miscelleanous utility functions.
 
-For a full list of headers see [files.html](files.html)
+For a full list of headers see [files.html](http://json-c.github.io/json-c/json-c-0.13.1/doc/html/files.html)
 
