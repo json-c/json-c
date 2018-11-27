@@ -951,7 +951,10 @@ double json_object_get_double(const struct json_object *jso)
 
     /* if conversion stopped at the first character, return 0.0 */
     if (errPtr == get_string_component(jso))
-        return 0.0;
+    {
+      errno = EINVAL;
+      return 0.0;
+    }
 
     /*
      * Check that the conversion terminated on something sensible
@@ -959,7 +962,10 @@ double json_object_get_double(const struct json_object *jso)
      * For example, { "pay" : 123AB } would parse as 123.
      */
     if (*errPtr != '\0')
-        return 0.0;
+    {
+      errno = EINVAL;
+      return 0.0;
+    }
 
     /*
      * If strtod encounters a string which would exceed the
@@ -977,6 +983,7 @@ double json_object_get_double(const struct json_object *jso)
             cdouble = 0.0;
     return cdouble;
   default:
+    errno = EINVAL;
     return 0.0;
   }
 }
