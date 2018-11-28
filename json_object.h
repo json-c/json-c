@@ -908,8 +908,8 @@ JSON_EXPORT struct json_object* json_object_new_string(const char *s);
  *
  * A copy of the string is made and the memory is managed by the json_object
  *
- * @param[in] s the string
- * @param[in] len max length of the new string
+ * @param s the string
+ * @param len max length of the new string
  * @returns a json_object of type json_type_string
  * @see json_object_new_string()
  */
