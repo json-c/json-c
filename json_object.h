@@ -899,10 +899,21 @@ JSON_EXPORT int json_object_set_double(struct json_object *obj,double new_value)
  *
  * @param s the string
  * @returns a json_object of type json_type_string
+ * @see json_object_new_string_len()
  */
 JSON_EXPORT struct json_object* json_object_new_string(const char *s);
 
-JSON_EXPORT struct json_object* json_object_new_string_len(const char *s, int len);
+/** Create a new empty json_object of type json_type_string and allocate
+ * len characters for the new string.
+ *
+ * A copy of the string is made and the memory is managed by the json_object
+ *
+ * @param s the string
+ * @param len max length of the new string
+ * @returns a json_object of type json_type_string
+ * @see json_object_new_string()
+ */
+JSON_EXPORT struct json_object* json_object_new_string_len(const char *s, const int len);
 
 /** Get the string value of a json_object
  *
