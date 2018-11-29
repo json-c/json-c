@@ -122,7 +122,7 @@ const char *json_tokener_error_desc(enum json_tokener_error jerr);
  * When parsing a JSON string in pieces, if the tokener is in the middle
  * of parsing this will return json_tokener_continue.
  *
- * See also json_tokener_error_desc().
+ * @see json_tokener_error_desc().
  */
 JSON_EXPORT enum json_tokener_error json_tokener_get_error(struct json_tokener *tok);
 
