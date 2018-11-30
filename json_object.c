@@ -171,7 +171,7 @@ extern struct json_object* json_object_get(struct json_object *jso)
 	if (!jso) return jso;
 
 	// Don't overflow the refcounter.
-	assert(jso->_ref_count < UINT_FAST32_MAX);
+	assert(jso->_ref_count < UINT32_MAX);
 
 #if defined(HAVE_ATOMIC_BUILTINS) && defined(ENABLE_THREADING)
 	__sync_add_and_fetch(&jso->_ref_count, 1);
