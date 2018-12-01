@@ -1388,7 +1388,7 @@ int json_c_shallow_copy_default(json_object *src, json_object *parent, const cha
 		break;
 
 	case json_type_string:
-		*dst = json_object_new_string(get_string_component(src));
+		*dst = json_object_new_string_len(get_string_component(src), src->o.c_string.len);
 		break;
 
 	case json_type_object:
