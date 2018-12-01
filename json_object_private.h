@@ -22,13 +22,10 @@ extern "C" {
 
 #define LEN_DIRECT_STRING_DATA 32 /**< how many bytes are directly stored in json_object for strings? */
 
-typedef void (json_object_private_delete_fn)(struct json_object *o);
-
 struct json_object
 {
   enum json_type o_type;
   uint32_t _ref_count;
-  json_object_private_delete_fn *_delete;
   json_object_to_json_string_fn *_to_json_string;
   struct printbuf *_pb;
   union data {
