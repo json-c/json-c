@@ -27,7 +27,6 @@ TESTS+= test_set_value.test
 TESTS+= test_visit.test
 TESTS+= test_json_pointer.test
 TESTS+= test_int_add.test
-TESTS+= test_string_spaced_pretty.test
 
 check_PROGRAMS=
 check_PROGRAMS += $(TESTS:.test=)
