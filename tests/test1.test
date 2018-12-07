@@ -19,4 +19,20 @@ for flag in plain spaced pretty ; do
 	fi
 done
 
+# Spaced and pretty JSON string
+run_output_test -o test1Formatted_spaced_pretty \
+					test1Formatted spaced pretty
+_err2=$?
+if [ $_err -eq 0 ] ; then
+	_err=$_err2
+fi
+
+# Spaced and pretty JSON string using tabs
+run_output_test -o test1Formatted_spaced_pretty_pretty_tab \
+					test1Formatted spaced pretty pretty_tab
+_err2=$?
+if [ $_err -eq 0 ] ; then
+	_err=$_err2
+fi
+
 exit $_err
