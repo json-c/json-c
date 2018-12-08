@@ -39,10 +39,6 @@
 #endif /* HAVE_UNISTD_H */
 
 #ifdef WIN32
-# if MSC_VER < 1800
-/* strtoll is available only since Visual Studio 2013 */
-#  define strtoll _strtoi64
-# endif
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
 # include <io.h>
@@ -195,16 +191,48 @@ int json_parse_double(const char *buf, double *retval)
   return end == buf ? 1 : 0;
 }
 
+// The input buffer 'buf' must contain only digits (0 to 9), except
+// for the first character, which may be a negative sign '-'.
+int json_parse_sanitized_int64(const char *buf, size_t len, int64_t *retval)
+{
+	uint64_t uval = 0;
+	int is_negative = (*buf == '-');
+	size_t ii = is_negative ? 1 : 0;
+
+	if (ii == len || buf[ii] == '\0')
+		return 1;
+
+	while (ii < len)
+	{
+		uint64_t tmp = (uval * 10) + buf[ii++] - '0';
+		// Check for overflow.
+		if ((int64_t) uval > (int64_t) tmp)
+		{
+			*retval = is_negative ? INT64_MIN : INT64_MAX;
+			return 0;
+		}
+		uval = tmp;
+	}
+
+	*retval = is_negative ? -uval : uval;
+
+	return 0;
+}
+
 int json_parse_int64(const char *buf, int64_t *retval)
 {
-	char *end = NULL;
-	int64_t val;
-
-	errno = 0;
-	val = strtoll(buf, &end, 10);
-	if (end != buf)
-		*retval = val;
-	return ((val == 0 && errno != 0) || (end == buf)) ? 1 : 0;
+	size_t len = 0;
+	// Skip leading white spaces.
+	while (isspace(*buf))
+		buf++;
+	// Calculate length of valid input.
+	if (buf[len] == '-')
+		len++;
+	while (buf[len] >= '0' && buf[len] <= '9')
+		len++;
+	if (len == 0)
+		return 1;
+	return json_parse_sanitized_int64(buf, len, retval);
 }
 
 #ifndef HAVE_REALLOC
