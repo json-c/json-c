@@ -66,6 +66,13 @@ static int is_ws_char(char c)
 	    || c == '\r';
 }
 
+static int is_hex_char(char c)
+{
+	return (c >= '0' && c <= '9')
+	    || (c >= 'A' && c <= 'F')
+	    || (c >= 'a' && c <= 'f');
+}
+
 /* Use C99 NAN by default; if not available, nan("") should work too. */
 #ifndef NAN
 #define NAN nan("")
@@ -609,7 +616,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 
 	  /* Handle a 4-byte sequence, or two sequences if a surrogate pair */
 	  while(1) {
-	    if (c && strchr(json_hex_chars, c)) {
+	    if (c && is_hex_char(c)) {
 	      tok->ucs_char += ((unsigned int)jt_hexdigit(c) << ((3-tok->st_pos++)*4));
 	      if(tok->st_pos == 4) {
 		unsigned char unescaped_utf[4];
@@ -641,7 +648,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
                   got_hi_surrogate = tok->ucs_char;
                   /* Not at end, and the next two chars should be "\u" */
                   if ((len == -1 || len > (tok->char_offset + 2)) &&
-                      // str[0] != '0' &&  // implied by json_hex_chars, above.
+                      // str[0] != '0' &&  // implied by is_hex_char, above.
                       (str[1] == '\\') &&
                       (str[2] == 'u'))
                   {
