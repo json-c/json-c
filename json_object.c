@@ -240,11 +240,14 @@ static struct json_object* json_object_new(enum json_type o_type)
 {
 	struct json_object *jso;
 
-	jso = (struct json_object*)calloc(sizeof(struct json_object), 1);
+	jso = (struct json_object*)malloc(sizeof(struct json_object));
 	if (!jso)
 		return NULL;
 	jso->o_type = o_type;
 	jso->_ref_count = 1;
+	jso->_pb = NULL;
+	jso->_user_delete = NULL;
+	jso->_userdata = NULL;
 #ifdef REFCOUNT_DEBUG
 	lh_table_insert(json_object_table, jso, jso);
 	MC_DEBUG("json_object_new_%s: %p\n", json_type_to_name(jso->o_type), jso);
@@ -1034,7 +1037,7 @@ struct json_object* json_object_new_string(const char *s)
 	jso->_to_json_string = &json_object_string_to_json_string;
 	jso->o.c_string.len = strlen(s);
 	if(jso->o.c_string.len < LEN_DIRECT_STRING_DATA) {
-		memcpy(jso->o.c_string.str.data, s, jso->o.c_string.len);
+		memcpy(jso->o.c_string.str.data, s, jso->o.c_string.len + 1);
 	} else {
 		jso->o.c_string.str.ptr = strdup(s);
 		if (!jso->o.c_string.str.ptr)
