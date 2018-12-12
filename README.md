@@ -86,7 +86,7 @@ Then start from the "git clone" command, above.
 
 ### Manually install and build autoconf, automake and libtool
 
-For older OS's that don't have up-to-date version of the packages will
+For older OS's that don't have up-to-date versions of the packages will
 require a bit more work. For example, CentOS release 5.11, etc...
 
 ```sh
@@ -149,16 +149,17 @@ make
 
 CMake can take a few options.
 
-Variable          | Type | Description
-------------------|------|--------------
-BUILD_SHARED_LIBS | Bool | The default build generates static library. Enable this to generate shared (dll/so) library.
-ENABLE_RDRAND     | Bool | Enable RDRAND Hardware RNG Hash Seed
-ENABLE_THREADING  | Bool | Enable partial threading support
+Variable             | Type   | Description
+---------------------|--------|--------------
+CMAKE_INSTALL_PREFIX | String | The install location.
+BUILD_SHARED_LIBS    | Bool   | The default build generates a dynamic (dll/so) library.  Set this to OFF to create a static library instead.
+ENABLE_RDRAND        | Bool   | Enable RDRAND Hardware RNG Hash Seed
+ENABLE_THREADING     | Bool   | Enable partial threading support
 
 Pass these options as `-D` on CMake's command-line.
 
 ```sh
-cmake -DBUILD_SHARED_LIBS=On ...
+cmake -DBUILD_SHARED_LIBS=OFF ...
 ```
 
 Linking to `libjson-c` <a name="linking">

@@ -31,6 +31,8 @@ include(CPack)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
+option(BUILD_SHARED_LIBS  "Default to building shared libraries" ON)
+
 # Enable or disable features. By default, all features are turned off.
 option(ENABLE_RDRAND                "Enable RDRAND Hardware RNG Hash Seed"          OFF)
 option(ENABLE_THREADING             "Enable partial threading support."             OFF)
