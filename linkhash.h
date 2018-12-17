@@ -79,6 +79,9 @@ typedef unsigned long (lh_hash_fn) (const void *k);
  */
 typedef int (lh_equal_fn) (const void *k1, const void *k2);
 
+int lh_char_equal(const void *k1, const void *k2);
+int lh_ptr_equal(const void *k1, const void *k2);
+
 /**
  * An entry in the hash table
  */
