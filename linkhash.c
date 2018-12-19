@@ -36,6 +36,10 @@ static unsigned long lh_char_hash(const void *k);
 static unsigned long lh_perllike_str_hash(const void *k);
 static lh_hash_fn *char_hash_fn = lh_char_hash;
 
+/* comparison functions */
+int lh_char_equal(const void *k1, const void *k2);
+int lh_ptr_equal(const void *k1, const void *k2);
+
 int
 json_global_set_string_hash(const int h)
 {

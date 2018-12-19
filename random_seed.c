@@ -53,7 +53,7 @@ static void do_cpuid(int regs[], int h)
 
 #if HAS_X86_CPUID
 
-static int has_rdrand()
+static int has_rdrand(void)
 {
     // CPUID.01H:ECX.RDRAND[bit 30] == 1
     int regs[4];
@@ -69,7 +69,7 @@ static int has_rdrand()
 
 #define HAVE_RDRAND 1
 
-static int get_rdrand_seed()
+static int get_rdrand_seed(void)
 {
     DEBUG_SEED("get_rdrand_seed");
     int _eax;
@@ -91,7 +91,7 @@ static int get_rdrand_seed()
 
 /* get_rdrand_seed - Visual Studio 2012 and above */
 
-static int get_rdrand_seed()
+static int get_rdrand_seed(void)
 {
     DEBUG_SEED("get_rdrand_seed");
     int r;
@@ -104,7 +104,7 @@ static int get_rdrand_seed()
 
 /* get_rdrand_seed - Visual Studio 2010 and below - x86 only */
 
-static int get_rdrand_seed()
+static int get_rdrand_seed(void)
 {
 	DEBUG_SEED("get_rdrand_seed");
 	int _eax;
@@ -136,7 +136,7 @@ retry:
 
 static const char *dev_random_file = "/dev/urandom";
 
-static int has_dev_urandom()
+static int has_dev_urandom(void)
 {
     struct stat buf;
     if (stat(dev_random_file, &buf)) {
@@ -148,7 +148,7 @@ static int has_dev_urandom()
 
 /* get_dev_random_seed */
 
-static int get_dev_random_seed()
+static int get_dev_random_seed(void)
 {
     DEBUG_SEED("get_dev_random_seed");
 
@@ -184,7 +184,7 @@ static int get_dev_random_seed()
 #pragma comment(lib, "advapi32.lib")
 #endif
 
-static int get_cryptgenrandom_seed()
+static int get_cryptgenrandom_seed(void)
 {
     HCRYPTPROV hProvider = 0;
     int r;
@@ -213,7 +213,7 @@ static int get_cryptgenrandom_seed()
 
 #include <time.h>
 
-static int get_time_seed()
+static int get_time_seed(void)
 {
     DEBUG_SEED("get_time_seed");
 
@@ -223,15 +223,15 @@ static int get_time_seed()
 
 /* json_c_get_random_seed */
 
-int json_c_get_random_seed()
+int json_c_get_random_seed(void)
 {
-#if HAVE_RDRAND
+#if defined HAVE_RDRAND && HAVE_RDRAND
     if (has_rdrand()) return get_rdrand_seed();
 #endif
-#if HAVE_DEV_RANDOM
+#if defined HAVE_DEV_RANDOM && HAVE_DEV_RANDOM
     if (has_dev_urandom()) return get_dev_random_seed();
 #endif
-#if HAVE_CRYPTGENRANDOM
+#if defined HAVE_CRYPTGENRANDOM && HAVE_CRYPTGENRANDOM
     return get_cryptgenrandom_seed();
 #endif
     return get_time_seed();
