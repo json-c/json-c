@@ -11,6 +11,8 @@ AC_PROG_MAKE_SET
 
 AC_CANONICAL_HOST
 
+MKDIR_P="mkdir -m 0755 -p"
+
 AC_ARG_ENABLE(threading,
  AS_HELP_STRING([--enable-threading],
    [Enable code to support partly multi-threaded use]),
