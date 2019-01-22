@@ -15,7 +15,7 @@ Build changes:
 0.13.1 (up to commit 0f814e5, 2018/03/04)
 =========================================
 
-* Bump the major version of the .so library generated up to 4.0 to avoid 
+* Bump the major version of the .so library generated up to 4.0 to avoid
   conflicts because some downstream packagers of json-c had already done
   their own bump to ".so.3" for a much older 0.12 release.
 * Add const size_t json_c_object_sizeof()
@@ -40,7 +40,7 @@ See issues_closed_for_0.13.md for a complete list.
 Deprecated and removed features:
 --------------------------------
 * All internal use of bits.h has been eliminated.  The file will be removed.
-	Do not use: hexdigit(), error_ptr(), error_descrition() and it_error() 
+	Do not use: hexdigit(), error_ptr(), error_descrition() and it_error()
 * lh_abort() is deprecated.  It will be removed.
 
 Behavior changes:
@@ -183,11 +183,11 @@ List of new functions added:
   * Make the json_tokener_errors array local.  It has been deprecated for
      a while, and json_tokener_error_desc() should be used instead.
 
-  * change the floating point output format to %.17g so values with 
+  * change the floating point output format to %.17g so values with
      more than 6 digits show up in the output.
 
   * Remove the old libjson.so name compatibility support.  The library is
-      only created as libjson-c.so now and headers are only installed 
+      only created as libjson-c.so now and headers are only installed
       into the ${prefix}/json-c directory.
 
   * When supported by the linker, add the -Bsymbolic-functions flag.
@@ -253,7 +253,7 @@ List of new functions added:
   * Allow json_tokener_parse_ex() to be re-used to parse multiple object.
      Also, fix some parsing issues with capitalized hexadecimal numbers and
      number in E notation.
-  * Add json_tokener_get_error() and json_tokener_error_desc() to better 
+  * Add json_tokener_get_error() and json_tokener_error_desc() to better
      encapsulate the process of retrieving errors while parsing.
   * Various improvements to the documentation of many functions.
   * Add new json_object_array_sort() function.
@@ -300,7 +300,7 @@ List of new functions added:
     Brent Miller, bdmiller at yahoo dash inc dot com
   * Disable REFCOUNT_DEBUG by default in json_object.c
   * Don't use this as a variable, so we can compile with a C++ compiler
-  * Add casts from void* to type of assignment when using malloc 
+  * Add casts from void* to type of assignment when using malloc
   * Add #ifdef __cplusplus guards to all of the headers
   * Add typedefs for json_object, json_tokener, array_list, printbuf, lh_table
     Michael Clark, <michael@metaparadigm.com>
@@ -384,13 +384,13 @@ List of new functions added:
     Added a Win32/Win64 compliant implementation of strndup
   * json_util.c - C. Watford (christopher.watford@gmail.com)
     Added cast and mask to suffice size_t v. unsigned int conversion
-    correctness 
+    correctness
   * json_tokener.c - sign reversal issue on error info for nested object parse
     spotted by Johan Björklund (johbjo09 at kth.se)
   * json_object.c - escape " in json_escape_str
   * Change to automake and libtool to build shared and static library
     Michael Clark <michael@metaparadigm.com>
-	
+
 0.1
 ===
   * initial release
