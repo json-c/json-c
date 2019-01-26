@@ -259,6 +259,12 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 if (UNIX OR MINGW OR CYGWIN)
+    SET(prefix ${CMAKE_INSTALL_PREFIX})
+    # exec_prefix is prefix by default and CMake does not have the
+    # concept.
+    SET(exec_prefix ${CMAKE_INSTALL_PREFIX})
+    SET(libdir ${CMAKE_INSTALL_FULL_LIBDIR})
+    SET(includedir ${CMAKE_INSTALL_FULL_INCLUDEDIR})
     configure_file(json-c.pc.in json-c.pc @ONLY)
     set(INSTALL_PKGCONFIG_DIR "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" CACHE PATH "Installation directory for pkgconfig (.pc) files")
     install(FILES ${PROJECT_BINARY_DIR}/json-c.pc DESTINATION "${INSTALL_PKGCONFIG_DIR}")
