@@ -2,6 +2,7 @@
  * Tests if binary strings are supported.
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <string.h>
@@ -14,30 +15,38 @@
 int main(void)
 {
 	/* this test has a space after the null character. check that it's still included */
-	char *str1 = strdup("This string should be longer than 32 characters");
-	char *str2 = strdup("this string is short");
+	char *str = strdup("This string should be longer than 32 characters");
 	struct json_object *jso_str = NULL;
 
-	if (!str1 || !str2)
+	if (!str)
 	{
 		puts("FAIL: strdup() returned NULL");
 		return 1;
 	}
 
-	jso_str = json_object_new_string_noalloc(str1);
+	jso_str = json_object_new_string_noalloc(str);
 	if (!jso_str)
 	{
-		puts("FAIL: json_object_new_string_noalloc(str1) returned NULL");
+		puts("FAIL: json_object_new_string_noalloc(str) returned NULL");
+		free(str);
 		return 2;
 	}
 
 	json_object_put(jso_str);
 	jso_str = NULL;
 
-	jso_str = json_object_new_string_noalloc(str2);
+	str = strdup("this string is short");
+	if (!str)
+	{
+		puts("FAIL: strdup() returned NULL");
+		return 1;
+	}
+
+	jso_str = json_object_new_string_noalloc(str);
 	if (!jso_str)
 	{
-		puts("FAIL: json_object_new_string_noalloc(str2) returned NULL");
+		puts("FAIL: json_object_new_string_noalloc(str) returned NULL");
+		free(str);
 		return 3;
 	}
 
