@@ -895,6 +895,19 @@ JSON_EXPORT int json_object_set_double(struct json_object *obj,double new_value)
 
 /** Create a new empty json_object of type json_type_string
  *
+ * Use given string as is, do not call malloc if given string is longer
+ * than internal buffer size. Ownership of s will be transferred to
+ * json_object and s will be freed when json_object_put decided to free
+ * memory of json_object.
+ *
+ * @param s the string, must be heap alloacted and must not be freed.
+ * @returns a json_object of type json_type_string
+ * @see json_object_new_string_len()
+ */
+JSON_EXPORT struct json_object* json_object_new_string_noalloc(char *s);
+
+/** Create a new empty json_object of type json_type_string
+ *
  * A copy of the string is made and the memory is managed by the json_object
  *
  * @param s the string

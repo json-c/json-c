@@ -1015,6 +1015,23 @@ static void json_object_string_delete(struct json_object* jso)
 	json_object_generic_delete(jso);
 }
 
+struct json_object* json_object_new_string_noalloc(char *s)
+{
+	struct json_object *jso = json_object_new(json_type_string);
+	if (!jso)
+		return NULL;
+	jso->_delete = &json_object_string_delete;
+	jso->_to_json_string = &json_object_string_to_json_string;
+	jso->o.c_string.len = strlen(s);
+	if(jso->o.c_string.len < LEN_DIRECT_STRING_DATA) {
+		memcpy(jso->o.c_string.str.data, s, jso->o.c_string.len);
+		free(s);
+	} else {
+		jso->o.c_string.str.ptr = s;
+	}
+	return jso;
+}
+
 struct json_object* json_object_new_string(const char *s)
 {
 	struct json_object *jso = json_object_new(json_type_string);
