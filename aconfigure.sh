@@ -65,7 +65,7 @@ do
     export LDFLAGS="-L${ANDROID_TOOLCHAIN_ROOT}/${COMPILER_PREFIX}/lib"
 
     export CC=${ANDROID_TOOLCHAIN_BIN}/${COMPILER_PREFIX}-clang
-    export CPP=${ANDROID_TOOLCHAIN_BIN}/${COMPILER_PREFIX}-cpp
+    # export CPP=${ANDROID_TOOLCHAIN_BIN}/${COMPILER_PREFIX}-cpp
     export CXX=${ANDROID_TOOLCHAIN_BIN}/${COMPILER_PREFIX}-clang++
     export LD=${ANDROID_TOOLCHAIN_BIN}/${COMPILER_PREFIX}-ld
     export AR=${ANDROID_TOOLCHAIN_BIN}/${COMPILER_PREFIX}-ar
@@ -73,7 +73,7 @@ do
     export STRIP=${ANDROID_TOOLCHAIN_BIN}/${COMPILER_PREFIX}-strip
 
     echo "---- Compiling for ${ARCH}"
-    ./configure --host="${COMPILER_PREFIX}" --prefix="${ANDROID_TOOLCHAIN_SYSROOT_DIR}/usr"
+    ./configure --host="${COMPILER_PREFIX}" --prefix="${ANDROID_TOOLCHAIN_SYSROOT_DIR}/usr" CFLAGS="-fPIC"
     make
     make install
 done
