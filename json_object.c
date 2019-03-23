@@ -107,6 +107,8 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 {
 	int pos = 0, start_offset = 0;
 	unsigned char c;
+	/* the previous byte. It's used for identifying rarely-used Chinese characters in GBK charset, those characters's the second byte is just the backslash '\'(0x5C)  */
+	unsigned char old_c = '\1';
 	while (len--)
 	{
 		c = str[pos];
@@ -135,7 +137,8 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 			else if(c == '\t') printbuf_memappend(pb, "\\t", 2);
 			else if(c == '\f') printbuf_memappend(pb, "\\f", 2);
 			else if(c == '"') printbuf_memappend(pb, "\\\"", 2);
-			else if(c == '\\') printbuf_memappend(pb, "\\\\", 2);
+			else if(c == '\\' && old_c < 0x80) printbuf_memappend(pb, "\\\\", 2); /* If the previous byte is ASCII character, this byte is escape character. */
+			else if(c == '\\' && old_c >= 0x80) printbuf_memappend(pb, "\\", 1); /* Else these two bytes are maybe a double-byte GBK character. */
 			else if(c == '/') printbuf_memappend(pb, "\\/", 2);
 
 			start_offset = ++pos;
@@ -157,6 +160,8 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 			} else
 				pos++;
 		}
+
+		old_c = c;
 	}
 	if (pos - start_offset > 0)
 		printbuf_memappend(pb, str + start_offset, pos - start_offset);

@@ -533,6 +533,8 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
       {
 	/* Advance until we change state */
 	const char *case_start = str;
+	/* the previous byte. It's used for identifying rarely-used Chinese characters in GBK charset, those characters's the second byte is just the backslash '\'(0x5C)  */
+	unsigned char old_c = '\1';
 	while(1) {
 	  if(c == tok->quote_char) {
 	    printbuf_memappend_fast(tok->pb, case_start, str-case_start);
@@ -542,12 +544,14 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	    saved_state = json_tokener_state_finish;
 	    state = json_tokener_state_eatws;
 	    break;
-	  } else if(c == '\\') {
+	  } else if(c == '\\' && old_c < 0x80) { /* If the previous byte is not ASCII character, maybe this is a double-byte GBK character, we can skip it. */
 	    printbuf_memappend_fast(tok->pb, case_start, str-case_start);
 	    saved_state = json_tokener_state_string;
 	    state = json_tokener_state_string_escape;
 	    break;
 	  }
+
+	  old_c = c;
 	  if (!ADVANCE_CHAR(str, tok) || !PEEK_CHAR(c, tok)) {
 	    printbuf_memappend_fast(tok->pb, case_start, str-case_start);
 	    goto out;
@@ -885,6 +889,8 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
       {
 	/* Advance until we change state */
 	const char *case_start = str;
+	/* the previous byte. It's used for identifying rarely-used Chinese characters in GBK charset, those characters's the second byte is just the backslash '\'(0x5C)  */
+	unsigned char old_c = '\1';
 	while(1) {
 	  if(c == tok->quote_char) {
 	    printbuf_memappend_fast(tok->pb, case_start, str-case_start);
@@ -892,12 +898,14 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	    saved_state = json_tokener_state_object_field_end;
 	    state = json_tokener_state_eatws;
 	    break;
-	  } else if(c == '\\') {
+	  } else if(c == '\\' && old_c < 0x80) { /* If the previous byte is not ASCII character, maybe this is a double-byte GBK character, we can skip it. */
 	    printbuf_memappend_fast(tok->pb, case_start, str-case_start);
 	    saved_state = json_tokener_state_object_field;
 	    state = json_tokener_state_string_escape;
 	    break;
 	  }
+
+	  old_c =c;
 	  if (!ADVANCE_CHAR(str, tok) || !PEEK_CHAR(c, tok)) {
 	    printbuf_memappend_fast(tok->pb, case_start, str-case_start);
 	    goto out;
