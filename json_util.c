@@ -207,6 +207,18 @@ int json_parse_int64(const char *buf, int64_t *retval)
 	return ((val == 0 && errno != 0) || (end == buf)) ? 1 : 0;
 }
 
+int json_parse_uint64(const char *buf, uint64_t *retval)
+{
+	char *end = NULL;
+	uint64_t val;
+
+	errno = 0;
+	val = strtoull(buf, &end, 10);
+	if (end != buf)
+		*retval = val;
+	return ((val == 0 && errno != 0) || (end == buf)) ? 1 : 0;
+}
+
 #ifndef HAVE_REALLOC
 void* rpl_realloc(void* p, size_t n)
 {
@@ -240,4 +252,3 @@ const char *json_type_to_name(enum json_type o_type)
 	}
 	return json_type_name[o_type];
 }
-

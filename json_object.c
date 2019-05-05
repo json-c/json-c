@@ -177,7 +177,7 @@ extern struct json_object* json_object_get(struct json_object *jso)
 	__sync_add_and_fetch(&jso->_ref_count, 1);
 #else
 	++jso->_ref_count;
-#endif        
+#endif
 
 	return jso;
 }
@@ -193,7 +193,7 @@ int json_object_put(struct json_object *jso)
 
 #if defined(HAVE_ATOMIC_BUILTINS) && defined(ENABLE_THREADING)
 	/* Note: this only allow the refcount to remain correct
-	 * when multiple threads are adjusting it.  It is still an error 
+	 * when multiple threads are adjusting it.  It is still an error
 	 * for a thread to decrement the refcount if it doesn't "own" it,
 	 * as that can result in the thread that loses the race to 0
 	 * operating on an already-freed object.
@@ -481,7 +481,7 @@ int json_object_object_add_ex(struct json_object* jso,
 	// We lookup the entry and replace the value, rather than just deleting
 	// and re-adding it, so the existing key remains valid.
 	hash = lh_get_hash(jso->o.c_object, (const void *)key);
-	existing_entry = (opts & JSON_C_OBJECT_ADD_KEY_IS_NEW) ? NULL : 
+	existing_entry = (opts & JSON_C_OBJECT_ADD_KEY_IS_NEW) ? NULL :
 			      lh_table_lookup_entry_w_hash(jso->o.c_object,
 							   (const void *)key, hash);
 
@@ -734,6 +734,61 @@ int json_object_int_inc(struct json_object *jso, int64_t val) {
 	} else {
 		jso->o.c_int64 += val;
 	}
+	return 1;
+}
+
+static int json_object_uint_to_json_string(struct json_object* jso,
+					  struct printbuf *pb,
+					  int level,
+					  int flags)
+{
+	/* room for 20 digits and a null term */
+	char sbuf[21];
+	snprintf(sbuf, sizeof(sbuf), "%" PRIu64, jso->o.c_uint64);
+	return printbuf_memappend (pb, sbuf, strlen(sbuf));
+}
+
+struct json_object* json_object_new_uint64(uint64_t u)
+{
+	struct json_object *jso = json_object_new(json_type_int);
+	if (!jso)
+		return NULL;
+	jso->_to_json_string = &json_object_uint_to_json_string;
+	jso->o.c_uint64 = u;
+	return jso;
+}
+
+uint64_t json_object_get_uint64(const struct json_object *jso)
+{
+	uint64_t u;
+
+	if (!jso)
+		return 0;
+	switch(jso->o_type)
+	{
+	case json_type_int:
+		return jso->o.c_uint64;
+	case json_type_double:
+		if (jso->o.c_double >= UINT64_MAX)
+			return UINT64_MAX;
+		if (jso->o.c_double <= 0)
+			return 0;
+		return (uint64_t)jso->o.c_double;
+	case json_type_boolean:
+		return jso->o.c_boolean;
+	case json_type_string:
+		if (json_parse_uint64(get_string_component(jso), &u) == 0)
+			return u;
+		/* FALLTHRU */
+	default:
+		return 0;
+	}
+}
+
+int json_object_set_uint64(struct json_object *jso, uint64_t new_value) {
+	if (!jso || jso->o_type != json_type_int)
+		return 0;
+	jso->o.c_uint64 = new_value;
 	return 1;
 }
 
@@ -1094,11 +1149,11 @@ int json_object_set_string(json_object* jso, const char* s) {
 }
 
 int json_object_set_string_len(json_object* jso, const char* s, int len){
-	char *dstbuf; 
-	if (jso==NULL || jso->o_type!=json_type_string) return 0; 	
+	char *dstbuf;
+	if (jso==NULL || jso->o_type!=json_type_string) return 0;
 	if (len<LEN_DIRECT_STRING_DATA) {
 		dstbuf=jso->o.c_string.str.data;
-		if (jso->o.c_string.len>=LEN_DIRECT_STRING_DATA) free(jso->o.c_string.str.ptr); 
+		if (jso->o.c_string.len>=LEN_DIRECT_STRING_DATA) free(jso->o.c_string.str.ptr);
 	} else {
 		dstbuf=(char *)malloc(len+1);
 		if (dstbuf==NULL) return 0;
@@ -1108,7 +1163,7 @@ int json_object_set_string_len(json_object* jso, const char* s, int len){
 	jso->o.c_string.len=len;
 	memcpy(dstbuf, (const void *)s, len);
 	dstbuf[len] = '\0';
-	return 1; 
+	return 1;
 }
 
 /* json_object_array */
@@ -1500,4 +1555,3 @@ int json_object_deep_copy(struct json_object *src, struct json_object **dst, jso
 
 	return rc;
 }
-

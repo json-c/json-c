@@ -35,6 +35,7 @@ struct json_object
     json_bool c_boolean;
     double c_double;
     int64_t c_int64;
+    uint64_t c_uint64;
     struct lh_table *c_object;
     struct array_list *c_array;
     struct {

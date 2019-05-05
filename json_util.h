@@ -12,7 +12,7 @@
 /**
  * @file
  * @brief Miscllaneous utility functions and macros.
- */ 
+ */
 #ifndef _json_util_h_
 #define _json_util_h_
 
@@ -91,6 +91,7 @@ const char *json_util_get_last_err(void);
 
 
 extern int json_parse_int64(const char *buf, int64_t *retval);
+extern int json_parse_uint64(const char *buf, uint64_t *retval);
 extern int json_parse_double(const char *buf, double *retval);
 
 /**
