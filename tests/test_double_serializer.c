@@ -74,4 +74,8 @@ int main()
 		printf("ERROR: json_c_set_serialization_double_format() failed");
 
 	json_object_put(obj);
+
+	obj = json_object_new_double(-12.0);
+	printf("obj(-12.0).to_string(default format)=%s\n", json_object_to_json_string(obj));
+
 }

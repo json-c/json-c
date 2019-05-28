@@ -810,6 +810,7 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
 	{
 		const char *std_format = "%.17g";
 		int format_drops_decimals = 0;
+		int looks_numeric = 0;
 
 		if (!format)
 		{
@@ -837,11 +838,15 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
 		if (format == std_format || strstr(format, ".0f") == NULL)
 			format_drops_decimals = 1;
 
+		looks_numeric = /* Looks like *some* kind of number */
+		    isdigit((unsigned char)buf[0]) ||
+		    (size > 1 && buf[0] == '-' && isdigit((unsigned char)buf[1]));
+
 		if (size < (int)sizeof(buf) - 2 &&
-		    isdigit((unsigned char)buf[0]) && /* Looks like *some* kind of number */
-			!p && /* Has no decimal point */
+		    looks_numeric &&
+		    !p && /* Has no decimal point */
 		    strchr(buf, 'e') == NULL && /* Not scientific notation */
-			format_drops_decimals)
+		    format_drops_decimals)
 		{
 			// Ensure it looks like a float, even if snprintf didn't,
 			//  unless a custom format is set to omit the decimal.

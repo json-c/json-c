@@ -16,3 +16,4 @@ obj(12.0).to_string(default format)=12.0
 obj(12.0).to_string(%.0f)=12
 obj(12.0).to_string(%.0g)=1e+01
 obj(12.0).to_string(%.1g)=12.0
+obj(-12.0).to_string(default format)=-12.0
