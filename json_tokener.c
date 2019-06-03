@@ -50,6 +50,39 @@
 # error You do not have strncasecmp on your system.
 #endif /* HAVE_STRNCASECMP */
 
+/* The following helper functions are used to speed up parsing. They
+ * are faster than their ctype counterparts because they assume that
+ * the input is in ASCII and that the locale is set to "C". The
+ * compiler will also inline these functions, providing an additional
+ * speedup by saving on function calls.
+ */
+static int is_ws_char(char c)
+{
+	return c == ' '
+	    || c == '\t'
+	    || c == '\n'
+	    || c == '\v'
+	    || c == '\f'
+	    || c == '\r';
+}
+
+static int is_hex_char(char c)
+{
+	return (c >= '0' && c <= '9')
+	    || (c >= 'A' && c <= 'F')
+	    || (c >= 'a' && c <= 'f');
+}
+
+static int is_number_char(char c)
+{
+	return (c >= '0' && c <= '9')
+	    || c == '.'
+	    || c == '+'
+	    || c == '-'
+	    || c == 'e'
+	    || c == 'E';
+}
+
 /* Use C99 NAN by default; if not available, nan("") should work too. */
 #ifndef NAN
 #define NAN nan("")
@@ -295,7 +328,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 
     case json_tokener_state_eatws:
       /* Advance until we change state */
-      while (isspace((unsigned char)c)) {
+      while (is_ws_char(c)) {
 	if ((!ADVANCE_CHAR(str, tok)) || (!PEEK_CHAR(c, tok)))
 	  goto out;
       }
@@ -593,7 +626,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 
 	  /* Handle a 4-byte sequence, or two sequences if a surrogate pair */
 	  while(1) {
-	    if (c && strchr(json_hex_chars, c)) {
+	    if (c && is_hex_char(c)) {
 	      tok->ucs_char += ((unsigned int)jt_hexdigit(c) << ((3-tok->st_pos++)*4));
 	      if(tok->st_pos == 4) {
 		unsigned char unescaped_utf[4];
@@ -625,7 +658,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
                   got_hi_surrogate = tok->ucs_char;
                   /* Not at end, and the next two chars should be "\u" */
                   if ((len == -1 || len > (tok->char_offset + 2)) &&
-                      // str[0] != '0' &&  // implied by json_hex_chars, above.
+                      // str[0] != '0' &&  // implied by is_hex_char, above.
                       (str[1] == '\\') &&
                       (str[2] == 'u'))
                   {
@@ -734,7 +767,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	int case_len=0;
 	int is_exponent=0;
 	int negativesign_next_possible_location=1;
-	while(c && strchr(json_number_chars, c)) {
+	while(c && is_number_char(c)) {
 	  ++case_len;
 
 	  /* non-digit characters checks */
@@ -791,7 +824,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
       {
 	int64_t num64;
 	double  numd;
-	if (!tok->is_double && json_parse_int64(tok->pb->buf, &num64) == 0) {
+	if (!tok->is_double && json_parse_sanitized_int64(tok->pb->buf, tok->pb->bpos, &num64) == 0) {
 		if (num64 && tok->pb->buf[0]=='0' &&
 		    (tok->flags & JSON_TOKENER_STRICT)) {
 			/* in strict mode, number must not start with 0 */

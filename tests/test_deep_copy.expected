@@ -13,6 +13,7 @@ Printing JSON objects for visual inspection
     "GlossDiv":{
       "title":"S",
       "null_obj":null,
+      "null_str":" \u0000 ",
       "GlossList":{
         "GlossEntry":{
           "ID":"SGML",

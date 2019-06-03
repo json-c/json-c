@@ -41,10 +41,8 @@
 // Don't define this.  It's not thread-safe.
 /* #define REFCOUNT_DEBUG 1 */
 
-const char *json_number_chars = "0123456789.+-eE";
 const char *json_hex_chars = "0123456789abcdefABCDEF";
 
-static void json_object_generic_delete(struct json_object* jso);
 static struct json_object* json_object_new(enum json_type o_type);
 
 static json_object_to_json_string_fn json_object_object_to_json_string;
@@ -54,6 +52,12 @@ static json_object_to_json_string_fn json_object_int_to_json_string;
 static json_object_to_json_string_fn json_object_string_to_json_string;
 static json_object_to_json_string_fn json_object_array_to_json_string;
 
+typedef void (json_object_private_delete_fn)(struct json_object *o);
+
+static json_object_private_delete_fn json_object_string_delete;
+static json_object_private_delete_fn json_object_array_delete;
+static json_object_private_delete_fn json_object_object_delete;
+static json_object_private_delete_fn json_object_generic_delete;
 
 /* ref count debugging */
 
@@ -205,7 +209,16 @@ int json_object_put(struct json_object *jso)
 
 	if (jso->_user_delete)
 		jso->_user_delete(jso, jso->_userdata);
-	jso->_delete(jso);
+
+	if (jso->o_type == json_type_string)
+		json_object_string_delete(jso);
+	else if (jso->o_type == json_type_array)
+		json_object_array_delete(jso);
+	else if (jso->o_type == json_type_object)
+		json_object_object_delete(jso);
+	else
+		json_object_generic_delete(jso);
+
 	return 1;
 }
 
@@ -227,12 +240,14 @@ static struct json_object* json_object_new(enum json_type o_type)
 {
 	struct json_object *jso;
 
-	jso = (struct json_object*)calloc(sizeof(struct json_object), 1);
+	jso = (struct json_object*)malloc(sizeof(struct json_object));
 	if (!jso)
 		return NULL;
 	jso->o_type = o_type;
 	jso->_ref_count = 1;
-	jso->_delete = &json_object_generic_delete;
+	jso->_pb = NULL;
+	jso->_user_delete = NULL;
+	jso->_userdata = NULL;
 #ifdef REFCOUNT_DEBUG
 	lh_table_insert(json_object_table, jso, jso);
 	MC_DEBUG("json_object_new_%s: %p\n", json_type_to_name(jso->o_type), jso);
@@ -441,7 +456,6 @@ struct json_object* json_object_new_object(void)
 	struct json_object *jso = json_object_new(json_type_object);
 	if (!jso)
 		return NULL;
-	jso->_delete = &json_object_object_delete;
 	jso->_to_json_string = &json_object_object_to_json_string;
 	jso->o.c_object = lh_kchar_table_new(JSON_OBJECT_DEF_HASH_ENTRIES,
 					     &json_object_lh_entry_free);
@@ -1020,51 +1034,45 @@ static void json_object_string_delete(struct json_object* jso)
 	json_object_generic_delete(jso);
 }
 
-struct json_object* json_object_new_string(const char *s)
+static int set_string_len(struct json_object *jso, const char *s, int len)
 {
-	struct json_object *jso = json_object_new(json_type_string);
-	if (!jso)
-		return NULL;
-	jso->_delete = &json_object_string_delete;
-	jso->_to_json_string = &json_object_string_to_json_string;
-	jso->o.c_string.len = strlen(s);
-	if(jso->o.c_string.len < LEN_DIRECT_STRING_DATA) {
-		memcpy(jso->o.c_string.str.data, s, jso->o.c_string.len);
-	} else {
-		jso->o.c_string.str.ptr = strdup(s);
-		if (!jso->o.c_string.str.ptr)
-		{
-			json_object_generic_delete(jso);
-			errno = ENOMEM;
-			return NULL;
-		}
-	}
-	return jso;
-}
-
-struct json_object* json_object_new_string_len(const char *s, const int len)
-{
-	char *dstbuf;
-	struct json_object *jso = json_object_new(json_type_string);
-	if (!jso)
-		return NULL;
-	jso->_delete = &json_object_string_delete;
-	jso->_to_json_string = &json_object_string_to_json_string;
-	if(len < LEN_DIRECT_STRING_DATA) {
+	char *dstbuf = NULL;
+	if (len < LEN_DIRECT_STRING_DATA)
+	{
 		dstbuf = jso->o.c_string.str.data;
-	} else {
-		jso->o.c_string.str.ptr = (char*)malloc(len + 1);
-		if (!jso->o.c_string.str.ptr)
+	}
+	else
+	{
+		dstbuf = (char *) malloc(len + 1);
+		if (dstbuf == NULL)
 		{
-			json_object_generic_delete(jso);
 			errno = ENOMEM;
-			return NULL;
+			return 0;
 		}
-		dstbuf = jso->o.c_string.str.ptr;
+		jso->o.c_string.str.ptr = dstbuf;
 	}
 	memcpy(dstbuf, (const void *)s, len);
 	dstbuf[len] = '\0';
 	jso->o.c_string.len = len;
+	return 1;
+}
+
+struct json_object *json_object_new_string(const char *s)
+{
+	return json_object_new_string_len(s, (int)strlen(s));
+}
+
+struct json_object *json_object_new_string_len(const char *s, const int len)
+{
+	struct json_object *jso = json_object_new(json_type_string);
+	if (!jso)
+		return NULL;
+	jso->_to_json_string = &json_object_string_to_json_string;
+	if (set_string_len(jso, s, len) == 0)
+	{
+		json_object_generic_delete(jso);
+		return NULL;
+	}
 	return jso;
 }
 
@@ -1094,26 +1102,23 @@ int json_object_get_string_len(const struct json_object *jso)
 	}
 }
 
-int json_object_set_string(json_object* jso, const char* s) {
+int json_object_set_string(json_object *jso, const char *s)
+{
 	return json_object_set_string_len(jso, s, (int)(strlen(s)));
 }
 
-int json_object_set_string_len(json_object* jso, const char* s, int len){
-	char *dstbuf; 
-	if (jso==NULL || jso->o_type!=json_type_string) return 0; 	
-	if (len<LEN_DIRECT_STRING_DATA) {
-		dstbuf=jso->o.c_string.str.data;
-		if (jso->o.c_string.len>=LEN_DIRECT_STRING_DATA) free(jso->o.c_string.str.ptr); 
-	} else {
-		dstbuf=(char *)malloc(len+1);
-		if (dstbuf==NULL) return 0;
-		if (jso->o.c_string.len>=LEN_DIRECT_STRING_DATA) free(jso->o.c_string.str.ptr);
-		jso->o.c_string.str.ptr=dstbuf;
-	}
-	jso->o.c_string.len=len;
-	memcpy(dstbuf, (const void *)s, len);
-	dstbuf[len] = '\0';
-	return 1; 
+int json_object_set_string_len(json_object *jso, const char *s, int len)
+{
+	char *old_ptr = NULL;
+	int ret;
+	if (jso == NULL || jso->o_type != json_type_string)
+		return 0;
+	if (jso->o.c_string.len >= LEN_DIRECT_STRING_DATA)
+		old_ptr = jso->o.c_string.str.ptr;
+	ret = set_string_len(jso, s, len);
+	if (ret != 0 && old_ptr != NULL)
+		free(old_ptr);
+	return ret;
 }
 
 /* json_object_array */
@@ -1177,7 +1182,6 @@ struct json_object* json_object_new_array(void)
 	struct json_object *jso = json_object_new(json_type_array);
 	if (!jso)
 		return NULL;
-	jso->_delete = &json_object_array_delete;
 	jso->_to_json_string = &json_object_array_to_json_string;
 	jso->o.c_array = array_list_new(&json_object_array_entry_free);
         if(jso->o.c_array == NULL)
@@ -1384,7 +1388,7 @@ int json_c_shallow_copy_default(json_object *src, json_object *parent, const cha
 		break;
 
 	case json_type_string:
-		*dst = json_object_new_string(get_string_component(src));
+		*dst = json_object_new_string_len(get_string_component(src), src->o.c_string.len);
 		break;
 
 	case json_type_object:

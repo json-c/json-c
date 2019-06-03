@@ -90,6 +90,7 @@ extern int json_object_to_fd(int fd, struct json_object *obj, int flags);
 const char *json_util_get_last_err(void);
 
 
+extern int json_parse_sanitized_int64(const char *buf, size_t len, int64_t *retval);
 extern int json_parse_int64(const char *buf, int64_t *retval);
 extern int json_parse_double(const char *buf, double *retval);
 
