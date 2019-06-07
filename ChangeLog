@@ -11,6 +11,7 @@ Deprecated and removed features:
 
 Build changes:
 --------------
+* Do not compile with -Werror by default
 
 0.13.1 (up to commit 0f814e5, 2018/03/04)
 =========================================

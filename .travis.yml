@@ -25,7 +25,7 @@ before_script:
   - ./configure
 
 script:
-  - make
+  - make AM_CFLAGS="-Werror"
 
 after_success:
   - make check
