@@ -165,8 +165,13 @@ AS_IF([test "x$enable_Bsymbolic" = "xcheck"],
 AS_IF([test "x$enable_Bsymbolic" = "xyes"], [JSON_BSYMBOLIC_LDFLAGS=-Wl[,]-Bsymbolic-functions])
 AC_SUBST(JSON_BSYMBOLIC_LDFLAGS)
 
-AX_APPEND_COMPILE_FLAGS([-Wall -Werror -Wcast-qual -Wno-error=deprecated-declarations])
-AX_APPEND_COMPILE_FLAGS([-Wextra -Wwrite-string -Wno-unused-parameter])
+AC_ARG_ENABLE([werror],
+    AS_HELP_STRING([--disable-werror], [avoid treating compiler warnings as fatal errors]))
+
+AS_IF([test "x$enable_werror" != "xno"], [AX_APPEND_COMPILE_FLAGS([-Werror])])
+
+AX_APPEND_COMPILE_FLAGS([-Wall -Wcast-qual -Wno-error=deprecated-declarations])
+AX_APPEND_COMPILE_FLAGS([-Wextra -Wwrite-strings -Wno-unused-parameter])
 AX_APPEND_COMPILE_FLAGS([-D_GNU_SOURCE])
 
 AC_LANG_PUSH([C])
