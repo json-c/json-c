@@ -186,7 +186,8 @@ int main(int argc, char **argv)
 	printf("\nTesting deep_copy with a custom serializer set\n");
 	json_object *with_serializer = json_object_new_string("notemitted");
 
-	json_object_set_serializer(with_serializer, my_custom_serializer, "dummy userdata", NULL);
+	char udata[] = "dummy userdata";
+	json_object_set_serializer(with_serializer, my_custom_serializer, udata, NULL);
 	json_object_object_add(src1, "with_serializer", with_serializer);
 	dst1 = NULL;
 	/* With a custom serializer in use, a custom shallow_copy function must also be used */
