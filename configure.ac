@@ -171,7 +171,7 @@ AC_ARG_ENABLE([werror],
 AS_IF([test "x$enable_werror" != "xno"], [AX_APPEND_COMPILE_FLAGS([-Werror])])
 
 AX_APPEND_COMPILE_FLAGS([-Wall -Wcast-qual -Wno-error=deprecated-declarations])
-AX_APPEND_COMPILE_FLAGS([-Wextra -Wwrite-string -Wno-unused-parameter])
+AX_APPEND_COMPILE_FLAGS([-Wextra -Wwrite-strings -Wno-unused-parameter])
 AX_APPEND_COMPILE_FLAGS([-D_GNU_SOURCE])
 
 AC_LANG_PUSH([C])
