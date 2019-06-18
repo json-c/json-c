@@ -11,16 +11,17 @@
 int main()
 {
 	struct json_object *obj = json_object_new_double(0.5);
+	char udata[] = "test";
 
 	printf("Test default serializer:\n");
 	printf("obj.to_string(standard)=%s\n", json_object_to_json_string(obj));
 
 	printf("Test default serializer with custom userdata:\n");
-	obj->_userdata = "test";
+	obj->_userdata = udata;
 	printf("obj.to_string(userdata)=%s\n", json_object_to_json_string(obj));
 
 	printf("Test explicit serializer with custom userdata:\n");
-	json_object_set_serializer(obj, json_object_double_to_json_string, "test", NULL);
+	json_object_set_serializer(obj, json_object_double_to_json_string, udata, NULL);
 	printf("obj.to_string(custom)=%s\n", json_object_to_json_string(obj));
 
 	printf("Test reset serializer:\n");
@@ -74,4 +75,8 @@ int main()
 		printf("ERROR: json_c_set_serialization_double_format() failed");
 
 	json_object_put(obj);
+
+	obj = json_object_new_double(-12.0);
+	printf("obj(-12.0).to_string(default format)=%s\n", json_object_to_json_string(obj));
+
 }
