@@ -135,6 +135,21 @@ extern "C" {
 #define JSON_C_OPTION_THREAD (1)
 
 /**
+ * A flag to duplicate given string with strdup while creating new string object
+ */
+#define JSON_C_NEW_STRING_STRDUP (0)
+
+/**
+ * A flag to transfer ownership of given string buffer to newly created string object
+ */
+#define JSON_C_NEW_STRING_NO_STRDUP (1<<0)
+
+/**
+ * A flaag to allocate a buffer of "len" bytes while creating a new string obejct
+ */
+#define JSON_C_NEW_STRING_LENGTH (1<<1)
+
+/**
  * A structure to use with json_object_object_foreachC() loops.
  * Contains key, val and entry members.
  */
@@ -892,6 +907,8 @@ JSON_EXPORT int json_object_set_double(struct json_object *obj,double new_value)
 
 
 /* string type methods */
+
+JSON_EXPORT struct json_object* json_object_new_string_ext(const char *s, const size_t len, int flags);
 
 /** Create a new empty json_object of type json_type_string
  *
