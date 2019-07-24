@@ -39,7 +39,7 @@ extern "C" {
  *
  * @param obj the json_object instance/tree from where to retrieve sub-objects
  * @param path a (RFC6901) string notation for the sub-object to retrieve
- * @param res a pointer where to store a reference to the json_object
+ * @param res a pointer that stores a reference to the json_object
  *              associated with the given path
  *
  * @return negative if an error (or not found), or 0 if succeeded
@@ -56,7 +56,7 @@ int json_pointer_get(struct json_object *obj, const char *path, struct json_obje
  * aspects when using this function.
  *
  * @param obj the json_object instance/tree to which to add a sub-object
- * @param res a pointer where to store a reference to the json_object
+ * @param res a pointer that stores a reference to the json_object
  *              associated with the given path
  * @param path_fmt a printf() style format for the path
  *
