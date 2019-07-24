@@ -8,6 +8,7 @@ addons:
   apt:
     packages:
       - cppcheck
+      - valgrind
 
 os:
   - linux
@@ -29,4 +30,9 @@ script:
 
 after_success:
   - make check
+  - result=$?
   - if type cppcheck &> /dev/null ; then cppcheck --error-exitcode=1 --quiet *.h *.c tests/ ; fi
+  - if [ $result != 0 ]; then
+      cat tests/*.log;
+      exit $result;
+    fi
