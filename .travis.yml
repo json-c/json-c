@@ -1,4 +1,4 @@
-language: c
+language: cpp
 cache: ccache
 matrix:
 # gcc
@@ -11,6 +11,7 @@ matrix:
           packages:
             - valgrind
             - cppcheck
+            - doxygen
       env: CHECK="true"
     - os: linux
       dist: xenial
@@ -49,7 +50,8 @@ matrix:
           packages:
             - clang-6.0
             - cppcheck
-      env: MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0"
+            - doxygen
+      env: MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0" CHECK="true"
     # The default clang on xenial is clang 7.0
     - os: linux
       dist: xenial
@@ -88,15 +90,17 @@ before_script:
 
 script:
   - make
-
-after_success:
   - if [ -n "$CHECK" ]; then
-      make distcheck;
+      if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+        brew install doxygen;
+      fi;
+      make check;
       result=$?;
       if [ $result != 0 ]; then
         cat tests/*.log;
         exit $result;
       fi;
+      make distcheck;
       if type cppcheck &> /dev/null ; then cppcheck --error-exitcode=1 --quiet *.h *.c tests/ ; fi;
     fi
 
