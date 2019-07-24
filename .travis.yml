@@ -29,10 +29,9 @@ script:
   - make
 
 after_success:
-  - make check
-  - result=$?
-  - if type cppcheck &> /dev/null ; then cppcheck --error-exitcode=1 --quiet *.h *.c tests/ ; fi
+  - make check ; result=$?
   - if [ $result != 0 ]; then
       cat tests/*.log;
-      exit $result;
     fi
+  - if type cppcheck &> /dev/null ; then cppcheck --error-exitcode=1 --quiet *.h *.c tests/ ; fi
+  - exit $result
