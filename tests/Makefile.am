@@ -40,7 +40,7 @@ EXTRA_DIST += valid.json
 
 # Note: handled by test1.test
 check_PROGRAMS += test1Formatted
-test1Formatted_SOURCES = test1.c parse_flags.c parse_flags.h
+test1Formatted_SOURCES = test1.c parse_flags.c parse_flags.h test_common.h
 test1Formatted_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_FORMATTED
 EXTRA_DIST+= test1Formatted_plain.expected
 EXTRA_DIST+= test1Formatted_pretty.expected
