@@ -35,4 +35,8 @@ extern "C" {
 }
 #endif
 
+#ifdef TEST
+#include "test_common.h"
+#endif
+
 #endif
