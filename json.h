@@ -31,12 +31,12 @@ extern "C" {
 #include "json_object_iterator.h"
 #include "json_c_version.h"
 
-#ifdef __cplusplus
-}
-#endif
-
 #ifdef TEST
 #include "test_common.h"
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif
