@@ -45,6 +45,8 @@ test1Formatted_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_FORMATTED
 EXTRA_DIST+= test1Formatted_plain.expected
 EXTRA_DIST+= test1Formatted_pretty.expected
 EXTRA_DIST+= test1Formatted_spaced.expected
+EXTRA_DIST+= test1Formatted_spaced_pretty.expected
+EXTRA_DIST+= test1Formatted_spaced_pretty_pretty_tab.expected
 
 # Note: handled by test2.test
 check_PROGRAMS += test2Formatted
@@ -53,6 +55,8 @@ test2Formatted_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_FORMATTED
 EXTRA_DIST+= test2Formatted_plain.expected
 EXTRA_DIST+= test2Formatted_pretty.expected
 EXTRA_DIST+= test2Formatted_spaced.expected
+EXTRA_DIST+= test2Formatted_spaced_pretty.expected
+EXTRA_DIST+= test2Formatted_spaced_pretty_pretty_tab.expected
 
 test_util_file_SOURCES = test_util_file.c
 
