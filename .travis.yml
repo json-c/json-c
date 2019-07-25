@@ -94,12 +94,6 @@ script:
       if [ "$TRAVIS_OS_NAME" = "osx" ]; then
         brew install doxygen;
       fi;
-      make check;
-      result=$?;
-      if [ $result != 0 ]; then
-        cat tests/*.log;
-        exit $result;
-      fi;
       make distcheck;
       if type cppcheck &> /dev/null ; then cppcheck --error-exitcode=1 --quiet *.h *.c tests/ ; fi;
     fi
