@@ -121,7 +121,7 @@ Building with partial threading support <a name="buildthreaded"></a>
 ----------------------------------------
 
 Although json-c does not support fully multi-threaded access to
-object trees, it has some code to help make use in threaded programs
+object trees, it has some code to help make its use in threaded programs
 a bit safer.  Currently, this is limited to using atomic operations for
 json_object_get() and json_object_put().
 
