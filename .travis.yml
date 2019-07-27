@@ -43,7 +43,7 @@ matrix:
             - clang-5.0
       env: MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
     - os: linux
-      dist: 
+      dist: xenial
       compiler: clang
       addons:
         apt:
