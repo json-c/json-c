@@ -1,32 +1,116 @@
 language: cpp
+matrix:
+  include:
+# gcc
+#   xenial
+#   gcc 5 is the default on xenial
+    - os: linux
+      dist: xenial
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - valgrind
+            - cppcheck
+            - doxygen
+      env: CHECK="true"
+#   bionic
+    - os: linux
+      dist: bionic
+      compiler: gcc
+      env: MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
+    
+    # gcc 7 is the default on bionic
+    - os: linux
+      dist: bionic
+      compiler: gcc
+      env: CHECK="true"
+    - os: linux
+      dist: bionic
+      compiler: gcc
+      env: MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
 
-compiler:
-  - gcc
-  - clang
+# clang      
+#   xenial
+    - os: linux
+      dist: xenial
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-xenial-5.0
+          packages:
+            - clang-5.0
+      env: MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+    - os: linux
+      dist: xenial
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-xenial-6.0
+          packages:
+            - clang-6.0
+      env: MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0" 
 
-addons:
-  apt:
-    packages:
-      - cppcheck
+    # clang-7 is the default on xenial and bionic
+    - os: linux
+      dist: xenial
+      compiler: clang
+      addons:
+        apt:
+          packages:
+            - valgrind
+            - cppcheck
+            - doxygen
+      env: CHECK="true"
 
-os:
-  - linux
-  - osx
+# bionic
+    - os: linux
+      dist: bionic
+      compiler: clang
+      env: CHECK="true"
+# osx
+    - os: osx
+      osx_image: xcode9.4
+      env: XCODE="true"
+    - os: osx
+      osx_image: xcode10.1
+      env: XCODE="true" CHECK="true"
 
-before_install:
-  - echo $LANG
-  - echo $LC_ALL
-  - set -e
+#  allow_failures:
+#    - os: osx
 
 install:
   - sh autogen.sh
+
+before_install:
+  - echo $CC
+  - echo $LANG
+  - echo $LC_ALL
+  - set -e
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+      eval "${MATRIX_EVAL}";
+      if [ -n "$MATRIX_EVAL" ] && [ "$TRAVIS_COMPILER" != "clang" ]; then
+        sudo apt-get install -y $CC;
+      fi;
+    fi
 
 before_script:
   - ./configure
 
 script:
   - make
+  # when using bionic, Travis seems to ignore the "addons" section, so installing the packages with apt-get...
+  - if [ -n "$CHECK" ]; then
+      if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+        brew install doxygen;
+      else
+        if [ "$TRAVIS_DIST" = "bionic" ]; then
+          sudo apt-get install -y valgrind cppcheck doxygen;
+        fi;
+      fi;
+      make distcheck;
+      if type cppcheck &> /dev/null ; then cppcheck --error-exitcode=1 --quiet *.h *.c tests/ ; fi;
+    fi
 
-after_success:
-  - make check
-  - if type cppcheck &> /dev/null ; then cppcheck --error-exitcode=1 --quiet *.h *.c tests/ ; fi
