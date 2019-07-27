@@ -121,7 +121,7 @@ Building with partial threading support <a name="buildthreaded"></a>
 ----------------------------------------
 
 Although json-c does not support fully multi-threaded access to
-object trees, it has some code to help make use in threaded programs
+object trees, it has some code to help make its use in threaded programs
 a bit safer.  Currently, this is limited to using atomic operations for
 json_object_get() and json_object_put().
 
@@ -131,7 +131,7 @@ default.  You may turn it on by adjusting your configure command with:
    --enable-threading
 
 Separately, the default hash function used for object field keys,
-lh_char_hash, uses a compare-and-swap operation to ensure the randomly
+lh_char_hash, uses a compare-and-swap operation to ensure the random
 seed is only generated once.  Because this is a one-time operation, it
 is always compiled in when the compare-and-swap operation is available.
 
