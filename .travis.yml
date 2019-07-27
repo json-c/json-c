@@ -53,8 +53,19 @@ matrix:
             - clang-6.0
       env: MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0" 
 
+    # clang-7 is the default on xenial and bionic
+    - os: linux
+      dist: xenial
+      compiler: clang
+      addons:
+        apt:
+          packages:
+            - valgrind
+            - cppcheck
+            - doxygen
+      env: CHECK="true"
+
 # bionic
-    # The default clang on bionic is clang 7.0
     - os: linux
       dist: bionic
       compiler: clang
