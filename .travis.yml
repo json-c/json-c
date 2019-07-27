@@ -24,12 +24,6 @@ matrix:
     - os: linux
       dist: bionic
       compiler: gcc
-      addons:
-        apt:
-          packages:
-            - valgrind
-            - cppcheck
-            - doxygen
       env: CHECK="true"
     - os: linux
       dist: bionic
@@ -38,44 +32,32 @@ matrix:
 
 # clang      
 #   xenial
-#   The default clang on xenial is clang 7.0
     - os: linux
       dist: xenial
       compiler: clang
       addons:
         apt:
-          packages:
-            - clang-6.0
-            - cppcheck
-            - doxygen
-      env: CHECK="true"
-
-#   bionic
-    - os: linux
-      dist: bionic
-      compiler: clang
-      addons:
-        apt:
           sources:
-            - llvm-toolchain-bionic-5.0
+            - llvm-toolchain-xenial-5.0
           packages:
             - clang-5.0
       env: MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
     - os: linux
-      dist: bionic
+      dist: 
       compiler: clang
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-xenial-6.0
+          packages:
+            - clang-6.0
       env: MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0" 
-    
+
+# bionic
     # The default clang on bionic is clang 7.0
     - os: linux
       dist: bionic
       compiler: clang
-      addons:
-        apt:
-          packages:
-            - clang-6.0
-            - cppcheck
-            - doxygen
       env: CHECK="true"
 # osx
     - os: osx
@@ -108,9 +90,14 @@ before_script:
 
 script:
   - make
+  # when using bionic, Travis seems to ignore the "addons" section, so installing the packages with apt-get...
   - if [ -n "$CHECK" ]; then
       if [ "$TRAVIS_OS_NAME" = "osx" ]; then
         brew install doxygen;
+      else
+        if [ "$TRAVIS_DIST" = "bionic" ]; then
+          sudo apt-get install -y valgrind cppcheck doxygen;
+        fi;
       fi;
       make distcheck;
       if type cppcheck &> /dev/null ; then cppcheck --error-exitcode=1 --quiet *.h *.c tests/ ; fi;
