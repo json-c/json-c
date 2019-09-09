@@ -79,17 +79,46 @@ struct json_tokener_srec
 
 #define JSON_TOKENER_DEFAULT_DEPTH 32
 
+/**
+ * Internal state of the json parser.
+ * Do not access any fields of this structure directly.
+ * Its definition is published due to historical limitations
+ * in the json tokener API, and will be changed to be an opaque
+ * type in the future.
+ */
 struct json_tokener
 {
   char *str;
   struct printbuf *pb;
-  int max_depth, depth, is_double, st_pos, char_offset;
+  int max_depth, depth, is_double, st_pos;
+  /**
+   * See json_tokener_get_parse_end()
+   */
+  int char_offset;
   enum json_tokener_error err;
   unsigned int ucs_char;
   char quote_char;
   struct json_tokener_srec *stack;
   int flags;
 };
+
+/**
+ * Return the offset of the byte after the last byte parsed
+ * relative to the start of the most recent string passed in
+ * to json_tokener_parse_ex().  i.e. this is where parsing
+ * would start again if the input contains another JSON object
+ * after the currently parsed one.
+ *
+ * Note that when multiple parse calls are issued, this is *not* the
+ * total number of characters parsed.
+ *
+ * In the past this would have been accessed as tok->char_offset.
+ *
+ * See json_tokener_parse_ex() for an example of how to use this.
+ */
+size_t json_tokener_get_parse_end(struct json_tokener *tok);
+
+
 /**
  * @deprecated Unused in json-c code
  */
@@ -160,13 +189,13 @@ JSON_EXPORT void json_tokener_set_flags(struct json_tokener *tok, int flags);
  * the type with json_object_is_type() or json_object_get_type() before using
  * the object.
  *
- * @b XXX this shouldn't use internal fields:
  * Trailing characters after the parsed value do not automatically cause an
  * error.  It is up to the caller to decide whether to treat this as an
  * error or to handle the additional characters, perhaps by parsing another
  * json value starting from that point.
  *
- * Extra characters can be detected by comparing the tok->char_offset against
+ * Extra characters can be detected by comparing the value returned by
+ * json_tokener_get_parse_end() against
  * the length of the last len parameter passed in.
  *
  * The tokener does \b not maintain an internal buffer so the caller is
@@ -194,7 +223,7 @@ if (jerr != json_tokener_success)
 	fprintf(stderr, "Error: %s\n", json_tokener_error_desc(jerr));
 	// Handle errors, as appropriate for your application.
 }
-if (tok->char_offset < stringlen) // XXX shouldn't access internal fields
+if (json_tokener_get_parse_end(tok) < stringlen)
 {
 	// Handle extra characters after parsed object as desired.
 	// e.g. issue an error, parse another object from that point, etc...

@@ -15,6 +15,7 @@
 
 #include "config.h"
 
+#include <assert.h>
 #include <math.h>
 #include "math_compat.h"
 #include <stdio.h>
@@ -225,7 +226,7 @@ struct json_object* json_tokener_parse_verbose(const char *str,
    )
 
 /* ADVANCE_CHAR() macro:
- *   Incrementes str & tok->char_offset.
+ *   Increments str & tok->char_offset.
  *   For convenience of existing conditionals, returns the old value of c (0 on eof)
  *   Implicit inputs:  c var
  */
@@ -995,3 +996,10 @@ void json_tokener_set_flags(struct json_tokener *tok, int flags)
 {
 	tok->flags = flags;
 }
+
+size_t json_tokener_get_parse_end(struct json_tokener *tok)
+{
+	assert(tok->char_offset >= 0); /* Drop this line when char_offset becomes a size_t */
+	return (size_t)tok->char_offset;
+}
+

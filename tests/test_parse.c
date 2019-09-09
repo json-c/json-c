@@ -334,7 +334,7 @@ static void test_incremental_parse()
 		int this_step_ok = 0;
 		struct incremental_step *step = &incremental_steps[ii];
 		int length = step->length;
-		int expected_char_offset = step->char_offset;
+		size_t expected_char_offset;
 
 		if (step->reset_tokener & 2)
 			json_tokener_set_flags(tok, JSON_TOKENER_STRICT);
@@ -343,8 +343,10 @@ static void test_incremental_parse()
 
 		if (length == -1)
 			length = strlen(step->string_to_parse);
-		if (expected_char_offset == -1)
+		if (step->char_offset == -1)
 			expected_char_offset = length;
+		else
+			expected_char_offset = step->char_offset;
 
 		printf("json_tokener_parse_ex(tok, %-12s, %3d) ... ",
 			step->string_to_parse, length);
@@ -359,9 +361,9 @@ static void test_incremental_parse()
 			else if (jerr != step->expected_error)
 				printf("ERROR: got wrong error: %s\n",
 				       json_tokener_error_desc(jerr));
-			else if (tok->char_offset != expected_char_offset)
-				printf("ERROR: wrong char_offset %d != expected %d\n",
-				       tok->char_offset,
+			else if (json_tokener_get_parse_end(tok) != expected_char_offset)
+				printf("ERROR: wrong char_offset %zu != expected %zu\n",
+				       json_tokener_get_parse_end(tok),
 				       expected_char_offset);
 			else
 			{
@@ -377,9 +379,9 @@ static void test_incremental_parse()
 			      strncmp(step->string_to_parse, "null", 4) == 0))
 				printf("ERROR: expected valid object, instead: %s\n",
 				       json_tokener_error_desc(jerr));
-			else if (tok->char_offset != expected_char_offset)
-				printf("ERROR: wrong char_offset %d != expected %d\n",
-				       tok->char_offset,
+			else if (json_tokener_get_parse_end(tok) != expected_char_offset)
+				printf("ERROR: wrong char_offset %zu != expected %zu\n",
+				       json_tokener_get_parse_end(tok),
 				       expected_char_offset);
 			else
 			{
