@@ -265,14 +265,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 #ifdef HAVE_USELOCALE
   {
     locale_t duploc = duplocale(oldlocale);
-    newloc = newlocale(LC_NUMERIC, "C", duploc);
-    // XXX at least Debian 8.4 has a bug in newlocale where it doesn't
-    //  change the decimal separator unless you set LC_TIME!
-    if (newloc)
-    {
-      duploc = newloc; // original duploc has been freed by newlocale()
-      newloc = newlocale(LC_TIME, "C", duploc);
-    }
+    newloc = newlocale(LC_NUMERIC_MASK, "C", duploc);
     if (newloc == NULL)
     {
       freelocale(duploc);
