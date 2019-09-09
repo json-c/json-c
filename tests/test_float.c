@@ -2,8 +2,8 @@
  * Released under ASL 2.0 */
 #include "config.h"
 #include <stdio.h>
-#include "../json_object.h"
-#include "../json_tokener.h"
+#include "json_object.h"
+#include "json_tokener.h"
 int main(void)
 {
   json_object *json;
