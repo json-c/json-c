@@ -26,6 +26,14 @@
 
 #include <stddef.h>
 
+#ifndef JSON_EXPORT
+#if defined(_MSC_VER) 
+#define JSON_EXPORT __declspec(dllexport)
+#else
+#define JSON_EXPORT extern
+#endif
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -72,7 +80,7 @@ struct json_object;
  *
  * @return json_object_iterator
  */
-struct json_object_iterator
+JSON_EXPORT struct json_object_iterator
 json_object_iter_init_default(void);
 
 /** Retrieves an iterator to the first pair of the JSON Object.
@@ -106,7 +114,7 @@ json_object_iter_init_default(void);
  *
  * @endcode
  */
-struct json_object_iterator
+JSON_EXPORT struct json_object_iterator
 json_object_iter_begin(struct json_object* obj);
 
 /** Retrieves the iterator that represents the position beyond the
@@ -137,7 +145,7 @@ json_object_iter_begin(struct json_object* obj);
  *              (i.e., NOT the last pair, but "beyond the last
  *              pair" value)
  */
-struct json_object_iterator
+JSON_EXPORT struct json_object_iterator
 json_object_iter_end(const struct json_object* obj);
 
 /** Returns an iterator to the next pair, if any
@@ -155,7 +163,7 @@ json_object_iter_end(const struct json_object* obj);
  *         of json_object_iter_end() for the same JSON Object
  *         instance.
  */
-void
+JSON_EXPORT void
 json_object_iter_next(struct json_object_iterator* iter);
 
 
@@ -174,7 +182,7 @@ json_object_iter_next(struct json_object_iterator* iter);
  *         deleted or modified, and MUST NOT be modified or
  *         freed by the user.
  */
-const char*
+JSON_EXPORT const char*
 json_object_iter_peek_name(const struct json_object_iterator* iter);
 
 
@@ -197,7 +205,7 @@ json_object_iter_peek_name(const struct json_object_iterator* iter);
  *         the JSON Null value as a NULL json_object instance
  *         pointer.
  */
-struct json_object*
+JSON_EXPORT struct json_object*
 json_object_iter_peek_value(const struct json_object_iterator* iter);
 
 
@@ -227,7 +235,7 @@ json_object_iter_peek_value(const struct json_object_iterator* iter);
  *         reference the same name/value pair or are both at
  *         "end"); zero if they are not equal.
  */
-json_bool
+JSON_EXPORT json_bool
 json_object_iter_equal(const struct json_object_iterator* iter1,
                        const struct json_object_iterator* iter2);
 

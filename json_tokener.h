@@ -116,7 +116,7 @@ struct json_tokener
  *
  * See json_tokener_parse_ex() for an example of how to use this.
  */
-size_t json_tokener_get_parse_end(struct json_tokener *tok);
+JSON_EXPORT size_t json_tokener_get_parse_end(struct json_tokener *tok);
 
 
 /**
@@ -142,7 +142,7 @@ typedef struct json_tokener json_tokener;
  *
  * @return a generic error message is returned if an invalid error value is provided.
  */
-const char *json_tokener_error_desc(enum json_tokener_error jerr);
+JSON_EXPORT const char *json_tokener_error_desc(enum json_tokener_error jerr);
 
 /**
  * Retrieve the error caused by the last call to json_tokener_parse_ex(),

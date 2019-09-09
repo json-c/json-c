@@ -33,10 +33,12 @@
 #define JSON_C_CONST_FUNCTION(func) func
 #endif
 
+#ifndef JSON_EXPORT
 #if defined(_MSC_VER) 
 #define JSON_EXPORT __declspec(dllexport)
 #else
 #define JSON_EXPORT extern
+#endif
 #endif
 
 #include <stddef.h>

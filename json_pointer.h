@@ -44,7 +44,7 @@ extern "C" {
  *
  * @return negative if an error (or not found), or 0 if succeeded
  */
-int json_pointer_get(struct json_object *obj, const char *path, struct json_object **res);
+JSON_EXPORT int json_pointer_get(struct json_object *obj, const char *path, struct json_object **res);
 
 /**
  * This is a variant of 'json_pointer_get()' that supports printf() style arguments.
@@ -62,7 +62,7 @@ int json_pointer_get(struct json_object *obj, const char *path, struct json_obje
  *
  * @return negative if an error (or not found), or 0 if succeeded
  */
-int json_pointer_getf(struct json_object *obj, struct json_object **res, const char *path_fmt, ...);
+JSON_EXPORT int json_pointer_getf(struct json_object *obj, struct json_object **res, const char *path_fmt, ...);
 
 /**
  * Sets JSON object 'value' in the 'obj' tree at the location specified
@@ -93,7 +93,7 @@ int json_pointer_getf(struct json_object *obj, struct json_object **res, const c
  *
  * @return negative if an error (or not found), or 0 if succeeded
  */
-int json_pointer_set(struct json_object **obj, const char *path, struct json_object *value);
+JSON_EXPORT int json_pointer_set(struct json_object **obj, const char *path, struct json_object *value);
 
 /**
  * This is a variant of 'json_pointer_set()' that supports printf() style arguments.
@@ -110,7 +110,7 @@ int json_pointer_set(struct json_object **obj, const char *path, struct json_obj
  *
  * @return negative if an error (or not found), or 0 if succeeded
  */
-int json_pointer_setf(struct json_object **obj, struct json_object *value, const char *path_fmt, ...);
+JSON_EXPORT int json_pointer_setf(struct json_object **obj, struct json_object *value, const char *path_fmt, ...);
 
 
 #ifdef __cplusplus

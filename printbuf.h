@@ -23,6 +23,14 @@
 #ifndef _printbuf_h_
 #define _printbuf_h_
 
+#ifndef JSON_EXPORT
+#if defined(_MSC_VER) 
+#define JSON_EXPORT __declspec(dllexport)
+#else
+#define JSON_EXPORT extern
+#endif
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -34,7 +42,7 @@ struct printbuf {
 };
 typedef struct printbuf printbuf;
 
-extern struct printbuf*
+JSON_EXPORT struct printbuf*
 printbuf_new(void);
 
 /* As an optimization, printbuf_memappend_fast() is defined as a macro
@@ -45,7 +53,7 @@ printbuf_new(void);
  * Your code should not use printbuf_memappend() directly unless it
  * checks the return code. Use printbuf_memappend_fast() instead.
  */
-extern int
+JSON_EXPORT int
 printbuf_memappend(struct printbuf *p, const char *buf, int size);
 
 #define printbuf_memappend_fast(p, bufptr, bufsize)          \
@@ -89,7 +97,7 @@ do {                                                         \
  *
  * If offset is -1, this starts at the end of the current data in the buffer.
  */
-extern int
+JSON_EXPORT int
 printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len);
 
 /**
@@ -106,13 +114,13 @@ printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len);
  *   printbuf_memappend()
  *   printbuf_strappend()
  */
-extern int
+JSON_EXPORT int
 sprintbuf(struct printbuf *p, const char *msg, ...);
 
-extern void
+JSON_EXPORT void
 printbuf_reset(struct printbuf *p);
 
-extern void
+JSON_EXPORT void
 printbuf_free(struct printbuf *p);
 
 #ifdef __cplusplus
