@@ -21,6 +21,18 @@ construct JSON objects in C, output them as JSON formatted strings and parse
 JSON formatted strings back into the C representation of JSON objects.
 It aims to conform to [RFC 7159](https://tools.ietf.org/html/rfc7159).
 
+Building on Unix and Windows with `vcpkg`, `gcc`/`g++`, `curl`, `unzip`, and `tar`
+--------------------------------------------------
+
+You can download and install JSON-C using the [vcpkg](https://github.com/Microsoft/vcpkg/) dependency manager:
+
+    git clone https://github.com/Microsoft/vcpkg.git
+    cd vcpkg
+    ./bootstrap-vcpkg.sh
+    ./vcpkg integrate install
+    vcpkg install json-c
+
+The JSON-C port in vcpkg is kept up to date by Microsoft team members and community contributors. If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg) on the vcpkg repository.
 
 Building on Unix with `git`, `gcc` and `autotools` <a name="buildunix"></a>
 --------------------------------------------------
