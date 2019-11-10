@@ -11,6 +11,10 @@ int main(void)
   json = json_object_new_double(1.0);
   printf("json = %s\n", json_object_to_json_string_ext(json, JSON_C_TO_STRING_PRETTY));
   json_object_put(json);
+
+  json = json_object_new_double(-1.0);
+  printf("json = %s\n", json_object_to_json_string_ext(json, JSON_C_TO_STRING_PRETTY));
+  json_object_put(json);
   json = json_object_new_double(1.23);
   printf("json = %s\n", json_object_to_json_string_ext(json, JSON_C_TO_STRING_PRETTY));
   json_object_put(json);
