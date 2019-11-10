@@ -50,7 +50,19 @@ JSON_EXPORT struct json_object* json_object_from_file(const char *filename);
  * Note, that the fd must be readable at the actual position, i.e.
  * use lseek(fd, 0, SEEK_SET) before.
  *
+ * The depth argument specifies the maximum object depth to pass to
+ * json_tokener_new_ex().  When depth == -1, JSON_TOKENER_DEFAULT_DEPTH
+ * is used instead.
+ *
  * Returns NULL on failure.  See json_util_get_last_err() for details.
+ */
+JSON_EXPORT struct json_object* json_object_from_fd_ex(int fd, int depth);
+
+/**
+ * Create a JSON object from an already opened file descriptor, using
+ * the default maximum object depth. (JSON_TOKENER_DEFAULT_DEPTH)
+ *
+ * See json_object_from_fd_ex() for details.
  */
 JSON_EXPORT struct json_object* json_object_from_fd(int fd);
 

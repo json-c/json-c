@@ -83,6 +83,10 @@ void _json_c_set_last_err(const char *err_fmt, ...)
 
 struct json_object* json_object_from_fd(int fd)
 {
+	return json_object_from_fd_ex(fd, -1);
+}
+struct json_object* json_object_from_fd_ex(int fd, int in_depth)
+{
   struct printbuf *pb;
   struct json_object *obj;
   char buf[JSON_FILE_BUF_SIZE];
@@ -92,17 +96,35 @@ struct json_object* json_object_from_fd(int fd)
     _json_c_set_last_err("json_object_from_file: printbuf_new failed\n");
     return NULL;
   }
+
+	int depth = JSON_TOKENER_DEFAULT_DEPTH;
+	if (in_depth != -1)
+		depth = in_depth;
+	json_tokener *tok = json_tokener_new_ex(depth);
+	if (!tok)
+	{
+		_json_c_set_last_err("json_object_from_fd: unable to allocate json_tokener(depth=%d): %s\n", depth, strerror(errno));
+		printbuf_free(pb);
+		return NULL;
+	}
+
   while((ret = read(fd, buf, JSON_FILE_BUF_SIZE)) > 0) {
     printbuf_memappend(pb, buf, ret);
   }
   if(ret < 0) {
     _json_c_set_last_err("json_object_from_fd: error reading fd %d: %s\n", fd, strerror(errno));
+	json_tokener_free(tok);
     printbuf_free(pb);
     return NULL;
   }
-  obj = json_tokener_parse(pb->buf);
-  printbuf_free(pb);
-  return obj;
+
+ 	obj = json_tokener_parse_ex(tok, pb->buf, printbuf_length(pb));
+	if (obj == NULL)
+		_json_c_set_last_err("json_tokener_parse_ex failed: %s\n", json_tokener_error_desc(json_tokener_get_error(tok)));
+
+	json_tokener_free(tok);
+	printbuf_free(pb);
+	return obj;
 }
 
 struct json_object* json_object_from_file(const char *filename)

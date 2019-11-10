@@ -36,6 +36,7 @@ EXTRA_DIST += $(TESTS)
 EXTRA_DIST += $(TESTS:.test=.expected)
 EXTRA_DIST += test-defs.sh
 EXTRA_DIST += valid.json
+EXTRA_DIST += valid_nested.json
 
 
 # Note: handled by test1.test
