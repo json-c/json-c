@@ -91,16 +91,17 @@ struct json_object* json_object_from_fd_ex(int fd, int in_depth)
   struct json_object *obj;
   char buf[JSON_FILE_BUF_SIZE];
   int ret;
+	int depth = JSON_TOKENER_DEFAULT_DEPTH;
+	json_tokener *tok;
 
   if(!(pb = printbuf_new())) {
     _json_c_set_last_err("json_object_from_file: printbuf_new failed\n");
     return NULL;
   }
 
-	int depth = JSON_TOKENER_DEFAULT_DEPTH;
 	if (in_depth != -1)
 		depth = in_depth;
-	json_tokener *tok = json_tokener_new_ex(depth);
+	tok = json_tokener_new_ex(depth);
 	if (!tok)
 	{
 		_json_c_set_last_err("json_object_from_fd: unable to allocate json_tokener(depth=%d): %s\n", depth, strerror(errno));
