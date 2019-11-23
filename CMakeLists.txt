@@ -2,8 +2,12 @@
 # specially true in old embedded systems (OpenWRT and friends) where CMake isn't necessarily upgraded.
 cmake_minimum_required(VERSION 2.8)
 
+if(POLICY CMP0048)
+	cmake_policy(SET CMP0048 NEW)
+endif()
+
 # JSON-C library is C only project.
-project(json-c C)
+project(json-c LANGUAGES C VERSION 0.13.99)
 
 # If we've got 3.0 then it's good, let's provide support. Otherwise, leave it be.
 if(POLICY CMP0038)
@@ -23,9 +27,9 @@ endif()
 
 # Set some packaging variables.
 set(CPACK_PACKAGE_NAME              "${PROJECT_NAME}")
-set(CPACK_PACKAGE_VERSION_MAJOR     "0")
-set(CPACK_PACKAGE_VERSION_MINOR     "13")
-set(CPACK_PACKAGE_VERSION_PATCH     "99")
+set(CPACK_PACKAGE_VERSION_MAJOR     "${PROJECT_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR     "${PROJECT_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH     "${PROJECT_VERSION_PATCH}")
 set(JSON_C_BUGREPORT                "json-c@googlegroups.com")
 
 include(CheckSymbolExists)
@@ -208,6 +212,7 @@ set(JSON_C_PUBLIC_HEADERS
     ${PROJECT_SOURCE_DIR}/json_pointer.h
     ${PROJECT_SOURCE_DIR}/json_tokener.h
     ${PROJECT_SOURCE_DIR}/json_util.h
+    ${PROJECT_SOURCE_DIR}/json_visit.h
     ${PROJECT_SOURCE_DIR}/linkhash.h
     ${PROJECT_SOURCE_DIR}/printbuf.h
 )
@@ -291,6 +296,7 @@ if (UNIX OR MINGW OR CYGWIN)
     SET(exec_prefix ${CMAKE_INSTALL_PREFIX})
     SET(libdir ${CMAKE_INSTALL_FULL_LIBDIR})
     SET(includedir ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+    SET(VERSION ${PROJECT_VERSION})
     configure_file(json-c.pc.in json-c.pc @ONLY)
     set(INSTALL_PKGCONFIG_DIR "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" CACHE PATH "Installation directory for pkgconfig (.pc) files")
     install(FILES ${PROJECT_BINARY_DIR}/json-c.pc DESTINATION "${INSTALL_PKGCONFIG_DIR}")
