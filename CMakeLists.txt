@@ -15,6 +15,12 @@ if(POLICY CMP0054)
     cmake_policy(SET CMP0054 NEW)
 endif()
 
+include(CTest)
+
+if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
+add_subdirectory(tests)
+endif()
+
 # Set some packaging variables.
 set(CPACK_PACKAGE_NAME              "${PROJECT_NAME}")
 set(CPACK_PACKAGE_VERSION_MAJOR     "0")
@@ -183,6 +189,11 @@ elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /wd4701")
 endif()
 
+if ($ENV{VALGRIND})
+	# Build so that valgrind doesn't complain about linkhash.c
+    add_definitions(-DVALGRIND=1)
+endif()
+
 set(JSON_C_PUBLIC_HEADERS
     ${PROJECT_BINARY_DIR}/config.h
     ${PROJECT_BINARY_DIR}/json_config.h
@@ -232,9 +243,9 @@ set(JSON_C_SOURCES
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_BINARY_DIR})
 
-# If -DBUILD_SHARED_LIBS is set in the CMake command-line, we'll be able to create shared libs, otherwise this would
-# generate static libs. Good enough for most use-cases unless there's some serious requirement to create both
-# simultaneously.
+# XXX for a normal full distribution we'll need to figure out
+# XXX how to build both shared and static libraries.
+# Probably leverage that to build a local VALGRIND=1 library for testing too.
 add_library(${PROJECT_NAME}
     ${JSON_C_SOURCES}
     ${JSON_C_HEADERS}

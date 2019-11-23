@@ -174,6 +174,41 @@ Pass these options as `-D` on CMake's command-line.
 cmake -DBUILD_SHARED_LIBS=OFF ...
 ```
 
+Testing with cmake:
+
+By default, if valgrind is available running tests uses it.
+That can slow the tests down considerably, so to disable it use:
+```sh
+export USE_VALGRIND=0
+```
+
+To run tests:
+```sh
+mkdir build-test
+cd build-test
+# VALGRIND=1 causes -DVALGRIND=1 to be included when building
+VALGRIND=1 cmake ..
+make
+
+make test
+# By default, if valgrind is available running tests uses it.
+make USE_VALGRIND=0 test   # optionally skip using valgrind
+```
+
+If a test fails, check `Testing/Temporary/LastTest.log`, 
+`tests/testSubDir/${testname}/${testname}.vg.out`, and other similar files.
+If there is insufficient output try:
+```sh
+VERBOSE=1 make test
+```
+or
+```sh
+JSONC_TEST_TRACE=1 make test
+```
+and check the log files again.
+
+
+
 Linking to `libjson-c` <a name="linking">
 ----------------------
 
