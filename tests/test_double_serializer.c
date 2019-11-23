@@ -8,6 +8,9 @@
 #include "json_object.h"
 #include "json_object_private.h"
 
+/* Avoid compiler warnings about diving by constant zero */
+double zero_dot_zero = 0.0;
+
 int main()
 {
 	struct json_object *obj = json_object_new_double(0.5);
@@ -79,5 +82,16 @@ int main()
 	obj = json_object_new_double(-12.0);
 	printf("obj(-12.0).to_string(default format)=%s\n", json_object_to_json_string(obj));
 	json_object_put(obj);
+
+	/* Test NaN handling */
+	obj = json_object_new_double(zero_dot_zero / zero_dot_zero);
+	printf("obj(0.0/0.0)=%s\n", json_object_to_json_string(obj));
+
+	/* Test Infinity and -Infinity handling */
+	obj = json_object_new_double(1.0/zero_dot_zero);
+	printf("obj(1.0/0.0)=%s\n", json_object_to_json_string(obj));
+
+	obj = json_object_new_double(-1.0/zero_dot_zero);
+	printf("obj(-1.0/0.0)=%s\n", json_object_to_json_string(obj));
 
 }
