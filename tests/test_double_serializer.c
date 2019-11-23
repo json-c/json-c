@@ -86,12 +86,16 @@ int main()
 	/* Test NaN handling */
 	obj = json_object_new_double(zero_dot_zero / zero_dot_zero);
 	printf("obj(0.0/0.0)=%s\n", json_object_to_json_string(obj));
+	json_object_put(obj);
 
 	/* Test Infinity and -Infinity handling */
 	obj = json_object_new_double(1.0/zero_dot_zero);
 	printf("obj(1.0/0.0)=%s\n", json_object_to_json_string(obj));
+	json_object_put(obj);
 
 	obj = json_object_new_double(-1.0/zero_dot_zero);
 	printf("obj(-1.0/0.0)=%s\n", json_object_to_json_string(obj));
+	json_object_put(obj);
 
+	return 0;
 }

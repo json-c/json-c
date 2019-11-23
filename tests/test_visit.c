@@ -49,6 +49,8 @@ int main(void)
 	printf("================================\n\n");
 
 	json_object_put(jso);
+
+	return 0;
 }
 
 

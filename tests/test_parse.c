@@ -26,6 +26,8 @@ int main(void)
 	puts(separator);
 	test_incremental_parse();
 	puts(separator);
+
+	return 0;
 }
 
 static json_c_visit_userfunc clear_serializer;

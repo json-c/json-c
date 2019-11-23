@@ -58,5 +58,7 @@ int main(int argc, char **argv)
 
 	printf("new_obj.to_string()=%s\n", json_object_to_json_string_ext(new_obj,JSON_C_TO_STRING_NOZERO));
 	json_object_put(new_obj);
+
+	return 0;
 }
 

@@ -14,6 +14,8 @@ int main(int argc, char **argv)
 	MC_SET_DEBUG(1);
 
 	test_case_parse();
+
+	return 0;
 }
 
 /* make sure only lowercase forms are parsed in strict mode */
