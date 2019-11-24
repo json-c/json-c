@@ -166,7 +166,7 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 
 /* reference counting */
 
-extern struct json_object* json_object_get(struct json_object *jso)
+struct json_object* json_object_get(struct json_object *jso)
 {
 	if (!jso) return jso;
 

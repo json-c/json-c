@@ -23,14 +23,22 @@
 extern "C" {
 #endif
 
-extern void mc_set_debug(int debug);
-extern int mc_get_debug(void);
+#ifndef JSON_EXPORT
+#if defined(_MSC_VER) 
+#define JSON_EXPORT __declspec(dllexport)
+#else
+#define JSON_EXPORT extern
+#endif
+#endif
 
-extern void mc_set_syslog(int syslog);
+JSON_EXPORT void mc_set_debug(int debug);
+JSON_EXPORT int mc_get_debug(void);
 
-extern void mc_debug(const char *msg, ...);
-extern void mc_error(const char *msg, ...);
-extern void mc_info(const char *msg, ...);
+JSON_EXPORT void mc_set_syslog(int syslog);
+
+JSON_EXPORT void mc_debug(const char *msg, ...);
+JSON_EXPORT void mc_error(const char *msg, ...);
+JSON_EXPORT void mc_info(const char *msg, ...);
 
 #ifndef __STRING
 #define __STRING(x) #x

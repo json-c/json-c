@@ -11,6 +11,11 @@
 static void test_basic_printbuf_memset(void);
 static void test_printbuf_memset_length(void);
 
+#ifndef __func__
+/* VC++ compat */
+#define __func__ __FUNCTION__
+#endif
+
 static void test_basic_printbuf_memset()
 {
 	struct printbuf *pb;
@@ -158,7 +163,7 @@ int main(int argc, char **argv)
 {
 	int before_resize = 0;
 
-	mc_set_debug(1);
+	MC_SET_DEBUG(1);
 
 	test_basic_printbuf_memset();
 	printf("========================================\n");

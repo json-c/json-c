@@ -351,7 +351,7 @@ JSON_EXPORT void json_object_set_serializer(json_object *jso,
  * @param jso unused
  * @param userdata the pointer that is passed to free().
  */
-json_object_delete_fn json_object_free_userdata;
+JSON_EXPORT json_object_delete_fn json_object_free_userdata;
 
 /**
  * Copy the jso->_userdata string over to pb as-is.
@@ -362,7 +362,7 @@ json_object_delete_fn json_object_free_userdata;
  * @param level Ignored.
  * @param flags Ignored.
  */
-json_object_to_json_string_fn json_object_userdata_to_json_string;
+JSON_EXPORT json_object_to_json_string_fn json_object_userdata_to_json_string;
 
 #ifdef __clang__
 /* } */
@@ -825,7 +825,7 @@ JSON_EXPORT struct json_object* json_object_new_double_s(double d, const char *d
  *
  * @return -1 on errors, 0 on success.
  */
-int json_c_set_serialization_double_format(const char *double_format, int global_or_thread);
+JSON_EXPORT int json_c_set_serialization_double_format(const char *double_format, int global_or_thread);
 
 
 
@@ -1013,7 +1013,7 @@ typedef int (json_c_shallow_copy_fn)(json_object *src, json_object *parent, cons
  *
  * @return 1 on success, -1 on errors, but never 2.
  */
-json_c_shallow_copy_fn json_c_shallow_copy_default;
+JSON_EXPORT json_c_shallow_copy_fn json_c_shallow_copy_default;
 
 /**
  * Copy the contents of the JSON object.
