@@ -1,5 +1,10 @@
 #include "strerror_override.h"
 #include "strerror_override_private.h"
+#ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <io.h>
+#endif /* defined(WIN32) */  
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -22,6 +27,10 @@ static void test_read_closed(void);
 
 static void test_write_to_file();
 static void stat_and_cat(const char *file);
+
+#ifndef PATH_MAX
+#define PATH_MAX 256
+#endif
 
 static void test_write_to_file()
 {
