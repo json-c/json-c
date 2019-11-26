@@ -257,6 +257,9 @@ add_library(${PROJECT_NAME}
     ${JSON_C_SOURCES}
     ${JSON_C_HEADERS}
 )
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    VERSION 4.0.0
+    SOVERSION 4)
 
 # If json-c is used as subroject it set to target correct interface -I flags and allow
 # to build external target without extra include_directories(...)
