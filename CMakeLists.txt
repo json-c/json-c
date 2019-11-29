@@ -258,6 +258,13 @@ add_library(${PROJECT_NAME}
     ${JSON_C_HEADERS}
 )
 
+# Set the SO-VERSION and the build version for the built version.
+set_target_properties(${PROJECT_NAME}
+    PROPERTIES
+        SOVERSION "5.0.0"
+        VERSION "${PROJECT_VERSION}"
+)
+
 # If json-c is used as subroject it set to target correct interface -I flags and allow
 # to build external target without extra include_directories(...)
 target_include_directories(${PROJECT_NAME}
