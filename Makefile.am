@@ -43,7 +43,7 @@ noinst_HEADERS=\
 	random_seed.h \
 	strerror_override.h
 
-libjson_c_la_LDFLAGS = -version-info 4:0:0 -no-undefined @JSON_BSYMBOLIC_LDFLAGS@
+libjson_c_la_LDFLAGS = -version-info 5:0:0 -no-undefined @JSON_BSYMBOLIC_LDFLAGS@
 
 libjson_c_la_SOURCES = \
 	arraylist.c \
