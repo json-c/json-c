@@ -19,6 +19,12 @@ if(POLICY CMP0054)
     cmake_policy(SET CMP0054 NEW)
 endif()
 
+# Include file check macros honor CMAKE_REQUIRED_LIBRARIES
+# i.e. the check_include_file() calls will include -lm when checking.
+if(POLICY CMP0075)
+	cmake_policy(SET CMP0075 NEW)
+endif()
+
 include(CTest)
 
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING AND
