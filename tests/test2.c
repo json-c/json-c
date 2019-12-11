@@ -13,6 +13,7 @@
 int main(int argc, char **argv)
 {
 	json_object *new_obj;
+	
 #ifdef TEST_FORMATTED
 	int sflags = 0;
 	sflags = parse_flags(argc, argv);
