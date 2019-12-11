@@ -181,7 +181,7 @@ int main(int argc, char **argv)
 	json_object_array_add(my_array, json_object_new_int(2));
 	json_object_array_add(my_array, json_object_new_int(3));
 	json_object_array_put_idx(my_array, 4, json_object_new_int(5));
-	int my_array_length = json_object_array_length(my_array);
+	unsigned int my_array_length = json_object_array_length(my_array);
 	printf("my_array=\n");
 	for(i=0; i < my_array_length; i++)
 	{
