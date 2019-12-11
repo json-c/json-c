@@ -141,13 +141,10 @@ int main(int argc, char **argv)
 	size_t i;
 #ifdef TEST_FORMATTED
 	int sflags = 0;
+	sflags = parse_flags(argc, argv);
 #endif
 
 	MC_SET_DEBUG(1);
-
-#ifdef TEST_FORMATTED
-	sflags = parse_flags(argc, argv);
-#endif
 
 	my_string = json_object_new_string("\t");
 	printf("my_string=%s\n", json_object_get_string(my_string));
@@ -184,8 +181,9 @@ int main(int argc, char **argv)
 	json_object_array_add(my_array, json_object_new_int(2));
 	json_object_array_add(my_array, json_object_new_int(3));
 	json_object_array_put_idx(my_array, 4, json_object_new_int(5));
+	int my_array_length = json_object_array_length(my_array);
 	printf("my_array=\n");
-	for(i=0; i < json_object_array_length(my_array); i++)
+	for(i=0; i < my_array_length; i++)
 	{
 		json_object *obj = json_object_array_get_idx(my_array, i);
 		printf("\t[%d]=%s\n", (int)i, json_object_to_json_string(obj));
@@ -202,7 +200,7 @@ int main(int argc, char **argv)
 	json_object_array_add(my_array, json_object_new_int(2));
 	json_object_array_put_idx(my_array, 4, json_object_new_int(0));
 	printf("my_array=\n");
-	for(i=0; i < json_object_array_length(my_array); i++)
+	for(i=0; i < my_array_length; i++)
 	{
 		json_object *obj = json_object_array_get_idx(my_array, i);
 		printf("\t[%d]=%s\n", (int)i, json_object_to_json_string(obj));
@@ -210,7 +208,7 @@ int main(int argc, char **argv)
 	printf("my_array.to_string()=%s\n", json_object_to_json_string(my_array));
 	json_object_array_sort(my_array, sort_fn);
 	printf("my_array=\n");
-	for(i=0; i < json_object_array_length(my_array); i++)
+	for(i=0; i < my_array_length; i++)
 	{
 		json_object *obj = json_object_array_get_idx(my_array, i);
 		printf("\t[%d]=%s\n", (int)i, json_object_to_json_string(obj));
