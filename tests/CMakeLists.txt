@@ -54,6 +54,6 @@ endforeach(TESTNAME)
 
 # Make sure NDEBUG is always undefined for tests
 if (UNIX OR MINGW OR CYGWIN)
-    list(APPEND CMAKE_C_FLAGS -UNDEBUG)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -UNDEBUG")
 endif()
 
