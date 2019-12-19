@@ -563,7 +563,9 @@ void lh_table_free(struct lh_table *t)
 			t->free_fn(c);
 	}
 	free(t->table);
+	t->table = NULL;
 	free(t);
+	t = NULL;
 }
 
 
