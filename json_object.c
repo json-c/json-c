@@ -149,9 +149,9 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 							   str + start_offset,
 							   pos - start_offset);
 				snprintf(sbuf, sizeof(sbuf),
-							 "\\u00%c%c",
-							 json_hex_chars[c >> 4],
-							 json_hex_chars[c & 0xf]);
+					 "\\u00%c%c",
+					 json_hex_chars[c >> 4],
+					 json_hex_chars[c & 0xf]);
 				printbuf_memappend_fast(pb, sbuf, (int) sizeof(sbuf) - 1);
 				start_offset = ++pos;
 			} else
@@ -220,16 +220,14 @@ static void json_object_generic_delete(struct json_object* jso)
 	lh_table_delete(json_object_table, jso);
 #endif /* REFCOUNT_DEBUG */
 	printbuf_free(jso->_pb);
-	jso->_pb = NULL;
 	free(jso);
-	jso= NULL;
 }
 
 static struct json_object* json_object_new(enum json_type o_type)
 {
 	struct json_object *jso;
 
-	jso = (struct json_object*)calloc(1, sizeof(struct json_object));
+	jso = (struct json_object*)calloc(sizeof(struct json_object), 1);
 	if (!jso)
 		return NULL;
 	jso->o_type = o_type;
@@ -327,30 +325,24 @@ const char* json_object_to_json_string_length(struct json_object *jso, int flags
 	const char *r = NULL;
 	size_t s = 0;
 
-	/* Failure case set first */
-	s = 4;
-	r = "null";
-
-	if (jso)
+	if (!jso)
 	{
-		if ( jso->_pb == NULL )
-			jso->_pb = printbuf_new();
+		s = 4;
+		r = "null";
+	}
+	else if ((jso->_pb) || (jso->_pb = printbuf_new()))
+	{
+		printbuf_reset(jso->_pb);
 
-		if ( jso->_pb != NULL )
+		if(jso->_to_json_string(jso, jso->_pb, 0, flags) >= 0)
 		{
-			printbuf_reset(jso->_pb);
-
-			if(jso->_to_json_string(jso, jso->_pb, 0, flags) >= 0)
-			{
-				s = (size_t)jso->_pb->bpos;
-				r = jso->_pb->buf;
-			}
+			s = (size_t)jso->_pb->bpos;
+			r = jso->_pb->buf;
 		}
 	}
 
 	if (length)
 		*length = s;
-
 	return r;
 }
 
@@ -408,12 +400,10 @@ static int json_object_object_to_json_string(struct json_object* jso,
 		indent(pb, level+1, flags);
 		printbuf_strappend(pb, "\"");
 		json_escape_str(pb, iter.key, strlen(iter.key), flags);
-
 		if (flags & JSON_C_TO_STRING_SPACED)
 			printbuf_strappend(pb, "\": ");
 		else
 			printbuf_strappend(pb, "\":");
-
 		if(iter.val == NULL)
 			printbuf_strappend(pb, "null");
 		else
@@ -477,19 +467,6 @@ struct lh_table* json_object_get_object(const struct json_object *jso)
 	}
 }
 
-static char *stringdup(const char *s)
-{
-  size_t len = strnlen (s, 1024) + 1;
-  char *new = malloc (len);
-
-  if (new == NULL)
-    return NULL;
-
-  new[len] = 0;
-  return (char *) memcpy (new, s, len);
-}
-
-
 int json_object_object_add_ex(struct json_object* jso,
 	const char *const key,
 	struct json_object *const val,
@@ -504,9 +481,9 @@ int json_object_object_add_ex(struct json_object* jso,
 	// We lookup the entry and replace the value, rather than just deleting
 	// and re-adding it, so the existing key remains valid.
 	hash = lh_get_hash(jso->o.c_object, (const void *)key);
-	existing_entry = (opts & JSON_C_OBJECT_ADD_KEY_IS_NEW) ?
-							NULL :
-							lh_table_lookup_entry_w_hash(jso->o.c_object, (const void *)key, hash);
+	existing_entry = (opts & JSON_C_OBJECT_ADD_KEY_IS_NEW) ? NULL : 
+			      lh_table_lookup_entry_w_hash(jso->o.c_object,
+							   (const void *)key, hash);
 
 	// The caller must avoid creating loops in the object tree, but do a
 	// quick check anyway to make sure we're not creating a trivial loop.
@@ -515,26 +492,17 @@ int json_object_object_add_ex(struct json_object* jso,
 
 	if (!existing_entry)
 	{
-		char *key_dup = stringdup(key);
-
-		/* key duplicate must be done first */
-		const void *const k = ((opts & JSON_C_OBJECT_KEY_IS_CONSTANT) ? (const void *)key : (const void *)key_dup);
-
-		/* key duplicate must be freed here if constant */
-		if (opts & JSON_C_OBJECT_KEY_IS_CONSTANT)
-			free(key_dup);
-
+		const void *const k = (opts & JSON_C_OBJECT_KEY_IS_CONSTANT) ?
+					(const void *)key : strdup(key);
 		if (k == NULL)
 			return -1;
-
 		return lh_table_insert_w_hash(jso->o.c_object, k, val, hash, opts);
-	} else {
-		existing_value = (json_object *) lh_entry_v(existing_entry);
-		if (existing_value)
-			json_object_put(existing_value);
-		existing_entry->v = val;
-		return 0;
 	}
+	existing_value = (json_object *) lh_entry_v(existing_entry);
+	if (existing_value)
+		json_object_put(existing_value);
+	existing_entry->v = val;
+	return 0;
 }
 
 int json_object_object_add(struct json_object* jso, const char *key,
@@ -1523,15 +1491,7 @@ int json_object_deep_copy(struct json_object *src, struct json_object **dst, jso
 	int rc;
 
 	/* Check if arguments are sane ; *dst must not point to a non-NULL object */
-	if (!src) {
-		errno = EINVAL;
-		return -1;
-	}
-	if (!dst) {
-		errno = EINVAL;
-		return -1;
-	}
-	if (*dst) {
+	if (!src || !dst || *dst) {
 		errno = EINVAL;
 		return -1;
 	}
@@ -1541,7 +1501,6 @@ int json_object_deep_copy(struct json_object *src, struct json_object **dst, jso
 
 	rc = json_object_deep_copy_recursive(src, NULL, NULL, -1, dst, shallow_copy);
 	if (rc < 0) {
-
 		json_object_put(*dst);
 		*dst = NULL;
 	}
