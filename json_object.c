@@ -10,8 +10,6 @@
  *
  */
 
-//#pragma GCC optimize ("O0")
-
 #include "config.h"
 
 #include "strerror_override.h"
