@@ -1457,7 +1457,7 @@ static int json_object_deep_copy_recursive(struct json_object *src, struct json_
 	if (shallow_copy_rc < 1)
 	{
 		errno = EINVAL;
-		return -120;
+		return -1;
 	}
 	assert(*dst != NULL);
 
@@ -1471,13 +1471,13 @@ static int json_object_deep_copy_recursive(struct json_object *src, struct json_
 			else if (json_object_deep_copy_recursive(iter.val, src, iter.key, -1, &jso, shallow_copy) < 0)
 			{
 				json_object_put(jso);
-				return -130;
+				return -1;
 			}
 
 			if (json_object_object_add(*dst, iter.key, jso) < 0)
 			{
 				json_object_put(jso);
-				return -140;
+				return -1;
 			}
 		}
 		break;
@@ -1493,13 +1493,13 @@ static int json_object_deep_copy_recursive(struct json_object *src, struct json_
 			else if (json_object_deep_copy_recursive(jso1, src, NULL, ii, &jso, shallow_copy) < 0)
 			{
 				json_object_put(jso);
-				return -150;
+				return -1;
 			}
 
 			if (json_object_array_add(*dst, jso) < 0)
 			{
 				json_object_put(jso);
-				return -160;
+				return -1;
 			}
 		}
 		break;
@@ -1522,15 +1522,15 @@ int json_object_deep_copy(struct json_object *src, struct json_object **dst, jso
 	/* Check if arguments are sane ; *dst must not point to a non-NULL object */
 	if (!src) {
 		errno = EINVAL;
-		return -101;
+		return -1;
 	}
 	if (!dst) {
 		errno = EINVAL;
-		return -102;
+		return -1;
 	}
 	if (*dst) {
 		errno = EINVAL;
-		return -103;
+		return -1;
 	}
 
 	if (shallow_copy == NULL)
