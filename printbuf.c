@@ -13,10 +13,6 @@
  * (http://www.opensource.org/licenses/mit-license.php)
  */
 
-#define PRINTBUF_DEBUG 1
-
-#pragma GCC optimize ("O0")
-
 #include "config.h"
 
 #include <stdio.h>
