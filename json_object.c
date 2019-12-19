@@ -149,9 +149,9 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 							   str + start_offset,
 							   pos - start_offset);
 				snprintf(sbuf, sizeof(sbuf),
-							 "\\u00%c%c",
-							 json_hex_chars[c >> 4],
-							 json_hex_chars[c & 0xf]);
+						 "\\u00%c%c",
+						 json_hex_chars[c >> 4],
+						 json_hex_chars[c & 0xf]);
 				printbuf_memappend_fast(pb, sbuf, (int) sizeof(sbuf) - 1);
 				start_offset = ++pos;
 			} else
@@ -330,6 +330,8 @@ const char* json_object_to_json_string_length(struct json_object *jso, int flags
 	/* Failure case set first */
 	s = 4;
 	r = "null";
+
+	/* no clutter and no fail cases after */
 
 	if (jso)
 	{
