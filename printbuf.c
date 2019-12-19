@@ -30,7 +30,11 @@
 #include "snprintf_compat.h"
 #include "vasprintf_compat.h"
 
-#define PRINTBUF_DEFAULT_SIZE 	(32)
+/* Default starting size of buffer and
+ * sprintbuf buffer
+ * */
+#define PRINTBUF_DEFAULT_SIZE		(32)
+#define PRINTBUF_DEFAULT_SIZE_BUF	(128)
 
 static int printbuf_extend(struct printbuf *p, int min_size);
 
@@ -148,7 +152,6 @@ int sprintbuf(struct printbuf *p, const char *msg, ...)
   va_list ap;
   char *t;
   long int size;
-#define PRINTBUF_DEFAULT_SIZE_BUF ((PRINTBUF_DEFAULT_SIZE<<2) > +1)
   char buf[PRINTBUF_DEFAULT_SIZE_BUF];
 
   /* user stack buffer first */

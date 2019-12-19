@@ -25,19 +25,9 @@ test_sprintbuf: starting test
 Buffer length: 0
 sprintbuf to just after resize(31+1): 32, [XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX], strlen(buf)=32
 5, [plain]
-6, [plain]
-16, [plain]
-27, [plain]
-29, [plain]
+6, [plain1]
+16, [plain12147483647]
+27, [plain12147483647-2147483648]
+29, [plain12147483647-2147483648%s]
 test_sprintbuf: end test
-========================================
-test_sprintbuf2: starting test
-Buffer length: 0
-sprintbuf to just after resize(31+1): 32, [XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX], strlen(buf)=32
-5, [plain]
-6, [plain]
-16, [plain]
-27, [plain]
-29, [plain]
-test_sprintbuf2: end test
 ========================================
