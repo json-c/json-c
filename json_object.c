@@ -143,13 +143,16 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 		default:
 			if(c < ' ')
 			{
+				char sbuf[7];
 				if(pos - start_offset > 0)
 					printbuf_memappend(pb,
 							   str + start_offset,
 							   pos - start_offset);
-				sprintbuf(pb, "\\u00%c%c",
-				json_hex_chars[c >> 4],
-				json_hex_chars[c & 0xf]);
+				snprintf(sbuf, sizeof(sbuf),
+							 "\\u00%c%c",
+							 json_hex_chars[c >> 4],
+							 json_hex_chars[c & 0xf]);
+				printbuf_memappend_fast(pb, sbuf, (int) sizeof(sbuf) - 1);
 				start_offset = ++pos;
 			} else
 				pos++;
