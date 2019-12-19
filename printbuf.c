@@ -30,6 +30,12 @@
 #include "snprintf_compat.h"
 #include "vasprintf_compat.h"
 
+/* Default starting size of buffer and
+ * sprintbuf buffer
+ * */
+#define PRINTBUF_DEFAULT_SIZE		(32)
+#define PRINTBUF_DEFAULT_SIZE_BUF	(128)
+
 static int printbuf_extend(struct printbuf *p, int min_size);
 
 struct printbuf* printbuf_new(void)
@@ -38,9 +44,10 @@ struct printbuf* printbuf_new(void)
 
   p = (struct printbuf*)calloc(1, sizeof(struct printbuf));
   if(!p) return NULL;
-  p->size = 32;
+  p->size = PRINTBUF_DEFAULT_SIZE;
   p->bpos = 0;
-  if(!(p->buf = (char*)malloc(p->size))) {
+  p->buf = (char*)calloc(1, p->size);
+  if(p->buf == NULL) {
     free(p);
     return NULL;
   }
@@ -59,32 +66,55 @@ struct printbuf* printbuf_new(void)
  */
 static int printbuf_extend(struct printbuf *p, int min_size)
 {
-	char *t;
+#define PRINTBUF_EXTEND_BY_BYTES_MIN (8)
+	char *t = NULL;
 	int new_size;
 
-	if (p->size >= min_size)
+	if(
+		(p       != NULL) &&
+		(p->buf  != NULL) &&
+		(p->size >= min_size)
+	  )
 		return 0;
 
 	new_size = p->size * 2;
-	if (new_size < min_size + 8)
-		new_size =  min_size + 8;
+
+	if (new_size < (min_size + PRINTBUF_EXTEND_BY_BYTES_MIN))
+		new_size =  min_size + PRINTBUF_EXTEND_BY_BYTES_MIN;
+
 #ifdef PRINTBUF_DEBUG
 	MC_DEBUG("printbuf_memappend: realloc "
 	  "bpos=%d min_size=%d old_size=%d new_size=%d\n",
 	  p->bpos, min_size, p->size, new_size);
 #endif /* PRINTBUF_DEBUG */
-	if(!(t = (char*)realloc(p->buf, new_size)))
+
+
+	t = (char*)realloc(p->buf, new_size);
+
+	if (t == NULL)
 		return -1;
+
 	p->size = new_size;
 	p->buf = t;
+
 	return 0;
 }
 
 int printbuf_memappend(struct printbuf *p, const char *buf, int size)
 {
+  /* If, for some reason, buf is NULL, but
+   * size is set -> extend to size
+   */
+  if ( (p->size > 0) && (p->buf == NULL)) {
+    int size_wanted = p->size;
+    p->size = 0;
+	if (printbuf_extend(p, size_wanted) < 0)
+	  return -1;
+  }
+
   if (p->size <= p->bpos + size + 1) {
-    if (printbuf_extend(p, p->bpos + size + 1) < 0)
-      return -1;
+	if (printbuf_extend(p, p->bpos + size + 1) < 0)
+	  return -2;
   }
   memcpy(p->buf + p->bpos, buf, size);
   p->bpos += size;
@@ -117,17 +147,20 @@ int sprintbuf(struct printbuf *p, const char *msg, ...)
   va_list ap;
   char *t;
   int size;
-  char buf[128];
+  char buf[PRINTBUF_DEFAULT_SIZE_BUF];
 
   /* user stack buffer first */
   va_start(ap, msg);
-  size = vsnprintf(buf, 128, msg, ap);
+  size = vsnprintf(buf, sizeof(buf), msg, ap);
   va_end(ap);
   /* if string is greater than stack buffer, then use dynamic string
      with vasprintf.  Note: some implementation of vsnprintf return -1
      if output is truncated whereas some return the number of bytes that
-     would have been written - this code handles both cases. */
-  if(size == -1 || size > 127) {
+     would have been written - this code handles both cases.
+
+     LJA: long unsigned int cast is done cause sizeof returns that type.
+     */
+  if(size == -1 || (long unsigned int)size > sizeof(buf)) {
     va_start(ap, msg);
     if((size = vasprintf(&t, msg, ap)) < 0) { va_end(ap); return -1; }
     va_end(ap);
@@ -142,14 +175,31 @@ int sprintbuf(struct printbuf *p, const char *msg, ...)
 
 void printbuf_reset(struct printbuf *p)
 {
-  p->buf[0] = '\0';
-  p->bpos = 0;
+  if (p != NULL)
+  {
+	  /* safety checks */
+	  if (
+		   (p->size > 0) &&
+		   (p->buf != NULL)
+		 )
+	  {
+		  p->buf[0] = '\0';
+	  }
+
+	  p->bpos = 0;
+  }
 }
 
 void printbuf_free(struct printbuf *p)
 {
   if(p) {
-    free(p->buf);
+
+	if (p->buf != NULL)
+		free(p->buf);
+
+    p->buf = NULL;
+
     free(p);
+    p = NULL;
   }
 }

@@ -220,9 +220,7 @@ static void json_object_generic_delete(struct json_object* jso)
 	lh_table_delete(json_object_table, jso);
 #endif /* REFCOUNT_DEBUG */
 	printbuf_free(jso->_pb);
-	jso->_pb = NULL;
 	free(jso);
-	jso= NULL;
 }
 
 static struct json_object* json_object_new(enum json_type o_type)
