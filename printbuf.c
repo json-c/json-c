@@ -30,7 +30,7 @@
 #include "snprintf_compat.h"
 #include "vasprintf_compat.h"
 
-#define PRINTBUF_DEFAULT_SIZE 	(256)
+#define PRINTBUF_DEFAULT_SIZE 	(32)
 
 static int printbuf_extend(struct printbuf *p, int min_size);
 

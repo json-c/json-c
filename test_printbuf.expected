@@ -13,17 +13,17 @@ test_printbuf_memset_length: end test
 ========================================
 test_printbuf_memappend: starting test
 Buffer length: 0
-Appended 256 bytes for resize: [xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
+Appended 32 bytes for resize: [xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
 Partial append: 3, [blu]
 With embedded \0 character: 4, [ab]
-Append to just before resize: 255, [XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX]
-Append to just after resize: 256, [XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX]
+Append to just before resize: 31, [XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX]
+Append to just after resize: 32, [XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX]
 Buffer size after printbuf_strappend(): 16, [XXXXXXXXXXXXXXXX]
 test_printbuf_memappend: end test
 ========================================
 test_sprintbuf: starting test
 Buffer length: 0
-sprintbuf to just after resize(255+1): 256, [XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX], strlen(buf)=256
+sprintbuf to just after resize(31+1): 32, [XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX], strlen(buf)=32
 5, [plain]
 6, [plain]
 16, [plain]
@@ -33,7 +33,7 @@ test_sprintbuf: end test
 ========================================
 test_sprintbuf2: starting test
 Buffer length: 0
-sprintbuf to just after resize(255+1): 256, [XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX], strlen(buf)=256
+sprintbuf to just after resize(31+1): 32, [XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX], strlen(buf)=32
 5, [plain]
 6, [plain]
 16, [plain]
