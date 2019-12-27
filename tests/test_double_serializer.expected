@@ -6,6 +6,8 @@ Test explicit serializer with custom userdata:
 obj.to_string(custom)=test
 Test reset serializer:
 obj.to_string(reset)=0.5
+Test no zero reset serializer:
+obj.to_string(reset)=3.1415000000000002
 obj.to_string(default format)=0.52381
 obj.to_string(with global format)=x0.524y
 obj.to_string(with thread format)=T0.52X

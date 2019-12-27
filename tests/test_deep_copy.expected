@@ -13,6 +13,9 @@ Printing JSON objects for visual inspection
     "GlossDiv":{
       "title":"S",
       "null_obj":null,
+      "exixt":false,
+      "quantity":20,
+      "univalent":19.8,
       "GlossList":{
         "GlossEntry":{
           "ID":"SGML",

@@ -49,7 +49,15 @@ static void test_basic_parse()
 	single_basic_parse("/* hello */\"foo\"", 0);
 	single_basic_parse("// hello\n\"foo\"", 0);
 	single_basic_parse("\"foo\"blue", 0);
+	single_basic_parse("\'foo\'", 0);
 	single_basic_parse("\"\\u0041\\u0042\\u0043\"", 0);
+	single_basic_parse("\"\\u4e16\\u754c\\u00df\"", 0);
+	single_basic_parse("\"\\u4E16\"", 0);
+	single_basic_parse("\"\\u4e1\"", 0);
+	single_basic_parse("\"\\u4e1@\"", 0);
+	single_basic_parse("\"\\ud840\\u4e16\"", 0);
+	single_basic_parse("\"\\ud840\"", 0);
+	single_basic_parse("\"\\udd27\"", 0);
 	// Test with a "short" high surrogate
 	single_basic_parse("[9,'\\uDAD", 0);
 	single_basic_parse("null", 0);
@@ -91,7 +99,9 @@ static void test_basic_parse()
 	single_basic_parse("12.3xxx", 0);
 
 	single_basic_parse("{\"FoO\"  :   -12.3E512}", 0);
+	single_basic_parse("{\"FoO\"  :   -12.3e512}", 0);
 	single_basic_parse("{\"FoO\"  :   -12.3E51.2}", 0); /* non-sensical, returns null */
+	single_basic_parse("{\"FoO\"  :   -12.3E512E12}", 0); /* non-sensical, returns null */
 	single_basic_parse("[\"\\n\"]", 0);
 	single_basic_parse("[\"\\nabc\\n\"]", 0);
 	single_basic_parse("[null]", 0);
@@ -100,16 +110,20 @@ static void test_basic_parse()
 	single_basic_parse("[\"abc\",null,\"def\",12]", 0);
 	single_basic_parse("{}", 0);
 	single_basic_parse("{ \"foo\": \"bar\" }", 0);
+	single_basic_parse("{ \'foo\': \'bar\' }", 0);
 	single_basic_parse("{ \"foo\": \"bar\", \"baz\": null, \"bool0\": true }", 0);
 	single_basic_parse("{ \"foo\": [null, \"foo\"] }", 0);
 	single_basic_parse("{ \"abc\": 12, \"foo\": \"bar\", \"bool0\": false, \"bool1\": true, \"arr\": [ 1, 2, 3, null, 5 ] }", 0);
 	single_basic_parse("{ \"abc\": \"blue\nred\\ngreen\" }", 0);
 
 	// Clear serializer for these tests so we see the actual parsed value.
+	single_basic_parse("null", 1);
+	single_basic_parse("false", 1);
 	single_basic_parse("[0e]", 1);
 	single_basic_parse("[0e+]", 1);
 	single_basic_parse("[0e+-1]", 1);
 	single_basic_parse("[18446744073709551616]", 1);
+	single_basic_parse("\"hello world!\"", 1);
 }
 
 static void test_utf8_parse()
@@ -177,6 +191,16 @@ struct incremental_step {
 	{ "{ \"foo\": 456 }", -1, -1, json_tokener_success,  1 },
 	{ "{ \"foo\": 789 }", -1, -1, json_tokener_success,  1 },
 
+	/* Check the comment parse*/
+	{ "/* hello */{ \"foo\"", -1, -1, json_tokener_continue,  0 },
+	{ "/* hello */:/* hello */", -1, -1, json_tokener_continue,  0 },
+	{ "\"bar\"/* hello */", -1, -1, json_tokener_continue,  0 },
+	{ "}/* hello */", -1, -1, json_tokener_success,  1 },
+	{ "/ hello ", -1, 1, json_tokener_error_parse_comment,  1 },
+	{ "/* hello\"foo\"", -1, -1, json_tokener_continue,  1 },
+	{ "/* hello*\"foo\"", -1, -1, json_tokener_continue,  1 },
+	{ "// hello\"foo\"", -1, -1, json_tokener_continue,  1 },
+
 	/*  Check a basic incremental parse */
 	{ "{ \"foo",          -1, -1, json_tokener_continue, 0 },
 	{ "\": {\"bar",       -1, -1, json_tokener_continue, 0 },
@@ -201,6 +225,8 @@ struct incremental_step {
 	/* This should parse as the number 12, since it continues the "1" */
 	{ "2",                 2, 1, json_tokener_success, 0 },
 	{ "12{",               3, 2, json_tokener_success, 1 },
+	/* Parse number in strict model */
+	{ "[02]",             -1, 3, json_tokener_error_parse_number, 3 },
 
 	/* Similar tests for other kinds of objects: */
 	/* These could all return success immediately, since regardless of
@@ -293,8 +319,17 @@ struct incremental_step {
 	{ "\"\\/\"",         -1, -1, json_tokener_success, 0 },
 	// Escaping a forward slash is optional
 	{ "\"/\"",           -1, -1, json_tokener_success, 0 },
+	/* Check wrong escape sequences */
+	{ "\"\\a\"",         -1, 2, json_tokener_error_parse_string, 1 },
 
+	/* Check '\'' in strict model */
+	{ "\'foo\'",         -1, 0, json_tokener_error_parse_unexpected, 3 },
+
+	/* Parse array/object */
 	{ "[1,2,3]",          -1, -1, json_tokener_success, 0 },
+	{ "[1,2,3}",         -1, 6, json_tokener_error_parse_array, 1 },
+	{ "{\"a\"}",         -1, 4, json_tokener_error_parse_object_key_sep, 1 },
+	{ "{\"a\":1]",       -1, 6, json_tokener_error_parse_object_value_sep, 1 },
 
 	/* This behaviour doesn't entirely follow the json spec, but until we have
 	   a way to specify how strict to be we follow Postel's Law and be liberal
