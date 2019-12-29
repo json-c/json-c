@@ -32,6 +32,13 @@ int main()
 	printf("obj.to_string(reset)=%s\n", json_object_to_json_string(obj));
 
 	json_object_put(obj);
+	printf("Test no zero reset serializer:\n");
+	obj = json_object_new_double(3.1415000);
+	char data[] = "%.17g";
+	json_object_set_serializer(obj, json_object_double_to_json_string, data, NULL);
+	printf("obj.to_string(reset)=%s\n", json_object_to_json_string_ext(obj, 4));
+
+	json_object_put(obj);
 	obj = json_object_new_double(0.52381);
 
 	printf("obj.to_string(default format)=%s\n", json_object_to_json_string(obj));
