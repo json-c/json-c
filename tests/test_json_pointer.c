@@ -146,6 +146,8 @@ static void test_recursion_get()
 	assert(json_object_is_type(jo2, json_type_string));
 	assert(0 == strcmp("1", json_object_get_string(jo2)));
 
+	assert(0 == json_pointer_getf(jo1, &jo2, "%s", "\0"));
+
 	printf("PASSED - GET - RECURSION TEST\n");
 
 	json_object_put(jo1);
@@ -176,13 +178,22 @@ static void test_wrong_inputs_get()
 	assert(0 != json_pointer_get(NULL, NULL, NULL));
 	assert(errno == EINVAL);
 	errno = 0;
+	assert(0 != json_pointer_getf(NULL, NULL, NULL));
+	assert(errno == EINVAL);
+	errno = 0;
 	assert(0 != json_pointer_get(jo1, NULL, NULL));
+	assert(errno == EINVAL);
+	errno = 0;
+	assert(0 != json_pointer_getf(jo1, NULL, NULL));
 	assert(errno == EINVAL);
 	printf("PASSED - GET - NULL INPUTS\n");
 
 	/* Test invalid indexes for array */
 	errno = 0;
 	assert(0 != json_pointer_get(jo1, "/foo/a", NULL));
+	assert(errno == EINVAL);
+	errno = 0;
+	assert(0 != json_pointer_get(jo1, "/foo/01", NULL));
 	assert(errno == EINVAL);
 	errno = 0;
 	assert(0 != json_pointer_getf(jo1, NULL, "/%s/a", "foo"));
@@ -258,8 +269,22 @@ static void test_wrong_inputs_set()
 	printf("PASSED - SET - LOADED TEST JSON\n");
 	printf("%s\n", json_object_get_string(jo1));
 
+	assert(0 != json_pointer_set(NULL, NULL, NULL));
+	assert(0 != json_pointer_setf(NULL, NULL, NULL));
+	assert(0 != json_pointer_set(&jo1, NULL, NULL));
+	assert(0 != json_pointer_setf(&jo1, NULL, NULL));
+	printf("PASSED - SET - failed with NULL params for input json & path\n");
+
 	assert(0 != json_pointer_set(&jo1, "foo/bar", (jo2 = json_object_new_string("cod"))));
 	printf("PASSED - SET - failed 'cod' with path 'foo/bar'\n");
+	json_object_put(jo2);
+
+	assert(0 != json_pointer_setf(&jo1, (jo2 = json_object_new_string("cod")), "%s", "foo/bar"));
+	printf("PASSED - SET - failed 'cod' with path 'foo/bar'\n");
+	json_object_put(jo2);
+
+	assert(0 != json_pointer_set(&jo1, "0", (jo2 = json_object_new_string("cod"))));
+	printf("PASSED - SET - failed with invalid array index'\n");
 	json_object_put(jo2);
 
 	jo2 = json_object_new_string("whatever");
@@ -275,6 +300,8 @@ static void test_wrong_inputs_set()
 	assert(0 != json_pointer_set(&jo1, "/fud/gaw/", jo2));
 	json_object_put(jo2);
 	printf("PASSED - SET - failed to set index to non-array\n");
+
+	assert(0 == json_pointer_setf(&jo1, json_object_new_string("cod"), "%s", "\0"));
 
 	json_object_put(jo1);
 }
