@@ -12,6 +12,9 @@ static json_c_visit_userfunc emit_object;
 static json_c_visit_userfunc skip_arrays;
 static json_c_visit_userfunc pop_and_stop;
 static json_c_visit_userfunc err_on_subobj2;
+static json_c_visit_userfunc pop_array;
+static json_c_visit_userfunc stop_array;
+static json_c_visit_userfunc err_return;
 
 int main(void)
 {
@@ -46,6 +49,18 @@ int main(void)
 
 	rv = json_c_visit(jso, 0, err_on_subobj2, NULL);
 	printf("json_c_visit(err_on_subobj2)=%d\n", rv);
+	printf("================================\n\n");
+
+	rv = json_c_visit(jso, 0, pop_array, NULL);
+	printf("json_c_visit(pop_array)=%d\n", rv);
+	printf("================================\n\n");
+
+	rv = json_c_visit(jso, 0, stop_array, NULL);
+	printf("json_c_visit(stop_array)=%d\n", rv);
+	printf("================================\n\n");
+
+	rv = json_c_visit(jso, 0, err_return, NULL);
+	printf("json_c_visit(err_return)=%d\n", rv);
 	printf("================================\n\n");
 
 	json_object_put(jso);
@@ -111,3 +126,43 @@ static int err_on_subobj2(json_object *jso, int flags,
 	return JSON_C_VISIT_RETURN_CONTINUE;
 }
 
+static int pop_array(json_object *jso, int flags,
+                     json_object *parent_jso,
+                     const char *jso_key,
+                     size_t *jso_index, void *userarg)
+{
+	(void)emit_object(jso, flags, parent_jso, jso_key, jso_index, userarg);
+	if (jso_index != NULL && (*jso_index == 0))
+	{
+		printf("POP after handling array[0]\n");
+		return JSON_C_VISIT_RETURN_POP;
+	}
+	return JSON_C_VISIT_RETURN_CONTINUE;
+}
+
+static int stop_array(json_object *jso, int flags,
+                     json_object *parent_jso,
+                     const char *jso_key,
+                     size_t *jso_index, void *userarg)
+{
+	(void)emit_object(jso, flags, parent_jso, jso_key, jso_index, userarg);
+	if (jso_index != NULL && (*jso_index == 0))
+	{
+		printf("STOP after handling array[1]\n");
+		return JSON_C_VISIT_RETURN_STOP;
+	}
+	return JSON_C_VISIT_RETURN_CONTINUE;
+}
+
+static int err_return(json_object *jso, int flags,
+                     json_object *parent_jso,
+                     const char *jso_key,
+                     size_t *jso_index, void *userarg)
+{
+	printf("flags: 0x%x, key: %s, index: %ld, value: %s\n",
+	       flags,
+	       (jso_key ? jso_key : "(null)"),
+	       (jso_index ? (long)*jso_index : -1L),
+	       json_object_to_json_string(jso));
+	return 100;
+}
