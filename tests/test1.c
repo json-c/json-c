@@ -136,6 +136,48 @@ void test_array_del_idx()
 	json_object_put(my_array);
 }
 
+void test_array_list_expand_internal(void);
+void test_array_list_expand_internal()
+{
+	int rc;
+	size_t ii;
+	size_t idx;
+	json_object *my_array;
+#ifdef TEST_FORMATTED
+	int sflags = 0;
+#endif
+
+	my_array = make_array();
+	printf("my_array=\n");
+	for(ii = 0; ii < json_object_array_length(my_array); ii++)
+	{
+		json_object *obj = json_object_array_get_idx(my_array, ii);
+		printf("\t[%d]=%s\n", (int)ii, json_object_to_json_string(obj));
+	}
+	printf("my_array.to_string()=%s\n", json_object_to_json_string(my_array));
+	
+	/* Put iNdex < array->size, no expand. */
+	rc = json_object_array_put_idx(my_array, 5, json_object_new_int(6));
+	printf("put_idx(5,6)=%d\n", rc);
+	
+	/* array->size < Put Index < array->size * 2 <= SIZE_T_MAX, the size = array->size * 2. */
+	idx = ARRAY_LIST_DEFAULT_SIZE * 2 - 1;
+	rc = json_object_array_put_idx(my_array, idx, json_object_new_int(0));
+	printf("put_idx(%d,0)=%d\n", (int)(idx), rc);
+	
+	/* array->size * 2 < Put Index, the size = Put Index. */
+	idx = ARRAY_LIST_DEFAULT_SIZE * 2 * 2 + 1;
+	rc = json_object_array_put_idx(my_array, idx, json_object_new_int(0));
+	printf("put_idx(%d,0)=%d\n", (int)(idx), rc);
+	
+	/* SIZE_T_MAX <= Put Index, it will fail and the size will no change. */
+	idx = SIZE_MAX; // SIZE_MAX = SIZE_T_MAX
+	rc = json_object_array_put_idx(my_array, idx, json_object_new_int(0));
+	printf("put_idx(SIZE_T_MAX,0)=%d\n", rc);
+	
+	json_object_put(my_array);
+}
+
 int main(int argc, char **argv)
 {
 	json_object *my_string, *my_int, *my_null, *my_object, *my_array;
@@ -201,6 +243,7 @@ int main(int argc, char **argv)
 	json_object_put(my_array);
 
 	test_array_del_idx();
+	test_array_list_expand_internal();
 
 	my_array = json_object_new_array();
 	json_object_array_add(my_array, json_object_new_int(3));
@@ -222,6 +265,9 @@ int main(int argc, char **argv)
 		printf("\t[%d]=%s\n", (int)i, json_object_to_json_string(obj));
 	}
 	printf("my_array.to_string()=%s\n", json_object_to_json_string(my_array));
+	
+	json_object* result = json_object_array_bsearch(json_object_new_int(1), my_array, sort_fn);
+	printf("find json_object(1) in my_array successfully: %s\n", json_object_to_json_string(result));
 
 	my_object = json_object_new_object();
 	int rc = json_object_object_add(my_object, "abc", my_object);
