@@ -34,6 +34,10 @@ new_obj.to_string(-Infinoodle)=null
 new_obj.to_string(-InfinAAA)=null
 new_obj.to_string(True)=true
 new_obj.to_string(False)=false
+new_obj.to_string(tRue)=true
+new_obj.to_string(fAlse)=false
+new_obj.to_string(nAn)=NaN
+new_obj.to_string(iNfinity)=Infinity
 new_obj.to_string(12)=12
 new_obj.to_string(12.3)=12.3
 new_obj.to_string(12.3.4)=null
@@ -144,6 +148,7 @@ json_tokener_parse_ex(tok, 1234        ,   5) ... OK: got object of type [int]: 
 json_tokener_parse_ex(tok, noodle      ,   7) ... OK: got correct error: null expected
 json_tokener_parse_ex(tok, naodle      ,   7) ... OK: got correct error: null expected
 json_tokener_parse_ex(tok, track       ,   6) ... OK: got correct error: boolean expected
+json_tokener_parse_ex(tok, fail        ,   5) ... OK: got correct error: boolean expected
 json_tokener_parse_ex(tok, null123     ,   9) ... OK: got object of type [null]: null
 json_tokener_parse_ex(tok, 123         ,   4) ... OK: got object of type [int]: 123
 json_tokener_parse_ex(tok, nullx       ,   5) ... OK: got object of type [null]: null
@@ -167,9 +172,16 @@ json_tokener_parse_ex(tok, [1,2,3]     ,   7) ... OK: got object of type [array]
 json_tokener_parse_ex(tok, [1,2,3}     ,   7) ... OK: got correct error: array value separator ',' expected
 json_tokener_parse_ex(tok, {"a"}       ,   5) ... OK: got correct error: object property name separator ':' expected
 json_tokener_parse_ex(tok, {"a":1]     ,   7) ... OK: got correct error: object value separator ',' expected
+json_tokener_parse_ex(tok, {"a"::1}    ,   8) ... OK: got correct error: unexpected character
+json_tokener_parse_ex(tok, {"a":}      ,   6) ... OK: got correct error: unexpected character
+json_tokener_parse_ex(tok, {"a":1,"a":2},  13) ... OK: got object of type [object]: { "a": 2 }
+json_tokener_parse_ex(tok, "a":1}      ,   6) ... OK: got object of type [string]: "a"
+json_tokener_parse_ex(tok, {"a":1      ,   6) ... OK: got correct error: continue
+json_tokener_parse_ex(tok, [,]         ,   3) ... OK: got correct error: unexpected character
+json_tokener_parse_ex(tok, [,1]        ,   4) ... OK: got correct error: unexpected character
 json_tokener_parse_ex(tok, [1,2,3,]    ,   8) ... OK: got object of type [array]: [ 1, 2, 3 ]
 json_tokener_parse_ex(tok, [1,2,,3,]   ,   9) ... OK: got correct error: unexpected character
 json_tokener_parse_ex(tok, [1,2,3,]    ,   8) ... OK: got correct error: unexpected character
 json_tokener_parse_ex(tok, {"a":1,}    ,   8) ... OK: got correct error: unexpected character
-End Incremental Tests OK=97 ERROR=0
+End Incremental Tests OK=105 ERROR=0
 ==================================
