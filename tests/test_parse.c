@@ -85,6 +85,12 @@ static void test_basic_parse()
 	single_basic_parse("True", 0);
 	single_basic_parse("False", 0);
 
+	/* not case sensitive */
+	single_basic_parse("tRue", 0);
+	single_basic_parse("fAlse", 0);
+	single_basic_parse("nAn", 0);
+	single_basic_parse("iNfinity", 0);
+
 	single_basic_parse("12", 0);
 	single_basic_parse("12.3", 0);
 	single_basic_parse("12.3.4", 0); /* non-sensical, returns null */
@@ -280,6 +286,7 @@ struct incremental_step {
 	{ "1234",              5, 4, json_tokener_success, 1 },
 
 	{ "Infinity9999",      8, 8, json_tokener_continue, 0 },
+
 	/* returns the Infinity loaded up by the previous call: */
 	{ "1234",              5, 0, json_tokener_success, 0 },
 	{ "1234",              5, 4, json_tokener_success, 1 },
@@ -290,6 +297,7 @@ struct incremental_step {
 	{ "naodle",            7, 2, json_tokener_error_parse_null, 1 },
 	/* offset=2 because "tr" is the start of "true".  hmm... */
 	{ "track",             6, 2, json_tokener_error_parse_boolean, 1 },
+	{ "fail",              5, 2, json_tokener_error_parse_boolean, 1 },
 
 	/* Although they may initially look like they should fail,
 	   the next few tests check that parsing multiple sequential
@@ -330,6 +338,13 @@ struct incremental_step {
 	{ "[1,2,3}",         -1, 6, json_tokener_error_parse_array, 1 },
 	{ "{\"a\"}",         -1, 4, json_tokener_error_parse_object_key_sep, 1 },
 	{ "{\"a\":1]",       -1, 6, json_tokener_error_parse_object_value_sep, 1 },
+	{ "{\"a\"::1}",      -1, 5, json_tokener_error_parse_unexpected, 1 },
+	{ "{\"a\":}",        -1, 5, json_tokener_error_parse_unexpected, 1 },
+	{ "{\"a\":1,\"a\":2}",-1, -1, json_tokener_success, 1 },
+	{ "\"a\":1}",        -1, 3, json_tokener_success, 1 },
+	{ "{\"a\":1",        -1, -1, json_tokener_continue, 1 },
+	{ "[,]",             -1, 1, json_tokener_error_parse_unexpected, 1 },
+	{ "[,1]",             -1, 1, json_tokener_error_parse_unexpected, 1 },
 
 	/* This behaviour doesn't entirely follow the json spec, but until we have
 	   a way to specify how strict to be we follow Postel's Law and be liberal
