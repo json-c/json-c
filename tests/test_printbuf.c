@@ -127,6 +127,10 @@ static void test_sprintbuf(int before_resize);
 static void test_sprintbuf(int before_resize)
 {
 	struct printbuf *pb;
+	const char  *max_char = "if string is greater than stack buffer, then use dynamic string"
+		" with vasprintf.  Note: some implementation of vsnprintf return -1 "
+		" if output is truncated whereas some return the number of bytes that "
+		" would have been written - this code handles both cases.";
 
 	printf("%s: starting test\n", __func__);
 	pb = printbuf_new();
@@ -155,6 +159,8 @@ static void test_sprintbuf(int before_resize)
 	sprintbuf(pb, "%s", "%s");
 	printf("%d, [%s]\n", printbuf_length(pb), pb->buf);
 
+	sprintbuf(pb, max_char);
+	printf("%d, [%s]\n", printbuf_length(pb), pb->buf);
 	printbuf_free(pb);
 	printf("%s: end test\n", __func__);
 }
