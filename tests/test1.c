@@ -172,8 +172,13 @@ void test_array_list_expand_internal()
 	
 	/* SIZE_T_MAX <= Put Index, it will fail and the size will no change. */
 	idx = SIZE_MAX; // SIZE_MAX = SIZE_T_MAX
-	rc = json_object_array_put_idx(my_array, idx, json_object_new_int(0));
+	json_object* tmp = json_object_new_int(10);
+	rc = json_object_array_put_idx(my_array, idx, tmp);
 	printf("put_idx(SIZE_T_MAX,0)=%d\n", rc);
+	if (rc == -1)
+	{
+		json_object_put(tmp);
+	}
 	
 	json_object_put(my_array);
 }
@@ -266,8 +271,10 @@ int main(int argc, char **argv)
 	}
 	printf("my_array.to_string()=%s\n", json_object_to_json_string(my_array));
 	
-	json_object* result = json_object_array_bsearch(json_object_new_int(1), my_array, sort_fn);
+	json_object* one = json_object_new_int(1);
+	json_object* result = json_object_array_bsearch(one, my_array, sort_fn);
 	printf("find json_object(1) in my_array successfully: %s\n", json_object_to_json_string(result));
+	json_object_put(one);
 
 	my_object = json_object_new_object();
 	int rc = json_object_object_add(my_object, "abc", my_object);
