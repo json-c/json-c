@@ -16,10 +16,12 @@
 #endif /* HAVE_UNISTD_H */
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <assert.h>
 
 #include "json.h"
 #include "json_util.h"
 #include "snprintf_compat.h"
+#include "json_util.h"
 
 static void test_read_valid_with_fd(const char *testdir);
 static void test_read_valid_nested_with_fd(const char *testdir);
@@ -142,6 +144,8 @@ int main(int argc, char **argv)
 	}
 	testdir = argv[1];
 
+	assert(NULL != json_c_version());
+	assert(0 != json_c_version_num());
 	test_read_valid_with_fd(testdir);
 	test_read_valid_nested_with_fd(testdir);
 	test_read_nonexistant();
