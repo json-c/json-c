@@ -38,6 +38,7 @@ enum json_tokener_error {
   json_tokener_error_parse_object_value_sep,
   json_tokener_error_parse_string,
   json_tokener_error_parse_comment,
+  json_tokener_error_parse_utf8_string,
   json_tokener_error_size
 };
 
@@ -162,6 +163,11 @@ JSON_EXPORT void json_tokener_reset(struct json_tokener *tok);
 JSON_EXPORT struct json_object* json_tokener_parse(const char *str);
 JSON_EXPORT struct json_object* json_tokener_parse_verbose(const char *str, enum json_tokener_error *error);
 
+/**
+ * validete the utf-8 string in strict model.
+ * if not utf-8 format, return err.
+ */
+json_bool json_tokener_validate_utf8(const char c, unsigned int *nBytes);
 /**
  * Set flags that control how parsing will be done.
  */
