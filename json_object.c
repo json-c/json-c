@@ -135,6 +135,7 @@ static int json_escape_str(struct printbuf *pb, const char *str, int len, int fl
 			else if(c == '\t') printbuf_memappend(pb, "\\t", 2);
 			else if(c == '\f') printbuf_memappend(pb, "\\f", 2);
 			else if(c == '"') printbuf_memappend(pb, "\\\"", 2);
+			else if(c == '\\' && !strncmp(str + pos, "\\u0000", 6)) printbuf_memappend(pb, "\\", 1);
 			else if(c == '\\') printbuf_memappend(pb, "\\\\", 2);
 			else if(c == '/') printbuf_memappend(pb, "\\/", 2);
 

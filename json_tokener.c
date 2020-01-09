@@ -604,7 +604,10 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
                   got_hi_surrogate = 0;
                 }
 
-		if (tok->ucs_char < 0x80) {
+		if (tok->ucs_char == 0x00) {
+		  unsigned char nul_unescaped_utf[6] = "\\u0000";
+		  printbuf_memappend_fast(tok->pb, (char*)nul_unescaped_utf, 6);
+		} else if (tok->ucs_char < 0x80) {
 		  unescaped_utf[0] = tok->ucs_char;
 		  printbuf_memappend_fast(tok->pb, (char*)unescaped_utf, 1);
 		} else if (tok->ucs_char < 0x800) {
