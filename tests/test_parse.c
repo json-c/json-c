@@ -355,6 +355,28 @@ struct incremental_step {
 	{ "[1,2,3,]",         -1, 7, json_tokener_error_parse_unexpected, 3 },
 	{ "{\"a\":1,}",         -1, 7, json_tokener_error_parse_unexpected, 3 },
 
+  // acsll encoding "123asc$%&"
+	{ "\x22\x31\x32\x33\x61\x73\x63\x24\x25\x26\x22", -1, -1, json_tokener_success, 3 },
+	{ "\x22\x31\x32\x33\x61\x73\x63\x24\x25\x26\x22", -1, -1, json_tokener_success, 1 },
+  // utf-8 encoding "世界" "πφ" "𥑕"
+	{ "\x22\xe4\xb8\x96\xe7\x95\x8c\x22", -1, -1, json_tokener_success, 3 },
+	{ "\x22\xe4\xb8\x96\xe7\x95\x8c\x22", -1, -1, json_tokener_success, 1 },
+	{ "\x22\xcf\x80\xcf\x86\x22", -1, -1, json_tokener_success, 3 },
+	{ "\x22\xf0\xa5\x91\x95\x22", -1, -1, json_tokener_success, 3 },
+	{ "\x22\xf8\xa5\xa5\x91\x95\x22", -1, -1, json_tokener_success, 3 },
+	{ "\x22\xfd\xa5\xa5\xa5\x91\x95\x22", -1, -1, json_tokener_success, 3 },
+  // wrong utf-8 encoding
+	{ "\x22\xe6\x9d\x4e\x22", -1, 0, json_tokener_error_parse_utf8_string, 3 },
+	{ "\x22\xe6\x9d\x4e\x22", -1, 5, json_tokener_success, 1 },
+  // GBK encoding
+	{ "\x22\xc0\xee\xc5\xf4\x22", -1, 0, json_tokener_error_parse_utf8_string, 3 },
+	{ "\x22\xc0\xee\xc5\xf4\x22", -1, 6, json_tokener_success, 1 },
+  // ucs-2/utf-16 encoding
+	{ "\x22\x11\xd2\x22", -1, 0, json_tokener_error_parse_utf8_string, 3 },
+	{ "\x22\x11\xd2\x22", -1, 4, json_tokener_success, 1 },
+	{ "\x22\x55\xd8\55\xdc\x22", -1, 0, json_tokener_error_parse_utf8_string, 3 },
+	{ "\x22\x16\x4e\x4c\x75\x22", -1, 6, json_tokener_success, 1 },
+
 	{ NULL, -1, -1, json_tokener_success, 0 },
 };
 

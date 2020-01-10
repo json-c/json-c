@@ -83,6 +83,7 @@ static const char* json_tokener_errors[] = {
   "object value separator ',' expected",
   "invalid string sequence",
   "expected comment",
+  "invalid utf-8 string",
   "buffer size overflow"
 };
 
@@ -281,6 +282,13 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
     setlocale(LC_NUMERIC, "C");
   }
 #endif
+
+  if ((tok->flags & JSON_TOKENER_STRICT) &&
+     (!json_tokener_validate_utf8(str)))
+  {
+    tok->err = json_tokener_error_parse_utf8_string;
+    goto out;
+  }
 
   while (PEEK_CHAR(c, tok)) {
 
@@ -983,6 +991,50 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
   MC_DEBUG("json_tokener_parse_ex: error %s at offset %d\n",
 	   json_tokener_errors[tok->err], tok->char_offset);
   return NULL;
+}
+
+json_bool json_tokener_validate_utf8(const char *str)
+{
+  unsigned int nBytes = 0;
+  unsigned char chr = *str;
+  unsigned int i; 
+  for (i = 0; str[i] != '\0'; ++i)
+  {
+    chr = *(str + i);
+    if (nBytes == 0)
+    {
+    /*Multibyte character, count the num of bytes(nBytes) */
+      if (chr >= 0x80)
+      {
+        if(chr >= 0xFC && chr <= 0xFD)
+          nBytes = 6;
+        else if (chr >= 0xF8)
+          nBytes = 5;
+        else if (chr >= 0xF0)
+          nBytes = 4;
+        else if (chr >= 0xE0)
+          nBytes = 3;
+        else if (chr >= 0xC0)
+          nBytes = 2;
+        else
+          return 0;
+        nBytes--;
+      }
+    }
+    else
+    {
+      /*The non-first byte of multibyte character should be 10xxxxxx */
+      if ((chr & 0xC0) != 0x80)
+        return 0;
+      nBytes--;
+    }
+  }
+  /*Violate  UTF-8 encoding rules*/
+  if (nBytes != 0)
+  {
+    return 0;
+  }
+  return 1;
 }
 
 void json_tokener_set_flags(struct json_tokener *tok, int flags)
