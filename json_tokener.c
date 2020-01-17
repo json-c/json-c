@@ -223,7 +223,7 @@ struct json_object* json_tokener_parse_verbose(const char *str,
     :						\
     (((tok)->err = json_tokener_continue), 0)	\
     ) :						\
-   (((tok->flags & JSON_TOKENER_STRICT) &&   \
+   (((tok->flags & JSON_TOKENER_VALIDATE_UTF8) &&   \
     (!json_tokener_validate_utf8(*str, nBytesp)))?  \
     ((tok->err = json_tokener_error_parse_utf8_string), 0)  \
     :            \
@@ -956,7 +956,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
   } /* while(PEEK_CHAR) */
 
  out:
-  if ((tok->flags & JSON_TOKENER_STRICT) && (nBytes != 0))
+  if ((tok->flags & JSON_TOKENER_VALIDATE_UTF8) && (nBytes != 0))
   {
     tok->err = json_tokener_error_parse_utf8_string;
   }
@@ -1004,19 +1004,14 @@ json_bool json_tokener_validate_utf8(const char c, unsigned int *nBytes)
   {
     if (chr >= 0x80)
     {
-      if(chr >= 0xFC && chr <= 0xFd)
-        *nBytes = 6;
-      else if (chr >= 0xF8)
-        *nBytes = 5;
-      else if (chr >= 0xF0)
-        *nBytes = 4;
-      else if (chr >= 0xE0)
-        *nBytes = 3;
-      else if (chr >= 0xC0)
+      if ((chr & 0xe0) == 0xc0)
+        *nBytes = 1;
+      else if ((chr & 0xf0) == 0xe0)
         *nBytes = 2;
+      else if ((chr & 0xf8) == 0xf0)
+        *nBytes = 3;
       else
         return 0;
-      (*nBytes)--;
     }
   }
   else

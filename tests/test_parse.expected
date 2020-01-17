@@ -191,8 +191,6 @@ json_tokener_parse_ex(tok, –ç•Œ"       ,   5) ... OK: got correct error: invalid
 json_tokener_parse_ex(tok, "ä¸–ç•Œ"    ,   8) ... OK: got object of type [string]: "ä¸–ç•Œ"
 json_tokener_parse_ex(tok, "Ï€Ï†"      ,   6) ... OK: got object of type [string]: "Ï€Ï†"
 json_tokener_parse_ex(tok, "ğ¥‘•"      ,   6) ... OK: got object of type [string]: "ğ¥‘•"
-json_tokener_parse_ex(tok, "ø¥¥‘•"     ,   7) ... OK: got object of type [string]: "ø¥¥‘•"
-json_tokener_parse_ex(tok, "ı¥¥¥‘•"    ,   8) ... OK: got object of type [string]: "ı¥¥¥‘•"
 json_tokener_parse_ex(tok, "æN"       ,   5) ... OK: got correct error: invalid utf-8 string
 json_tokener_parse_ex(tok, "æN"       ,   5) ... OK: got object of type [string]: "æN"
 json_tokener_parse_ex(tok, "ÀîÅô"      ,   6) ... OK: got correct error: invalid utf-8 string
@@ -207,5 +205,5 @@ json_tokener_parse_ex(tok, "\ud855Àudc55",  14) ... OK: got correct error: inval
 json_tokener_parse_ex(tok, "\ud0031À"  ,  10) ... OK: got correct error: invalid utf-8 string
 json_tokener_parse_ex(tok, 1111       ,   5) ... OK: got correct error: invalid utf-8 string
 json_tokener_parse_ex(tok, {"1":1}    ,   8) ... OK: got correct error: invalid utf-8 string
-End Incremental Tests OK=129 ERROR=0
+End Incremental Tests OK=127 ERROR=0
 ==================================
