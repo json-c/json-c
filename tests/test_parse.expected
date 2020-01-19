@@ -61,6 +61,7 @@ new_obj.to_string({ "foo": [null, "foo"] })={ "foo": [ null, "foo" ] }
 new_obj.to_string({ "abc": 12, "foo": "bar", "bool0": false, "bool1": true, "arr": [ 1, 2, 3, null, 5 ] })={ "abc": 12, "foo": "bar", "bool0": false, "bool1": true, "arr": [ 1, 2, 3, null, 5 ] }
 new_obj.to_string({ "abc": "blue
 red\ngreen" })={ "abc": "blue\nred\ngreen" }
+new_obj.to_string({ "foo\u0000bar": "foo\u0000bar" })={ "foo\\u0000bar": "foo\u0000bar" }
 new_obj.to_string(null)=null
 new_obj.to_string(false)=false
 new_obj.to_string([0e])=[ 0.0 ]

@@ -68,6 +68,8 @@ static const int json_true_str_len = sizeof(json_true_str) - 1;
 static const char json_false_str[] = "false";
 static const int json_false_str_len = sizeof(json_false_str) - 1;
 
+static char *replace_null_character(struct printbuf *puf);
+
 static const char* json_tokener_errors[] = {
   "success",
   "continue",
@@ -882,7 +884,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	while(1) {
 	  if(c == tok->quote_char) {
 	    printbuf_memappend_fast(tok->pb, case_start, str-case_start);
-	    obj_field_name = strdup(tok->pb->buf);
+	    obj_field_name = replace_null_character(tok->pb);
 	    saved_state = json_tokener_state_object_field_end;
 	    state = json_tokener_state_eatws;
 	    break;
@@ -996,3 +998,44 @@ size_t json_tokener_get_parse_end(struct json_tokener *tok)
 	return (size_t)tok->char_offset;
 }
 
+char *replace_null_character(struct printbuf *puf)
+{
+	if (puf->bpos - strlen(puf->buf) > 0) {
+		
+		char c;
+		char *str = NULL;
+		char *p = NULL;
+		int pos = 0, size = 0, str_length = 0;
+		int length = puf->bpos;
+		
+		while (length --) {
+			c = puf->buf[pos];
+
+			if ('\0' == c) {
+				size ++;
+			}
+			pos ++;
+		}
+	
+		pos = 0;	
+		length = puf->bpos;
+		str_length = (length - size + 1) + size*6;
+		str = (char *)malloc(str_length * sizeof(char));
+		*str = '\0';
+
+		while (length --) {
+			c = puf->buf[pos];
+
+			if ('\0' == c) {
+				strncat(str, "\\u0000", 6);
+			} else {
+				strncat(str, &c, 1);
+			}
+			pos ++;
+		}
+		p =strdup(str);
+		free(str);
+		return p;
+	}
+	return strdup(puf->buf);
+}
