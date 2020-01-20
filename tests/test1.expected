@@ -12,6 +12,7 @@ my_string=foo
 my_string.to_string()="foo"
 my_int=9
 my_int.to_string()=9
+my_null.to_string()=null
 my_array=
 	[0]=1
 	[1]=2

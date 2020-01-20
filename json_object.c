@@ -1275,6 +1275,11 @@ static int json_array_equal(struct json_object* jso1,
 	return 1;
 }
 
+struct json_object* json_object_new_null()
+{
+  return NULL;
+}
+
 static int json_object_all_values_equal(struct json_object* jso1,
 					struct json_object* jso2)
 {

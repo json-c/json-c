@@ -965,6 +965,11 @@ JSON_EXPORT int json_object_set_string(json_object* obj, const char* new_value);
  */
 JSON_EXPORT int json_object_set_string_len(json_object* obj, const char* new_value, int len);
 
+/** Create a new empty json_object of type null and return NULL.
+ *
+ */
+JSON_EXPORT struct json_object* json_object_new_null();
+
 /** Check if two json_object's are equal
  *
  * If the passed objects are equal 1 will be returned.
