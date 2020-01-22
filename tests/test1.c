@@ -137,7 +137,7 @@ void test_array_del_idx()
 
 int main(int argc, char **argv)
 {
-	json_object *my_string, *my_int, *my_object, *my_array;
+	json_object *my_string, *my_int, *my_null, *my_object, *my_array;
 	size_t i;
 #ifdef TEST_FORMATTED
 	int sflags = 0;
@@ -178,6 +178,9 @@ int main(int argc, char **argv)
 	my_int = json_object_new_int(9);
 	printf("my_int=%d\n", json_object_get_int(my_int));
 	printf("my_int.to_string()=%s\n", json_object_to_json_string(my_int));
+
+	my_null = json_object_new_null();
+	printf("my_null.to_string()=%s\n", json_object_to_json_string(my_null));
 
 	my_array = json_object_new_array();
 	json_object_array_add(my_array, json_object_new_int(1));
@@ -249,6 +252,7 @@ int main(int argc, char **argv)
 
 	json_object_put(my_string);
 	json_object_put(my_int);
+	json_object_put(my_null);
 	json_object_put(my_object);
 	json_object_put(my_array);
 
