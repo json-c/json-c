@@ -965,8 +965,9 @@ JSON_EXPORT int json_object_set_string(json_object* obj, const char* new_value);
  */
 JSON_EXPORT int json_object_set_string_len(json_object* obj, const char* new_value, int len);
 
-/** Create a new empty json_object of type null and return NULL.
- *
+/** This method exists only to provide a complementary function
+ * along the lines of the other json_object_new_* functions.
+ * It always returns NULL, and it is entirely acceptable to simply use NULL directly.
  */
 JSON_EXPORT struct json_object* json_object_new_null();
 
