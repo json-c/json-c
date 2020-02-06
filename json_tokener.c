@@ -83,6 +83,7 @@ static const char* json_tokener_errors[] = {
   "object value separator ',' expected",
   "invalid string sequence",
   "expected comment",
+  "invalid utf-8 string",
   "buffer size overflow"
 };
 
@@ -222,8 +223,12 @@ struct json_object* json_tokener_parse_verbose(const char *str,
     :						\
     (((tok)->err = json_tokener_continue), 0)	\
     ) :						\
-   (((dest) = *str), 1)				\
-   )
+   (((tok->flags & JSON_TOKENER_VALIDATE_UTF8) &&   \
+    (!json_tokener_validate_utf8(*str, nBytesp)))?  \
+    ((tok->err = json_tokener_error_parse_utf8_string), 0)  \
+    :            \
+    (((dest) = *str), 1)				\
+   ))
 
 /* ADVANCE_CHAR() macro:
  *   Increments str & tok->char_offset.
@@ -242,6 +247,9 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 {
   struct json_object *obj = NULL;
   char c = '\1';
+  unsigned int nBytes = 0;
+  unsigned int *nBytesp = &nBytes;
+
 #ifdef HAVE_USELOCALE
   locale_t oldlocale = uselocale(NULL);
   locale_t newloc;
@@ -948,6 +956,10 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
   } /* while(PEEK_CHAR) */
 
  out:
+  if ((tok->flags & JSON_TOKENER_VALIDATE_UTF8) && (nBytes != 0))
+  {
+    tok->err = json_tokener_error_parse_utf8_string;
+  }
   if (c &&
      (state == json_tokener_state_finish) &&
      (tok->depth == 0) &&
@@ -983,6 +995,32 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
   MC_DEBUG("json_tokener_parse_ex: error %s at offset %d\n",
 	   json_tokener_errors[tok->err], tok->char_offset);
   return NULL;
+}
+
+json_bool json_tokener_validate_utf8(const char c, unsigned int *nBytes)
+{
+  unsigned char chr = c;
+  if (*nBytes == 0)
+  {
+    if (chr >= 0x80)
+    {
+      if ((chr & 0xe0) == 0xc0)
+        *nBytes = 1;
+      else if ((chr & 0xf0) == 0xe0)
+        *nBytes = 2;
+      else if ((chr & 0xf8) == 0xf0)
+        *nBytes = 3;
+      else
+        return 0;
+    }
+  }
+  else
+  {
+    if ((chr & 0xC0) != 0x80)
+      return 0;
+    (*nBytes)--;
+  }
+  return 1;
 }
 
 void json_tokener_set_flags(struct json_tokener *tok, int flags)

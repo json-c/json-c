@@ -38,6 +38,7 @@ enum json_tokener_error {
   json_tokener_error_parse_object_value_sep,
   json_tokener_error_parse_string,
   json_tokener_error_parse_comment,
+  json_tokener_error_parse_utf8_string,
   json_tokener_error_size
 };
 
@@ -137,6 +138,17 @@ typedef struct json_tokener json_tokener;
 #define JSON_TOKENER_STRICT  0x01
 
 /**
+ * Allow json_tokener_parse_ex() validate utf-8 char.
+ * The json_tokener_validate_utf8() validate one utf8 char
+ * after get one char, then begin to parse it.
+ *
+ * This flag is not set by default.
+ *
+ * @see json_tokener_set_flags()
+ */
+#define JSON_TOKENER_VALIDATE_UTF8  0x10
+
+/**
  * Given an error previously returned by json_tokener_get_error(),
  * return a human readable description of the error.
  *
@@ -162,6 +174,11 @@ JSON_EXPORT void json_tokener_reset(struct json_tokener *tok);
 JSON_EXPORT struct json_object* json_tokener_parse(const char *str);
 JSON_EXPORT struct json_object* json_tokener_parse_verbose(const char *str, enum json_tokener_error *error);
 
+/**
+ * validete the utf-8 string in strict model.
+ * if not utf-8 format, return err.
+ */
+json_bool json_tokener_validate_utf8(const char c, unsigned int *nBytes);
 /**
  * Set flags that control how parsing will be done.
  */
