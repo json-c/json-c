@@ -4,6 +4,10 @@ cmake_minimum_required(VERSION 2.8.7)
 cmake_policy(SET CMP0048 NEW)
 project(json-c VERSION 0.13.1)
 
+if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+  include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+  conan_basic_setup()
+endif()
 
 include(CheckSymbolExists)
 
@@ -70,6 +74,7 @@ set(JSON_C_PUBLIC_HEADERS
     ./json_pointer.h
     ./json_tokener.h
     ./json_util.h
+    ./json_visit.h
     ./linkhash.h
     ./printbuf.h
 )
@@ -116,6 +121,9 @@ add_library(json-c-static
 set_property(TARGET json-c PROPERTY C_STANDARD 99)
 set_property(TARGET json-c-static PROPERTY C_STANDARD 99)
 set_target_properties(json-c-static PROPERTIES OUTPUT_NAME json-c)
+
+# -fPIC is implicit in SHARED libraries, see POSITION_INDEPENDANT_CODE property in cmake documentation
+set_target_properties(json-c-static PROPERTIES COMPILE_FLAGS "-fPIC")
 
 install(TARGETS json-c json-c-static
     RUNTIME DESTINATION bin
