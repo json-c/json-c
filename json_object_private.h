@@ -20,7 +20,7 @@
 extern "C" {
 #endif
 
-#define LEN_DIRECT_STRING_DATA 32 /**< how many bytes are directly stored in json_object for strings? */
+#define LEN_DIRECT_STRING_DATA 16 /**< how many bytes are directly stored in json_object for strings? */
 
 typedef void (json_object_private_delete_fn)(struct json_object *o);
 
