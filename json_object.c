@@ -999,6 +999,8 @@ int json_object_set_double(struct json_object *jso,double new_value){
 	if (!jso || jso->o_type!=json_type_double)
 		return 0;
 	jso->o.c_double=new_value;
+	if (jso->_to_json_string == &json_object_userdata_to_json_string)
+	    json_object_set_serializer(jso, NULL, NULL, NULL);
 	return 1;
 }
 

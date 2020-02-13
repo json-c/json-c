@@ -45,8 +45,14 @@ int main(int argc, char **argv)
 	assert (strcmp(json_object_get_string(tmp),SHORT)==0); 
 	json_object_put(tmp);
 	printf("STRING PASSED\n");
-	
-	
+
+	tmp = json_tokener_parse("1.234");
+	json_object_set_double(tmp, 12.3);
+	const char *serialized = json_object_to_json_string(tmp);
+	fprintf(stderr, "%s\n", serialized);
+	assert(strncmp(serialized, "12.3", 4)==0);
+	printf("PARSE AND SET PASSED\n");
+
 	printf("PASSED\n");
 	return 0;
 }
