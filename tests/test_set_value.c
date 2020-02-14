@@ -51,6 +51,7 @@ int main(int argc, char **argv)
 	const char *serialized = json_object_to_json_string(tmp);
 	fprintf(stderr, "%s\n", serialized);
 	assert(strncmp(serialized, "12.3", 4)==0);
+	json_object_put(tmp);
 	printf("PARSE AND SET PASSED\n");
 
 	printf("PASSED\n");
