@@ -801,7 +801,8 @@ JSON_EXPORT struct json_object* json_object_new_double(double d);
  * The userdata field is used to store the string representation, so it
  * can't be used for other data if this function is used.
  *
- * An equivalent sequence of calls is:
+ * A roughly equivalent sequence of calls, with the difference being that
+ *  the serialization function won't be reset by json_object_set_double(), is:
  * @code
  *   jso = json_object_new_double(d);
  *   json_object_set_serializer(jso, json_object_userdata_to_json_string,
@@ -884,6 +885,9 @@ JSON_EXPORT double json_object_get_double(const struct json_object *obj);
  * The type of obj is checked to be a json_type_double and 0 is returned 
  * if it is not without any further actions. If type of obj is json_type_double
  * the object value is changed to new_value
+ *
+ * If the object was created with json_object_new_double_s(), the serialization
+ * function is reset to the default and the cached serialized value is cleared.
  *
  * @param obj the json_object instance
  * @param new_value the value to be set

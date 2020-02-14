@@ -53,6 +53,7 @@ static json_object_to_json_string_fn json_object_double_to_json_string_default;
 static json_object_to_json_string_fn json_object_int_to_json_string;
 static json_object_to_json_string_fn json_object_string_to_json_string;
 static json_object_to_json_string_fn json_object_array_to_json_string;
+static json_object_to_json_string_fn _json_object_userdata_to_json_string;
 
 
 /* ref count debugging */
@@ -921,9 +922,20 @@ struct json_object* json_object_new_double_s(double d, const char *ds)
 		errno = ENOMEM;
 		return NULL;
 	}
-	json_object_set_serializer(jso, json_object_userdata_to_json_string,
+	json_object_set_serializer(jso, _json_object_userdata_to_json_string,
 	    new_ds, json_object_free_userdata);
 	return jso;
+}
+
+/*
+ * A wrapper around json_object_userdata_to_json_string() used only
+ * by json_object_new_double_s() just so json_object_set_double() can
+ * detect when it needs to reset the serializer to the default.
+ */
+static int _json_object_userdata_to_json_string(struct json_object *jso,
+	struct printbuf *pb, int level, int flags)
+{
+	return json_object_userdata_to_json_string(jso, pb, level, flags);
 }
 
 int json_object_userdata_to_json_string(struct json_object *jso,
@@ -999,7 +1011,7 @@ int json_object_set_double(struct json_object *jso,double new_value){
 	if (!jso || jso->o_type!=json_type_double)
 		return 0;
 	jso->o.c_double=new_value;
-	if (jso->_to_json_string == &json_object_userdata_to_json_string)
+	if (jso->_to_json_string == &_json_object_userdata_to_json_string)
 	    json_object_set_serializer(jso, NULL, NULL, NULL);
 	return 1;
 }
@@ -1354,7 +1366,8 @@ static int json_object_copy_serializer_data(struct json_object *src, struct json
 	if (!src->_userdata && !src->_user_delete)
 		return 0;
 
-	if (dst->_to_json_string == json_object_userdata_to_json_string)
+	if (dst->_to_json_string == json_object_userdata_to_json_string ||
+	    dst->_to_json_string == _json_object_userdata_to_json_string)
 	{
 		dst->_userdata = strdup(src->_userdata);
 	}
