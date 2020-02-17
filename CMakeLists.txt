@@ -197,6 +197,7 @@ message(STATUS "Written ${PROJECT_BINARY_DIR}/json_config.h")
 
 if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections")
+    set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
 	if ("${DISABLE_WERROR}" STREQUAL "OFF")
 	    set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -Werror")
 	endif()
