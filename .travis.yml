@@ -78,22 +78,33 @@ matrix:
       osx_image: xcode10.1
       env: XCODE="true" CHECK="true"
 
-#   run coveralls
+# run coveralls
     - os: linux
       dist: xenial
       compiler: gcc
       env: CHECK="true"
+      install:
+        - sh autogen.sh
       before_install:
         - sudo pip install cpp-coveralls
+        - echo $CC
+        - echo $LANG
+        - echo $LC_ALL
+        - set -e
+        - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+            eval "${MATRIX_EVAL}";
+            if [ -n "$MATRIX_EVAL" ] && [ "$TRAVIS_COMPILER" != "clang" ]; then
+              sudo apt-get install -y $CC;
+            fi;
+          fi
+      before_script:
+        - export CFLAGS="-fprofile-arcs -ftest-coverage"
+        - ./configure
       script:
-        - mkdir build
-        - cd build
-        - cmake ..
         - make
-        - make test
-        - cd -
+        - make check
       after_success:
-        - coveralls --include arraylist.c --include arraylist.h --include json_object.c --include json_object.h --include json_object_iterator.c --include json_object_iterator.h --include json_object_private.h --include json_pointer.c --include json_pointer.h --include json_tokener.c --include json_tokener.h --include json_util.c --include json_util.h --include json_visit.c --include json_visit.h --include linkhash.c --include linkhash.h --include printbuf.c --include printbuf.h --include random_seed.c --include strerror_override.c
+        - coveralls --exclude tests --exclude fuzz
 
 #  allow_failures:
 #    - os: osx
