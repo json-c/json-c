@@ -128,8 +128,18 @@ static void test_basic_parse()
 	single_basic_parse("[0e]", 1);
 	single_basic_parse("[0e+]", 1);
 	single_basic_parse("[0e+-1]", 1);
-	single_basic_parse("[18446744073709551616]", 1);
 	single_basic_parse("\"hello world!\"", 1);
+
+  // uint64/int64 range test
+	single_basic_parse("[9223372036854775806]", 1);
+	single_basic_parse("[9223372036854775807]", 1);
+	single_basic_parse("[9223372036854775808]", 1);
+	single_basic_parse("[-9223372036854775807]", 1);
+	single_basic_parse("[-9223372036854775808]", 1);
+	single_basic_parse("[-9223372036854775809]", 1);
+	single_basic_parse("[18446744073709551614]", 1);
+	single_basic_parse("[18446744073709551615]", 1);
+	single_basic_parse("[18446744073709551616]", 1);
 }
 
 static void test_utf8_parse()

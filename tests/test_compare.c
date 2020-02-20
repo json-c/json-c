@@ -15,6 +15,9 @@ int main()
 	struct json_object *int1 = json_object_new_int(0);
 	struct json_object *int2 = json_object_new_int(1);
 	struct json_object *int3 = json_object_new_int(1);
+	struct json_object *uint1 = json_object_new_uint64(0);
+	struct json_object *uint2 = json_object_new_uint64(1);
+	struct json_object *uint3 = json_object_new_uint64(1);
 
 	if (!json_object_equal(int1, int2))
 		printf("JSON integer comparison is correct\n");
@@ -31,9 +34,27 @@ int main()
 	else
 		printf("JSON same integer comparison failed\n");
 
+	if (!json_object_equal(uint1, uint2))
+		printf("JSON usigned integer comparison is correct\n");
+	else
+		printf("JSON usigned integer comparison failed\n");
+
+	if (json_object_equal(uint1, uint1))
+		printf("JSON same usigned object comparison is correct\n");
+	else
+		printf("JSON same usigned object comparison failed\n");
+
+	if (json_object_equal(uint2, uint3))
+		printf("JSON same usigned integer comparison is correct\n");
+	else
+		printf("JSON same usigned integer comparison failed\n");
+
 	json_object_put(int1);
 	json_object_put(int2);
 	json_object_put(int3);
+	json_object_put(uint1);
+	json_object_put(uint2);
+	json_object_put(uint3);
 
 	/* string tests */
 	struct json_object *str1 = json_object_new_string("TESTSTRING");

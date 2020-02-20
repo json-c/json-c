@@ -176,6 +176,7 @@ typedef enum json_type {
   json_type_boolean,
   json_type_double,
   json_type_int,
+  json_type_uint,
   json_type_object,
   json_type_array,
   json_type_string
@@ -210,6 +211,7 @@ JSON_EXPORT int json_object_put(struct json_object *obj);
      json_type_boolean,
      json_type_double,
      json_type_int,
+     json_type_uint,
      json_type_object,
      json_type_array,
      json_type_string
@@ -226,6 +228,7 @@ JSON_EXPORT int json_object_is_type(const struct json_object *obj, enum json_typ
      json_type_boolean,
      json_type_double,
      json_type_int,
+     json_type_uint,
      json_type_object,
      json_type_array,
      json_type_string
@@ -701,6 +704,13 @@ JSON_EXPORT struct json_object* json_object_new_int(int32_t i);
 JSON_EXPORT struct json_object* json_object_new_int64(int64_t i);
 
 
+/** Create a new empty json_object of type json_type_uint
+ * @param i the integer
+ * @returns a json_object of type json_type_uint
+ */
+JSON_EXPORT struct json_object* json_object_new_uint64(uint64_t i);
+
+
 /** Get the int value of a json_object
  *
  * The type is coerced to a int if the passed object is not a int.
@@ -745,6 +755,19 @@ JSON_EXPORT int json_object_set_int(struct json_object *obj,int new_value);
  */
 JSON_EXPORT int json_object_int_inc(struct json_object *obj, int64_t val);
 
+/** Increment a json_type_uint object by the given amount, which may be negative.
+ *
+ * If the type of obj is not json_type_uint then 0 is returned with no further
+ * action taken.
+ * If the addition would result in a overflow, the object value
+ * is set to UINT64_MAX.
+ * Neither overflow nor underflow affect the return value.
+ *
+ * @param obj the json_object instance
+ * @param val the value to add
+ * @returns 1 if the increment succeded, 0 otherwise
+ */
+JSON_EXPORT int json_object_uint_inc(struct json_object *obj, uint64_t val);
 
 /** Get the int value of a json_object
  *
@@ -761,6 +784,20 @@ JSON_EXPORT int json_object_int_inc(struct json_object *obj, int64_t val);
  */
 JSON_EXPORT int64_t json_object_get_int64(const struct json_object *obj);
 
+/** Get the uint value of a json_object
+ *
+ * The type is coerced to a uint64 if the passed object is not a uint64.
+ * double objects will return their uint64 conversion. Strings will be
+ * parsed as an uint64. If no conversion exists then 0 is returned.
+ *
+ * NOTE: Set errno to 0 directly before a call to this function to determine
+ * whether or not conversion was successful (it does not clear the value for
+ * you).
+ *
+ * @param obj the json_object instance
+ * @returns an uint64
+ */
+JSON_EXPORT uint64_t json_object_get_uint64(const struct json_object *obj);
 
 /** Set the int64_t value of a json_object
  * 
@@ -773,6 +810,18 @@ JSON_EXPORT int64_t json_object_get_int64(const struct json_object *obj);
  * @returns 1 if value is set correctly, 0 otherwise
  */
 JSON_EXPORT int json_object_set_int64(struct json_object *obj,int64_t new_value);
+
+/** Set the uint64_t value of a json_object
+ *
+ * The type of obj is checked to be a json_type_uint and 0 is returned
+ * if it is not without any further actions. If type of obj is json_type_uint
+ * the object value is changed to new_value
+ *
+ * @param obj the json_object instance
+ * @param new_value the value to be set
+ * @returns 1 if value is set correctly, 0 otherwise
+ */
+JSON_EXPORT int json_object_set_uint64(struct json_object *obj,uint64_t new_value);
 
 /* double type methods */
 

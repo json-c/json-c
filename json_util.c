@@ -40,8 +40,9 @@
 
 #ifdef WIN32
 # if MSC_VER < 1800
-/* strtoll is available only since Visual Studio 2013 */
+/* strtoll/strtoull is available only since Visual Studio 2013 */
 #  define strtoll _strtoi64
+#  define strtoull _strtoui64
 # endif
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
@@ -230,6 +231,23 @@ int json_parse_int64(const char *buf, int64_t *retval)
 	return ((val == 0 && errno != 0) || (end == buf)) ? 1 : 0;
 }
 
+int json_parse_uint64(const char *buf, uint64_t *retval)
+{
+	char *end = NULL;
+	uint64_t val;
+	errno = 1;
+
+	while (*buf == ' ') {
+		buf++;
+	}
+	if (*buf == '-') errno = 0;
+
+	val = strtoull(buf, &end, 10);
+	if (end != buf)
+		*retval = val;
+	return ((errno == 0) || (end == buf)) ? 1 : 0;
+}
+
 #ifndef HAVE_REALLOC
 void* rpl_realloc(void* p, size_t n)
 {
@@ -248,6 +266,7 @@ static const char* json_type_name[] = {
   "boolean",
   "double",
   "int",
+  "uint",
   "object",
   "array",
   "string",

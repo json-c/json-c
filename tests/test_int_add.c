@@ -41,6 +41,18 @@ int main(int argc, char **argv)
 	assert(json_object_get_int64(tmp) != INT64_MIN);
 	json_object_put(tmp);
 	printf("INT64 ADD UNDERFLOW PASSED\n");
+	tmp = json_object_new_uint64(321321321);
+	json_object_uint_inc(tmp, 321321321);
+	assert(json_object_get_uint64(tmp) == 642642642);
+	json_object_put(tmp);
+	printf("UINT64 ADD PASSED\n");
+	tmp = json_object_new_uint64(UINT64_MAX);
+	json_object_uint_inc(tmp, 100);
+	assert(json_object_get_uint64(tmp) == UINT64_MAX);
+	json_object_uint_inc(tmp, -100);
+	assert(json_object_get_uint64(tmp) != INT64_MAX);
+	json_object_put(tmp);
+	printf("UINT64 ADD OVERFLOW PASSED\n");
 
 	printf("PASSED\n");
 	return 0;

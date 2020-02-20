@@ -115,6 +115,8 @@
 
 #cmakedefine HAVE_STRTOLL
 #cmakedefine strtoll @cmake_strtoll@
+#cmakedefine HAVE_STRTOULL
+#cmakedefine strtoull @cmake_strtoull@
 
 /* Define to 1 if you have the <syslog.h> header file. */
 #undef HAVE_SYSLOG_H
