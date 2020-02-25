@@ -174,6 +174,29 @@ Pass these options as `-D` on CMake's command-line.
 cmake -DBUILD_SHARED_LIBS=OFF ...
 ```
 
+cmake-configure: Wrapper around cmake to emulate useful options 
+
+To use cmake-configure,build it like:
+
+```sh
+mkdir build
+cd build
+../cmake-configure --disable-werror
+make
+```
+
+cmake-configure can take a few options.
+
+| options | Description|
+| ---- | ---- |
+| prefix=PREFIX |  install architecture-independent files in PREFIX | 
+| enable-threading |  Enable code to support partly multi-threaded use |
+| enable-rdrand | Enable RDRAND Hardware RNG Hash Seed generation on supported x86/x64 platforms. | 
+| enable-shared  |  build shared libraries [default=yes] |
+| enable-static  |  build static libraries [default=yes] |
+| disable-Bsymbolic |  Avoid linking with -Bsymbolic-function |
+| disable-werror |  Avoid treating compiler warnings as fatal errors |
+
 Testing with cmake:
 
 By default, if valgrind is available running tests uses it.
