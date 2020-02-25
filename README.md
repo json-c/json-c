@@ -174,9 +174,9 @@ Pass these options as `-D` on CMake's command-line.
 cmake -DBUILD_SHARED_LIBS=OFF ...
 ```
 
-cmake-configure: Wrapper around cmake to emulate useful options 
+**In addition， you can also use cmake-configure: Wrapper around cmake to emulate useful options.**
 
-To use cmake-configure,build it like:
+To use cmake-configure, build it like:
 
 ```sh
 mkdir build
