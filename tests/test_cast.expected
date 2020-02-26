@@ -59,13 +59,13 @@ new_obj.a_null json_object_get_boolean()=0
 new_obj.a_null json_object_get_double()=0.000000
 
 ================================
-json_object_is_type: null,boolean,double,int,uint,object,array,string
-new_obj                   : 0,0,0,0,0,1,0,0
-new_obj.string_of_digits  : 0,0,0,0,0,0,0,1
-new_obj.regular_number    : 0,0,0,1,0,0,0,0
-new_obj.decimal_number    : 0,0,1,0,0,0,0,0
-new_obj.boolean_true      : 0,1,0,0,0,0,0,0
-new_obj.boolean_false     : 0,1,0,0,0,0,0,0
-new_obj.int64_number      : 0,0,0,1,0,0,0,0
-new_obj.negative_number   : 0,0,0,1,0,0,0,0
-new_obj.a_null            : 1,0,0,0,0,0,0,0
+json_object_is_type: null,boolean,double,int,object,array,string
+new_obj                   : 0,0,0,0,1,0,0
+new_obj.string_of_digits  : 0,0,0,0,0,0,1
+new_obj.regular_number    : 0,0,0,1,0,0,0
+new_obj.decimal_number    : 0,0,1,0,0,0,0
+new_obj.boolean_true      : 0,1,0,0,0,0,0
+new_obj.boolean_false     : 0,1,0,0,0,0,0
+new_obj.int64_number      : 0,0,0,1,0,0,0
+new_obj.negative_number   : 0,0,0,1,0,0,0
+new_obj.a_null            : 1,0,0,0,0,0,0

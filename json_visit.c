@@ -57,7 +57,6 @@ static int _json_c_visit(json_object *jso, json_object *parent_jso,
 	case json_type_boolean:
 	case json_type_double:
 	case json_type_int:
-	case json_type_uint:
 	case json_type_string:
 		// we already called userfunc above, move on to the next object
 		return JSON_C_VISIT_RETURN_CONTINUE;

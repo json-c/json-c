@@ -176,11 +176,16 @@ typedef enum json_type {
   json_type_boolean,
   json_type_double,
   json_type_int,
-  json_type_uint,
   json_type_object,
   json_type_array,
   json_type_string
 } json_type;
+
+/* json object int type, support extension*/
+typedef enum json_object_int_type {
+  json_object_int_type_int64,
+  json_object_int_type_uint64
+}json_object_int_type;
 
 /* reference counting functions */
 
@@ -211,7 +216,6 @@ JSON_EXPORT int json_object_put(struct json_object *obj);
      json_type_boolean,
      json_type_double,
      json_type_int,
-     json_type_uint,
      json_type_object,
      json_type_array,
      json_type_string
@@ -228,7 +232,6 @@ JSON_EXPORT int json_object_is_type(const struct json_object *obj, enum json_typ
      json_type_boolean,
      json_type_double,
      json_type_int,
-     json_type_uint,
      json_type_object,
      json_type_array,
      json_type_string

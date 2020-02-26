@@ -266,7 +266,6 @@ static const char* json_type_name[] = {
   "boolean",
   "double",
   "int",
-  "uint",
   "object",
   "array",
   "string",
