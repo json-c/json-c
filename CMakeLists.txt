@@ -317,6 +317,24 @@ set(JSON_C_SOURCES
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_BINARY_DIR})
 
+# generate doxygen documentation for json-c API
+
+find_package(Doxygen)
+option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation(requires Doxygen)" ${DOXYGEN_FOUND})
+
+if (DOXYGEN_FOUND)
+
+	add_custom_target(doc
+  	COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+	
+	# request to configure the file
+	configure_file(Doxyfile Doxyfile)
+
+else (DOXYGEN_FOUND)
+	message("Doxygen need to be installed to generate the doxygen documentation")
+endif(DOXYGEN_FOUND)
+
 # XXX for a normal full distribution we'll need to figure out
 # XXX how to build both shared and static libraries.
 # Probably leverage that to build a local VALGRIND=1 library for testing too.

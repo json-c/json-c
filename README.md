@@ -230,6 +230,14 @@ JSONC_TEST_TRACE=1 make test
 ```
 and check the log files again.
 
+To get doxygen documentation
+
+The libray documentation can be generated directly from the source codes using Doxygen tool:
+
+```sh
+make doc
+google-chrome ../doc/html/index.html
+```
 
 
 Linking to `libjson-c` <a name="linking">
