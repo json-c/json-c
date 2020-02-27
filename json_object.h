@@ -181,12 +181,6 @@ typedef enum json_type {
   json_type_string
 } json_type;
 
-/* json object int type, support extension*/
-typedef enum json_object_int_type {
-  json_object_int_type_int64,
-  json_object_int_type_uint64
-}json_object_int_type;
-
 /* reference counting functions */
 
 /**

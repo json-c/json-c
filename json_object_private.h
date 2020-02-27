@@ -24,6 +24,12 @@ extern "C" {
 
 typedef void (json_object_private_delete_fn)(struct json_object *o);
 
+/* json object int type, support extension*/
+typedef enum json_object_int_type {
+  json_object_int_type_int64,
+  json_object_int_type_uint64
+}json_object_int_type;
+
 struct json_object
 {
   enum json_type o_type;
