@@ -594,8 +594,10 @@ json_bool json_object_get_boolean(const struct json_object *jso)
 		switch(jso->o.c_int.cint_type) {
 		case json_object_int_type_int64:
 			return (jso->o.c_int.cint.c_int64 != 0);
-		default:
+		case json_object_int_type_uint64:
 			return (jso->o.c_int.cint.c_uint64 != 0);
+		default:
+			assert(0);
 		}
 	case json_type_double:
 		return (jso->o.c_double != 0);
@@ -624,11 +626,9 @@ static int json_object_int_to_json_string(struct json_object* jso,
 	/* room for 19 digits, the sign char, and a null term */
 	char sbuf[21];
 	if (jso->o.c_int.cint_type == json_object_int_type_int64)
-	  snprintf(sbuf, sizeof(sbuf), "%" PRId64, jso->o.c_int.cint.c_int64);
-	else if (jso->o.c_int.cint_type == json_object_int_type_uint64)
-	  snprintf(sbuf, sizeof(sbuf), "%" PRIu64, jso->o.c_int.cint.c_uint64);
+		snprintf(sbuf, sizeof(sbuf), "%" PRId64, jso->o.c_int.cint.c_int64);
 	else
-		return 0;
+		snprintf(sbuf, sizeof(sbuf), "%" PRIu64, jso->o.c_int.cint.c_uint64);
 	return printbuf_memappend (pb, sbuf, strlen(sbuf));
 }
 
@@ -653,7 +653,7 @@ int32_t json_object_get_int(const struct json_object *jso)
   o_type = jso->o_type;
   if (jso->o.c_int.cint_type == json_object_int_type_int64) {
     cint64 = jso->o.c_int.cint.c_int64;
-  } else if (jso->o.c_int.cint_type == json_object_int_type_uint64) {
+  } else {
     if (jso->o.c_int.cint.c_uint64 >= INT64_MAX)
       cint64 = INT64_MAX;
     cint64 = (int64_t)jso->o.c_int.cint.c_uint64;
@@ -734,7 +734,7 @@ int64_t json_object_get_int64(const struct json_object *jso)
 				return INT64_MAX;
 			return (int64_t)jso->o.c_int.cint.c_uint64;
 		default:
-			return 0;
+			assert(0);
 		}
 	case json_type_double:
 		// INT64_MAX can't be exactly represented as a double
@@ -772,7 +772,7 @@ uint64_t json_object_get_uint64(const struct json_object *jso)
 		case json_object_int_type_uint64:
 			return jso->o.c_int.cint.c_uint64;
 		default:
-			return 0;
+			assert(0);
 		}
 	case json_type_double:
 		// UINT64_MAX can't be exactly represented as a double
@@ -830,40 +830,13 @@ int json_object_int_inc(struct json_object *jso, int64_t val) {
 			jso->o.c_int.cint.c_int64 = (int64_t)jso->o.c_int.cint.c_uint64 + val;
 			jso->o.c_int.cint_type = json_object_int_type_int64;
 		} else if (val < 0 && jso->o.c_int.cint.c_uint64 >= (uint64_t)(-val)) {
-			jso->o.c_int.cint.c_uint64 = jso->o.c_int.cint.c_uint64 - (uint64_t)(-val);
+			jso->o.c_int.cint.c_uint64 -= (uint64_t)(-val);
 		} else {
 			jso->o.c_int.cint.c_uint64 += val;
 		}
 		return 1;
 	default:
-		return 0;
-	}
-}
-
-int json_object_uint_inc(struct json_object *jso, uint64_t val) {
-	if (!jso || jso->o_type != json_type_int)
-		return 0;
-	switch(jso->o.c_int.cint_type) {
-	case json_object_int_type_int64:
-		if ((uint64_t)jso->o.c_int.cint.c_uint64 + val> UINT64_MAX) {
-			jso->o.c_int.cint.c_uint64 = UINT64_MAX;
-			jso->o.c_int.cint_type = json_object_int_type_uint64;
-		} else if ((uint64_t)jso->o.c_int.cint.c_uint64 + val < INT64_MAX) {
-			jso->o.c_int.cint.c_int64 += (int64_t)val;
-		} else {
-			jso->o.c_int.cint.c_uint64 =(uint64_t) jso->o.c_int.cint.c_uint64 + val;
-			jso->o.c_int.cint_type = json_object_int_type_uint64;
-		}
-		return 1;
-	case json_object_int_type_uint64:
-		if (jso->o.c_int.cint.c_uint64 > UINT64_MAX - val) {
-			jso->o.c_int.cint.c_uint64 = UINT64_MAX;
-		} else {
-			jso->o.c_int.cint.c_uint64 += val;
-		}
-		return 1;
-	default:
-		return 0;
+		assert(0);
 	}
 }
 
@@ -1094,8 +1067,8 @@ double json_object_get_double(const struct json_object *jso)
     case json_object_int_type_uint64:
       return jso->o.c_int.cint.c_uint64;
     default:
-      return 0.0;
-		}
+      assert(0);
+    }
   case json_type_boolean:
     return jso->o.c_boolean;
   case json_type_string:
@@ -1475,26 +1448,22 @@ int json_object_equal(struct json_object* jso1, struct json_object* jso2)
 
 		case json_type_int:
 			if (jso1->o.c_int.cint_type == json_object_int_type_int64) {
-				if (jso2->o.c_int.cint_type == json_object_int_type_int64)
+				if (jso2->o.c_int.cint_type == json_object_int_type_int64) {
 					return (jso1->o.c_int.cint.c_int64 == jso2->o.c_int.cint.c_int64);
-				if (jso2->o.c_int.cint_type == json_object_int_type_uint64) {
+				} else {
 					if (jso1->o.c_int.cint.c_int64 < 0)
 						return 0;
 					return ((uint64_t)jso1->o.c_int.cint.c_int64 == jso2->o.c_int.cint.c_uint64);
 				}
-				return 0;
-			}
-			if (jso1->o.c_int.cint_type == json_object_int_type_uint64) {
-				if (jso2->o.c_int.cint_type == json_object_int_type_uint64)
+			} else {
+				if (jso2->o.c_int.cint_type == json_object_int_type_uint64) {
 					return (jso1->o.c_int.cint.c_uint64 == jso2->o.c_int.cint.c_uint64);
-				if (jso2->o.c_int.cint_type == json_object_int_type_int64){
+				} else {
 					if (jso2->o.c_int.cint.c_int64 < 0)
 						return 0;
 					return (jso1->o.c_int.cint.c_uint64 == (uint64_t)jso2->o.c_int.cint.c_int64);
 				}
-				return 0;
 			}
-			return 0;
 
 		case json_type_string:
 			return (jso1->o.c_string.len == jso2->o.c_string.len &&
@@ -1563,6 +1532,8 @@ int json_c_shallow_copy_default(json_object *src, json_object *parent, const cha
 		case json_object_int_type_uint64:
 			*dst = json_object_new_uint64(src->o.c_int.cint.c_uint64);
 			break;
+		default:
+			assert(0);
 		}
 		break;
 

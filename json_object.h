@@ -752,20 +752,6 @@ JSON_EXPORT int json_object_set_int(struct json_object *obj,int new_value);
  */
 JSON_EXPORT int json_object_int_inc(struct json_object *obj, int64_t val);
 
-/** Increment a json_type_uint object by the given amount, which may be negative.
- *
- * If the type of obj is not json_type_uint then 0 is returned with no further
- * action taken.
- * If the addition would result in a overflow, the object value
- * is set to UINT64_MAX.
- * Neither overflow nor underflow affect the return value.
- *
- * @param obj the json_object instance
- * @param val the value to add
- * @returns 1 if the increment succeded, 0 otherwise
- */
-JSON_EXPORT int json_object_uint_inc(struct json_object *obj, uint64_t val);
-
 /** Get the int value of a json_object
  *
  * The type is coerced to a int64 if the passed object is not a int64.
