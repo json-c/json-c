@@ -2,7 +2,12 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#ifdef NDEBUG
+#undef NDEBUG
 #include <assert.h>
+#else
+#include <assert.h>
+#endif
 #include <errno.h>
 #include <time.h>
 

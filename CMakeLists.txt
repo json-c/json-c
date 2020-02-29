@@ -19,6 +19,11 @@ if(POLICY CMP0054)
     cmake_policy(SET CMP0054 NEW)
 endif()
 
+# set default build type if not specified by user
+if(NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE debug)
+endif()
+
 # Include file check macros honor CMAKE_REQUIRED_LIBRARIES
 # i.e. the check_include_file() calls will include -lm when checking.
 if(POLICY CMP0075)
@@ -237,6 +242,9 @@ elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /wd4127")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /wd4701")
 endif()
+
+set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG} -O0")
+set(CMAKE_C_FLAGS_Release   "${CMAKE_C_FLAGS_Release} -O2")
 
 if (NOT ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC"))
 	check_c_source_compiles(
