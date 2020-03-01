@@ -792,21 +792,33 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
       }
       {
 	int64_t num64;
+	uint64_t numuint64;
 	double  numd;
-	if (!tok->is_double && json_parse_int64(tok->pb->buf, &num64) == 0) {
-		if (num64 && tok->pb->buf[0]=='0' &&
-		    (tok->flags & JSON_TOKENER_STRICT)) {
-			/* in strict mode, number must not start with 0 */
-			tok->err = json_tokener_error_parse_number;
-			goto out;
-		}
+	if (!tok->is_double && tok->pb->buf[0] == '-'
+	    && json_parse_int64(tok->pb->buf, &num64) == 0) {
 		current = json_object_new_int64(num64);
 		if(current == NULL)
 		    goto out;
-	}
-	else if(tok->is_double && json_parse_double(tok->pb->buf, &numd) == 0)
+	} else if ( !tok->is_double && tok->pb->buf[0] != '-'
+             && json_parse_uint64(tok->pb->buf, &numuint64) == 0) {
+		if (numuint64 && tok->pb->buf[0]=='0' &&
+		    (tok->flags & JSON_TOKENER_STRICT)) {
+			tok->err = json_tokener_error_parse_number;
+			goto out;
+		}
+		if (numuint64 <= INT64_MAX){
+			num64 = (uint64_t) numuint64;
+			current = json_object_new_int64(num64);
+			if(current == NULL)
+				goto out;
+		} else {
+			current = json_object_new_uint64(numuint64);
+			if(current == NULL)
+				goto out;
+		}
+	} else if(tok->is_double && json_parse_double(tok->pb->buf, &numd) == 0)
 	{
-          current = json_object_new_double_s(numd, tok->pb->buf);
+	  current = json_object_new_double_s(numd, tok->pb->buf);
 	  if(current == NULL)
 		goto out;
         } else {

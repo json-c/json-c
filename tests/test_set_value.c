@@ -15,6 +15,16 @@ int main(int argc, char **argv)
 	assert (json_object_get_int64(tmp)==321321321); 
 	json_object_put(tmp);
 	printf("INT64 PASSED\n");
+	tmp=json_object_new_uint64(123);
+	assert (json_object_get_int(tmp)==123);
+	assert (json_object_get_int64(tmp)==123);
+	assert (json_object_get_uint64(tmp)==123);
+	json_object_set_uint64(tmp,(uint64_t)321321321);
+	assert (json_object_get_uint64(tmp)==321321321);
+	json_object_set_uint64(tmp,9223372036854775808U);
+	assert (json_object_get_uint64(tmp)==9223372036854775808U);
+	json_object_put(tmp);
+	printf("UINT64 PASSED\n");
 	tmp=json_object_new_boolean(1);
 	assert (json_object_get_boolean(tmp)==1); 
 	json_object_set_boolean(tmp,0);
@@ -29,6 +39,12 @@ int main(int argc, char **argv)
 	assert (json_object_get_double(tmp)==34.56); 
 	json_object_set_double(tmp,6435.34);
 	assert (json_object_get_double(tmp)==6435.34); 
+	json_object_set_double(tmp,2e21);
+	assert (json_object_get_int64(tmp)==INT64_MAX);
+	assert (json_object_get_uint64(tmp)==UINT64_MAX);
+	json_object_set_double(tmp,-2e21);
+	assert (json_object_get_int64(tmp)==INT64_MIN);
+	assert (json_object_get_uint64(tmp)==0);
 	json_object_put(tmp);
 	printf("DOUBLE PASSED\n");
 	#define SHORT "SHORT"

@@ -24,6 +24,12 @@ extern "C" {
 
 typedef void (json_object_private_delete_fn)(struct json_object *o);
 
+/* json object int type, support extension*/
+typedef enum json_object_int_type {
+  json_object_int_type_int64,
+  json_object_int_type_uint64
+}json_object_int_type;
+
 struct json_object
 {
   enum json_type o_type;
@@ -34,7 +40,13 @@ struct json_object
   union data {
     json_bool c_boolean;
     double c_double;
-    int64_t c_int64;
+    struct {
+      union {
+        int64_t c_int64;
+        uint64_t c_uint64;
+      } cint;
+      enum json_object_int_type cint_type;
+    } c_int;
     struct lh_table *c_object;
     struct array_list *c_array;
     struct {

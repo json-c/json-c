@@ -66,8 +66,16 @@ new_obj.to_string(false)=false
 new_obj.to_string([0e])=[ 0.0 ]
 new_obj.to_string([0e+])=[ 0.0 ]
 new_obj.to_string([0e+-1])=null
-new_obj.to_string([18446744073709551616])=[ 9223372036854775807 ]
 new_obj.to_string("hello world!")="hello world!"
+new_obj.to_string([9223372036854775806])=[ 9223372036854775806 ]
+new_obj.to_string([9223372036854775807])=[ 9223372036854775807 ]
+new_obj.to_string([9223372036854775808])=[ 9223372036854775808 ]
+new_obj.to_string([-9223372036854775807])=[ -9223372036854775807 ]
+new_obj.to_string([-9223372036854775808])=[ -9223372036854775808 ]
+new_obj.to_string([-9223372036854775809])=[ -9223372036854775808 ]
+new_obj.to_string([18446744073709551614])=[ 18446744073709551614 ]
+new_obj.to_string([18446744073709551615])=[ 18446744073709551615 ]
+new_obj.to_string([18446744073709551616])=[ 18446744073709551615 ]
 ==================================
 new_obj.to_string(﻿)=null
 new_obj.to_string(﻿{})=null

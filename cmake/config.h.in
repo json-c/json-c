@@ -137,6 +137,8 @@
 
 #cmakedefine HAVE_STRTOLL
 #cmakedefine strtoll @json_c_strtoll@
+#cmakedefine HAVE_STRTOULL
+#cmakedefine strtoull @json_c_strtoull@
 
 /* Have __thread */
 #cmakedefine HAVE___THREAD

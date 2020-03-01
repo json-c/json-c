@@ -1,6 +1,17 @@
 JSON integer comparison is correct
 JSON same object comparison is correct
 JSON same integer comparison is correct
+JSON usigned integer comparison is correct
+JSON same usigned object comparison is correct
+JSON same usigned integer comparison is correct
+JSON integer & usigned integer comparison is correct
+JSON integer & usigned integer comparison is correct
+JSON integer & usigned integer comparison is correct
+JSON integer & usigned integer comparison is correct
+JSON usigned integer & integer comparison is correct
+JSON usigned integer & integer comparison is correct
+JSON usigned integer & integer comparison is correct
+JSON usigned integer & integer comparison is correct
 Comparing equal strings is correct
 Comparing different strings is correct
 Comparing equal doubles is correct

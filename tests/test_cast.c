@@ -25,10 +25,13 @@ int main(int argc, char **argv)
 		\"decimal_number\": 99.55,\n\
 		\"boolean_true\": true,\n\
 		\"boolean_false\": false,\n\
-		\"big_number\": 2147483649,\n\
+		\"int64_number\": 2147483649,\n\
+		\"negative_number\": -321321321,\n\
 		\"a_null\": null,\n\
 	}";
 	/* Note: 2147483649 = INT_MAX + 2 */
+	/* Note: 9223372036854775809 = INT64_MAX + 2 */
+	/* Note: 18446744073709551617 = UINT64_MAX + 2 */
 
 	struct json_object *new_obj;
 
@@ -43,7 +46,8 @@ int main(int argc, char **argv)
 	getit(new_obj, "decimal_number");
 	getit(new_obj, "boolean_true");
 	getit(new_obj, "boolean_false");
-	getit(new_obj, "big_number");
+	getit(new_obj, "int64_number");
+	getit(new_obj, "negative_number");
 	getit(new_obj, "a_null");
 
 	// Now check the behaviour of the json_object_is_type() function.
@@ -55,7 +59,8 @@ int main(int argc, char **argv)
 	checktype(new_obj, "decimal_number");
 	checktype(new_obj, "boolean_true");
 	checktype(new_obj, "boolean_false");
-	checktype(new_obj, "big_number");
+	checktype(new_obj, "int64_number");
+	checktype(new_obj, "negative_number");
 	checktype(new_obj, "a_null");
 
 	json_object_put(new_obj);
@@ -76,6 +81,8 @@ static void getit(struct json_object *new_obj, const char *field)
 	       json_object_get_int(o));
 	printf("new_obj.%s json_object_get_int64()=%" PRId64 "\n", field,
 	       json_object_get_int64(o));
+	printf("new_obj.%s json_object_get_uint64()=%" PRIu64 "\n", field,
+	       json_object_get_uint64(o));
 	printf("new_obj.%s json_object_get_boolean()=%d\n", field,
 	       json_object_get_boolean(o));
 	printf("new_obj.%s json_object_get_double()=%f\n", field,
