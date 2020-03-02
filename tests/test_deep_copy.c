@@ -4,10 +4,8 @@
 #include <string.h>
 #ifdef NDEBUG
 #undef NDEBUG
-#include <assert.h>
-#else
-#include <assert.h>
 #endif
+#include <assert.h>
 #include <errno.h>
 #include <time.h>
 
