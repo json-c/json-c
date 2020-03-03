@@ -19,6 +19,13 @@ if(POLICY CMP0054)
     cmake_policy(SET CMP0054 NEW)
 endif()
 
+# set default build type if not specified by user
+if(NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE debug)
+endif()
+
+set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE} -O2")
+
 # Include file check macros honor CMAKE_REQUIRED_LIBRARIES
 # i.e. the check_include_file() calls will include -lm when checking.
 if(POLICY CMP0075)
