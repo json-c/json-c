@@ -1,0 +1,3 @@
+BasedOnStyle:  LLVM
+DerivePointerAlignment: false
+PointerAlignment: Left
