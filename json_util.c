@@ -10,6 +10,7 @@
  */
 
 #include "config.h"
+#include "json_tokener.h"
 #undef realloc
 
 #include "strerror_override.h"
@@ -223,9 +224,12 @@ int json_parse_int64(const char *buf, int64_t *retval)
 {
 	char *end = NULL;
 	int64_t val;
+	int base;
 
 	errno = 0;
-	val = strtoll(buf, &end, 10);
+	base = json_tokener_number_has_hex_prefix(buf) ? 16 : 10;
+
+	val = strtoll(buf, &end, base);
 	if (end != buf)
 		*retval = val;
 	return ((val == 0 && errno != 0) || (end == buf)) ? 1 : 0;
@@ -235,14 +239,17 @@ int json_parse_uint64(const char *buf, uint64_t *retval)
 {
 	char *end = NULL;
 	uint64_t val;
+	int base;
+
 	errno = 1;
+	base = json_tokener_number_has_hex_prefix(buf) ? 16 : 10;
 
 	while (*buf == ' ') {
 		buf++;
 	}
 	if (*buf == '-') errno = 0;
 
-	val = strtoull(buf, &end, 10);
+	val = strtoull(buf, &end, base);
 	if (end != buf)
 		*retval = val;
 	return ((errno == 0) || (end == buf)) ? 1 : 0;

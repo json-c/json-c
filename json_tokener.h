@@ -148,6 +148,8 @@ typedef struct json_tokener json_tokener;
  */
 #define JSON_TOKENER_VALIDATE_UTF8  0x10
 
+int json_tokener_number_has_hex_prefix(const char *number);
+
 /**
  * Given an error previously returned by json_tokener_get_error(),
  * return a human readable description of the error.

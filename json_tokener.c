@@ -242,6 +242,30 @@ struct json_object* json_tokener_parse_verbose(const char *str,
 /* End optimization macro defs */
 
 
+int json_tokener_number_has_hex_prefix(const char *number)
+{
+	char *ptr_x;
+
+	/* Find 'x' location on string, if exist */
+	ptr_x = strchr(number, 'x');
+	if (!ptr_x)
+		return 0;
+
+	/* Check if 'x' located in a valid place */
+	switch (ptr_x - number) {
+	case 1:
+		/* Positive Hex number, must start with '0x' */
+		return (number[0] == '0');
+	case 2:
+		/* Negative Hex number, must start with '-0x' */
+		return (number[0] == '-') && (number[1] == '0');
+	default:
+		return 0;
+	}
+
+	return 0;
+}
+
 struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 					  const char *str, int len)
 {
@@ -736,7 +760,21 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	int case_len=0;
 	int is_exponent=0;
 	int negativesign_next_possible_location=1;
-	while(c && strchr(json_number_chars, c)) {
+	const char *json_valid_chars = json_number_chars;
+	if (json_tokener_number_has_hex_prefix(str)) {
+          json_valid_chars = json_hex_chars;
+          /* Advance pointers after the `0x` prefix */
+          while (c != 'x') {
+            case_len++;
+            if (!PEEK_CHAR(c, tok) || !ADVANCE_CHAR(str, tok)) {
+              tok->err = json_tokener_error_parse_number;
+              goto out;
+            }
+          }
+          if (!PEEK_CHAR(c, tok))
+            goto out;
+        }
+	while(c && strchr(json_valid_chars, c)) {
 	  ++case_len;
 
 	  /* non-digit characters checks */
