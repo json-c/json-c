@@ -482,7 +482,7 @@ static unsigned long lh_char_hash(const void *k)
 #endif
 	}
 
-	return hashlittle((const char*)k, strlen((const char*)k), random_seed);
+	return hashlittle((const char*)k, strlen((const char*)k), (uint32_t)random_seed);
 }
 
 int lh_char_equal(const void *k1, const void *k2)
