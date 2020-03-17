@@ -597,7 +597,7 @@ json_bool json_object_get_boolean(const struct json_object *jso)
 		case json_object_int_type_uint64:
 			return (jso->o.c_int.cint.c_uint64 != 0);
 		default:
-			assert(!"invalid cint_type");
+			json_abort("invalid cint_type");
 		}
 	case json_type_double:
 		return (jso->o.c_double != 0);
@@ -734,7 +734,7 @@ int64_t json_object_get_int64(const struct json_object *jso)
 				return INT64_MAX;
 			return (int64_t)jso->o.c_int.cint.c_uint64;
 		default:
-			assert(!"invalid cint_type");
+			json_abort("invalid cint_type");
 		}
 	case json_type_double:
 		// INT64_MAX can't be exactly represented as a double
@@ -772,7 +772,7 @@ uint64_t json_object_get_uint64(const struct json_object *jso)
 		case json_object_int_type_uint64:
 			return jso->o.c_int.cint.c_uint64;
 		default:
-			assert(!"invalid cint_type");
+			json_abort("invalid cint_type");
 		}
 	case json_type_double:
 		// UINT64_MAX can't be exactly represented as a double
@@ -836,7 +836,7 @@ int json_object_int_inc(struct json_object *jso, int64_t val) {
 		}
 		return 1;
 	default:
-		assert(!"invalid cint_type");
+		json_abort("invalid cint_type");
 	}
 }
 
@@ -1067,7 +1067,7 @@ double json_object_get_double(const struct json_object *jso)
     case json_object_int_type_uint64:
       return jso->o.c_int.cint.c_uint64;
     default:
-      assert(!"invalid cint_type");
+      json_abort("invalid cint_type");
     }
   case json_type_boolean:
     return jso->o.c_boolean;
