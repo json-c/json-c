@@ -350,7 +350,7 @@ if (DOXYGEN_FOUND)
 	configure_file(Doxyfile Doxyfile)
 
 else (DOXYGEN_FOUND)
-	message("Doxygen need to be installed to generate the doxygen documentation")
+	message("Warning: doxygen not found, the 'doc' target will not be included")
 endif(DOXYGEN_FOUND)
 
 # uninstall
