@@ -93,8 +93,8 @@ struct json_tokener
   struct printbuf *pb;
   int max_depth, depth, is_double, st_pos;
   /**
-   * See json_tokener_get_parse_end()
-   */
+	 * See json_tokener_get_parse_end()
+	 */
   int char_offset;
   enum json_tokener_error err;
   unsigned int ucs_char;

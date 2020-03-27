@@ -32,30 +32,32 @@ static const char *input_json_str = "{ "
 	"'m~n': 8 "
 "}";
 
-
-static const char *rec_input_json_str = "{"
-	"'arr' : ["
-		"{"
-			"'obj': ["
-				"{},{},"
-				"{"
-					"'obj1': 0,"
-					"'obj2': \"1\""
-				"}"
-			"]"
-		"}"
-	"],"
-	"'obj' : {"
-		"'obj': {"
-			"'obj': ["
-				"{"
-					"'obj1': 0,"
-					"'obj2': \"1\""
-				"}"
-			"]"
-		"}"
-	"}"
-"}";
+/* clang-format off */
+static const char *rec_input_json_str =
+    "{"
+	    "'arr' : ["
+		    "{"
+			    "'obj': ["
+				    "{},{},"
+					"{"
+					    "'obj1': 0,"
+					    "'obj2': \"1\""
+				    "}"
+			    "]"
+		    "}"
+	    "],"
+	    "'obj' : {"
+		    "'obj': {"
+			    "'obj': ["
+				    "{"
+					    "'obj1': 0,"
+					    "'obj2': \"1\""
+				    "}"
+			    "]"
+		    "}"
+	    "}"
+    "}";
+/* clang-format on */
 
 /* Example from RFC */
 static void test_example_get()
@@ -67,6 +69,7 @@ static void test_example_get()
 		int i;
 	};
 	/* Create a map to iterate over for the ints */
+	/* clang-format off */
 	struct json_pointer_map_s_i json_pointers[] = {
 		{ "/", 0 },
 		{ "/a~1b", 1 },
@@ -79,6 +82,7 @@ static void test_example_get()
 		{ "/m~0n", 8 },
 		{ NULL, 0}
 	};
+	/* clang-format on */
 
 	jo1 = json_tokener_parse(input_json_str);
 	assert(NULL != jo1);

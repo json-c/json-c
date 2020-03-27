@@ -41,8 +41,9 @@ static void string_replace_all_occurrences_with_char(char *s, const char *occur,
 static int is_valid_index(struct json_object *jo, const char *path, int32_t *idx)
 {
 	int i, len = strlen(path);
-	/* this code-path optimizes a bit, for when we reference the 0-9 index range in a JSON array
-	   and because leading zeros not allowed */
+	/* this code-path optimizes a bit, for when we reference the 0-9 index range
+	 * in a JSON array and because leading zeros not allowed
+	 */
 	if (len == 1) {
 		if (isdigit((unsigned char)path[0])) {
 			*idx = (path[0] - '0');
@@ -124,12 +125,14 @@ static int json_pointer_set_single_path(
 	}
 
 	/* path replacements should have been done in json_pointer_get_single_path(),
-	   and we should still be good here */
+	 * and we should still be good here
+	 */
 	if (json_object_is_type(parent, json_type_object))
 		return json_object_object_add(parent, path, value);
 
-	/* Getting here means that we tried to "dereference" a primitive JSON type (like string, int, bool).
-	   i.e. add a sub-object to it */
+	/* Getting here means that we tried to "dereference" a primitive JSON type
+	 * (like string, int, bool).i.e. add a sub-object to it
+	 */
 	errno = ENOENT;
 	return -1;
 }
@@ -158,7 +161,8 @@ static int json_pointer_get_recursive(
 		return rc;
 
 	if (endp) {
-		*endp = '/'; /* Put the slash back, so that the sanity check passes on next recursion level */
+		/* Put the slash back, so that the sanity check passes on next recursion level */
+		*endp = '/';
 		return json_pointer_get_recursive(obj, endp, value);
 	}
 

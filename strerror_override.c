@@ -9,6 +9,7 @@ static struct {
 	int errno_value;
 	const char *errno_str;
 } errno_list[] = {
+/* clang-format off */
 #define STRINGIFY(x) #x
 #define ENTRY(x) {x, &STRINGIFY(undef_ ## x)[6]}
 	ENTRY(EPERM),
@@ -52,6 +53,7 @@ static struct {
 	ENTRY(EAGAIN),
 	{ 0, (char *)0 }
 };
+/* clang-format on */
 
 // Enabled during tests
 int _json_c_strerror_enable = 0;

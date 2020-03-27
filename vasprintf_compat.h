@@ -24,7 +24,8 @@ static int vasprintf(char **buf, const char *fmt, va_list ap)
 	chars = _vscprintf(fmt, ap)+1;
 #else /* !defined(WIN32) */
 	/* CAW: RAWR! We have to hope to god here that vsnprintf doesn't overwrite
-	   our buffer like on some 64bit sun systems.... but hey, its time to move on */
+	 * our buffer like on some 64bit sun systems.... but hey, its time to move on
+	 */
 	chars = vsnprintf(&_T_emptybuffer, 0, fmt, ap)+1;
 	if(chars < 0) { chars *= -1; } /* CAW: old glibc versions have this problem */
 #endif /* defined(WIN32) */

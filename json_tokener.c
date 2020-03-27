@@ -68,24 +68,26 @@ static const int json_true_str_len = sizeof(json_true_str) - 1;
 static const char json_false_str[] = "false";
 static const int json_false_str_len = sizeof(json_false_str) - 1;
 
-static const char* json_tokener_errors[] = {
-  "success",
-  "continue",
-  "nesting too deep",
-  "unexpected end of data",
-  "unexpected character",
-  "null expected",
-  "boolean expected",
-  "number expected",
-  "array value separator ',' expected",
-  "quoted object property name expected",
-  "object property name separator ':' expected",
-  "object value separator ',' expected",
-  "invalid string sequence",
-  "expected comment",
-  "invalid utf-8 string",
-  "buffer size overflow"
+/* clang-format off */
+static const char *json_tokener_errors[] = {
+	"success",
+	"continue",
+	"nesting too deep",
+	"unexpected end of data",
+	"unexpected character",
+	"null expected",
+	"boolean expected",
+	"number expected",
+	"array value separator ',' expected",
+	"quoted object property name expected",
+	"object property name separator ':' expected",
+	"object value separator ',' expected",
+	"invalid string sequence",
+	"expected comment",
+	"invalid utf-8 string",
+	"buffer size overflow"
 };
+/* clang-format on */
 
 const char *json_tokener_error_desc(enum json_tokener_error jerr)
 {
@@ -261,10 +263,11 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
   tok->err = json_tokener_success;
 
   /* this interface is presently not 64-bit clean due to the int len argument
-     and the internal printbuf interface that takes 32-bit int len arguments
-     so the function limits the maximum string size to INT32_MAX (2GB).
-     If the function is called with len == -1 then strlen is called to check
-     the string length is less than INT32_MAX (2GB) */
+	 * and the internal printbuf interface that takes 32-bit int len arguments
+	 * so the function limits the maximum string size to INT32_MAX (2GB).
+	 * If the function is called with len == -1 then strlen is called to check
+	 * the string length is less than INT32_MAX (2GB)
+	 */
   if ((len < -1) || (len == -1 && strlen(str) > INT32_MAX)) {
     tok->err = json_tokener_error_size;
     return NULL;
@@ -390,12 +393,12 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
     case json_tokener_state_inf: /* aka starts with 'i' (or 'I', or "-i", or "-I") */
       {
 	/* If we were guaranteed to have len set, then we could (usually) handle
-	 * the entire "Infinity" check in a single strncmp (strncasecmp), but
-	 * since len might be -1 (i.e. "read until \0"), we need to check it
-	 * a character at a time.
-	 * Trying to handle it both ways would make this code considerably more
-	 * complicated with likely little performance benefit.
-	 */
+			 * the entire "Infinity" check in a single strncmp (strncasecmp), but
+			 * since len might be -1 (i.e. "read until \0"), we need to check it
+			 * a character at a time.
+			 * Trying to handle it both ways would make this code considerably more
+			 * complicated with likely little performance benefit.
+			 */
 	int is_negative = 0;
 	const char *_json_inf_str = json_inf_str;
 	if (!(tok->flags & JSON_TOKENER_STRICT))
@@ -421,9 +424,9 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 		}
 	}
 	/* We checked the full length of "Infinity", so create the object.
-	 * When handling -Infinity, the number parsing code will have dropped
-	 * the "-" into tok->pb for us, so check it now.
-	 */
+			 * When handling -Infinity, the number parsing code will have dropped
+			 * the "-" into tok->pb for us, so check it now.
+			 */
 	if (printbuf_length(tok->pb) > 0 && *(tok->pb->buf) == '-')
 	{
 		is_negative = 1;
@@ -620,10 +623,10 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 		  unescaped_utf[1] = 0x80 | (tok->ucs_char & 0x3f);
 		  printbuf_memappend_fast(tok->pb, (char*)unescaped_utf, 2);
 		} else if (IS_HIGH_SURROGATE(tok->ucs_char)) {
-                  /* Got a high surrogate.  Remember it and look for the
-                   * the beginning of another sequence, which should be the
-                   * low surrogate.
-                   */
+							 /* Got a high surrogate.  Remember it and look for
+							 * the beginning of another sequence, which
+							 * should be the low surrogate.
+							 */
                   got_hi_surrogate = tok->ucs_char;
                   /* Not at end, and the next two chars should be "\u" */
                   if ((len == -1 || len > (tok->char_offset + 2)) &&
@@ -631,17 +634,17 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
                       (str[1] == '\\') &&
                       (str[2] == 'u'))
                   {
-                /* Advance through the 16 bit surrogate, and move on to the
-                 * next sequence. The next step is to process the following
-                 * characters.
-                 */
+								/* Advance through the 16 bit surrogate, and move
+								 * on to the next sequence. The next step is to
+								 * process the following characters.
+								 */
 	            if( !ADVANCE_CHAR(str, tok) || !ADVANCE_CHAR(str, tok) ) {
                     printbuf_memappend_fast(tok->pb,
 					    (char*) utf8_replacement_char, 3);
 		    }
-                    /* Advance to the first char of the next sequence and
-                     * continue processing with the next sequence.
-                     */
+								/* Advance to the first char of the next sequence and
+								 * continue processing with the next sequence.
+								 */
 	            if (!ADVANCE_CHAR(str, tok) || !PEEK_CHAR(c, tok)) {
 	              printbuf_memappend_fast(tok->pb,
 					      (char*) utf8_replacement_char, 3);
@@ -649,12 +652,13 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
                     }
 	            tok->ucs_char = 0;
                     tok->st_pos = 0;
-                    continue; /* other json_tokener_state_escape_unicode */
+                    /* other json_tokener_state_escape_unicode */
+                    continue;
                   } else {
-                    /* Got a high surrogate without another sequence following
-                     * it.  Put a replacement char in for the hi surrogate
-                     * and pretend we finished.
-                     */
+								/* Got a high surrogate without another sequence following
+								 * it.  Put a replacement char in for the hi surrogate
+								 * and pretend we finished.
+								 */
 		    printbuf_memappend_fast(tok->pb,
 					    (char*) utf8_replacement_char, 3);
                   }
@@ -684,7 +688,8 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	      goto out;
 	    }
 	  if (!ADVANCE_CHAR(str, tok) || !PEEK_CHAR(c, tok)) {
-            if (got_hi_surrogate) /* Clean up any pending chars */
+            /* Clean up any pending chars */
+            if (got_hi_surrogate)
 	      printbuf_memappend_fast(tok->pb, (char*)utf8_replacement_char, 3);
 	    goto out;
 	  }
@@ -741,14 +746,16 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 
 	  /* non-digit characters checks */
 	  /* note: since the main loop condition to get here was
-	           an input starting with 0-9 or '-', we are
-	           protected from input starting with '.' or
-	           e/E. */
+				 * an input starting with 0-9 or '-', we are
+				 * protected from input starting with '.' or
+				 * e/E.
+				 */
 	  if (c == '.') {
 	    if (tok->is_double != 0) {
 	      /* '.' can only be found once, and out of the exponent part.
-	         Thus, if the input is already flagged as double, it
-	         is invalid. */
+						 * Thus, if the input is already flagged as double, it
+						 * is invalid.
+						 */
 	      tok->err = json_tokener_error_parse_number;
 	      goto out;
 	    }
@@ -767,8 +774,9 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
 	  }
 	  if (c == '-' && case_len != negativesign_next_possible_location) {
 	    /* If the negative sign is not where expected (ie
-	       start of input or start of exponent part), the
-	       input is invalid. */
+					 * start of input or start of exponent part), the
+					 * input is invalid.
+					 */
 	    tok->err = json_tokener_error_parse_number;
 	    goto out;
 	  }
@@ -979,7 +987,8 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
       /* unexpected char after JSON data */
       tok->err = json_tokener_error_parse_unexpected;
   }
-  if (!c) { /* We hit an eof char (0) */
+  if (!c) {
+	/* We hit an eof char (0) */
     if(state != json_tokener_state_finish &&
        saved_state != json_tokener_state_finish)
       tok->err = json_tokener_error_parse_eof;

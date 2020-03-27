@@ -189,7 +189,8 @@ static int _json_object_to_fd(int fd, struct json_object *obj, int flags, const 
 		return -1;
 	}
 
-	wsize = (unsigned int)(strlen(json_str) & UINT_MAX); /* CAW: probably unnecessary, but the most 64bit safe */
+	/* CAW: probably unnecessary, but the most 64bit safe */
+	wsize = (unsigned int)(strlen(json_str) & UINT_MAX);
 	wpos = 0;
 	while(wpos < wsize) {
 		if((ret = write(fd, json_str + wpos, wsize-wpos)) < 0) {
@@ -260,16 +261,18 @@ void* rpl_realloc(void* p, size_t n)
 #endif
 
 #define NELEM(a)        (sizeof(a) / sizeof(a[0]))
-static const char* json_type_name[] = {
-  /* If you change this, be sure to update the enum json_type definition too */
-  "null",
-  "boolean",
-  "double",
-  "int",
-  "object",
-  "array",
-  "string",
+/* clang-format off */
+static const char *json_type_name[] = {
+	/* If you change this, be sure to update the enum json_type definition too */
+	"null",
+	"boolean",
+	"double",
+	"int",
+	"object",
+	"array",
+	"string",
 };
+/* clang-format on */
 
 const char *json_type_to_name(enum json_type o_type)
 {

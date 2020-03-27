@@ -20,7 +20,8 @@
 extern "C" {
 #endif
 
-#define LEN_DIRECT_STRING_DATA 32 /**< how many bytes are directly stored in json_object for strings? */
+/**< how many bytes are directly stored in json_object for strings? */
+#define LEN_DIRECT_STRING_DATA 32
 
 typedef void (json_object_private_delete_fn)(struct json_object *o);
 
@@ -52,8 +53,8 @@ struct json_object
     struct {
 	union {
 		/* optimize: if we have small strings, we can store them
-		 * directly. This saves considerable CPU cycles AND memory.
-		 */
+				 * directly. This saves considerable CPU cycles AND memory.
+				 */
 		char *ptr;
 		char data[LEN_DIRECT_STRING_DATA];
 	} str;

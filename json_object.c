@@ -663,9 +663,9 @@ int32_t json_object_get_int(const struct json_object *jso)
   if (o_type == json_type_string)
   {
 	/*
-	 * Parse strings into 64-bit numbers, then use the
-	 * 64-to-32-bit number handling below.
-	 */
+		 * Parse strings into 64-bit numbers, then use the
+		 * 64-to-32-bit number handling below.
+		 */
 	if (json_parse_int64(get_string_component(jso), &cint64) != 0)
 		return 0; /* whoops, it didn't work. */
 	o_type = json_type_int;
@@ -896,9 +896,10 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
 	char buf[128], *p, *q;
 	int size;
 	/* Although JSON RFC does not support
-	NaN or Infinity as numeric values
-	ECMA 262 section 9.8.1 defines
-	how to handle these cases as strings */
+	 * NaN or Infinity as numeric values
+	 * ECMA 262 section 9.8.1 defines
+	 * how to handle these cases as strings
+	 */
 	if (isnan(jso->o.c_double))
 	{
 		size = snprintf(buf, sizeof(buf), "NaN");
@@ -1084,10 +1085,10 @@ double json_object_get_double(const struct json_object *jso)
     }
 
     /*
-     * Check that the conversion terminated on something sensible
-     *
-     * For example, { "pay" : 123AB } would parse as 123.
-     */
+		 * Check that the conversion terminated on something sensible
+		 *
+		 * For example, { "pay" : 123AB } would parse as 123.
+		 */
     if (*errPtr != '\0')
     {
       errno = EINVAL;
@@ -1095,16 +1096,16 @@ double json_object_get_double(const struct json_object *jso)
     }
 
     /*
-     * If strtod encounters a string which would exceed the
-     * capacity of a double, it returns +/- HUGE_VAL and sets
-     * errno to ERANGE. But +/- HUGE_VAL is also a valid result
-     * from a conversion, so we need to check errno.
-     *
-     * Underflow also sets errno to ERANGE, but it returns 0 in
-     * that case, which is what we will return anyway.
-     *
-     * See CERT guideline ERR30-C
-     */
+		 * If strtod encounters a string which would exceed the
+		 * capacity of a double, it returns +/- HUGE_VAL and sets
+		 * errno to ERANGE. But +/- HUGE_VAL is also a valid result
+		 * from a conversion, so we need to check errno.
+		 *
+		 * Underflow also sets errno to ERANGE, but it returns 0 in
+		 * that case, which is what we will return anyway.
+		 *
+		 * See CERT guideline ERR30-C
+		 */
     if ((HUGE_VAL == cdouble || -HUGE_VAL == cdouble) &&
         (ERANGE == errno))
             cdouble = 0.0;

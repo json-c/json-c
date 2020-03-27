@@ -153,10 +153,10 @@ json_object_iter_init_default(void)
     struct json_object_iterator iter;
 
     /**
-     * @note Make this a negative, invalid value, such that
-     *       accidental access to it would likely be trapped by the
-     *       hardware as an invalid address.
-     */
+	 * @note Make this a negative, invalid value, such that
+	 *       accidental access to it would likely be trapped by the
+	 *       hardware as an invalid address.
+	 */
     iter.opaque_ = NULL;
 
     return iter;

@@ -310,8 +310,9 @@ struct incremental_step {
 	{ "fail",              5, 2, json_tokener_error_parse_boolean, 1 },
 
 	/* Although they may initially look like they should fail,
-	   the next few tests check that parsing multiple sequential
-       json objects in the input works as expected */
+	 * the next few tests check that parsing multiple sequential
+	 * json objects in the input works as expected
+	 */
 	{ "null123",           9, 4, json_tokener_success, 0 },
 	{ &"null123"[4],       4, 3, json_tokener_success, 1 },
 	{ "nullx",             5, 4, json_tokener_success, 0 },
@@ -357,8 +358,9 @@ struct incremental_step {
 	{ "[,1]",             -1, 1, json_tokener_error_parse_unexpected, 1 },
 
 	/* This behaviour doesn't entirely follow the json spec, but until we have
-	   a way to specify how strict to be we follow Postel's Law and be liberal
-	   in what we accept (up to a point). */
+	 * a way to specify how strict to be we follow Postel's Law and be liberal
+	 * in what we accept (up to a point).
+	 */
 	{ "[1,2,3,]",         -1, -1, json_tokener_success, 0 },
 	{ "[1,2,,3,]",        -1, 5, json_tokener_error_parse_unexpected, 0 },
 
