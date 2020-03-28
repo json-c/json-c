@@ -78,6 +78,34 @@ matrix:
       osx_image: xcode10.1
       env: XCODE="true" CHECK="true"
 
+# run coveralls
+    - os: linux
+      dist: xenial
+      compiler: gcc
+      env: CHECK="true"
+      install:
+        - sh autogen.sh
+      before_install:
+        - sudo pip install cpp-coveralls
+        - echo $CC
+        - echo $LANG
+        - echo $LC_ALL
+        - set -e
+        - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+            eval "${MATRIX_EVAL}";
+            if [ -n "$MATRIX_EVAL" ] && [ "$TRAVIS_COMPILER" != "clang" ]; then
+              sudo apt-get install -y $CC;
+            fi;
+          fi
+      before_script:
+        - export CFLAGS="-fprofile-arcs -ftest-coverage"
+        - ./configure
+      script:
+        - make
+        - make check
+      after_success:
+        - coveralls --exclude tests --exclude fuzz
+
 #  allow_failures:
 #    - os: osx
 
