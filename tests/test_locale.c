@@ -1,8 +1,8 @@
+#include <assert.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stddef.h>
 #include <string.h>
-#include <assert.h>
 
 #include "config.h"
 #include "json.h"
@@ -37,8 +37,7 @@ int main(int argc, char **argv)
 
 	(void)snprintf(buf2, sizeof(buf2), "%f", 0.1);
 	if (strcmp(buf1, buf2) != 0)
-		printf("ERROR: Original locale not restored \"%s\" != \"%s\"",
-		       buf1, buf2);
+		printf("ERROR: Original locale not restored \"%s\" != \"%s\"", buf1, buf2);
 
 #ifdef HAVE_SETLOCALE
 	setlocale(LC_NUMERIC, "C");
@@ -49,16 +48,16 @@ int main(int argc, char **argv)
 	// string that was parsed.  (see json_object_new_double_s())
 	printf("new_obj.to_string()=[");
 	unsigned int ii;
-	for (ii = 0 ; ii < json_object_array_length(new_obj); ii++)
+	for (ii = 0; ii < json_object_array_length(new_obj); ii++)
 	{
 		json_object *val = json_object_array_get_idx(new_obj, ii);
 		printf("%s%.2lf", (ii > 0) ? "," : "", json_object_get_double(val));
 	}
 	printf("]\n");
 
-	printf("new_obj.to_string()=%s\n", json_object_to_json_string_ext(new_obj,JSON_C_TO_STRING_NOZERO));
+	printf("new_obj.to_string()=%s\n",
+	       json_object_to_json_string_ext(new_obj, JSON_C_TO_STRING_NOZERO));
 	json_object_put(new_obj);
 
 	return 0;
 }
-

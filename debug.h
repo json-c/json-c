@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 #ifndef JSON_EXPORT
-#if defined(_MSC_VER) 
+#if defined(_MSC_VER)
 #define JSON_EXPORT __declspec(dllexport)
 #else
 #define JSON_EXPORT extern
@@ -46,17 +46,24 @@ JSON_EXPORT void mc_info(const char *msg, ...);
 
 #ifndef PARSER_BROKEN_FIXED
 
-#define JASSERT(cond) do {} while(0)
+#define JASSERT(cond) \
+	do            \
+	{             \
+	} while (0)
 
 #else
 
-#define JASSERT(cond) do { \
-		if (!(cond)) { \
-			mc_error("cjson assert failure %s:%d : cond \"" __STRING(cond) "failed\n", __FILE__, __LINE__); \
-			*(int *)0 = 1;\
-			abort(); \
-		}\
-	} while(0)
+#define JASSERT(cond)                                                                              \
+	do                                                                                         \
+	{                                                                                          \
+		if (!(cond))                                                                       \
+		{                                                                                  \
+			mc_error("cjson assert failure %s:%d : cond \"" __STRING(cond) "failed\n", \
+			         __FILE__, __LINE__);                                              \
+			*(int *)0 = 1;                                                             \
+			abort();                                                                   \
+		}                                                                                  \
+	} while (0)
 
 #endif
 
@@ -69,11 +76,19 @@ JSON_EXPORT void mc_info(const char *msg, ...);
 #define MC_DEBUG(x, ...) mc_debug(x, ##__VA_ARGS__)
 #define MC_INFO(x, ...) mc_info(x, ##__VA_ARGS__)
 #else
-#define MC_SET_DEBUG(x) if (0) mc_set_debug(x)
+#define MC_SET_DEBUG(x) \
+	if (0)          \
+	mc_set_debug(x)
 #define MC_GET_DEBUG() (0)
-#define MC_SET_SYSLOG(x) if (0) mc_set_syslog(x)
-#define MC_DEBUG(x, ...) if (0) mc_debug(x, ##__VA_ARGS__)
-#define MC_INFO(x, ...) if (0) mc_info(x, ##__VA_ARGS__)
+#define MC_SET_SYSLOG(x) \
+	if (0)           \
+	mc_set_syslog(x)
+#define MC_DEBUG(x, ...) \
+	if (0)           \
+	mc_debug(x, ##__VA_ARGS__)
+#define MC_INFO(x, ...) \
+	if (0)          \
+	mc_info(x, ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

@@ -43,7 +43,7 @@ int main(int argc, char **argv)
 	assert(json_object_get_int64(tmp) != INT64_MIN);
 	json_object_put(tmp);
 	printf("INT64 ADD UNDERFLOW PASSED\n");
-  // uint64 + negative int64--> negative int64
+	// uint64 + negative int64--> negative int64
 	tmp = json_object_new_uint64(400);
 	json_object_int_inc(tmp, -200);
 	assert(json_object_get_int64(tmp) == 200);

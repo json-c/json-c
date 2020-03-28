@@ -12,24 +12,24 @@
 
 #include "config.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include <limits.h>
 #include <stdarg.h>
 #include <stddef.h>
-#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifdef HAVE_ENDIAN_H
-# include <endian.h>    /* attempt to define endianness */
+#include <endian.h> /* attempt to define endianness */
 #endif
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
-# define WIN32_LEAN_AND_MEAN
-# include <windows.h>   /* Get InterlockedCompareExchange */
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h> /* Get InterlockedCompareExchange */
 #endif
 
-#include "random_seed.h"
 #include "linkhash.h"
+#include "random_seed.h"
 
 /* hash functions */
 static unsigned long lh_char_hash(const void *k);
@@ -40,18 +40,13 @@ static lh_hash_fn *char_hash_fn = lh_char_hash;
 int lh_char_equal(const void *k1, const void *k2);
 int lh_ptr_equal(const void *k1, const void *k2);
 
-int
-json_global_set_string_hash(const int h)
+int json_global_set_string_hash(const int h)
 {
-	switch(h) {
-	case JSON_C_STR_HASH_DFLT:
-		char_hash_fn = lh_char_hash;
-		break;
-	case JSON_C_STR_HASH_PERLLIKE:
-		char_hash_fn = lh_perllike_str_hash;
-		break;
-	default:
-		return -1;
+	switch (h)
+	{
+	case JSON_C_STR_HASH_DFLT: char_hash_fn = lh_char_hash; break;
+	case JSON_C_STR_HASH_PERLLIKE: char_hash_fn = lh_perllike_str_hash; break;
+	default: return -1;
 	}
 	return 0;
 }
@@ -114,25 +109,23 @@ on 1 byte), but shoehorning those bytes into integers efficiently is messy.
  * My best guess at if you are big-endian or little-endian.  This may
  * need adjustment.
  */
-#if (defined(__BYTE_ORDER) && defined(__LITTLE_ENDIAN) && \
-     __BYTE_ORDER == __LITTLE_ENDIAN) || \
-    (defined(i386) || defined(__i386__) || defined(__i486__) || \
-     defined(__i586__) || defined(__i686__) || defined(vax) || defined(MIPSEL))
-# define HASH_LITTLE_ENDIAN 1
-# define HASH_BIG_ENDIAN 0
-#elif (defined(__BYTE_ORDER) && defined(__BIG_ENDIAN) && \
-       __BYTE_ORDER == __BIG_ENDIAN) || \
-      (defined(sparc) || defined(POWERPC) || defined(mc68000) || defined(sel))
-# define HASH_LITTLE_ENDIAN 0
-# define HASH_BIG_ENDIAN 1
+#if (defined(__BYTE_ORDER) && defined(__LITTLE_ENDIAN) && __BYTE_ORDER == __LITTLE_ENDIAN) || \
+    (defined(i386) || defined(__i386__) || defined(__i486__) || defined(__i586__) ||          \
+     defined(__i686__) || defined(vax) || defined(MIPSEL))
+#define HASH_LITTLE_ENDIAN 1
+#define HASH_BIG_ENDIAN 0
+#elif (defined(__BYTE_ORDER) && defined(__BIG_ENDIAN) && __BYTE_ORDER == __BIG_ENDIAN) || \
+    (defined(sparc) || defined(POWERPC) || defined(mc68000) || defined(sel))
+#define HASH_LITTLE_ENDIAN 0
+#define HASH_BIG_ENDIAN 1
 #else
-# define HASH_LITTLE_ENDIAN 0
-# define HASH_BIG_ENDIAN 0
+#define HASH_LITTLE_ENDIAN 0
+#define HASH_BIG_ENDIAN 0
 #endif
 
-#define hashsize(n) ((uint32_t)1<<(n))
-#define hashmask(n) (hashsize(n)-1)
-#define rot(x,k) (((x)<<(k)) | ((x)>>(32-(k))))
+#define hashsize(n) ((uint32_t)1 << (n))
+#define hashmask(n) (hashsize(n) - 1)
+#define rot(x, k) (((x) << (k)) | ((x) >> (32 - (k))))
 
 /*
 -------------------------------------------------------------------------------
@@ -227,7 +220,6 @@ and these came close:
 	c ^= b; c -= rot(b,24); \
 }
 /* clang-format on */
-
 
 /*
 -------------------------------------------------------------------------------
@@ -449,15 +441,15 @@ static uint32_t hashlittle(const void *key, size_t length, uint32_t initval)
 /* a simple hash function similiar to what perl does for strings.
  * for good results, the string should not be excessivly large.
  */
-static unsigned long lh_perllike_str_hash(const void *k) 
+static unsigned long lh_perllike_str_hash(const void *k)
 {
-    const char *rkey = (const char *)k;
-    unsigned hashval = 1;
+	const char *rkey = (const char *)k;
+	unsigned hashval = 1;
 
-    while (*rkey)
-        hashval = hashval * 33 + *rkey++;
+	while (*rkey)
+		hashval = hashval * 33 + *rkey++;
 
-    return hashval;
+	return hashval;
 }
 
 static unsigned long lh_char_hash(const void *k)
@@ -469,7 +461,8 @@ static unsigned long lh_char_hash(const void *k)
 #endif
 	static volatile RANDOM_SEED_TYPE random_seed = -1;
 
-	if (random_seed == -1) {
+	if (random_seed == -1)
+	{
 		RANDOM_SEED_TYPE seed;
 		/* we can't use -1 as it is the unitialized sentinel */
 		while ((seed = json_c_get_random_seed()) == -1) {}
@@ -487,34 +480,32 @@ static unsigned long lh_char_hash(const void *k)
 #elif defined _MSC_VER || defined __MINGW32__
 		InterlockedCompareExchange(&random_seed, seed, -1);
 #else
-//#warning "racy random seed initializtion if used by multiple threads"
+		//#warning "racy random seed initializtion if used by multiple threads"
 		random_seed = seed; /* potentially racy */
 #endif
 	}
 
-	return hashlittle((const char*)k, strlen((const char*)k), random_seed);
+	return hashlittle((const char *)k, strlen((const char *)k), random_seed);
 }
 
 int lh_char_equal(const void *k1, const void *k2)
 {
-	return (strcmp((const char*)k1, (const char*)k2) == 0);
+	return (strcmp((const char *)k1, (const char *)k2) == 0);
 }
 
-struct lh_table* lh_table_new(int size,
-			      lh_entry_free_fn *free_fn,
-			      lh_hash_fn *hash_fn,
-			      lh_equal_fn *equal_fn)
+struct lh_table *lh_table_new(int size, lh_entry_free_fn *free_fn, lh_hash_fn *hash_fn,
+                              lh_equal_fn *equal_fn)
 {
 	int i;
 	struct lh_table *t;
 
-	t = (struct lh_table*)calloc(1, sizeof(struct lh_table));
+	t = (struct lh_table *)calloc(1, sizeof(struct lh_table));
 	if (!t)
 		return NULL;
 
 	t->count = 0;
 	t->size = size;
-	t->table = (struct lh_entry*)calloc(size, sizeof(struct lh_entry));
+	t->table = (struct lh_entry *)calloc(size, sizeof(struct lh_entry));
 	if (!t->table)
 	{
 		free(t);
@@ -523,18 +514,17 @@ struct lh_table* lh_table_new(int size,
 	t->free_fn = free_fn;
 	t->hash_fn = hash_fn;
 	t->equal_fn = equal_fn;
-	for(i = 0; i < size; i++) t->table[i].k = LH_EMPTY;
+	for (i = 0; i < size; i++)
+		t->table[i].k = LH_EMPTY;
 	return t;
 }
 
-struct lh_table* lh_kchar_table_new(int size,
-				    lh_entry_free_fn *free_fn)
+struct lh_table *lh_kchar_table_new(int size, lh_entry_free_fn *free_fn)
 {
 	return lh_table_new(size, free_fn, char_hash_fn, lh_char_equal);
 }
 
-struct lh_table* lh_kptr_table_new(int size,
-				   lh_entry_free_fn *free_fn)
+struct lh_table *lh_kptr_table_new(int size, lh_entry_free_fn *free_fn)
 {
 	return lh_table_new(size, free_fn, lh_ptr_hash, lh_ptr_equal);
 }
@@ -573,16 +563,17 @@ int lh_table_resize(struct lh_table *t, int new_size)
 void lh_table_free(struct lh_table *t)
 {
 	struct lh_entry *c;
-	if(t->free_fn) {
-		for(c = t->head; c != NULL; c = c->next)
+	if (t->free_fn)
+	{
+		for (c = t->head; c != NULL; c = c->next)
 			t->free_fn(c);
 	}
 	free(t->table);
 	free(t);
 }
 
-
-int lh_table_insert_w_hash(struct lh_table *t, const void *k, const void *v, const unsigned long h, const unsigned opts)
+int lh_table_insert_w_hash(struct lh_table *t, const void *k, const void *v, const unsigned long h,
+                           const unsigned opts)
 {
 	unsigned long n;
 
@@ -592,9 +583,12 @@ int lh_table_insert_w_hash(struct lh_table *t, const void *k, const void *v, con
 
 	n = h % t->size;
 
-	while( 1 ) {
-		if(t->table[n].k == LH_EMPTY || t->table[n].k == LH_FREED) break;
-		if ((int)++n == t->size) n = 0;
+	while (1)
+	{
+		if (t->table[n].k == LH_EMPTY || t->table[n].k == LH_FREED)
+			break;
+		if ((int)++n == t->size)
+			n = 0;
 	}
 
 	t->table[n].k = k;
@@ -602,10 +596,13 @@ int lh_table_insert_w_hash(struct lh_table *t, const void *k, const void *v, con
 	t->table[n].v = v;
 	t->count++;
 
-	if(t->head == NULL) {
+	if (t->head == NULL)
+	{
 		t->head = t->tail = &t->table[n];
 		t->table[n].next = t->table[n].prev = NULL;
-	} else {
+	}
+	else
+	{
 		t->tail->next = &t->table[n];
 		t->table[n].prev = t->tail;
 		t->table[n].next = NULL;
@@ -619,36 +616,42 @@ int lh_table_insert(struct lh_table *t, const void *k, const void *v)
 	return lh_table_insert_w_hash(t, k, v, lh_get_hash(t, k), 0);
 }
 
-
-struct lh_entry* lh_table_lookup_entry_w_hash(struct lh_table *t, const void *k, const unsigned long h)
+struct lh_entry *lh_table_lookup_entry_w_hash(struct lh_table *t, const void *k,
+                                              const unsigned long h)
 {
 	unsigned long n = h % t->size;
 	int count = 0;
 
-	while( count < t->size ) {
-		if(t->table[n].k == LH_EMPTY) return NULL;
-		if(t->table[n].k != LH_FREED &&
-		   t->equal_fn(t->table[n].k, k)) return &t->table[n];
-		if ((int)++n == t->size) n = 0;
+	while (count < t->size)
+	{
+		if (t->table[n].k == LH_EMPTY)
+			return NULL;
+		if (t->table[n].k != LH_FREED && t->equal_fn(t->table[n].k, k))
+			return &t->table[n];
+		if ((int)++n == t->size)
+			n = 0;
 		count++;
 	}
 	return NULL;
 }
 
-struct lh_entry* lh_table_lookup_entry(struct lh_table *t, const void *k)
+struct lh_entry *lh_table_lookup_entry(struct lh_table *t, const void *k)
 {
 	return lh_table_lookup_entry_w_hash(t, k, lh_get_hash(t, k));
 }
 
-json_bool lh_table_lookup_ex(struct lh_table* t, const void* k, void **v)
+json_bool lh_table_lookup_ex(struct lh_table *t, const void *k, void **v)
 {
 	struct lh_entry *e = lh_table_lookup_entry(t, k);
-	if (e != NULL) {
-		if (v != NULL) *v = lh_entry_v(e);
+	if (e != NULL)
+	{
+		if (v != NULL)
+			*v = lh_entry_v(e);
 		return 1; /* key found */
 	}
-	if (v != NULL) *v = NULL;
-		return 0; /* key not found */
+	if (v != NULL)
+		*v = NULL;
+	return 0; /* key not found */
 }
 
 int lh_table_delete_entry(struct lh_table *t, struct lh_entry *e)
@@ -657,22 +660,34 @@ int lh_table_delete_entry(struct lh_table *t, struct lh_entry *e)
 	ptrdiff_t n = (ptrdiff_t)(e - t->table);
 
 	/* CAW: this is bad, really bad, maybe stack goes other direction on this machine... */
-	if(n < 0) { return -2; }
+	if (n < 0)
+	{
+		return -2;
+	}
 
-	if(t->table[n].k == LH_EMPTY || t->table[n].k == LH_FREED) return -1;
+	if (t->table[n].k == LH_EMPTY || t->table[n].k == LH_FREED)
+		return -1;
 	t->count--;
-	if(t->free_fn) t->free_fn(e);
+	if (t->free_fn)
+		t->free_fn(e);
 	t->table[n].v = NULL;
 	t->table[n].k = LH_FREED;
-	if(t->tail == &t->table[n] && t->head == &t->table[n]) {
+	if (t->tail == &t->table[n] && t->head == &t->table[n])
+	{
 		t->head = t->tail = NULL;
-	} else if (t->head == &t->table[n]) {
+	}
+	else if (t->head == &t->table[n])
+	{
 		t->head->next->prev = NULL;
 		t->head = t->head->next;
-	} else if (t->tail == &t->table[n]) {
+	}
+	else if (t->tail == &t->table[n])
+	{
 		t->tail->prev->next = NULL;
 		t->tail = t->tail->prev;
-	} else {
+	}
+	else
+	{
 		t->table[n].prev->next = t->table[n].next;
 		t->table[n].next->prev = t->table[n].prev;
 	}
@@ -680,11 +695,11 @@ int lh_table_delete_entry(struct lh_table *t, struct lh_entry *e)
 	return 0;
 }
 
-
 int lh_table_delete(struct lh_table *t, const void *k)
 {
 	struct lh_entry *e = lh_table_lookup_entry(t, k);
-	if(!e) return -1;
+	if (!e)
+		return -1;
 	return lh_table_delete_entry(t, e);
 }
 

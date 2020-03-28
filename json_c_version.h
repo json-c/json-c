@@ -15,13 +15,12 @@
 #define JSON_C_MAJOR_VERSION 0
 #define JSON_C_MINOR_VERSION 13
 #define JSON_C_MICRO_VERSION 99
-#define JSON_C_VERSION_NUM ((JSON_C_MAJOR_VERSION << 16) | \
-                            (JSON_C_MINOR_VERSION << 8) | \
-                            JSON_C_MICRO_VERSION)
+#define JSON_C_VERSION_NUM \
+	((JSON_C_MAJOR_VERSION << 16) | (JSON_C_MINOR_VERSION << 8) | JSON_C_MICRO_VERSION)
 #define JSON_C_VERSION "0.13.99"
 
 #ifndef JSON_EXPORT
-#if defined(_MSC_VER) 
+#if defined(_MSC_VER)
 #define JSON_EXPORT __declspec(dllexport)
 #else
 #define JSON_EXPORT extern
@@ -43,6 +42,6 @@ JSON_EXPORT const char *json_c_version(void); /* Returns JSON_C_VERSION */
  * @see JSON_C_VERSION_NUM
  * @return the version of the json-c library as an int
  */
-JSON_EXPORT int json_c_version_num(void);     /* Returns JSON_C_VERSION_NUM */
+JSON_EXPORT int json_c_version_num(void); /* Returns JSON_C_VERSION_NUM */
 
 #endif

@@ -20,17 +20,17 @@ static void test_example_int(struct json_object *jo1, const char *json_pointer, 
 }
 
 static const char *input_json_str = "{ "
-	"'foo': ['bar', 'baz'], "
-	"'': 0, "
-	"'a/b': 1, "
-	"'c%d': 2, "
-	"'e^f': 3, "
-	"'g|h': 4, "
-	"'i\\\\j': 5, "
-	"'k\\\"l': 6, "
-	"' ': 7, "
-	"'m~n': 8 "
-"}";
+                                    "'foo': ['bar', 'baz'], "
+                                    "'': 0, "
+                                    "'a/b': 1, "
+                                    "'c%d': 2, "
+                                    "'e^f': 3, "
+                                    "'g|h': 4, "
+                                    "'i\\\\j': 5, "
+                                    "'k\\\"l': 6, "
+                                    "' ': 7, "
+                                    "'m~n': 8 "
+                                    "}";
 
 /* clang-format off */
 static const char *rec_input_json_str =
@@ -64,7 +64,8 @@ static void test_example_get()
 {
 	int i;
 	struct json_object *jo1, *jo2, *jo3;
-	struct json_pointer_map_s_i {
+	struct json_pointer_map_s_i
+	{
 		const char *s;
 		int i;
 	};
@@ -118,7 +119,7 @@ static void test_example_get()
 	assert(0 == strcmp("bar", json_object_get_string(jo2)));
 	printf("PASSED - GET - /foo/0 == 'bar'\n");
 
-	for (i = 0 ; json_pointers[i].s; i++)
+	for (i = 0; json_pointers[i].s; i++)
 		test_example_int(jo1, json_pointers[i].s, json_pointers[i].i);
 
 	json_object_put(jo1);
@@ -239,7 +240,8 @@ static void test_example_set()
 	printf("%s\n", json_object_get_string(jo1));
 
 	assert(0 == json_pointer_set(&jo1, "/foo/1", json_object_new_string("cod")));
-	assert(0 == strcmp("cod", json_object_get_string(json_object_array_get_idx(json_object_object_get(jo1, "foo"), 1))));
+	assert(0 == strcmp("cod", json_object_get_string(json_object_array_get_idx(
+	                              json_object_object_get(jo1, "foo"), 1))));
 	printf("PASSED - SET - 'cod' in /foo/1\n");
 	assert(0 != json_pointer_set(&jo1, "/fud/gaw", (jo2 = json_tokener_parse("[1,2,3]"))));
 	assert(errno == ENOENT);
@@ -256,7 +258,9 @@ static void test_example_set()
 	assert(0 == json_pointer_set(&jo1, "/", json_object_new_int(9)));
 	printf("PASSED - SET - / == 9\n");
 
-	jo2 = json_tokener_parse("{ 'foo': [ 'bar', 'cod' ], '': 9, 'a/b': 1, 'c%d': 2, 'e^f': 3, 'g|h': 4, 'i\\\\j': 5, 'k\\\"l': 6, ' ': 7, 'm~n': 8, 'fud': { 'gaw': [ 0, 2, 3, 4 ] } }");
+	jo2 = json_tokener_parse(
+	    "{ 'foo': [ 'bar', 'cod' ], '': 9, 'a/b': 1, 'c%d': 2, 'e^f': 3, 'g|h': 4, 'i\\\\j': "
+	    "5, 'k\\\"l': 6, ' ': 7, 'm~n': 8, 'fud': { 'gaw': [ 0, 2, 3, 4 ] } }");
 	assert(json_object_equal(jo2, jo1));
 	printf("PASSED - SET - Final JSON is: %s\n", json_object_get_string(jo1));
 	json_object_put(jo2);
@@ -286,7 +290,8 @@ static void test_wrong_inputs_set()
 	printf("PASSED - SET - failed 'cod' with path 'foo/bar'\n");
 	json_object_put(jo2);
 
-	assert(0 != json_pointer_setf(&jo1, (jo2 = json_object_new_string("cod")), "%s", "foo/bar"));
+	assert(0 !=
+	       json_pointer_setf(&jo1, (jo2 = json_object_new_string("cod")), "%s", "foo/bar"));
 	printf("PASSED - SET - failed 'cod' with path 'foo/bar'\n");
 	json_object_put(jo2);
 

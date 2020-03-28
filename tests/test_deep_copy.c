@@ -1,6 +1,6 @@
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stddef.h>
 #include <string.h>
 #ifdef NDEBUG
 #undef NDEBUG
@@ -14,76 +14,76 @@
 
 static void do_benchmark(json_object *src1);
 
-static const char *json_str1 = 
-"{"
-"    \"glossary\": {"
-"        \"title\": \"example glossary\","
-"        \"GlossDiv\": {"
-"            \"number\": 16446744073709551615,"
-"            \"title\": \"S\","
-"            \"null_obj\": null, "
-"            \"exixt\": false,"
-"            \"quantity\":20,"
-"            \"univalent\":19.8,"
-"            \"GlossList\": {"
-"                \"GlossEntry\": {"
-"                    \"ID\": \"SGML\","
-"                    \"SortAs\": \"SGML\","
-"                    \"GlossTerm\": \"Standard Generalized Markup Language\","
-"                    \"Acronym\": \"SGML\","
-"                    \"Abbrev\": \"ISO 8879:1986\","
-"                    \"GlossDef\": {"
-"                        \"para\": \"A meta-markup language, used to create markup languages such as DocBook.\","
-"                        \"GlossSeeAlso\": [\"GML\", \"XML\"]"
-"                    },"
-"                    \"GlossSee\": \"markup\""
-"                }"
-"            }"
-"        }"
-"    }"
-"}";
+static const char *json_str1 =
+    "{"
+    "    \"glossary\": {"
+    "        \"title\": \"example glossary\","
+    "        \"GlossDiv\": {"
+    "            \"number\": 16446744073709551615,"
+    "            \"title\": \"S\","
+    "            \"null_obj\": null, "
+    "            \"exixt\": false,"
+    "            \"quantity\":20,"
+    "            \"univalent\":19.8,"
+    "            \"GlossList\": {"
+    "                \"GlossEntry\": {"
+    "                    \"ID\": \"SGML\","
+    "                    \"SortAs\": \"SGML\","
+    "                    \"GlossTerm\": \"Standard Generalized Markup Language\","
+    "                    \"Acronym\": \"SGML\","
+    "                    \"Abbrev\": \"ISO 8879:1986\","
+    "                    \"GlossDef\": {"
+    "                        \"para\": \"A meta-markup language, used to create markup languages "
+    "such as DocBook.\","
+    "                        \"GlossSeeAlso\": [\"GML\", \"XML\"]"
+    "                    },"
+    "                    \"GlossSee\": \"markup\""
+    "                }"
+    "            }"
+    "        }"
+    "    }"
+    "}";
 
 static const char *json_str2 =
-"{\"menu\": {"
-"    \"header\": \"SVG Viewer\","
-"    \"items\": ["
-"        {\"id\": \"Open\"},"
-"        {\"id\": \"OpenNew\", \"label\": \"Open New\"},"
-"        null,"
-"        {\"id\": \"ZoomIn\", \"label\": \"Zoom In\"},"
-"        {\"id\": \"ZoomOut\", \"label\": \"Zoom Out\"},"
-"        {\"id\": \"OriginalView\", \"label\": \"Original View\"},"
-"        null,"
-"        {\"id\": \"Quality\", \"another_null\": null},"
-"        {\"id\": \"Pause\"},"
-"        {\"id\": \"Mute\"},"
-"        null,"
-"        {\"id\": \"Find\", \"label\": \"Find...\"},"
-"        {\"id\": \"FindAgain\", \"label\": \"Find Again\"},"
-"        {\"id\": \"Copy\"},"
-"        {\"id\": \"CopyAgain\", \"label\": \"Copy Again\"},"
-"        {\"id\": \"CopySVG\", \"label\": \"Copy SVG\"},"
-"        {\"id\": \"ViewSVG\", \"label\": \"View SVG\"},"
-"        {\"id\": \"ViewSource\", \"label\": \"View Source\"},"
-"        {\"id\": \"SaveAs\", \"label\": \"Save As\"},"
-"        null,"
-"        {\"id\": \"Help\"},"
-"        {\"id\": \"About\", \"label\": \"About Adobe CVG Viewer...\"}"
-"    ]"
-"}}";
+    "{\"menu\": {"
+    "    \"header\": \"SVG Viewer\","
+    "    \"items\": ["
+    "        {\"id\": \"Open\"},"
+    "        {\"id\": \"OpenNew\", \"label\": \"Open New\"},"
+    "        null,"
+    "        {\"id\": \"ZoomIn\", \"label\": \"Zoom In\"},"
+    "        {\"id\": \"ZoomOut\", \"label\": \"Zoom Out\"},"
+    "        {\"id\": \"OriginalView\", \"label\": \"Original View\"},"
+    "        null,"
+    "        {\"id\": \"Quality\", \"another_null\": null},"
+    "        {\"id\": \"Pause\"},"
+    "        {\"id\": \"Mute\"},"
+    "        null,"
+    "        {\"id\": \"Find\", \"label\": \"Find...\"},"
+    "        {\"id\": \"FindAgain\", \"label\": \"Find Again\"},"
+    "        {\"id\": \"Copy\"},"
+    "        {\"id\": \"CopyAgain\", \"label\": \"Copy Again\"},"
+    "        {\"id\": \"CopySVG\", \"label\": \"Copy SVG\"},"
+    "        {\"id\": \"ViewSVG\", \"label\": \"View SVG\"},"
+    "        {\"id\": \"ViewSource\", \"label\": \"View Source\"},"
+    "        {\"id\": \"SaveAs\", \"label\": \"Save As\"},"
+    "        null,"
+    "        {\"id\": \"Help\"},"
+    "        {\"id\": \"About\", \"label\": \"About Adobe CVG Viewer...\"}"
+    "    ]"
+    "}}";
 
-static const char *json_str3 =
-"{\"menu\": {"
-"  \"id\": \"file\","
-"  \"value\": \"File\","
-"  \"popup\": {"
-"    \"menuitem\": ["
-"      {\"value\": \"New\", \"onclick\": \"CreateNewDoc()\"},"
-"      {\"value\": \"Open\", \"onclick\": \"OpenDoc()\"},"
-"      {\"value\": \"Close\", \"onclick\": \"CloseDoc()\"}"
-"    ]"
-"  }"
-"}}";
+static const char *json_str3 = "{\"menu\": {"
+                               "  \"id\": \"file\","
+                               "  \"value\": \"File\","
+                               "  \"popup\": {"
+                               "    \"menuitem\": ["
+                               "      {\"value\": \"New\", \"onclick\": \"CreateNewDoc()\"},"
+                               "      {\"value\": \"Open\", \"onclick\": \"OpenDoc()\"},"
+                               "      {\"value\": \"Close\", \"onclick\": \"CloseDoc()\"}"
+                               "    ]"
+                               "  }"
+                               "}}";
 
 json_object_to_json_string_fn my_custom_serializer;
 int my_custom_serializer(struct json_object *jso, struct printbuf *pb, int level, int flags)
@@ -93,7 +93,8 @@ int my_custom_serializer(struct json_object *jso, struct printbuf *pb, int level
 }
 
 json_c_shallow_copy_fn my_shallow_copy;
-int my_shallow_copy(json_object *src, json_object *parent, const char *key, size_t index, json_object **dst)
+int my_shallow_copy(json_object *src, json_object *parent, const char *key, size_t index,
+                    json_object **dst)
 {
 	int rc;
 	rc = json_c_shallow_copy_default(src, parent, key, index, dst);
@@ -108,7 +109,6 @@ int my_shallow_copy(json_object *src, json_object *parent, const char *key, size
 	}
 	return rc;
 }
-
 
 int main(int argc, char **argv)
 {
@@ -238,19 +238,24 @@ static void do_benchmark(json_object *src2)
 	time_t start = time(NULL);
 
 	start = time(NULL);
-	for (ii = 0; ii < iterations; ii++) {
+	for (ii = 0; ii < iterations; ii++)
+	{
 		dst2 = json_tokener_parse(json_object_get_string(src2));
 		json_object_put(dst2);
 	}
-	printf("BENCHMARK - %d iterations of 'dst2 = json_tokener_parse(json_object_get_string(src2))' took %d seconds\n", iterations, (int)(time(NULL) - start));
+	printf("BENCHMARK - %d iterations of 'dst2 = "
+	       "json_tokener_parse(json_object_get_string(src2))' took %d seconds\n",
+	       iterations, (int)(time(NULL) - start));
 
 	start = time(NULL);
 	dst2 = NULL;
-	for (ii = 0; ii < iterations; ii++) {
+	for (ii = 0; ii < iterations; ii++)
+	{
 		json_object_deep_copy(src2, &dst2, NULL);
 		json_object_put(dst2);
 		dst2 = NULL;
 	}
-	printf("BENCHMARK - %d iterations of 'json_object_deep_copy(src2, &dst2, NULL)' took %d seconds\n", iterations, (int)(time(NULL) - start));
+	printf("BENCHMARK - %d iterations of 'json_object_deep_copy(src2, &dst2, NULL)' took %d "
+	       "seconds\n",
+	       iterations, (int)(time(NULL) - start));
 }
-

@@ -2,20 +2,20 @@
 #include "strerror_override_private.h"
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 #include <io.h>
-#endif /* defined(WIN32) */  
-#include <stdio.h>
-#include <stdlib.h>
-#include <stddef.h>
-#include <string.h>
+#include <windows.h>
+#endif /* defined(WIN32) */
 #include <fcntl.h>
 #include <limits.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #if HAVE_UNISTD_H
-# include <unistd.h>
+#include <unistd.h>
 #endif /* HAVE_UNISTD_H */
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 #include "json.h"
 #include "json_util.h"
@@ -38,21 +38,20 @@ static void test_write_to_file()
 	json_object *jso;
 
 	jso = json_tokener_parse("{"
-		"\"foo\":1234,"
-		"\"foo1\":\"abcdefghijklmnopqrstuvwxyz\","
-		"\"foo2\":\"abcdefghijklmnopqrstuvwxyz\","
-		"\"foo3\":\"abcdefghijklmnopqrstuvwxyz\","
-		"\"foo4\":\"abcdefghijklmnopqrstuvwxyz\","
-		"\"foo5\":\"abcdefghijklmnopqrstuvwxyz\","
-		"\"foo6\":\"abcdefghijklmnopqrstuvwxyz\","
-		"\"foo7\":\"abcdefghijklmnopqrstuvwxyz\","
-		"\"foo8\":\"abcdefghijklmnopqrstuvwxyz\","
-		"\"foo9\":\"abcdefghijklmnopqrstuvwxyz\""
-		"}");
+	                         "\"foo\":1234,"
+	                         "\"foo1\":\"abcdefghijklmnopqrstuvwxyz\","
+	                         "\"foo2\":\"abcdefghijklmnopqrstuvwxyz\","
+	                         "\"foo3\":\"abcdefghijklmnopqrstuvwxyz\","
+	                         "\"foo4\":\"abcdefghijklmnopqrstuvwxyz\","
+	                         "\"foo5\":\"abcdefghijklmnopqrstuvwxyz\","
+	                         "\"foo6\":\"abcdefghijklmnopqrstuvwxyz\","
+	                         "\"foo7\":\"abcdefghijklmnopqrstuvwxyz\","
+	                         "\"foo8\":\"abcdefghijklmnopqrstuvwxyz\","
+	                         "\"foo9\":\"abcdefghijklmnopqrstuvwxyz\""
+	                         "}");
 	const char *outfile = "json.out";
 	int rv = json_object_to_file(outfile, jso);
-	printf("%s: json_object_to_file(%s, jso)=%d\n",
-		(rv == 0) ? "OK" : "FAIL", outfile, rv);
+	printf("%s: json_object_to_file(%s, jso)=%d\n", (rv == 0) ? "OK" : "FAIL", outfile, rv);
 	if (rv == 0)
 		stat_and_cat(outfile);
 
@@ -66,7 +65,7 @@ static void test_write_to_file()
 		stat_and_cat(outfile2);
 
 	const char *outfile3 = "json3.out";
-	int d = open(outfile3, O_WRONLY|O_CREAT, 0600);
+	int d = open(outfile3, O_WRONLY | O_CREAT, 0600);
 	if (d < 0)
 	{
 		printf("FAIL: unable to open %s %s\n", outfile3, strerror(errno));
@@ -92,19 +91,17 @@ static void stat_and_cat(const char *file)
 	int d = open(file, O_RDONLY, 0600);
 	if (d < 0)
 	{
-		printf("FAIL: unable to open %s: %s\n",
-		       file, strerror(errno));
+		printf("FAIL: unable to open %s: %s\n", file, strerror(errno));
 		return;
 	}
 	if (fstat(d, &sb) < 0)
 	{
-		printf("FAIL: unable to stat %s: %s\n",
-		       file, strerror(errno));
+		printf("FAIL: unable to stat %s: %s\n", file, strerror(errno));
 		close(d);
 		return;
 	}
 	char *buf = malloc(sb.st_size + 1);
-	if(!buf)
+	if (!buf)
 	{
 		printf("FAIL: unable to allocate memory\n");
 		close(d);
@@ -112,8 +109,7 @@ static void stat_and_cat(const char *file)
 	}
 	if (read(d, buf, sb.st_size) < sb.st_size)
 	{
-		printf("FAIL: unable to read all of %s: %s\n",
-		       file, strerror(errno));
+		printf("FAIL: unable to read all of %s: %s\n", file, strerror(errno));
 		free(buf);
 		close(d);
 		return;
@@ -126,8 +122,8 @@ static void stat_and_cat(const char *file)
 
 int main(int argc, char **argv)
 {
-//	json_object_to_file(file, obj);
-//	json_object_to_file_ext(file, obj, flags);
+	//	json_object_to_file(file, obj);
+	//	json_object_to_file_ext(file, obj, flags);
 
 	_json_c_strerror_enable = 1;
 
@@ -135,9 +131,9 @@ int main(int argc, char **argv)
 	if (argc < 2)
 	{
 		fprintf(stderr,
-			"Usage: %s <testdir>\n"
-			"  <testdir> is the location of input files\n",
-			argv[0]);
+		        "Usage: %s <testdir>\n"
+		        "  <testdir> is the location of input files\n",
+		        argv[0]);
 		return EXIT_FAILURE;
 	}
 	testdir = argv[1];
@@ -158,23 +154,19 @@ static void test_read_valid_with_fd(const char *testdir)
 	int d = open(filename, O_RDONLY, 0);
 	if (d < 0)
 	{
-		fprintf(stderr,
-			"FAIL: unable to open %s: %s\n",
-			filename, strerror(errno));
+		fprintf(stderr, "FAIL: unable to open %s: %s\n", filename, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 	json_object *jso = json_object_from_fd(d);
 	if (jso != NULL)
 	{
-		printf("OK: json_object_from_fd(valid.json)=%s\n",
-		       json_object_to_json_string(jso));
+		printf("OK: json_object_from_fd(valid.json)=%s\n", json_object_to_json_string(jso));
 		json_object_put(jso);
 	}
 	else
 	{
-		fprintf(stderr,
-		        "FAIL: unable to parse contents of %s: %s\n",
-		        filename, json_util_get_last_err());
+		fprintf(stderr, "FAIL: unable to parse contents of %s: %s\n", filename,
+		        json_util_get_last_err());
 	}
 	close(d);
 }
@@ -187,9 +179,7 @@ static void test_read_valid_nested_with_fd(const char *testdir)
 	int d = open(filename, O_RDONLY, 0);
 	if (d < 0)
 	{
-		fprintf(stderr,
-			"FAIL: unable to open %s: %s\n",
-			filename, strerror(errno));
+		fprintf(stderr, "FAIL: unable to open %s: %s\n", filename, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 	json_object *jso = json_object_from_fd_ex(d, 20);
@@ -201,9 +191,8 @@ static void test_read_valid_nested_with_fd(const char *testdir)
 	}
 	else
 	{
-		fprintf(stderr,
-		        "FAIL: unable to parse contents of %s: %s\n",
-		        filename, json_util_get_last_err());
+		fprintf(stderr, "FAIL: unable to parse contents of %s: %s\n", filename,
+		        json_util_get_last_err());
 	}
 
 	(void)lseek(d, SEEK_SET, 0);
@@ -211,14 +200,15 @@ static void test_read_valid_nested_with_fd(const char *testdir)
 	jso = json_object_from_fd_ex(d, 3);
 	if (jso != NULL)
 	{
-		printf("FAIL: json_object_from_fd_ex(%s, 3)=%s\n",
-		       filename, json_object_to_json_string(jso));
+		printf("FAIL: json_object_from_fd_ex(%s, 3)=%s\n", filename,
+		       json_object_to_json_string(jso));
 		json_object_put(jso);
 	}
 	else
 	{
-		printf("OK: correctly unable to parse contents of valid_nested.json with low max depth: %s\n",
-		        json_util_get_last_err());
+		printf("OK: correctly unable to parse contents of valid_nested.json with low max "
+		       "depth: %s\n",
+		       json_util_get_last_err());
 	}
 	close(d);
 }
@@ -230,14 +220,14 @@ static void test_read_nonexistant()
 	json_object *jso = json_object_from_file(filename);
 	if (jso != NULL)
 	{
-		printf("FAIL: json_object_from_file(%s) returned %p when NULL expected\n",
-		       filename, (void *)jso);
+		printf("FAIL: json_object_from_file(%s) returned %p when NULL expected\n", filename,
+		       (void *)jso);
 		json_object_put(jso);
 	}
 	else
 	{
-		printf("OK: json_object_from_file(%s) correctly returned NULL: %s\n",
-		       filename, json_util_get_last_err());
+		printf("OK: json_object_from_file(%s) correctly returned NULL: %s\n", filename,
+		       json_util_get_last_err());
 	}
 }
 
@@ -245,7 +235,7 @@ static void test_read_closed()
 {
 	// Test reading from a closed fd
 	int d = open("/dev/null", O_RDONLY, 0);
-	if(d < 0)
+	if (d < 0)
 	{
 		puts("FAIL: unable to open");
 	}
@@ -261,8 +251,7 @@ static void test_read_closed()
 	json_object *jso = json_object_from_fd(fixed_d);
 	if (jso != NULL)
 	{
-		printf("FAIL: read from closed fd returning non-NULL: %p\n",
-		       (void *)jso);
+		printf("FAIL: read from closed fd returning non-NULL: %p\n", (void *)jso);
 		fflush(stdout);
 		printf("  jso=%s\n", json_object_to_json_string(jso));
 		json_object_put(jso);

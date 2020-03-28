@@ -2,9 +2,9 @@
  * Tests if binary strings are supported.
  */
 
+#include "config.h"
 #include <stdio.h>
 #include <string.h>
-#include "config.h"
 
 #include "json_inttypes.h"
 #include "json_object.h"
@@ -18,20 +18,22 @@ int main(void)
 	struct json_object *string = json_object_new_string_len(input, 3);
 	const char *json = json_object_to_json_string(string);
 
-	int strings_match =  !strcmp( expected, json);
+	int strings_match = !strcmp(expected, json);
 	int retval = 0;
 	if (strings_match)
 	{
 		printf("JSON write result is correct: %s\n", json);
 		puts("PASS");
-	} else {
+	}
+	else
+	{
 		puts("JSON write result doesn't match expected string");
 		printf("expected string: ");
 		puts(expected);
 		printf("parsed string:   ");
 		puts(json);
 		puts("FAIL");
-		retval=1;
+		retval = 1;
 	}
 	json_object_put(string);
 
@@ -42,7 +44,7 @@ int main(void)
 		const char *parsed_cstr = json_object_get_string(parsed_str);
 		int ii;
 		printf("Re-parsed object string len=%d, chars=[", parsed_len);
-		for (ii = 0; ii < parsed_len ; ii++)
+		for (ii = 0; ii < parsed_len; ii++)
 		{
 			printf("%s%d", (ii ? ", " : ""), (int)parsed_cstr[ii]);
 		}
