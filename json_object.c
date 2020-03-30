@@ -656,7 +656,8 @@ int32_t json_object_get_int(const struct json_object *jso)
   } else {
     if (jso->o.c_int.cint.c_uint64 >= INT64_MAX)
       cint64 = INT64_MAX;
-    cint64 = (int64_t)jso->o.c_int.cint.c_uint64;
+    else
+      cint64 = (int64_t)jso->o.c_int.cint.c_uint64;
   }
 
   if (o_type == json_type_string)

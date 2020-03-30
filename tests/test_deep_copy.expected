@@ -11,6 +11,7 @@ Printing JSON objects for visual inspection
   "glossary":{
     "title":"example glossary",
     "GlossDiv":{
+      "number":16446744073709551615,
       "title":"S",
       "null_obj":null,
       "exixt":false,

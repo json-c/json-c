@@ -208,8 +208,50 @@ int main()
 	else
 		printf("Comparing different objects is incorrect\n");
 
+	/* iterate over jso2 keys to see if any exist that are not in jso1 */
+	json_object_object_add(obj2, "test3", json_object_new_int(320));
+	json_object_object_add(obj2, "test6", json_object_new_int(321));
+	if (!json_object_equal(obj1, obj2))
+		printf("Comparing different objects is correct\n");
+	else
+		printf("Comparing different objects is incorrect\n");
+
+	/* iterate over jso1 keys and see if they exist in jso1 */
+	json_object_object_add(obj1, "test6", json_object_new_int(321));
+	if (json_object_equal(obj1, obj2))
+		printf("Comparing different objects is correct\n");
+	else
+		printf("Comparing different objects is incorrect\n");
+	json_object_object_add(obj1, "test7", json_object_new_int(322));
+	if (!json_object_equal(obj1, obj2))
+		printf("Comparing different objects is correct\n");
+	else
+		printf("Comparing different objects is incorrect\n");
+
 	json_object_put(obj1);
 	json_object_put(obj2);
+
+	/* different types tests */
+	struct json_object *int5 = json_object_new_int(0);
+	struct json_object *dbl5 = json_object_new_double(3.14159);
+
+	if (!json_object_equal(int5, NULL))
+		printf("JSON integer and NULL comparison is correct\n");
+	else
+		printf("JSON integer and NULL comparison failed\n");
+
+	if (!json_object_equal(NULL, dbl5))
+		printf("JSON NULL and double comparison is correct\n");
+	else
+		printf("JSON NULL and double comparison failed\n");
+
+	if (!json_object_equal(int5, dbl5))
+		printf("JSON integer and double comparison is correct\n");
+	else
+		printf("JSON integer and double comparison failed\n");
+
+	json_object_put(int5);
+	json_object_put(dbl5);
 
 	return 0;
 }
