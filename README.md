@@ -16,6 +16,9 @@ Build Status
 * [AppVeyor Build](https://ci.appveyor.com/project/hawicz/json-c) ![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/json-c/json-c?branch=master&svg=true)
 * [Travis Build](https://travis-ci.org/json-c/json-c) ![Travis Build Status](https://travis-ci.org/json-c/json-c.svg?branch=master)
 
+Test Status
+* [Coveralls](https://coveralls.io/github/json-c/json-c?branch=master) [![Coverage Status](https://coveralls.io/repos/github/json-c/json-c/badge.svg?branch=master)](https://coveralls.io/github/json-c/json-c?branch=master)
+
 JSON-C implements a reference counting object model that allows you to easily
 construct JSON objects in C, output them as JSON formatted strings and parse
 JSON formatted strings back into the C representation of JSON objects.
