@@ -19,6 +19,7 @@ static const char *json_str1 =
 "    \"glossary\": {"
 "        \"title\": \"example glossary\","
 "        \"GlossDiv\": {"
+"            \"number\": 16446744073709551615,"
 "            \"title\": \"S\","
 "            \"null_obj\": null, "
 "            \"exixt\": false,"
