@@ -121,6 +121,7 @@ static void test_basic_parse()
 	single_basic_parse("{ \"foo\": [null, \"foo\"] }", 0);
 	single_basic_parse("{ \"abc\": 12, \"foo\": \"bar\", \"bool0\": false, \"bool1\": true, \"arr\": [ 1, 2, 3, null, 5 ] }", 0);
 	single_basic_parse("{ \"abc\": \"blue\nred\\ngreen\" }", 0);
+	single_basic_parse("{ \"foo\\u0000bar\": \"foo\\u0000bar\" }", 0);
 
 	// Clear serializer for these tests so we see the actual parsed value.
 	single_basic_parse("null", 1);
