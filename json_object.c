@@ -228,7 +228,7 @@ static struct json_object* json_object_new(enum json_type o_type)
 {
 	struct json_object *jso;
 
-	jso = (struct json_object*)calloc(sizeof(struct json_object), 1);
+	jso = (struct json_object*)calloc(1, sizeof(struct json_object));
 	if (!jso)
 		return NULL;
 	jso->o_type = o_type;

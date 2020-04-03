@@ -46,7 +46,7 @@ array_list_new(array_list_free_fn *free_fn)
   arr->size = ARRAY_LIST_DEFAULT_SIZE;
   arr->length = 0;
   arr->free_fn = free_fn;
-  if(!(arr->array = (void**)calloc(sizeof(void*), arr->size))) {
+  if(!(arr->array = (void**)calloc(arr->size, sizeof(void*)))) {
     free(arr);
     return NULL;
   }
