@@ -24,7 +24,7 @@
 #define _printbuf_h_
 
 #ifndef JSON_EXPORT
-#if defined(_MSC_VER) 
+#if defined(_MSC_VER)
 #define JSON_EXPORT __declspec(dllexport)
 #else
 #define JSON_EXPORT extern
@@ -35,15 +35,15 @@
 extern "C" {
 #endif
 
-struct printbuf {
-  char *buf;
-  int bpos;
-  int size;
+struct printbuf
+{
+	char *buf;
+	int bpos;
+	int size;
 };
 typedef struct printbuf printbuf;
 
-JSON_EXPORT struct printbuf*
-printbuf_new(void);
+JSON_EXPORT struct printbuf *printbuf_new(void);
 
 /* As an optimization, printbuf_memappend_fast() is defined as a macro
  * that handles copying data if the buffer is large enough; otherwise
@@ -53,17 +53,22 @@ printbuf_new(void);
  * Your code should not use printbuf_memappend() directly unless it
  * checks the return code. Use printbuf_memappend_fast() instead.
  */
-JSON_EXPORT int
-printbuf_memappend(struct printbuf *p, const char *buf, int size);
+JSON_EXPORT int printbuf_memappend(struct printbuf *p, const char *buf, int size);
 
-#define printbuf_memappend_fast(p, bufptr, bufsize)          \
-do {                                                         \
-  if ((p->size - p->bpos) > bufsize) {                       \
-    memcpy(p->buf + p->bpos, (bufptr), bufsize);             \
-    p->bpos += bufsize;                                      \
-    p->buf[p->bpos]= '\0';                                   \
-  } else {  printbuf_memappend(p, (bufptr), bufsize); }      \
-} while (0)
+#define printbuf_memappend_fast(p, bufptr, bufsize)                  \
+	do                                                           \
+	{                                                            \
+		if ((p->size - p->bpos) > bufsize)                   \
+		{                                                    \
+			memcpy(p->buf + p->bpos, (bufptr), bufsize); \
+			p->bpos += bufsize;                          \
+			p->buf[p->bpos] = '\0';                      \
+		}                                                    \
+		else                                                 \
+		{                                                    \
+			printbuf_memappend(p, (bufptr), bufsize);    \
+		}                                                    \
+	} while (0)
 
 #define printbuf_length(p) ((p)->bpos)
 
@@ -87,7 +92,7 @@ do {                                                         \
  *   sprintbuf()
  */
 #define printbuf_strappend(pb, str) \
-   printbuf_memappend ((pb), _printbuf_check_literal(str), sizeof(str) - 1)
+	printbuf_memappend((pb), _printbuf_check_literal(str), sizeof(str) - 1)
 
 /**
  * Set len bytes of the buffer to charvalue, starting at offset offset.
@@ -97,8 +102,7 @@ do {                                                         \
  *
  * If offset is -1, this starts at the end of the current data in the buffer.
  */
-JSON_EXPORT int
-printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len);
+JSON_EXPORT int printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len);
 
 /**
  * Formatted print to printbuf.
@@ -114,14 +118,11 @@ printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len);
  *   printbuf_memappend()
  *   printbuf_strappend()
  */
-JSON_EXPORT int
-sprintbuf(struct printbuf *p, const char *msg, ...);
+JSON_EXPORT int sprintbuf(struct printbuf *p, const char *msg, ...);
 
-JSON_EXPORT void
-printbuf_reset(struct printbuf *p);
+JSON_EXPORT void printbuf_reset(struct printbuf *p);
 
-JSON_EXPORT void
-printbuf_free(struct printbuf *p);
+JSON_EXPORT void printbuf_free(struct printbuf *p);
 
 #ifdef __cplusplus
 }

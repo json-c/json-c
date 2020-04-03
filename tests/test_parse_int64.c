@@ -35,7 +35,7 @@ int main()
 {
 	char buf[100];
 
-  printf("==========json_parse_int64() test===========\n");
+	printf("==========json_parse_int64() test===========\n");
 	checkit("x");
 
 	checkit("0");
@@ -70,7 +70,7 @@ int main()
 	strcpy(buf, "4294967295"); // aka UINT32_MAX
 	checkit(buf);
 
-	strcpy(buf, "4294967296");  // aka UINT32_MAX + 1
+	strcpy(buf, "4294967296"); // aka UINT32_MAX + 1
 	checkit(buf);
 
 	strcpy(buf, "21474836470"); // INT32_MAX * 10
@@ -122,7 +122,7 @@ int main()
 	strcpy(buf, "123");
 	checkit(buf);
 
-  printf("\n==========json_parse_uint64() test===========\n");
+	printf("\n==========json_parse_uint64() test===========\n");
 	checkit_uint("x");
 
 	checkit_uint("0");
@@ -154,7 +154,7 @@ int main()
 	strcpy(buf, "4294967295"); // aka UINT32_MAX
 	checkit_uint(buf);
 
-	strcpy(buf, "4294967296");  // aka UINT32_MAX + 1
+	strcpy(buf, "4294967296"); // aka UINT32_MAX + 1
 	checkit_uint(buf);
 
 	strcpy(buf, "21474836470"); // INT32_MAX * 10

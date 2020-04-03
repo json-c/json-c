@@ -2,8 +2,8 @@
 * Tests if the format string for double serialization is handled correctly
 */
 
-#include <stdio.h>
 #include "config.h"
+#include <stdio.h>
 
 #include "json_object.h"
 #include "json_object_private.h"
@@ -49,7 +49,8 @@ int main()
 	if (json_c_set_serialization_double_format("T%0.2fX", JSON_C_OPTION_THREAD) < 0)
 		printf("ERROR: json_c_set_serialization_double_format() failed");
 	printf("obj.to_string(with thread format)=%s\n", json_object_to_json_string(obj));
-	if (json_c_set_serialization_double_format("Ttttttttttttt%0.2fxxxxxxxxxxxxxxxxxxX", JSON_C_OPTION_THREAD) < 0)
+	if (json_c_set_serialization_double_format("Ttttttttttttt%0.2fxxxxxxxxxxxxxxxxxxX",
+	                                           JSON_C_OPTION_THREAD) < 0)
 		printf("ERROR: json_c_set_serialization_double_format() failed");
 	printf("obj.to_string(long thread format)=%s\n", json_object_to_json_string(obj));
 	if (json_c_set_serialization_double_format(NULL, JSON_C_OPTION_THREAD) < 0)
@@ -96,11 +97,11 @@ int main()
 	json_object_put(obj);
 
 	/* Test Infinity and -Infinity handling */
-	obj = json_object_new_double(1.0/zero_dot_zero);
+	obj = json_object_new_double(1.0 / zero_dot_zero);
 	printf("obj(1.0/0.0)=%s\n", json_object_to_json_string(obj));
 	json_object_put(obj);
 
-	obj = json_object_new_double(-1.0/zero_dot_zero);
+	obj = json_object_new_double(-1.0 / zero_dot_zero);
 	printf("obj(-1.0/0.0)=%s\n", json_object_to_json_string(obj));
 	json_object_put(obj);
 

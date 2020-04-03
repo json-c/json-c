@@ -12,20 +12,19 @@
 /**
  * @file
  * @brief Miscllaneous utility functions and macros.
- */ 
+ */
 #ifndef _json_util_h_
 #define _json_util_h_
 
 #include "json_object.h"
 
 #ifndef json_min
-#define json_min(a,b) ((a) < (b) ? (a) : (b))
+#define json_min(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
 #ifndef json_max
-#define json_max(a,b) ((a) > (b) ? (a) : (b))
+#define json_max(a, b) ((a) > (b) ? (a) : (b))
 #endif
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,7 +39,7 @@ extern "C" {
  *
  * Returns NULL on failure.  See json_util_get_last_err() for details.
  */
-JSON_EXPORT struct json_object* json_object_from_file(const char *filename);
+JSON_EXPORT struct json_object *json_object_from_file(const char *filename);
 
 /**
  * Create a JSON object from already opened file descriptor.
@@ -56,7 +55,7 @@ JSON_EXPORT struct json_object* json_object_from_file(const char *filename);
  *
  * Returns NULL on failure.  See json_util_get_last_err() for details.
  */
-JSON_EXPORT struct json_object* json_object_from_fd_ex(int fd, int depth);
+JSON_EXPORT struct json_object *json_object_from_fd_ex(int fd, int depth);
 
 /**
  * Create a JSON object from an already opened file descriptor, using
@@ -64,7 +63,7 @@ JSON_EXPORT struct json_object* json_object_from_fd_ex(int fd, int depth);
  *
  * See json_object_from_fd_ex() for details.
  */
-JSON_EXPORT struct json_object* json_object_from_fd(int fd);
+JSON_EXPORT struct json_object *json_object_from_fd(int fd);
 
 /**
  * Equivalent to:
@@ -101,7 +100,6 @@ JSON_EXPORT int json_object_to_fd(int fd, struct json_object *obj, int flags);
  */
 JSON_EXPORT const char *json_util_get_last_err(void);
 
-
 JSON_EXPORT int json_parse_int64(const char *buf, int64_t *retval);
 JSON_EXPORT int json_parse_uint64(const char *buf, uint64_t *retval);
 JSON_EXPORT int json_parse_double(const char *buf, double *retval);
@@ -119,7 +117,7 @@ JSON_EXPORT const char *json_type_to_name(enum json_type o_type);
 /* 'cold' attribute is for optimization, telling the computer this code
  * path is unlikely.
  */
-#define JSON_NORETURN __attribute__ ((noreturn, cold))
+#define JSON_NORETURN __attribute__((noreturn, cold))
 #endif
 #endif
 /**

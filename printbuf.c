@@ -20,9 +20,9 @@
 #include <string.h>
 
 #ifdef HAVE_STDARG_H
-# include <stdarg.h>
+#include <stdarg.h>
 #else /* !HAVE_STDARG_H */
-# error Not enough var arg support!
+#error Not enough var arg support!
 #endif /* HAVE_STDARG_H */
 
 #include "debug.h"
@@ -32,22 +32,23 @@
 
 static int printbuf_extend(struct printbuf *p, int min_size);
 
-struct printbuf* printbuf_new(void)
+struct printbuf *printbuf_new(void)
 {
-  struct printbuf *p;
+	struct printbuf *p;
 
-  p = (struct printbuf*)calloc(1, sizeof(struct printbuf));
-  if(!p) return NULL;
-  p->size = 32;
-  p->bpos = 0;
-  if(!(p->buf = (char*)malloc(p->size))) {
-    free(p);
-    return NULL;
-  }
-  p->buf[0]= '\0';
-  return p;
+	p = (struct printbuf *)calloc(1, sizeof(struct printbuf));
+	if (!p)
+		return NULL;
+	p->size = 32;
+	p->bpos = 0;
+	if (!(p->buf = (char *)malloc(p->size)))
+	{
+		free(p);
+		return NULL;
+	}
+	p->buf[0] = '\0';
+	return p;
 }
-
 
 /**
  * Extend the buffer p so it has a size of at least min_size.
@@ -67,13 +68,13 @@ static int printbuf_extend(struct printbuf *p, int min_size)
 
 	new_size = p->size * 2;
 	if (new_size < min_size + 8)
-		new_size =  min_size + 8;
+		new_size = min_size + 8;
 #ifdef PRINTBUF_DEBUG
 	MC_DEBUG("printbuf_memappend: realloc "
-	  "bpos=%d min_size=%d old_size=%d new_size=%d\n",
-	  p->bpos, min_size, p->size, new_size);
+	         "bpos=%d min_size=%d old_size=%d new_size=%d\n",
+	         p->bpos, min_size, p->size, new_size);
 #endif /* PRINTBUF_DEBUG */
-	if(!(t = (char*)realloc(p->buf, new_size)))
+	if (!(t = (char *)realloc(p->buf, new_size)))
 		return -1;
 	p->size = new_size;
 	p->buf = t;
@@ -82,14 +83,15 @@ static int printbuf_extend(struct printbuf *p, int min_size)
 
 int printbuf_memappend(struct printbuf *p, const char *buf, int size)
 {
-  if (p->size <= p->bpos + size + 1) {
-    if (printbuf_extend(p, p->bpos + size + 1) < 0)
-      return -1;
-  }
-  memcpy(p->buf + p->bpos, buf, size);
-  p->bpos += size;
-  p->buf[p->bpos]= '\0';
-  return size;
+	if (p->size <= p->bpos + size + 1)
+	{
+		if (printbuf_extend(p, p->bpos + size + 1) < 0)
+			return -1;
+	}
+	memcpy(p->buf + p->bpos, buf, size);
+	p->bpos += size;
+	p->buf[p->bpos] = '\0';
+	return size;
 }
 
 int printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len)
@@ -114,42 +116,51 @@ int printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len)
 
 int sprintbuf(struct printbuf *p, const char *msg, ...)
 {
-  va_list ap;
-  char *t;
-  int size;
-  char buf[128];
+	va_list ap;
+	char *t;
+	int size;
+	char buf[128];
 
-  /* user stack buffer first */
-  va_start(ap, msg);
-  size = vsnprintf(buf, 128, msg, ap);
-  va_end(ap);
-  /* if string is greater than stack buffer, then use dynamic string
-     with vasprintf.  Note: some implementation of vsnprintf return -1
-     if output is truncated whereas some return the number of bytes that
-     would have been written - this code handles both cases. */
-  if(size == -1 || size > 127) {
-    va_start(ap, msg);
-    if((size = vasprintf(&t, msg, ap)) < 0) { va_end(ap); return -1; }
-    va_end(ap);
-    printbuf_memappend(p, t, size);
-    free(t);
-    return size;
-  } else {
-    printbuf_memappend(p, buf, size);
-    return size;
-  }
+	/* user stack buffer first */
+	va_start(ap, msg);
+	size = vsnprintf(buf, 128, msg, ap);
+	va_end(ap);
+	/* if string is greater than stack buffer, then use dynamic string
+	 * with vasprintf.  Note: some implementation of vsnprintf return -1
+	 * if output is truncated whereas some return the number of bytes that
+	 * would have been written - this code handles both cases.
+	 */
+	if (size == -1 || size > 127)
+	{
+		va_start(ap, msg);
+		if ((size = vasprintf(&t, msg, ap)) < 0)
+		{
+			va_end(ap);
+			return -1;
+		}
+		va_end(ap);
+		printbuf_memappend(p, t, size);
+		free(t);
+		return size;
+	}
+	else
+	{
+		printbuf_memappend(p, buf, size);
+		return size;
+	}
 }
 
 void printbuf_reset(struct printbuf *p)
 {
-  p->buf[0] = '\0';
-  p->bpos = 0;
+	p->buf[0] = '\0';
+	p->bpos = 0;
 }
 
 void printbuf_free(struct printbuf *p)
 {
-  if(p) {
-    free(p->buf);
-    free(p);
-  }
+	if (p)
+	{
+		free(p->buf);
+		free(p);
+	}
 }

@@ -7,19 +7,20 @@
 #include "parse_flags.h"
 
 #if !defined(HAVE_STRCASECMP) && defined(_MSC_VER)
-# define strcasecmp _stricmp
+#define strcasecmp _stricmp
 #elif !defined(HAVE_STRCASECMP)
-# error You do not have strcasecmp on your system.
+#error You do not have strcasecmp on your system.
 #endif /* HAVE_STRNCASECMP */
 
-static struct {
+static struct
+{
 	const char *arg;
 	int flag;
 } format_args[] = {
-	{ "plain", JSON_C_TO_STRING_PLAIN },
-	{ "spaced", JSON_C_TO_STRING_SPACED },
-	{ "pretty", JSON_C_TO_STRING_PRETTY },
-	{ "pretty_tab", JSON_C_TO_STRING_PRETTY_TAB },
+    {"plain", JSON_C_TO_STRING_PLAIN},
+    {"spaced", JSON_C_TO_STRING_SPACED},
+    {"pretty", JSON_C_TO_STRING_PRETTY},
+    {"pretty_tab", JSON_C_TO_STRING_PRETTY_TAB},
 };
 
 #ifndef NELEM
@@ -30,7 +31,7 @@ int parse_flags(int argc, char **argv)
 {
 	int arg_idx;
 	int sflags = 0;
-	for (arg_idx = 1; arg_idx < argc ; arg_idx++)
+	for (arg_idx = 1; arg_idx < argc; arg_idx++)
 	{
 		int jj;
 		for (jj = 0; jj < (int)NELEM(format_args); jj++)

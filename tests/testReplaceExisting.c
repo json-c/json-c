@@ -1,6 +1,6 @@
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stddef.h>
 #include <string.h>
 
 #include "json.h"
@@ -67,12 +67,12 @@ int main(int argc, char **argv)
 	}
 	if (new_count != orig_count)
 	{
-		printf("mismatch between original count (%d) and new count (%d)\n",
-		       orig_count, new_count);
+		printf("mismatch between original count (%d) and new count (%d)\n", orig_count,
+		       new_count);
 		retval = 1;
 	}
 
-	json_object_put( my_object );
+	json_object_put(my_object);
 
 	return retval;
 }
