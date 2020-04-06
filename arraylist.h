@@ -22,6 +22,8 @@
 extern "C" {
 #endif
 
+#include <stddef.h>
+
 #define ARRAY_LIST_DEFAULT_SIZE 32
 
 typedef void(array_list_free_fn)(void *data);

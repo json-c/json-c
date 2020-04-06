@@ -23,15 +23,8 @@
 #ifndef JSON_OBJECT_ITERATOR_H
 #define JSON_OBJECT_ITERATOR_H
 
+#include "json_types.h"
 #include <stddef.h>
-
-#ifndef JSON_EXPORT
-#if defined(_MSC_VER)
-#define JSON_EXPORT __declspec(dllexport)
-#else
-#define JSON_EXPORT extern
-#endif
-#endif
 
 #ifdef __cplusplus
 extern "C" {

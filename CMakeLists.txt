@@ -298,6 +298,7 @@ set(JSON_C_PUBLIC_HEADERS
     ${PROJECT_SOURCE_DIR}/json_object_iterator.h
     ${PROJECT_SOURCE_DIR}/json_pointer.h
     ${PROJECT_SOURCE_DIR}/json_tokener.h
+    ${PROJECT_SOURCE_DIR}/json_types.h
     ${PROJECT_SOURCE_DIR}/json_util.h
     ${PROJECT_SOURCE_DIR}/json_visit.h
     ${PROJECT_SOURCE_DIR}/linkhash.h

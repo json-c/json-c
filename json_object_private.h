@@ -23,6 +23,10 @@ extern "C" {
 /**< how many bytes are directly stored in json_object for strings? */
 #define LEN_DIRECT_STRING_DATA 32
 
+struct json_object;
+#include "json_inttypes.h"
+#include "json_types.h"
+
 typedef void(json_object_private_delete_fn)(struct json_object *o);
 
 /* json object int type, support extension*/
