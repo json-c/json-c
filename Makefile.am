@@ -29,6 +29,7 @@ libjson_cinclude_HEADERS = \
 	json_object_iterator.h \
 	json_pointer.h \
 	json_tokener.h \
+	json_types.h \
 	json_util.h \
 	json_visit.h \
 	linkhash.h \
