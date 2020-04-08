@@ -101,7 +101,7 @@ matrix:
           fi
       before_script:
         - export CFLAGS="-fprofile-arcs -ftest-coverage"
-        - cmake .
+        - mkdir build && cd build && cmake ..
       script:
         - make
         - make check
@@ -124,7 +124,7 @@ before_install:
     fi
 
 before_script:
-  - cmake .
+  - mkdir build && cd build && cmake ..
 
 script:
   - make
