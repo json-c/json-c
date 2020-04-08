@@ -39,7 +39,7 @@
 #endif /* HAVE_UNISTD_H */
 
 #ifdef WIN32
-#if MSC_VER < 1800
+#if (MSC_VER < 1800) && !defined(__MINGW32__)
 /* strtoll/strtoull is available only since Visual Studio 2013 */
 #define strtoll _strtoi64
 #define strtoull _strtoui64
