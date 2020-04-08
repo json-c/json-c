@@ -8,7 +8,7 @@
 
 #include "snprintf_compat.h"
 
-#include <malloc.h>
+#include <stdlib.h>
 
 #if !defined(HAVE_VASPRINTF)
 /* CAW: compliant version of vasprintf */
