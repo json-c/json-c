@@ -126,9 +126,12 @@ before_install:
 before_script:
   # Wait a while for output to flush :(
   - onexit() { sleep 20; }; trap onexit 0
-  - mkdir -p build || (echo "Failed to mkdir build" ; false)
-  - cd build || (echo "Failed to cd build" ; false)
-  - cmake .. || (echo "Failed to run cmake"; false)
+  - pwd
+  - mkdir -p build || echo "Failed to mkdir build"
+  - ls
+  - cd build || echo "Failed to cd build"
+  - pwd
+  - cmake .. || echo "Failed to run cmake"
   - echo "After cmake"
   - pwd
 
