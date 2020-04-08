@@ -124,17 +124,11 @@ before_install:
     fi
 
 before_script:
-  # Wait a while for output to flush :(
-  - set +e
-  - onexit() { sleep 20; }; trap onexit 0
-  - pwd
+  # XXX osx on travis doesn't work w/ set -e, so turn it off :(
+  - set +e 
   - mkdir -p build || echo "Failed to mkdir build"
-  - ls
   - cd build || echo "Failed to cd build"
-  - pwd
   - cmake .. || echo "Failed to run cmake"
-  - echo "After cmake"
-  - pwd
 
 script:
   - make
