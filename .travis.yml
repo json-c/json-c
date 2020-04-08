@@ -124,10 +124,11 @@ before_install:
     fi
 
 before_script:
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-        brew install cmake;
-    fi
-  - mkdir build && cd build && cmake ..
+  - mkdir -p build || (echo "Failed to mkdir build" ; false)
+  - cd build || (echo "Failed to cd build" ; false)
+  - cmake .. || (echo "Failed to run cmake"; false)
+  - echo "After cmake"
+  - pwd
 
 script:
   - make
