@@ -125,6 +125,7 @@ before_install:
 
 before_script:
   # Wait a while for output to flush :(
+  - set +e
   - onexit() { sleep 20; }; trap onexit 0
   - pwd
   - mkdir -p build || echo "Failed to mkdir build"
