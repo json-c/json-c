@@ -104,7 +104,7 @@ matrix:
         - mkdir build && cd build && cmake ..
       script:
         - make
-        - make check
+        - make test
       after_success:
         - coveralls --exclude tests --exclude fuzz
 
@@ -124,6 +124,9 @@ before_install:
     fi
 
 before_script:
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+        brew install cmake;
+    fi
   - mkdir build && cd build && cmake ..
 
 script:
