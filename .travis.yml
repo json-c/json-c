@@ -13,6 +13,7 @@ matrix:
             - valgrind
             - cppcheck
             - doxygen
+            - cmake
       env: CHECK="true"
 #   bionic
     - os: linux
@@ -41,6 +42,7 @@ matrix:
             - llvm-toolchain-xenial-5.0
           packages:
             - clang-5.0
+            - cmake
       env: MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
     - os: linux
       dist: xenial
@@ -51,6 +53,7 @@ matrix:
             - llvm-toolchain-xenial-6.0
           packages:
             - clang-6.0
+            - cmake
       env: MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0" 
 
     # clang-7 is the default on xenial and bionic
@@ -63,6 +66,7 @@ matrix:
             - valgrind
             - cppcheck
             - doxygen
+            - cmake
       env: CHECK="true"
 
 # bionic
@@ -83,8 +87,6 @@ matrix:
       dist: xenial
       compiler: gcc
       env: CHECK="true"
-      install:
-        - sh autogen.sh
       before_install:
         - sudo pip install cpp-coveralls
         - echo $CC
@@ -99,7 +101,7 @@ matrix:
           fi
       before_script:
         - export CFLAGS="-fprofile-arcs -ftest-coverage"
-        - ./configure
+        - cmake .
       script:
         - make
         - make check
@@ -108,9 +110,6 @@ matrix:
 
 #  allow_failures:
 #    - os: osx
-
-install:
-  - sh autogen.sh
 
 before_install:
   - echo $CC
@@ -125,7 +124,7 @@ before_install:
     fi
 
 before_script:
-  - ./configure
+  - cmake .
 
 script:
   - make
