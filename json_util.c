@@ -39,11 +39,6 @@
 #endif /* HAVE_UNISTD_H */
 
 #ifdef WIN32
-#if MSC_VER < 1800
-/* strtoll/strtoull is available only since Visual Studio 2013 */
-#define strtoll _strtoi64
-#define strtoull _strtoui64
-#endif
 #define WIN32_LEAN_AND_MEAN
 #include <io.h>
 #include <windows.h>

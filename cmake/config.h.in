@@ -136,9 +136,16 @@
 #cmakedefine HAVE_VSYSLOG @HAVE_VSYSLOG@
 
 #cmakedefine HAVE_STRTOLL
-#cmakedefine strtoll @json_c_strtoll@
+#if !defined(HAVE_STRTOLL)
+#define strtoll @json_c_strtoll@
+/* #cmakedefine json_c_strtoll @json_c_strtoll@*/
+#endif
+
 #cmakedefine HAVE_STRTOULL
-#cmakedefine strtoull @json_c_strtoull@
+#if !defined(HAVE_STRTOULL)
+#define strtoull @json_c_strtoull@
+/* #cmakedefine json_c_strtoull @json_c_strtoull@ */
+#endif
 
 /* Have __thread */
 #cmakedefine HAVE___THREAD

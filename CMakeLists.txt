@@ -166,30 +166,27 @@ if (HAVE_SYSLOG_H)
     check_symbol_exists(vsyslog     "syslog.h" HAVE_VSYSLOG)
 endif()
 
-if (MSVC)
-    check_symbol_exists(strtoll     "stdlib.h" HAVE_STRTOLL)
-    check_symbol_exists(strtoull    "stdlib.h" HAVE_STRTOULL)
+check_symbol_exists(strtoll     "stdlib.h" HAVE_STRTOLL)
+check_symbol_exists(strtoull    "stdlib.h" HAVE_STRTOULL)
 
-    set(json_c_strtoll "strtoll")
-    if (NOT HAVE_STRTOLL)
-        # Use _strtoi64 if strtoll is not available.
-        check_symbol_exists(_strtoi64 "stdlib.h" __have_strtoi64)
-        if (__have_strtoi64)
-            set(HAVE_STRTOLL 1)
-            set(json_c_strtoll "_strtoi64")
-            # could do the same for strtoull, if needed
-        endif()
-    endif()
+set(json_c_strtoll "strtoll")
+if (NOT HAVE_STRTOLL)
+# Use _strtoi64 if strtoll is not available.
+check_symbol_exists(_strtoi64 "stdlib.h" __have_strtoi64)
+if (__have_strtoi64)
+    #set(HAVE_STRTOLL 1)
+    set(json_c_strtoll "_strtoi64")
+endif()
+endif()
 
-    set(json_c_strtoull "strtoull")
-    if (NOT HAVE_STRTOULL)
-        # Use _strtoui64 if strtoull is not available.
-        check_symbol_exists(_strtoui64 "stdlib.h" __have_strtoui64)
-        if (__have_strtoui64)
-            set(HAVE_STRTOULL 1)
-            set(json_c_strtoull "_strtoui64")
-        endif()
-    endif()
+set(json_c_strtoull "strtoull")
+if (NOT HAVE_STRTOULL)
+# Use _strtoui64 if strtoull is not available.
+check_symbol_exists(_strtoui64 "stdlib.h" __have_strtoui64)
+if (__have_strtoui64)
+    #set(HAVE_STRTOULL 1)
+    set(json_c_strtoull "_strtoui64")
+endif()
 endif()
 
 
