@@ -1,74 +1,86 @@
 
 Release checklist:
 
-release=0.14
-git clone https://github.com/json-c/json-c json-c-${release}
-cd json-c-${release}
+Figure out whether a release is worthwhile to do.
+Analyze the previous release branch to see if anything should have beeni
+  applied to master.
+Analyze APIs between previous release branch and master to produce list of
+  changes (added/removed/updated funcs, etc...), and detect backwards compat
+  issues.
+  If the new release is not backwards compatible, then this is a MAJOR release.
+Collect changes and assemble tentative release notes.
+	Identify previous release branch point
+	Check commit logs between previous branch point and now
+	Create a new issues_closed_for_X.Y.md file
+
+Update ChangeLog with relevant notes before branching.
 
 Check that the compile works on Linux
 Check that the compile works on NetBSD
 Check that the compile works on Windows
-Run "make distcheck" and fix any problems
-	 (e.g. adding new files to SOURCES variables in Makefile.am)
-Check ChangeLog to see if anything should be added.
+
+Start creating the new release:
+    release=0.14
+    git clone https://github.com/json-c/json-c json-c-${release}
+
+    mkdir distcheck
+    cd distcheck
+    # Note, the build directory *must* be entirely separate from
+    # the source tree for distcheck to work properly.
+    cmake ../json-c-${release}
+    make distcheck
+    cd ..
+
 Make any fixes/changes *before* branching.
 
-  git branch json-c-${release}
-  git checkout json-c-${release}
+    cd json-c-${release}
+    git branch json-c-${release}
+    git checkout json-c-${release}
 
 ------------
 
-Update the version in json_c_version.h
-Update the version in Doxyfile
-Update the version in configure.ac
-Update the version in CMakeLists.txt
-Update the version in config.h.win32
-	Use ${release}.
+Using ${release}:
+	Update the version in json_c_version.h
+	Update the version in Doxyfile (PROJECT_NUMBER)
+	Update the version in CMakeLists.txt (VERSION in the project(...) line)
+	Update the version in config.h.win32 (several places)
 
-Update the libjson_la_LDFLAGS line in Makefile.am to the new version.
-	Generally, unless we're doing a major release, change:
-		-version-info x:y:z
-	to
-		-version-info x:y+1:z
+Update the set_target_properties() line in CmakeLists.txt to set the shared
+library version.  Generally, unless we're doing a major release, change:
+	VERSION x.y.z
+to
+	VERSION x.y+1.z
 
-------------
-
-Generate the configure script and other files:
-  sh autogen.sh
-  git add -f Makefile.in aclocal.m4 config.guess config.h.in \
-       config.sub configure depcomp install-sh \
-       ltmain.sh missing tests/Makefile.in \
-       INSTALL compile test-driver
-
-  # check for anything else to be added:
-  git status --ignored
-  git commit
+    git commit -a -m "Bump version to ${release}"
 
 ------------
 
 Generate the doxygen documentation:
-  doxygen
-  git add -f doc
-  git commit doc
+
+    doxygen
+    git add -f doc
+    git commit doc
 
 ------------
 
-cd ..
-echo .git > excludes
-echo autom4te.cache >> excludes
-tar -czf json-c-${release}.tar.gz -X excludes json-c-${release}
+Create the release tarballs:
 
-echo doc >> excludes
-tar -czf json-c-${release}-nodoc.tar.gz -X excludes json-c-${release}
+    cd ..
+    echo .git > excludes
+    tar -czf json-c-${release}.tar.gz -X excludes json-c-${release}
+
+    echo doc >> excludes
+    tar -czf json-c-${release}-nodoc.tar.gz -X excludes json-c-${release}
 
 ------------
 
 Tag the branch:
-cd json-c-${release}
-git tag -a json-c-${release}-$(date +%Y%m%d) -m "Release json-c-${release}"
 
-git push origin json-c-${release}
-git push --tags
+    cd json-c-${release}
+    git tag -a json-c-${release}-$(date +%Y%m%d) -m "Release json-c-${release}"
+
+    git push origin json-c-${release}
+    git push --tags
 
 ------------
 
@@ -85,48 +97,49 @@ Logout of Amazon S3, and verify that the files are visible.
 
 Post-release checklist:
 
-git checkout master
-Add new section to ChangeLog
-Update the version in json_c_version.h
-Update the version in Doxyfile
-Update the version in configure.ac
-Update the version in CMakeLists.txt
-Update the version in config.h.win32
-    Use ${release}.99 to indicate a version "newer" than anything on the branch.
+    git checkout master
 
-Update the libjson_la_LDFLAGS line in Makefile.am to match the release branch.
-	For more details see:
-	http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+Add new section to ChangeLog for ${release}+1
+
+Use ${release}.99 to indicate a version "newer" than anything on the branch:
+	Update the version in json_c_version.h
+	Update the version in Doxyfile
+	Update the version in CMakeLists.txt
+	Update the version in config.h.win32
+
+Update RELEASE_CHECKLIST.txt, set release=${release}+1
+
+Update the set_target_properties() line in CmakeLists.txt to match the release branch.
 
 ------------
 
 Update the gh-pages branch with new docs:
 
-cd json-c-${release}
-git checkout json-c-${release}
-cd ..
+    cd json-c-${release}
+    git checkout json-c-${release}
+    cd ..
 
-git clone -b gh-pages https://github.com/json-c/json-c json-c-pages
-cd json-c-pages
-mkdir json-c-${release}
-cp -R ../json-c-${release}/doc json-c-${release}/.
-git add json-c-${release}
-git commit
+    git clone -b gh-pages https://github.com/json-c/json-c json-c-pages
+    cd json-c-pages
+    mkdir json-c-${release}
+    cp -R ../json-c-${release}/doc json-c-${release}/.
+    git add json-c-${release}
+    git commit
 
-vi index.html
-    Add/change links to current release.
+    vi index.html
+    # Add/change links to current release.
 
-git commit index.html
+    git commit index.html
 
-git push
+    git push
 
 ------------
 
 Update checksums on wiki page.
 
-cd ..
-openssl sha -sha256 json-c*gz
-openssl md5 json-c*gz
+    cd ..
+    openssl sha -sha256 json-c*gz
+    openssl md5 json-c*gz
 
 Copy and paste this output into the wiki page at:
 	https://github.com/json-c/json-c/wiki
