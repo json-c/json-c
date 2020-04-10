@@ -356,7 +356,7 @@ if (DOXYGEN_FOUND)
 	add_custom_target(doc
 	COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_SOURCE_DIR}/Doxyfile
 		WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
-	
+
 	# request to configure the file
 	configure_file(Doxyfile Doxyfile)
 

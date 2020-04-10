@@ -11,7 +11,7 @@ spaces for continuation lines have been abandoned in favor of the
 convenience of using clang-format.
 Refer to the .clang-format file for details, and run the tool before commit:
 
-    clang-format -i somefile.c foo.h 
+    clang-format -i somefile.c foo.h
 
 For sections of code that would be significantly negatively impacted, surround
 them with magic comments to disable formatting:

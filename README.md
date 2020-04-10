@@ -143,9 +143,9 @@ cmake-configure can take a few options.
 
 | options | Description|
 | ---- | ---- |
-| prefix=PREFIX |  install architecture-independent files in PREFIX | 
+| prefix=PREFIX |  install architecture-independent files in PREFIX |
 | enable-threading |  Enable code to support partly multi-threaded use |
-| enable-rdrand | Enable RDRAND Hardware RNG Hash Seed generation on supported x86/x64 platforms. | 
+| enable-rdrand | Enable RDRAND Hardware RNG Hash Seed generation on supported x86/x64 platforms. |
 | enable-shared  |  build shared libraries [default=yes] |
 | enable-static  |  build static libraries [default=yes] |
 | disable-Bsymbolic |  Avoid linking with -Bsymbolic-function |
@@ -175,7 +175,7 @@ make test
 make USE_VALGRIND=0 test   # optionally skip using valgrind
 ```
 
-If a test fails, check `Testing/Temporary/LastTest.log`, 
+If a test fails, check `Testing/Temporary/LastTest.log`,
 `tests/testSubDir/${testname}/${testname}.vg.out`, and other similar files.
 If there is insufficient output try:
 ```sh

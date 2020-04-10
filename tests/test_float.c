@@ -1,4 +1,4 @@
-/* Copyright (C) 2016 by Rainer Gerhards 
+/* Copyright (C) 2016 by Rainer Gerhards
  * Released under ASL 2.0 */
 #include "config.h"
 #include "json_object.h"

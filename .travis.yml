@@ -20,7 +20,7 @@ matrix:
       dist: bionic
       compiler: gcc
       env: MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
-    
+
     # gcc 7 is the default on bionic
     - os: linux
       dist: bionic
@@ -31,7 +31,7 @@ matrix:
       compiler: gcc
       env: MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
 
-# clang      
+# clang
 #   xenial
     - os: linux
       dist: xenial
@@ -54,7 +54,7 @@ matrix:
           packages:
             - clang-6.0
             - cmake
-      env: MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0" 
+      env: MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0"
 
     # clang-7 is the default on xenial and bionic
     - os: linux
@@ -132,7 +132,7 @@ before_install:
 
 before_script:
   # XXX osx on travis doesn't work w/ set -e, so turn it off :(
-  - set +e 
+  - set +e
   - mkdir -p build || echo "Failed to mkdir build"
   - cd build || echo "Failed to cd build"
   - cmake .. || echo "Failed to run cmake"

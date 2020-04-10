@@ -25,7 +25,7 @@ typedef int(json_c_visit_userfunc)(json_object *jso, int flags, json_object *par
  * userfunc must return one of the defined return values, to indicate
  * whether and how to continue visiting nodes, or one of various ways to stop.
  *
- * Returns 0 if nodes were visited successfully, even if some were 
+ * Returns 0 if nodes were visited successfully, even if some were
  *  intentionally skipped due to what userfunc returned.
  * Returns <0 if an error occurred during iteration, including if
  *  userfunc returned JSON_C_VISIT_RETURN_ERROR.
@@ -58,7 +58,7 @@ JSON_EXPORT int json_c_visit(json_object *jso, int future_flags, json_c_visit_us
  * This json_c_visit_userfunc return value indicates that iteration
  * of the fields/elements of the <b>containing</b> object should stop
  * and continue "popped up" a level of the object hierarchy.
- * For example, returning this when handling arg will result in 
+ * For example, returning this when handling arg will result in
  * arg3 and any other fields being skipped.   The next call to userfunc
  * will be the JSON_C_VISIT_SECOND call on "foo", followed by a userfunc
  * call on "bar".
