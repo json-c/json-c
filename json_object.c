@@ -1501,7 +1501,7 @@ int json_c_shallow_copy_default(json_object *src, json_object *parent, const cha
 		case json_object_int_type_uint64:
 			*dst = json_object_new_uint64(src->o.c_int.cint.c_uint64);
 			break;
-		default: assert(!"invalid cint_type");
+		default: json_abort("invalid cint_type");
 		}
 		break;
 
