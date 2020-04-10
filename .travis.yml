@@ -151,4 +151,3 @@ script:
       make distcheck;
       if type cppcheck &> /dev/null ; then cppcheck --error-exitcode=1 --quiet *.h *.c tests/ ; fi;
     fi
-
