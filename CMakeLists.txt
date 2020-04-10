@@ -271,7 +271,7 @@ if (NOT ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC"))
 	endif()
 
 	if (DISABLE_BSYMBOLIC STREQUAL "OFF")
-		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKED_FLAGS} -Wl,-Bsymbolic-functions")
+		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-Bsymbolic-functions")
 		# XXX need cmake>=3.13 for this:
 		#add_link_options("-Wl,-Bsymbolic-functions")
 	endif()
