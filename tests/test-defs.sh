@@ -90,7 +90,7 @@ run_output_test()
 	fi
 	TEST_COMMAND="$1"
 	shift
-	if [ -z "${TEST_OUTPUT}" ] ; then	
+	if [ -z "${TEST_OUTPUT}" ] ; then
 		TEST_OUTPUT=${TEST_COMMAND}
 	fi
 

@@ -197,7 +197,7 @@ int json_object_put(struct json_object *jso)
 
 #if defined(HAVE_ATOMIC_BUILTINS) && defined(ENABLE_THREADING)
 	/* Note: this only allow the refcount to remain correct
-	 * when multiple threads are adjusting it.  It is still an error 
+	 * when multiple threads are adjusting it.  It is still an error
 	 * for a thread to decrement the refcount if it doesn't "own" it,
 	 * as that can result in the thread that loses the race to 0
 	 * operating on an already-freed object.

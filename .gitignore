@@ -42,6 +42,7 @@
 /tests/*.trs
 
 # Generated folders
+/build
 /Debug
 /Release
 /*/Debug
@@ -86,4 +87,3 @@
 /libjson-c.a
 /libjson-c.so
 /libjson-c.so.*
-
