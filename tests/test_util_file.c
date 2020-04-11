@@ -138,6 +138,12 @@ int main(int argc, char **argv)
 	}
 	testdir = argv[1];
 
+	//	Test json_c_version.c
+	if (strncmp(json_c_version(), JSON_C_VERSION, sizeof(JSON_C_VERSION)))
+		return EXIT_FAILURE;
+	if (json_c_version_num() != JSON_C_VERSION_NUM)
+		return EXIT_FAILURE;
+
 	test_read_valid_with_fd(testdir);
 	test_read_valid_nested_with_fd(testdir);
 	test_read_nonexistant();
