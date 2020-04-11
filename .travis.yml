@@ -135,11 +135,7 @@ before_script:
   - set +e 
   - mkdir -p build || echo "Failed to mkdir build"
   - cd build || echo "Failed to cd build"
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-       cmake -DDISABLE_BSYMBOLIC=ON .. ;
-    else 
-       cmake .. ;
-    fi || echo "Failed to run cmake"
+  - cmake .. || echo "Failed to run cmake"
 
 script:
   - make

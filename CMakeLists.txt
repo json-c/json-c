@@ -270,8 +270,21 @@ if (NOT ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC"))
 		add_compile_options("-D_REENTRANT")
 	endif()
 
-	if (DISABLE_BSYMBOLIC STREQUAL "OFF")
-		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKED_FLAGS} -Wl,-Bsymbolic-functions")
+	# OSX Mach-O doesn't support linking with '-Bsymbolic-functions'.
+	# Others may not support it, too.
+	list(APPEND CMAKE_REQUIRED_LIBRARIES "-Wl,-Bsymbolic-functions")
+	check_c_source_compiles(
+	[=[
+	int main ()
+	{
+	  return 0;
+	}
+	]=]
+	BSYMBOLIC_WORKS
+	)
+	list(REMOVE_ITEM CMAKE_REQUIRED_LIBRARIES "-Wl,-Bsymbolic-functions")
+	if (DISABLE_BSYMBOLIC STREQUAL "OFF" AND BSYMBOLIC_WORKS)
+		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-Bsymbolic-functions")
 		# XXX need cmake>=3.13 for this:
 		#add_link_options("-Wl,-Bsymbolic-functions")
 	endif()
@@ -341,8 +354,8 @@ option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation(
 if (DOXYGEN_FOUND)
 
 	add_custom_target(doc
-  	COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+	COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_SOURCE_DIR}/Doxyfile
+		WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 	
 	# request to configure the file
 	configure_file(Doxyfile Doxyfile)
