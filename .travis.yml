@@ -86,9 +86,13 @@ matrix:
     - os: linux
       dist: xenial
       compiler: gcc
+      addons:
+        apt:
+          packages:
+            - lcov
       env: CHECK="true"
       before_install:
-        - sudo pip install cpp-coveralls
+        - sudo gem install coveralls-lcov
         - echo $CC
         - echo $LANG
         - echo $LC_ALL
@@ -106,7 +110,10 @@ matrix:
         - make
         - make test
       after_success:
-        - coveralls --exclude tests --exclude fuzz
+        - cd ..
+        - lcov -d build/ -b . -c -o build/all_coverage.info
+        - lcov -r build/all_coverage.info '/usr/*' '*CMakeFiles*' '*fuzz*' '*test*' -o build/coverage.info
+        - coveralls-lcov --verbose build/coverage.info
 
 #  allow_failures:
 #    - os: osx
