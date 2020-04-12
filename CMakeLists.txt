@@ -423,7 +423,7 @@ if (UNIX OR MINGW OR CYGWIN)
     SET(includedir ${CMAKE_INSTALL_FULL_INCLUDEDIR})
     SET(VERSION ${PROJECT_VERSION})
     configure_file(json-c.pc.in json-c.pc @ONLY)
-    set(INSTALL_PKGCONFIG_DIR "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" CACHE PATH "Installation directory for pkgconfig (.pc) files")
+    set(INSTALL_PKGCONFIG_DIR "${CMAKE_INSTALL_LIBDIR}/pkgconfig" CACHE PATH "Installation directory for pkgconfig (.pc) files")
     install(FILES ${PROJECT_BINARY_DIR}/json-c.pc DESTINATION "${INSTALL_PKGCONFIG_DIR}")
 endif ()
 
