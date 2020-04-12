@@ -140,9 +140,17 @@ int main(int argc, char **argv)
 
 	//	Test json_c_version.c
 	if (strncmp(json_c_version(), JSON_C_VERSION, sizeof(JSON_C_VERSION)))
+	{
+		printf("FAIL: Output from json_c_version(): %s "
+			"does not match %s", json_c_version(), JSON_C_VERSION);
 		return EXIT_FAILURE;
+	}
 	if (json_c_version_num() != JSON_C_VERSION_NUM)
+	{
+		printf("FAIL: Output from json_c_version_num(): %d "
+			"does not match %d", json_c_version_num(), JSON_C_VERSION_NUM);
 		return EXIT_FAILURE;
+	}
 
 	test_read_valid_with_fd(testdir);
 	test_read_valid_nested_with_fd(testdir);
