@@ -1373,7 +1373,7 @@ static int json_array_equal(struct json_object *jso1, struct json_object *jso2)
 	return 1;
 }
 
-struct json_object *json_object_new_null()
+struct json_object *json_object_new_null(void)
 {
 	return NULL;
 }
