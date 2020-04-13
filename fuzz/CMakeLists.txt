@@ -3,29 +3,22 @@
 enable_language(CXX)
 
 include_directories(PUBLIC ${CMAKE_SOURCE_DIR})
+include_directories(PUBLIC ${PROJECT_BINARY_DIR})
+
+if(DEFINED ENV{LIB_FUZZING_ENGINE})
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} $ENV{LIB_FUZZING_ENGINE}")
+        set(fuzzing_engine "")
+else()
+        add_library(fuzzing_engine standalone_runner.cc)
+        set(fuzzing_engine fuzzing_engine)
+endif()
 
 foreach(FUZZERNAME
 	tokener_parse_ex_fuzzer)
 
-	add_executable(${FUZZERNAME}
-		${FUZZERNAME}.cc)
+	add_executable(${FUZZERNAME} ${FUZZERNAME}.cc)
+	target_link_libraries(${FUZZERNAME}
+		json-c
+		${fuzzing_engine})
 
-	target_include_directories(${FUZZERNAME}
-		PUBLIC
-		${PROJECT_BINARY_DIR})
-
-	set_target_properties(${FUZZERNAME} PROPERTIES CXX_STANDARD 11)
-
-	# define whether we want to use the standalone runner for our own testing or
-	# link against libFuzzer populated from env variables
-	if (NOT DEFINED $ENV{LIB_FUZZING_ENGINE})
-		add_library(standalone_runner standalone_runner.cc)
-		target_link_libraries(${FUZZERNAME}
-			json-c
-			standalone_runner)
-	else()
-		target_link_libraries(${FUZZERNAME}
-			json-c
-			${LIB_FUZZING_ENGINE})
-	endif()
 endforeach(FUZZERNAME)
