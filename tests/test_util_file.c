@@ -14,9 +14,9 @@
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif /* HAVE_UNISTD_H */
+#include <assert.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <assert.h>
 
 #include "json.h"
 #include "json_util.h"
@@ -88,14 +88,14 @@ static void test_write_to_file()
 	json_object_to_file_ext(outfile4, jso, JSON_C_TO_STRING_PRETTY);
 	json_object *new_jso = NULL;
 	assert(-1 == json_object_to_file(outfile4, new_jso));
-	d = open(outfile4, O_WRONLY|O_CREAT, 0600);
+	d = open(outfile4, O_WRONLY | O_CREAT, 0600);
 	if (d < 0)
 	{
 		printf("FAIL: unable to open %s %s\n", outfile4, strerror(errno));
 		return;
 	}
 	assert(-1 == json_object_to_fd(d, new_jso, JSON_C_TO_STRING_PRETTY));
-	close(d);	
+	close(d);
 
 	json_object_put(jso);
 	json_object_put(new_jso);
@@ -160,13 +160,15 @@ int main(int argc, char **argv)
 	if (strncmp(json_c_version(), JSON_C_VERSION, sizeof(JSON_C_VERSION)))
 	{
 		printf("FAIL: Output from json_c_version(): %s "
-			"does not match %s", json_c_version(), JSON_C_VERSION);
+		       "does not match %s",
+		       json_c_version(), JSON_C_VERSION);
 		return EXIT_FAILURE;
 	}
 	if (json_c_version_num() != JSON_C_VERSION_NUM)
 	{
 		printf("FAIL: Output from json_c_version_num(): %d "
-			"does not match %d", json_c_version_num(), JSON_C_VERSION_NUM);
+		       "does not match %d",
+		       json_c_version_num(), JSON_C_VERSION_NUM);
 		return EXIT_FAILURE;
 	}
 
@@ -300,16 +302,14 @@ static void test_read_fd_equal(const char *testdir)
 {
 	char filename[PATH_MAX];
 	(void)snprintf(filename, sizeof(filename), "%s/valid_nested.json", testdir);
-	
+
 	json_object *jso = json_object_from_file(filename);
 
 	assert(NULL == json_type_to_name(20));
 	int d = open(filename, O_RDONLY, 0);
 	if (d < 0)
-	{	
-		fprintf(stderr,
-			"FAIL: unable to open %s: %s\n",
-			filename, strerror(errno));
+	{
+		fprintf(stderr, "FAIL: unable to open %s: %s\n", filename, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 	json_object *new_jso = json_object_from_fd(d);

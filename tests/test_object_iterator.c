@@ -1,11 +1,11 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include "config.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "json_object.h"
-#include "json_tokener.h"
 #include "json_object_iterator.h"
+#include "json_tokener.h"
 
 int main(int atgc, char **argv)
 {
@@ -28,9 +28,10 @@ int main(int atgc, char **argv)
 	it = json_object_iter_begin(new_obj);
 	itEnd = json_object_iter_end(new_obj);
 
-	while (!json_object_iter_equal(&it,&itEnd)) {
-		printf("%s\n",json_object_iter_peek_name(&it));
-		printf("%s\n",json_object_to_json_string(json_object_iter_peek_value(&it)));
+	while (!json_object_iter_equal(&it, &itEnd))
+	{
+		printf("%s\n", json_object_iter_peek_name(&it));
+		printf("%s\n", json_object_to_json_string(json_object_iter_peek_value(&it)));
 		json_object_iter_next(&it);
 	}
 
