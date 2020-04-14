@@ -940,7 +940,7 @@ JSON_EXPORT int json_object_set_string_len(json_object *obj, const char *new_val
  * along the lines of the other json_object_new_* functions.
  * It always returns NULL, and it is entirely acceptable to simply use NULL directly.
  */
-JSON_EXPORT struct json_object *json_object_new_null();
+JSON_EXPORT struct json_object *json_object_new_null(void);
 
 /** Check if two json_object's are equal
  *
