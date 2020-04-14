@@ -260,7 +260,7 @@ if (NOT ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC"))
 	/* uClibc toolchains without threading barf when _REENTRANT is defined */
 	#define _REENTRANT 1
 	#include <sys/types.h>
-	int main ()
+	int main (void)
 	{
 	  return 0;
 	}
@@ -276,7 +276,7 @@ if (NOT ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC"))
 	list(APPEND CMAKE_REQUIRED_LIBRARIES "-Wl,-Bsymbolic-functions")
 	check_c_source_compiles(
 	[=[
-	int main ()
+	int main (void)
 	{
 	  return 0;
 	}
