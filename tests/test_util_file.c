@@ -84,21 +84,7 @@ static void test_write_to_file()
 	if (rv == 0)
 		stat_and_cat(outfile3);
 
-	const char *outfile4 = "./test_cast.test";
-	json_object_to_file_ext(outfile4, jso, JSON_C_TO_STRING_PRETTY);
-	json_object *new_jso = NULL;
-	assert(-1 == json_object_to_file(outfile4, new_jso));
-	d = open(outfile4, O_WRONLY | O_CREAT, 0600);
-	if (d < 0)
-	{
-		printf("FAIL: unable to open %s %s\n", outfile4, strerror(errno));
-		return;
-	}
-	assert(-1 == json_object_to_fd(d, new_jso, JSON_C_TO_STRING_PRETTY));
-	close(d);
-
 	json_object_put(jso);
-	json_object_put(new_jso);
 }
 
 static void stat_and_cat(const char *file)
@@ -141,8 +127,6 @@ int main(int argc, char **argv)
 	//	json_object_to_file(file, obj);
 	//	json_object_to_file_ext(file, obj, flags);
 
-	_json_c_strerror(0);
-	json_util_get_last_err();
 	_json_c_strerror_enable = 1;
 
 	const char *testdir;
@@ -305,7 +289,6 @@ static void test_read_fd_equal(const char *testdir)
 
 	json_object *jso = json_object_from_file(filename);
 
-	assert(NULL == json_type_to_name(20));
 	int d = open(filename, O_RDONLY, 0);
 	if (d < 0)
 	{
