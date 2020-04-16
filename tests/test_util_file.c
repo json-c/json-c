@@ -14,6 +14,7 @@
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif /* HAVE_UNISTD_H */
+#include <assert.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -28,6 +29,7 @@ static void test_read_closed(void);
 
 static void test_write_to_file();
 static void stat_and_cat(const char *file);
+static void test_read_fd_equal(const char *testdir);
 
 #ifndef PATH_MAX
 #define PATH_MAX 256
@@ -142,13 +144,15 @@ int main(int argc, char **argv)
 	if (strncmp(json_c_version(), JSON_C_VERSION, sizeof(JSON_C_VERSION)))
 	{
 		printf("FAIL: Output from json_c_version(): %s "
-			"does not match %s", json_c_version(), JSON_C_VERSION);
+		       "does not match %s",
+		       json_c_version(), JSON_C_VERSION);
 		return EXIT_FAILURE;
 	}
 	if (json_c_version_num() != JSON_C_VERSION_NUM)
 	{
 		printf("FAIL: Output from json_c_version_num(): %d "
-			"does not match %d", json_c_version_num(), JSON_C_VERSION_NUM);
+		       "does not match %d",
+		       json_c_version_num(), JSON_C_VERSION_NUM);
 		return EXIT_FAILURE;
 	}
 
@@ -157,6 +161,7 @@ int main(int argc, char **argv)
 	test_read_nonexistant();
 	test_read_closed();
 	test_write_to_file();
+	test_read_fd_equal(testdir);
 	return EXIT_SUCCESS;
 }
 
@@ -196,6 +201,7 @@ static void test_read_valid_nested_with_fd(const char *testdir)
 		fprintf(stderr, "FAIL: unable to open %s: %s\n", filename, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
+	assert(NULL == json_object_from_fd_ex(d, -2));
 	json_object *jso = json_object_from_fd_ex(d, 20);
 	if (jso != NULL)
 	{
@@ -274,4 +280,26 @@ static void test_read_closed()
 	printf("OK: json_object_from_fd(closed_fd), "
 	       "expecting NULL, EBADF, got:NULL, %s\n",
 	       json_util_get_last_err());
+}
+
+static void test_read_fd_equal(const char *testdir)
+{
+	char filename[PATH_MAX];
+	(void)snprintf(filename, sizeof(filename), "%s/valid_nested.json", testdir);
+
+	json_object *jso = json_object_from_file(filename);
+
+	int d = open(filename, O_RDONLY, 0);
+	if (d < 0)
+	{
+		fprintf(stderr, "FAIL: unable to open %s: %s\n", filename, strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+	json_object *new_jso = json_object_from_fd(d);
+	close(d);
+
+	printf("OK: json_object_from_file(valid.json)=%s\n", json_object_to_json_string(jso));
+	printf("OK: json_object_from_fd(valid.json)=%s\n", json_object_to_json_string(new_jso));
+	json_object_put(jso);
+	json_object_put(new_jso);
 }

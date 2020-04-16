@@ -33,7 +33,8 @@ foreach(TESTNAME
 	test_set_serializer
 	test_set_value
 	test_util_file
-	test_visit)
+	test_visit
+	test_object_iterator)
 
 add_executable(${TESTNAME} ${TESTNAME}.c)
 add_test(NAME ${TESTNAME} COMMAND ${PROJECT_SOURCE_DIR}/tests/${TESTNAME}.test)

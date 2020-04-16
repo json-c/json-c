@@ -36,3 +36,5 @@ file[json3.out], size=703, contents={
   "foo8":"abcdefghijklmnopqrstuvwxyz",
   "foo9":"abcdefghijklmnopqrstuvwxyz"
 }{"foo":1234,"foo1":"abcdefghijklmnopqrstuvwxyz","foo2":"abcdefghijklmnopqrstuvwxyz","foo3":"abcdefghijklmnopqrstuvwxyz","foo4":"abcdefghijklmnopqrstuvwxyz","foo5":"abcdefghijklmnopqrstuvwxyz","foo6":"abcdefghijklmnopqrstuvwxyz","foo7":"abcdefghijklmnopqrstuvwxyz","foo8":"abcdefghijklmnopqrstuvwxyz","foo9":"abcdefghijklmnopqrstuvwxyz"}
+OK: json_object_from_file(valid.json)={ "foo": 123, "obj2": { "obj3": { "obj4": { "foo": 999 } } } }
+OK: json_object_from_fd(valid.json)={ "foo": 123, "obj2": { "obj3": { "obj4": { "foo": 999 } } } }
