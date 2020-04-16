@@ -84,15 +84,20 @@ typedef int(lh_equal_fn)(const void *k1, const void *k2);
  */
 struct lh_entry
 {
+
 	/**
-	 * The key.  Use lh_entry_k() instead of accessing this directly.
+	 *The hash. Use to determine the position of the entry in the array.
 	 */
-	const void *k;
+	uint32_t hash;
 	/**
 	 * A flag for users of linkhash to know whether or not they
 	 * need to free k.
 	 */
 	int k_is_constant;
+	/**
+	 * The key.  Use lh_entry_k() instead of accessing this directly.
+	 */
+	const void *k;
 	/**
 	 * The value.  Use lh_entry_v() instead of accessing this directly.
 	 */
