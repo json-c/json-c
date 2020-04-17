@@ -15,13 +15,22 @@
 #
 ################################################################################
 # this is expected to be run only by oss-fuzz. It will run from $SRC (above json-c)
-cp $SRC/json-c/fuzz/*.dict $OUT/
+cp $SRC/json-c/fuzz/*.dict "$OUT/"
 
 BUILD="$SRC/json-c/build"
 
-mkdir $BUILD
-cd $BUILD
+zip -j "$SRC/corpus.zip" "$SRC/go-fuzz-corpus/json/corpus"
+
+mkdir "$BUILD"
+cd "$BUILD"
 cmake -DCMAKE_C_FLAGS="$CFLAGS" -DCMAKE_CXX_FLAGS="$CXXFLAGS" -DBUILD_SHARED_LIBS=OFF ..
 make -j$(nproc)
-cp fuzz/*_fuzzer $OUT/
+cp fuzz/*_fuzzer "$OUT/"
 
+fuzzerFiles=$(find fuzz/ -name "*_fuzzer")
+
+for F in $fuzzerFiles; do
+	FN=$(basename -- $F)
+	cp "$SRC/corpus.zip" "$OUT/${FN}_seed_corpus.zip"
+done
+# for fuzzer in fuzz copy the json corpus as a zip file

@@ -5,21 +5,32 @@ enable_language(CXX)
 include_directories(PUBLIC ${CMAKE_SOURCE_DIR})
 include_directories(PUBLIC ${PROJECT_BINARY_DIR})
 
+# This sets up either the standalone runner or the user supplied libfuzzing
+# engine. We're using the standalone runner for unit testing alone at the
+# moment to make the sure the fuzzer builds and runs appropriately.
 if(DEFINED ENV{LIB_FUZZING_ENGINE})
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} $ENV{LIB_FUZZING_ENGINE}")
-        set(fuzzing_engine "")
+        set(FUZZING_ENGINE "")
 else()
         add_library(fuzzing_engine standalone_runner.cc)
-        set(fuzzing_engine fuzzing_engine)
+        set(FUZZING_ENGINE fuzzing_engine)
 endif()
 
 foreach(FUZZERNAME
+	bad_fuzzer
 	tokener_parse_ex_fuzzer)
 
 	add_executable(${FUZZERNAME} ${FUZZERNAME}.cc)
 	target_link_libraries(${FUZZERNAME}
 		json-c
-		${fuzzing_engine})
+		${FUZZING_ENGINE})
 
-	add_test(NAME test_${FUZZERNAME} COMMAND ${CMAKE_BINARY_DIR}/fuzz/${FUZZERNAME} ${CMAKE_SOURCE_DIR}/fuzz/tests/valid.json)
+	file(GLOB TESTFILES "${CMAKE_SOURCE_DIR}/fuzz/tests/*.json")
+	foreach(TESTFILE ${TESTFILES})
+		get_filename_component(FILENAME ${TESTFILE} NAME_WE)
+		add_test(NAME test_${FUZZERNAME}_${FILENAME}
+			COMMAND ${CMAKE_BINARY_DIR}/fuzz/${FUZZERNAME}
+			${TESTFILE})
+
+	endforeach(TESTFILE)
 endforeach(FUZZERNAME)
