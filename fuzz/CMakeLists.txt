@@ -21,4 +21,5 @@ foreach(FUZZERNAME
 		json-c
 		${fuzzing_engine})
 
+	add_test(NAME test_${FUZZERNAME} COMMAND ${CMAKE_BINARY_DIR}/fuzz/${FUZZERNAME} ${CMAKE_SOURCE_DIR}/fuzz/tests/valid.json)
 endforeach(FUZZERNAME)
