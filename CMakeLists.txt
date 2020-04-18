@@ -40,6 +40,15 @@ if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING AND
 add_subdirectory(tests)
 endif()
 
+# Library version and SONAME.
+# SOVERSION and the major library VERSION need to be in lockstep.
+# Major library version: Bump this, when interfaces are removed
+# from the API.
+set(LIB_VERSION_MAJOR    4)
+# Library revision: Bump this, when new interfaces are added to
+# the API.  Reset to 0, in case of bumping the major version!
+set(LIB_VERSION_REVISION 0)
+
 # Set some packaging variables.
 set(CPACK_PACKAGE_NAME              "${PROJECT_NAME}")
 set(CPACK_PACKAGE_VERSION_MAJOR     "${PROJECT_VERSION_MAJOR}")
@@ -381,8 +390,8 @@ add_library(${PROJECT_NAME}
     ${JSON_C_HEADERS}
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    VERSION 4.0.0
-    SOVERSION 4)
+    VERSION ${LIB_VERSION_MAJOR}.${LIB_VERSION_REVISION}.0
+    SOVERSION ${LIB_VERSION_MAJOR})
 
 # If json-c is used as subroject it set to target correct interface -I flags and allow
 # to build external target without extra include_directories(...)
