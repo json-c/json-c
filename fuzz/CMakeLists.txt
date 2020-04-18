@@ -1,6 +1,7 @@
 # https://cmake.org/cmake/help/v3.0/command/add_test.html
 # https://pabloariasal.github.io/2018/02/19/its-time-to-do-cmake-right/
 enable_language(CXX)
+set (CMAKE_CXX_STANDARD 11)
 
 include_directories(PUBLIC ${CMAKE_SOURCE_DIR})
 include_directories(PUBLIC ${PROJECT_BINARY_DIR})
