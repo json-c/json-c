@@ -297,9 +297,3 @@ const char *json_type_to_name(enum json_type o_type)
 	return json_type_name[o_type];
 }
 
-void json_abort(const char *message)
-{
-	if (message != NULL)
-		fprintf(stderr, "json-c aborts with error: %s\n", message);
-	abort();
-}

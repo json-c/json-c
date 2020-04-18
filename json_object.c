@@ -55,6 +55,24 @@ static json_object_to_json_string_fn json_object_string_to_json_string;
 static json_object_to_json_string_fn json_object_array_to_json_string;
 static json_object_to_json_string_fn _json_object_userdata_to_json_string;
 
+#ifndef JSON_NORETURN
+#if defined(_MSC_VER)
+#define JSON_NORETURN __declspec(noreturn)
+#else
+/* 'cold' attribute is for optimization, telling the computer this code
+ * path is unlikely.
+ */
+#define JSON_NORETURN __attribute__((noreturn, cold))
+#endif
+#endif
+/**
+ * Abort and optionally print a message on standard error.
+ * This should be used rather than assert() for unconditional abortion
+ * (in particular for code paths which are never supposed to be run).
+ * */
+JSON_NORETURN static void json_abort(const char *message);
+
+
 /* ref count debugging */
 
 #ifdef REFCOUNT_DEBUG
@@ -1630,4 +1648,11 @@ int json_object_deep_copy(struct json_object *src, struct json_object **dst,
 	}
 
 	return rc;
+}
+
+static void json_abort(const char *message)
+{
+	if (message != NULL)
+		fprintf(stderr, "json-c aborts with error: %s\n", message);
+	abort();
 }
