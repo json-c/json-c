@@ -139,9 +139,10 @@ typedef struct json_tokener json_tokener;
 #define JSON_TOKENER_STRICT 0x01
 
 /**
- * Allow json_tokener_parse_ex() validate utf-8 char.
- * The json_tokener_validate_utf8() validate one utf8 char
- * after get one char, then begin to parse it.
+ * Cause json_tokener_parse_ex() to validate that input is UTF8.
+ * If this flag is specified and validation fails, then
+ * json_tokener_get_error(tok) will return
+ * json_tokener_error_parse_utf8_string
  *
  * This flag is not set by default.
  *
@@ -176,11 +177,6 @@ JSON_EXPORT struct json_object *json_tokener_parse(const char *str);
 JSON_EXPORT struct json_object *json_tokener_parse_verbose(const char *str,
                                                            enum json_tokener_error *error);
 
-/**
- * validete the utf-8 string in strict model.
- * if not utf-8 format, return err.
- */
-json_bool json_tokener_validate_utf8(const char c, unsigned int *nBytes);
 /**
  * Set flags that control how parsing will be done.
  */

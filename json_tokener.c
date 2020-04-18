@@ -89,6 +89,13 @@ static const char *json_tokener_errors[] = {
 };
 /* clang-format on */
 
+/**
+ * validete the utf-8 string in strict model.
+ * if not utf-8 format, return err.
+ */
+static json_bool json_tokener_validate_utf8(const char c, unsigned int *nBytes);
+
+
 const char *json_tokener_error_desc(enum json_tokener_error jerr)
 {
 	int jerr_int = (int)jerr;
@@ -1160,7 +1167,7 @@ out:
 	return NULL;
 }
 
-json_bool json_tokener_validate_utf8(const char c, unsigned int *nBytes)
+static json_bool json_tokener_validate_utf8(const char c, unsigned int *nBytes)
 {
 	unsigned char chr = c;
 	if (*nBytes == 0)
