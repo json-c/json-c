@@ -200,3 +200,4 @@ Issues and Pull Requests closed for the 0.14 release (since commit d582d3a(2017-
 [Issue #579](https://github.com/json-c/json-c/issues/579) - Enforce strict prototypes. \
 [Issue #580](https://github.com/json-c/json-c/issues/580) - Fix CMake tests for enforced strict prototypes. \
 [Issue #581](https://github.com/json-c/json-c/issues/581) - CMakeLists: do not enforce strict prototypes on Windows. \
+[Issue #584](https://github.com/json-c/json-c/issues/584) - CMake: SOVERSION and the major library VERSION need to be in lockstep. \
