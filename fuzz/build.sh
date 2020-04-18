@@ -33,4 +33,3 @@ for F in $fuzzerFiles; do
 	FN=$(basename -- $F)
 	cp "$SRC/corpus.zip" "$OUT/${FN}_seed_corpus.zip"
 done
-# for fuzzer in fuzz copy the json corpus as a zip file

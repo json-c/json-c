@@ -17,7 +17,6 @@ else()
 endif()
 
 foreach(FUZZERNAME
-	bad_fuzzer
 	tokener_parse_ex_fuzzer)
 
 	add_executable(${FUZZERNAME} ${FUZZERNAME}.cc)
