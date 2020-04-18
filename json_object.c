@@ -72,7 +72,6 @@ static json_object_to_json_string_fn _json_object_userdata_to_json_string;
  * */
 JSON_NORETURN static void json_abort(const char *message);
 
-
 /* ref count debugging */
 
 #ifdef REFCOUNT_DEBUG

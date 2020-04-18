@@ -296,4 +296,3 @@ const char *json_type_to_name(enum json_type o_type)
 	}
 	return json_type_name[o_type];
 }
-
