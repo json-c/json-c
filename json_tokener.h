@@ -43,6 +43,9 @@ enum json_tokener_error
 	json_tokener_error_size
 };
 
+/**
+ * @deprecated Don't use this outside of json_tokener.c, it will be made private in a future release.
+ */
 enum json_tokener_state
 {
 	json_tokener_state_eatws,
@@ -72,6 +75,9 @@ enum json_tokener_state
 	json_tokener_state_inf
 };
 
+/**
+ * @deprecated Don't use this outside of json_tokener.c, it will be made private in a future release.
+ */
 struct json_tokener_srec
 {
 	enum json_tokener_state state, saved_state;
@@ -91,13 +97,19 @@ struct json_tokener_srec
  */
 struct json_tokener
 {
+	/**
+	 * @deprecated Do not access any of these fields outside of json_tokener.c
+	 */
 	char *str;
 	struct printbuf *pb;
 	int max_depth, depth, is_double, st_pos;
 	/**
-	 * See json_tokener_get_parse_end()
+	 * @deprecated See json_tokener_get_parse_end() instead.
 	 */
 	int char_offset;
+	/**
+	 * @deprecated See json_tokener_get_error() instead.
+	 */
 	enum json_tokener_error err;
 	unsigned int ucs_char;
 	char quote_char;
