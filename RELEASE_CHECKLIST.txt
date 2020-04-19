@@ -31,7 +31,7 @@
 ## Release creation
 
 Start creating the new release:
-    release=0.14
+    release=0.15
     git clone https://github.com/json-c/json-c json-c-${release}
 
     mkdir distcheck

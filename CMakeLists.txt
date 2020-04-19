@@ -7,7 +7,7 @@ if(POLICY CMP0048)
 endif()
 
 # JSON-C library is C only project.
-project(json-c LANGUAGES C VERSION 0.13.99)
+project(json-c LANGUAGES C VERSION 0.14.99)
 
 # If we've got 3.0 then it's good, let's provide support. Otherwise, leave it be.
 if(POLICY CMP0038)
@@ -381,8 +381,8 @@ add_library(${PROJECT_NAME}
     ${JSON_C_HEADERS}
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    VERSION 4.0.0
-    SOVERSION 4)
+    VERSION 5.0.0
+    SOVERSION 5)
 
 # If json-c is used as subroject it set to target correct interface -I flags and allow
 # to build external target without extra include_directories(...)
