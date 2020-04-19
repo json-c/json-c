@@ -1,23 +1,34 @@
 
-Release checklist:
+# Release checklist:
 
-Figure out whether a release is worthwhile to do.
-Analyze the previous release branch to see if anything should have beeni
+## Pre-release tasks
+
+* Figure out whether a release is worthwhile to do.
+* Analyze the previous release branch to see if anything should have been
   applied to master.
-Analyze APIs between previous release branch and master to produce list of
-  changes (added/removed/updated funcs, etc...), and detect backwards compat
-  issues.
-  If the new release is not backwards compatible, then this is a MAJOR release.
-Collect changes and assemble tentative release notes.
-	Identify previous release branch point
-	Check commit logs between previous branch point and now
-	Create a new issues_closed_for_X.Y.md file
+* Collect changes and assemble tentative release notes.
+    * Identify previous release branch point
+    * Check commit logs between previous branch point and now for
+       notable changes worth mentioning
+    * Create a new issues_closed_for_X.Y.md file
+        * Include notable entries from here in the release notes.
+    * Analyze APIs between previous release branch and master to produce list of
+      changes (added/removed/updated funcs, etc...), and detect backwards compat
+      issues.
+        * https://github.com/lvc/abi-compliance-checker
+        * If the new release is not backwards compatible, then this is a MAJOR release.
+        * Mention removed features in ChangeLog
+    * Update the AUTHORS file
+    * Exclude mentioning changes that have already been included in a point 
+      release of the previous release branch.
 
-Update ChangeLog with relevant notes before branching.
+* Update ChangeLog with relevant notes before branching.
 
-Check that the compile works on Linux
-Check that the compile works on NetBSD
-Check that the compile works on Windows
+* Check that the compile works on Linux - automatic through Travis
+* Check that the compile works on NetBSD
+* Check that the compile works on Windows - automatic through AppVeyor
+
+## Release creation
 
 Start creating the new release:
     release=0.14

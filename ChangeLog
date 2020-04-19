@@ -12,36 +12,6 @@ Deprecated and removed features:
 Build changes:
 --------------
 
-Contributors to this release
-----------------------------
-* Alexander Dahl <post@lespocky.de>
-* andy5995 <andy400-dev@yahoo.com>
-* Björn Esser <besser82@fedoraproject.org>
-* changyong guo <guo1487@163.com>
-* chenguoping <chenguopingdota@163.com>
-* Christopher Head <chead@chead.ca>
-* Chris Wolfe <chriswwolfe@gmail.com>
-* Darjan Krijan <darjan_krijan@gmx.de>
-* Eric Hawicz <erh+git@nimenees.com>
-* grdowns <grdowns@microsoft.com>
-* Ivan Romanov <drizt@land.ru>
-* Jaap Keuter <jaap.keuter@xs4all.nl>
-* janczer <menshikov.ivn@gmail.com>
-* Jehan <jehan@girinstud.io>
-* Jonathan Wiens <j.wiens@teles.com>
-* Jose Bollo <jose.bollo@iot.bzh>
-* Keith Holman <keith.holman@windriver.com>
-* Liang, Gao <liang.gao@intel.com>
-* max <mpano91@gmail.com>
-* myd7349 <myd7349@gmail.com>
-* Pierce Lopez <pierce.lopez@gmail.com>
-* Po-Chuan Hsieh <sunpoet@sunpoet.net>
-* Ramiro Polla <ramiro.polla@gmail.com>
-* Rikard Falkeborn <rikard.falkeborn@gmail.com>
-* Robert <roby_p97@yahoo.com>
-* Rubasri Kalidas <rubasri.kalidas@intel.com>
-* Unmanned Player <36690541+unmanned-player@users.noreply.github.com>
-
 
 0.13.1 (up to commit 0f814e5, 2018/03/04)
 =========================================
