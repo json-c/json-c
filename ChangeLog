@@ -1,6 +1,7 @@
 
-Next version, 0.14
-==================
+
+0.14 (up to commit 9ed00a6, 2020/04/14)
+=========================================
 
 Deprecated and removed features:
 --------------------------------
@@ -11,7 +12,71 @@ Deprecated and removed features:
 
 Build changes:
 --------------
+## Deprecated and removed features:
+* bits.h has been removed
+* lh_abort() has been removed
+* lh_table_lookup() has been removed, use lh_table_lookup_ex() instead.
+* Remove TRUE and FALSE defines, use 1 and 0 instead.
+* autoconf support, including autogen.sh, has been removed.  See details about cmake, below.
+* With the addition of json_tokener_get_parse_end(), access to internal fields of json_tokener, as well as use of many other symbols and types in json_tokener.h, is deprecated now.
+* The use of Android.configure.mk to build for Android no longer works, and it is unknown how (or if) the new cmake-based build machinery can be used.
+    * Reports of success, or pull requests to correct issues are welcome.
 
+## Notable improvements and new features
+
+### Builds and documentation
+* Build machinery has been switched to CMake.  See README.md for details about how to build.
+    * TL;DR: `mkdir build ; cd build ; cmake -DCMAKE_INSTALL_PREFIX=/some/path ../json-c ; make all test install`
+    * To ease the transition, there is a `cmake-configure` wrapper that emulates the old autoconf-based configure script.
+    * This has enabled improvements to the build on Windows system; also all public functions have been fixed to be properly exported.  For best results, use Visual Studio 2015 or newer.
+* The json-c style guide has been updated to specify the use of clang-format, and all code has been reformatted.
+    * Since many lines of code have trivial changes now, when using git blame, be sure to specify -w
+* Numerous improvements have been made to the documentation including function effects on refcounts, when passing a NULL is safe, and so on.
+
+### json_tokener changes
+* Added a json_tokener_get_parse_end() function to replace direct access of tok->char_offset.
+    * The char_offset field, and the rest of the json_tokener structure remain exposed for now, but expect a future release to hide it like is done with json_object_private.h
+* json_tokener_parse_ex() now accepts a new JSON_TOKENER_VALIDATE_UTF8 flag to validate that input is UTF8.
+    * If validation fails, json_tokener_get_error(tok) will return json_tokener_error_parse_utf8_string (see enum json_tokener_error).
+
+### Other changes and additions
+* Add support for unsigned 64-bit integers, uint64_t, to gain one extra bit of magnitude for positive ints.
+    * json_tokener will now parse values up to UINT64_MAX (18446744073709551615)
+    * Existing methods returning int32_t or int64_t will cap out-of-range values at INT32_MAX or INT64_MAX, preserving existing behavior.
+    * The implementation includes the possibility of easily extending this to larger sizes in the future.
+* A total of 7 new functions were added:
+    * json_object_get_uint64 ( struct json_object const* jso )
+    * json_object_new_uint64 ( uint64_t i )
+    * json_object_set_uint64 ( struct json_object* jso, uint64_t new_value )
+    * json_parse_uint64 ( char const* buf, uint64_t* retval )
+        * See description of uint64 support, above.
+    * json_tokener_get_parse_end ( struct json_tokener* tok )
+        * See details under "json_tokener changes", above.
+    * json_object_from_fd_ex ( int fd, int in_depth )
+        * Allows the max nesting depth to be specified.
+    * json_object_new_null ( )
+        * Simply returns NULL.  Its use is not recommended.
+* The size of struct json_object has decreased from 96 bytes to 88 bytes.
+
+### Testing
+* Many updates were made to test cases, increasing code coverage.
+* There is now a quick way (JSONC_TEST_TRACE=1) to turn on shell tracing in tests.
+* To run tests, use `make test`; the old "check" target no longer exists.
+
+## Significant bug fixes
+For the full list of issues and pull requests since the previous release, please see issues_closed_for_0.14.md
+
+* [Issue #389](https://github.com/json-c/json-c/issues/389): Add an assert to explicitly crash when _ref_count is corrupted, instead of a later "double free" error.
+* [Issue #407](https://github.com/json-c/json-c/issues/407): fix incorrect casts in calls to ctype functions (isdigit and isspace) so we don't crash when asserts are enabled on certain platforms and characters > 128 are parsed.
+* [Issue #418](https://github.com/json-c/json-c/issues/418): Fix docs for json_util_from_fd and json_util_from_file to say that they return NULL on failures.
+* [Issue #422](https://github.com/json-c/json-c/issues/422): json_object.c:set errno in json_object_get_double() when called on a json_type_string object with bad content.
+* [Issue #453](https://github.com/json-c/json-c/issues/453): Fixed misalignment in JSON serialization when JSON_C_TO_STRING_SPACED and JSON_C_TO_STRING_PRETTY are used together.
+* [Issue #463](https://github.com/json-c/json-c/issues/463): fix newlocale() call to use LC_NUMERIC_MASK instead of LC_NUMERIC, and remove incorrect comment.
+* [Issue #486](https://github.com/json-c/json-c/issues/486): append a missing ".0" to negative double values to ensure they are serialized as floating point numbers.
+* [Issue #488](https://github.com/json-c/json-c/issues/488): use JSON_EXPORT on functions so they are properly exported on Windows.
+* [Issue #539](https://github.com/json-c/json-c/issues/539): use an internal-only serializer function in json_object_new_double_s() to avoid potential conflicts with user code that uses the json_object_userdata_to_json_string serializer.
+
+***
 
 0.13.1 (up to commit 0f814e5, 2018/03/04)
 =========================================
