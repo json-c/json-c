@@ -21,7 +21,7 @@
 extern "C" {
 #endif
 
-#include "arraylist.h"
+#include "json_c_arraylist.h"
 #include "debug.h"
 #include "json_c_version.h"
 #include "json_object.h"

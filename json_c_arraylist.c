@@ -1,5 +1,5 @@
 /*
- * $Id: arraylist.c,v 1.4 2006/01/26 02:16:28 mclark Exp $
+ * $Id: json_c_arraylist.c,v 1.4 2006/01/26 02:16:28 mclark Exp $
  *
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
@@ -34,7 +34,7 @@
 #endif
 #endif
 
-#include "arraylist.h"
+#include "json_c_arraylist.h"
 
 struct array_list *array_list_new(array_list_free_fn *free_fn)
 {
