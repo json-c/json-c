@@ -55,7 +55,7 @@
 #include "json_object.h"
 #include "json_tokener.h"
 #include "json_util.h"
-#include "printbuf.h"
+#include "json_c_printbuf.h"
 
 static int _json_object_to_fd(int fd, struct json_object *obj, int flags, const char *filename);
 

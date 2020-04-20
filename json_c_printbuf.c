@@ -1,5 +1,5 @@
 /*
- * $Id: printbuf.c,v 1.5 2006/01/26 02:16:28 mclark Exp $
+ * $Id: json_c_printbuf.c,v 1.5 2006/01/26 02:16:28 mclark Exp $
  *
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
@@ -26,7 +26,7 @@
 #endif /* HAVE_STDARG_H */
 
 #include "json_c_debug.h"
-#include "printbuf.h"
+#include "json_c_printbuf.h"
 #include "snprintf_compat.h"
 #include "vasprintf_compat.h"
 

@@ -10,7 +10,7 @@
 #include <time.h>
 
 #include "json.h"
-#include "printbuf.h"
+#include "json_c_printbuf.h"
 
 static void do_benchmark(json_object *src1);
 

@@ -314,7 +314,7 @@ set(JSON_C_PUBLIC_HEADERS
     ${PROJECT_SOURCE_DIR}/json_util.h
     ${PROJECT_SOURCE_DIR}/json_visit.h
     ${PROJECT_SOURCE_DIR}/linkhash.h
-    ${PROJECT_SOURCE_DIR}/printbuf.h
+    ${PROJECT_SOURCE_DIR}/json_c_printbuf.h
 )
 
 set(JSON_C_HEADERS
@@ -341,7 +341,7 @@ set(JSON_C_SOURCES
     ${PROJECT_SOURCE_DIR}/json_util.c
     ${PROJECT_SOURCE_DIR}/json_visit.c
     ${PROJECT_SOURCE_DIR}/linkhash.c
-    ${PROJECT_SOURCE_DIR}/printbuf.c
+    ${PROJECT_SOURCE_DIR}/json_c_printbuf.c
     ${PROJECT_SOURCE_DIR}/random_seed.c
     ${PROJECT_SOURCE_DIR}/strerror_override.c
 )

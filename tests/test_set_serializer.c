@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "json.h"
-#include "printbuf.h"
+#include "json_c_printbuf.h"
 
 struct myinfo
 {

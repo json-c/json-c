@@ -32,7 +32,7 @@
 #include "json_object_private.h"
 #include "json_tokener.h"
 #include "json_util.h"
-#include "printbuf.h"
+#include "json_c_printbuf.h"
 #include "strdup_compat.h"
 
 #ifdef HAVE_LOCALE_H

@@ -35,7 +35,7 @@
 
 #include "json_inttypes.h"
 #include "json_types.h"
-#include "printbuf.h"
+#include "json_c_printbuf.h"
 
 #include <stddef.h>
 

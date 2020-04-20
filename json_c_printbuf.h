@@ -1,5 +1,5 @@
 /*
- * $Id: printbuf.h,v 1.4 2006/01/26 02:16:28 mclark Exp $
+ * $Id: json_c_printbuf.h,v 1.4 2006/01/26 02:16:28 mclark Exp $
  *
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
@@ -20,8 +20,8 @@
  *        json_object_set_serializer() direct use of this is not
  *        recommended.
  */
-#ifndef _printbuf_h_
-#define _printbuf_h_
+#ifndef _json_c_printbuf_h_
+#define _json_c_printbuf_h_
 
 #ifndef JSON_EXPORT
 #if defined(_MSC_VER)

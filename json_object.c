@@ -30,7 +30,7 @@
 #include "json_util.h"
 #include "linkhash.h"
 #include "math_compat.h"
-#include "printbuf.h"
+#include "json_c_printbuf.h"
 #include "snprintf_compat.h"
 #include "strdup_compat.h"
 
