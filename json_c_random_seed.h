@@ -1,5 +1,5 @@
 /*
- * random_seed.h
+ * json_c_random_seed.h
  *
  * Copyright (c) 2013 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>

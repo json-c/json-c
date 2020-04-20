@@ -321,13 +321,13 @@ set(JSON_C_HEADERS
     ${JSON_C_PUBLIC_HEADERS}
     ${PROJECT_BINARY_DIR}/config.h
     ${PROJECT_SOURCE_DIR}/json_object_private.h
-    ${PROJECT_SOURCE_DIR}/random_seed.h
-    ${PROJECT_SOURCE_DIR}/strerror_override.h
-    ${PROJECT_SOURCE_DIR}/strerror_override_private.h
-    ${PROJECT_SOURCE_DIR}/math_compat.h
-    ${PROJECT_SOURCE_DIR}/snprintf_compat.h
-    ${PROJECT_SOURCE_DIR}/strdup_compat.h
-    ${PROJECT_SOURCE_DIR}/vasprintf_compat.h
+    ${PROJECT_SOURCE_DIR}/json_c_random_seed.h
+    ${PROJECT_SOURCE_DIR}/json_c_strerror_override.h
+    ${PROJECT_SOURCE_DIR}/json_c_strerror_override_private.h
+    ${PROJECT_SOURCE_DIR}/json_c_math_compat.h
+    ${PROJECT_SOURCE_DIR}/json_c_snprintf_compat.h
+    ${PROJECT_SOURCE_DIR}/json_c_strdup_compat.h
+    ${PROJECT_SOURCE_DIR}/json_c_vasprintf_compat.h
 )
 
 set(JSON_C_SOURCES
@@ -342,8 +342,8 @@ set(JSON_C_SOURCES
     ${PROJECT_SOURCE_DIR}/json_visit.c
     ${PROJECT_SOURCE_DIR}/json_c_linkhash.c
     ${PROJECT_SOURCE_DIR}/json_c_printbuf.c
-    ${PROJECT_SOURCE_DIR}/random_seed.c
-    ${PROJECT_SOURCE_DIR}/strerror_override.c
+    ${PROJECT_SOURCE_DIR}/json_c_random_seed.c
+    ${PROJECT_SOURCE_DIR}/json_c_strerror_override.c
 )
 
 include_directories(${PROJECT_SOURCE_DIR})

@@ -1,5 +1,5 @@
-#include "strerror_override.h"
-#include "strerror_override_private.h"
+#include "json_c_strerror_override.h"
+#include "json_c_strerror_override_private.h"
 #ifdef NDEBUG
 #undef NDEBUG
 #endif

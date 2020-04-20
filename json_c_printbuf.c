@@ -27,8 +27,8 @@
 
 #include "json_c_debug.h"
 #include "json_c_printbuf.h"
-#include "snprintf_compat.h"
-#include "vasprintf_compat.h"
+#include "json_c_snprintf_compat.h"
+#include "json_c_vasprintf_compat.h"
 
 static int printbuf_extend(struct printbuf *p, int min_size);
 

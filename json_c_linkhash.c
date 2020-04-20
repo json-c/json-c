@@ -29,7 +29,7 @@
 #endif
 
 #include "json_c_linkhash.h"
-#include "random_seed.h"
+#include "json_c_random_seed.h"
 
 /* hash functions */
 static unsigned long lh_char_hash(const void *k);

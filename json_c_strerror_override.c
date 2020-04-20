@@ -1,5 +1,5 @@
 #define STRERROR_OVERRIDE_IMPL 1
-#include "strerror_override.h"
+#include "json_c_strerror_override.h"
 
 /*
  * Override strerror() to get consistent output across platforms.

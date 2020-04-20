@@ -15,7 +15,7 @@
 
 #include "config.h"
 
-#include "math_compat.h"
+#include "json_c_math_compat.h"
 #include <assert.h>
 #include <ctype.h>
 #include <limits.h>
@@ -33,7 +33,7 @@
 #include "json_tokener.h"
 #include "json_util.h"
 #include "json_c_printbuf.h"
-#include "strdup_compat.h"
+#include "json_c_strdup_compat.h"
 
 #ifdef HAVE_LOCALE_H
 #include <locale.h>

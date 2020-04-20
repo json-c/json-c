@@ -1,5 +1,5 @@
-#ifndef _json_strerror_override_h_
-#define _json_strerror_override_h_
+#ifndef _json_json_c_strerror_override_h_
+#define _json_json_c_strerror_override_h_
 
 /**
  * @file
@@ -27,4 +27,4 @@ JSON_EXPORT char *_json_c_strerror(int errno_in);
 }
 #endif
 
-#endif /* _json_strerror_override_h_ */
+#endif /* _json_json_c_strerror_override_h_ */

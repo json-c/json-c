@@ -1,12 +1,12 @@
-#ifndef __vasprintf_compat_h
-#define __vasprintf_compat_h
+#ifndef __json_c_vasprintf_compat_h
+#define __json_c_vasprintf_compat_h
 
 /**
  * @file
  * @brief Do not use, json-c internal, may be changed or removed at any time.
  */
 
-#include "snprintf_compat.h"
+#include "json_c_snprintf_compat.h"
 
 #include <stdlib.h>
 
@@ -57,4 +57,4 @@ static int vasprintf(char **buf, const char *fmt, va_list ap)
 }
 #endif /* !HAVE_VASPRINTF */
 
-#endif /* __vasprintf_compat_h */
+#endif /* __json_c_vasprintf_compat_h */

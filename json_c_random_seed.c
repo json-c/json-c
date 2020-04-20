@@ -1,5 +1,5 @@
 /*
- * random_seed.c
+ * json_c_random_seed.c
  *
  * Copyright (c) 2013 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
@@ -9,9 +9,9 @@
  *
  */
 
-#include "random_seed.h"
+#include "json_c_random_seed.h"
 #include "config.h"
-#include "strerror_override.h"
+#include "json_c_strerror_override.h"
 #include <stdio.h>
 
 #define DEBUG_SEED(s)

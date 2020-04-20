@@ -12,7 +12,7 @@
 #include "config.h"
 #undef realloc
 
-#include "strerror_override.h"
+#include "json_c_strerror_override.h"
 
 #include <ctype.h>
 #include <limits.h>
@@ -48,7 +48,7 @@
 #define open _open
 #endif
 
-#include "snprintf_compat.h"
+#include "json_c_snprintf_compat.h"
 
 #include "json_c_debug.h"
 #include "json_inttypes.h"

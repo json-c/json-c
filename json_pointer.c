@@ -8,7 +8,7 @@
 
 #include "config.h"
 
-#include "strerror_override.h"
+#include "json_c_strerror_override.h"
 
 #include <ctype.h>
 #include <stdarg.h>
@@ -17,8 +17,8 @@
 #include <string.h>
 
 #include "json_pointer.h"
-#include "strdup_compat.h"
-#include "vasprintf_compat.h"
+#include "json_c_strdup_compat.h"
+#include "json_c_vasprintf_compat.h"
 
 /**
  * JavaScript Object Notation (JSON) Pointer

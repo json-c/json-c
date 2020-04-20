@@ -1,5 +1,5 @@
-#ifndef __strdup_compat_h
-#define __strdup_compat_h
+#ifndef __json_c_strdup_compat_h
+#define __json_c_strdup_compat_h
 
 /**
  * @file

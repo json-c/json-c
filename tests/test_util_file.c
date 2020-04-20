@@ -1,5 +1,5 @@
-#include "strerror_override.h"
-#include "strerror_override_private.h"
+#include "json_c_strerror_override.h"
+#include "json_c_strerror_override_private.h"
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <io.h>
@@ -20,7 +20,7 @@
 
 #include "json.h"
 #include "json_util.h"
-#include "snprintf_compat.h"
+#include "json_c_snprintf_compat.h"
 
 static void test_read_valid_with_fd(const char *testdir);
 static void test_read_valid_nested_with_fd(const char *testdir);

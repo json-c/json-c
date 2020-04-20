@@ -12,7 +12,7 @@
 
 #include "config.h"
 
-#include "strerror_override.h"
+#include "json_c_strerror_override.h"
 
 #include <assert.h>
 #include <ctype.h>
@@ -29,10 +29,10 @@
 #include "json_object_private.h"
 #include "json_util.h"
 #include "json_c_linkhash.h"
-#include "math_compat.h"
+#include "json_c_math_compat.h"
 #include "json_c_printbuf.h"
-#include "snprintf_compat.h"
-#include "strdup_compat.h"
+#include "json_c_snprintf_compat.h"
+#include "json_c_strdup_compat.h"
 
 #if SIZEOF_LONG_LONG != SIZEOF_INT64_T
 #error "The long long type isn't 64-bits"

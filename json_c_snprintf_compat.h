@@ -1,5 +1,5 @@
-#ifndef __snprintf_compat_h
-#define __snprintf_compat_h
+#ifndef __json_c_snprintf_compat_h
+#define __json_c_snprintf_compat_h
 
 /**
  * @file
@@ -38,4 +38,4 @@ static int json_c_snprintf(char *str, size_t size, const char *format, ...)
 #error Need vsnprintf!
 #endif /* !HAVE_SNPRINTF && defined(WIN32) */
 
-#endif /* __snprintf_compat_h */
+#endif /* __json_c_snprintf_compat_h */

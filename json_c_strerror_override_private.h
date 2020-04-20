@@ -1,5 +1,5 @@
-#ifndef __json_strerror_override_private_h__
-#define __json_strerror_override_private_h__
+#ifndef __json_json_c_strerror_override_private_h__
+#define __json_json_c_strerror_override_private_h__
 
 /**
  * @file

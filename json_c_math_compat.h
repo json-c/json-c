@@ -1,5 +1,5 @@
-#ifndef __math_compat_h
-#define __math_compat_h
+#ifndef __json_c_math_compat_h
+#define __json_c_math_compat_h
 
 /**
  * @file
