@@ -238,6 +238,13 @@ struct incremental_step
     {"{\"x\": 123 }\"X\"", -1, 11, json_tokener_success, 0},
     {"\"Y\"", -1, -1, json_tokener_success, 1},
 
+    /* Trailing characters should cause a failure in strict mode */
+    {"{\"foo\":9}{\"bar\":8}", -1, 9, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT },
+
+    /* ... unless explicitly allowed. */
+    {"{\"foo\":9}{\"bar\":8}", -1, 9, json_tokener_success, 0, JSON_TOKENER_STRICT|JSON_TOKENER_ALLOW_TRAILING_CHARS },
+    {"{\"b\":8}ignored garbage", -1, 7, json_tokener_success, 1, JSON_TOKENER_STRICT|JSON_TOKENER_ALLOW_TRAILING_CHARS },
+
     /* To stop parsing a number we need to reach a non-digit, e.g. a \0 */
     {"1", 1, 1, json_tokener_continue, 0},
     /* This should parse as the number 12, since it continues the "1" */

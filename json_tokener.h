@@ -144,11 +144,24 @@ typedef struct json_tokener json_tokener;
  * restrictive from one release to the next, causing your
  * code to fail on previously working input.
  *
+ * Note that setting this will also effectively disable parsing
+ * of multiple json objects in a single character stream
+ * (e.g. {"foo":123}{"bar":234}); if you want to allow that
+ * also set JSON_TOKENER_ALLOW_TRAILING_CHARS
+ *
  * This flag is not set by default.
  *
  * @see json_tokener_set_flags()
  */
 #define JSON_TOKENER_STRICT 0x01
+
+/**
+ * Use with JSON_TOKENER_STRICT to allow trailing characters after the
+ * first parsed object.
+ *
+ * @see json_tokener_set_flags()
+ */
+#define JSON_TOKENER_ALLOW_TRAILING_CHARS 0x02
 
 /**
  * Cause json_tokener_parse_ex() to validate that input is UTF8.

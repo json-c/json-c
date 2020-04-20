@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "arraylist.h"
 #include "debug.h"
 #include "json_inttypes.h"
 #include "json_object.h"
@@ -1130,7 +1129,7 @@ out:
 		tok->err = json_tokener_error_parse_utf8_string;
 	}
 	if (c && (state == json_tokener_state_finish) && (tok->depth == 0) &&
-	    (tok->flags & JSON_TOKENER_STRICT))
+	    (tok->flags & (JSON_TOKENER_STRICT|JSON_TOKENER_ALLOW_TRAILING_CHARS)) == JSON_TOKENER_STRICT)
 	{
 		/* unexpected char after JSON data */
 		tok->err = json_tokener_error_parse_unexpected;

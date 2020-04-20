@@ -8,7 +8,9 @@ Deprecated and removed features:
 
 Other changes
 --------------
-...none yet...
+* Added a JSON_TOKENER_ALLOW_TRAILING_CHARS flag to allow multiple objects
+  to be parsed even when JSON_TOKENER_STRICT is set.
+
 
 ***
 
