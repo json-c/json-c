@@ -299,7 +299,6 @@ if ($ENV{VALGRIND})
 endif()
 
 set(JSON_C_PUBLIC_HEADERS
-    ${PROJECT_BINARY_DIR}/config.h
     ${PROJECT_BINARY_DIR}/json_config.h
 
     ${PROJECT_SOURCE_DIR}/json.h
@@ -320,6 +319,7 @@ set(JSON_C_PUBLIC_HEADERS
 
 set(JSON_C_HEADERS
     ${JSON_C_PUBLIC_HEADERS}
+    ${PROJECT_BINARY_DIR}/config.h
     ${PROJECT_SOURCE_DIR}/json_object_private.h
     ${PROJECT_SOURCE_DIR}/random_seed.h
     ${PROJECT_SOURCE_DIR}/strerror_override.h
