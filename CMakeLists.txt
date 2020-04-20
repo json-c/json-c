@@ -303,7 +303,7 @@ set(JSON_C_PUBLIC_HEADERS
 
     ${PROJECT_SOURCE_DIR}/json.h
     ${PROJECT_SOURCE_DIR}/json_c_arraylist.h
-    ${PROJECT_SOURCE_DIR}/debug.h
+    ${PROJECT_SOURCE_DIR}/json_c_debug.h
     ${PROJECT_SOURCE_DIR}/json_c_version.h
     ${PROJECT_SOURCE_DIR}/json_inttypes.h
     ${PROJECT_SOURCE_DIR}/json_object.h
@@ -332,7 +332,7 @@ set(JSON_C_HEADERS
 
 set(JSON_C_SOURCES
     ${PROJECT_SOURCE_DIR}/json_c_arraylist.c
-    ${PROJECT_SOURCE_DIR}/debug.c
+    ${PROJECT_SOURCE_DIR}/json_c_debug.c
     ${PROJECT_SOURCE_DIR}/json_c_version.c
     ${PROJECT_SOURCE_DIR}/json_object.c
     ${PROJECT_SOURCE_DIR}/json_object_iterator.c

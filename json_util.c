@@ -50,7 +50,7 @@
 
 #include "snprintf_compat.h"
 
-#include "debug.h"
+#include "json_c_debug.h"
 #include "json_inttypes.h"
 #include "json_object.h"
 #include "json_tokener.h"

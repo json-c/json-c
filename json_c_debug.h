@@ -1,5 +1,5 @@
 /*
- * $Id: debug.h,v 1.5 2006/01/30 23:07:57 mclark Exp $
+ * $Id: json_c_debug.h,v 1.5 2006/01/30 23:07:57 mclark Exp $
  *
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>

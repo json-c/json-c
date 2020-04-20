@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "debug.h"
+#include "json_c_debug.h"
 #include "printbuf.h"
 
 static void test_basic_printbuf_memset(void);

@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.5 2006/01/26 02:16:28 mclark Exp $
+ * $Id: json_c_debug.c,v 1.5 2006/01/26 02:16:28 mclark Exp $
  *
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
@@ -28,7 +28,7 @@
 #include <sys/param.h>
 #endif /* HAVE_SYS_PARAM_H */
 
-#include "debug.h"
+#include "json_c_debug.h"
 
 static int _syslog = 0;
 static int _debug = 0;
