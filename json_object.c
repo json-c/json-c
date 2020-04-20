@@ -28,7 +28,7 @@
 #include "json_object.h"
 #include "json_object_private.h"
 #include "json_util.h"
-#include "linkhash.h"
+#include "json_c_linkhash.h"
 #include "math_compat.h"
 #include "json_c_printbuf.h"
 #include "snprintf_compat.h"

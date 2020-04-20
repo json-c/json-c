@@ -1,5 +1,5 @@
 /*
- * $Id: linkhash.h,v 1.6 2006/01/30 23:07:57 mclark Exp $
+ * $Id: json_c_linkhash.h,v 1.6 2006/01/30 23:07:57 mclark Exp $
  *
  * Copyright (c) 2004, 2005 Metaparadigm Pte. Ltd.
  * Michael Clark <michael@metaparadigm.com>
@@ -16,8 +16,8 @@
  *        this is exposed by the json_object_get_object() function and within the
  *        json_object_iter type, it is not recommended for direct use.
  */
-#ifndef _linkhash_h_
-#define _linkhash_h_
+#ifndef _json_c_linkhash_h_
+#define _json_c_linkhash_h_
 
 #include "json_object.h"
 
@@ -309,7 +309,7 @@ extern int lh_table_length(struct lh_table *t);
 int lh_table_resize(struct lh_table *t, int new_size);
 
 /**
- * @deprecated Don't use this outside of linkhash.h:
+ * @deprecated Don't use this outside of json_c_linkhash.h:
  */
 #if !defined(_MSC_VER) || (_MSC_VER > 1800)
 /* VS2010 can't handle inline funcs, so skip it there */
@@ -337,7 +337,7 @@ static _LH_INLINE unsigned long lh_get_hash(const struct lh_table *t, const void
 #undef _LH_INLINE
 
 /**
- * @deprecated Don't use this outside of linkhash.h:
+ * @deprecated Don't use this outside of json_c_linkhash.h:
  */
 #ifdef __UNCONST
 #define _LH_UNCONST(a) __UNCONST(a)

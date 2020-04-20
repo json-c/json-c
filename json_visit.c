@@ -11,7 +11,7 @@
 #include "json_inttypes.h"
 #include "json_object.h"
 #include "json_visit.h"
-#include "linkhash.h"
+#include "json_c_linkhash.h"
 
 static int _json_c_visit(json_object *jso, json_object *parent_jso, const char *jso_key,
                          size_t *jso_index, json_c_visit_userfunc *userfunc, void *userarg);

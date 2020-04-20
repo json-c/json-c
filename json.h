@@ -29,7 +29,7 @@ extern "C" {
 #include "json_pointer.h"
 #include "json_tokener.h"
 #include "json_util.h"
-#include "linkhash.h"
+#include "json_c_linkhash.h"
 
 #ifdef __cplusplus
 }
