@@ -8,6 +8,8 @@ Deprecated and removed features:
 
 Other changes
 --------------
+* Add a json_parse binary, for use in testing changes (not installed).
+* Issue #471: always create directories with mode 0755, regardless of umask.
 * Added a JSON_TOKENER_ALLOW_TRAILING_CHARS flag to allow multiple objects
   to be parsed even when JSON_TOKENER_STRICT is set.
 

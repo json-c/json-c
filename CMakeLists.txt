@@ -40,6 +40,8 @@ if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING AND
 add_subdirectory(tests)
 endif()
 
+add_subdirectory(apps)
+
 # Set some packaging variables.
 set(CPACK_PACKAGE_NAME              "${PROJECT_NAME}")
 set(CPACK_PACKAGE_VERSION_MAJOR     "${PROJECT_VERSION_MAJOR}")
@@ -108,6 +110,7 @@ check_include_files("stdlib.h;stdarg.h;string.h;float.h" STDC_HEADERS)
 
 check_include_file(unistd.h         HAVE_UNISTD_H)
 check_include_file(sys/types.h      HAVE_SYS_TYPES_H)
+check_include_file(sys/resource.h   HAVE_SYS_RESOURCE_H) # for getrusage
 
 check_include_file("dlfcn.h"        HAVE_DLFCN_H)
 check_include_file("endian.h"       HAVE_ENDIAN_H)
@@ -164,6 +167,9 @@ if (HAVE_STRING_H)
 endif()
 if (HAVE_SYSLOG_H)
     check_symbol_exists(vsyslog     "syslog.h" HAVE_VSYSLOG)
+endif()
+if (HAVE_SYS_RESOURCE_H)
+    check_symbol_exists(getrusage   "sys/resource.h" HAVE_GETRUSAGE)
 endif()
 
 check_symbol_exists(strtoll     "stdlib.h" HAVE_STRTOLL)
