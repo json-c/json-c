@@ -299,7 +299,7 @@ if ($ENV{VALGRIND})
 endif()
 
 set(JSON_C_PUBLIC_HEADERS
-    ${PROJECT_BINARY_DIR}/config.h
+    # Note: config.h is _not_ included here
     ${PROJECT_BINARY_DIR}/json_config.h
 
     ${PROJECT_SOURCE_DIR}/json.h
