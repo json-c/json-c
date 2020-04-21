@@ -40,7 +40,9 @@ if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING AND
 add_subdirectory(tests)
 endif()
 
+if (NOT MSVC)  # cmd line apps don't built on Windows currently.
 add_subdirectory(apps)
+endif()
 
 # Set some packaging variables.
 set(CPACK_PACKAGE_NAME              "${PROJECT_NAME}")
