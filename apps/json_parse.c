@@ -8,7 +8,11 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "config.h"
+#include "apps_config.h"
+
+/* XXX for a regular program, these should be <json-c/foo.h>
+ * but that's inconvenient when building in the json-c source tree.
+ */
 #include "json_object.h"
 #include "json_tokener.h"
 #include "json_util.h"
@@ -22,6 +26,10 @@ static int formatted_output = 0;
 static int show_output = 1;
 static int strict_mode = 0;
 static const char *fname = NULL;
+
+#ifndef HAVE_JSON_TOKENER_GET_PARSE_END
+#define json_tokener_get_parse_end(tok) ((tok)->char_offset)
+#endif
 
 static void usage(int exitval, const char *errmsg);
 static void showmem(void);
@@ -52,7 +60,11 @@ static int parseit(int fd, int (*callback)(struct json_object *))
 		fprintf(stderr, "unable to allocate json_tokener: %s\n", strerror(errno));
 		return 1;
 	}
-	json_tokener_set_flags(tok, JSON_TOKENER_STRICT | JSON_TOKENER_ALLOW_TRAILING_CHARS);
+	json_tokener_set_flags(tok, JSON_TOKENER_STRICT
+#ifdef JSON_TOKENER_ALLOW_TRAILING_CHARS
+		 | JSON_TOKENER_ALLOW_TRAILING_CHARS
+#endif
+	);
 
 	// XXX push this into some kind of json_tokener_parse_fd API?
 	//  json_object_from_fd isn't flexible enough, and mirroring

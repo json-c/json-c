@@ -1,4 +1,3 @@
-/* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Enable RDRAND Hardware RNG Hash Seed */
 #cmakedefine ENABLE_RDRAND "@ENABLE_RDRAND@"
