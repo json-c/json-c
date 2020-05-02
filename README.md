@@ -135,7 +135,7 @@ there is a `cmake-configure` wrapper script to ease the transition to cmake.
 ```sh
 mkdir build
 cd build
-../cmake-configure --prefix=/some/install/path
+../cmake-configure --prefix /some/install/path
 make
 ```
 
