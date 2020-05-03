@@ -31,7 +31,7 @@ static const char *fname = NULL;
 #define json_tokener_get_parse_end(tok) ((tok)->char_offset)
 #endif
 
-static void usage(int exitval, const char *errmsg);
+static void usage(const char *argv0, int exitval, const char *errmsg);
 static void showmem(void);
 static int parseit(int fd, int (*callback)(struct json_object *));
 static int showobj(struct json_object *new_obj);
@@ -42,7 +42,7 @@ static void showmem(void)
 	struct rusage rusage;
 	memset(&rusage, 0, sizeof(rusage));
 	getrusage(RUSAGE_SELF, &rusage);
-	printf("maxrss: %d KB\n", rusage.ru_maxrss);
+	printf("maxrss: %ld KB\n", rusage.ru_maxrss);
 #endif
 }
 
@@ -137,14 +137,14 @@ static int showobj(struct json_object *new_obj)
 	return 0;
 }
 
-static void usage(int exitval, const char *errmsg)
+static void usage(const char *argv0, int exitval, const char *errmsg)
 {
 	FILE *fp = stdout;
 	if (exitval != 0)
 		fp = stderr;
 	if (errmsg != NULL)
 		fprintf(fp, "ERROR: %s\n\n", errmsg);
-	fprintf(fp, "Usage: %s [-f] [-n] [-s]\n");
+	fprintf(fp, "Usage: %s [-f] [-n] [-s]\n", argv0);
 	fprintf(fp, "  -f - Format the output with JSON_C_TO_STRING_PRETTY\n");
 	fprintf(fp, "  -n - No output\n");
 	fprintf(fp, "  -s - Parse in strict mode, flags:\n");
@@ -160,14 +160,15 @@ int main(int argc, char **argv)
 	json_object *new_obj;
 	int opt;
 
-	while ((opt = getopt(argc, argv, "fns")) != -1)
+	while ((opt = getopt(argc, argv, "fhns")) != -1)
 	{
 		switch (opt)
 		{
 		case 'f': formatted_output = 1; break;
 		case 'n': show_output = 0; break;
 		case 's': strict_mode = 1; break;
-		default: /* '?' */ fprintf(stderr, "Usage: %s [-f]\n", argv[0]); exit(EXIT_FAILURE);
+		case 'h': usage(argv[0], 0, NULL);
+		default: /* '?' */ usage(argv[0], 1, "Unknown arguments");
 		}
 	}
 
