@@ -52,6 +52,9 @@ while [ $# -gt 0 ] ; do
 		FLAGS+=(-DCMAKE_INSTALL_PREFIX="$2")
 		shift
 		;;
+	--prefix=*)
+		FLAGS+=(-DCMAKE_INSTALL_PREFIX="${1##--prefix=}")
+		;;
 	--enable-threading)
 		FLAGS+=(-DENABLE_THREADING=ON)
 		;;
