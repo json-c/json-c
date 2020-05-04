@@ -77,29 +77,69 @@ done
 WORK="${RUNDIR}/work"
 mkdir -p "${WORK}"
 
-# XAX use a different data dir
-if [ ! -r "${WORK}/../canada.json" ] ; then
-	curl -L -o "${WORK}/../canada.json" 'https://github.com/mloskot/json_benchmark/raw/master/data/canada.json'
+DATA="${RUNDIR}/data"
+mkdir -p "${DATA}"
+
+if [ ! -r "${DATA}/canada.json" ] ; then
+	curl -L -o "${DATA}/canada.json" 'https://github.com/mloskot/json_benchmark/raw/master/data/canada.json'
 fi
 
-# Identify "after" commit hash
-after_src_dir=$TOP
-after_commit=
-if [ ! -z "$after_arg" ] ; then
-	# XXX decode this in more detail.
-	# XXX for now, just assume it's a path
-	after_src_dir=$after_arg
+# Identify "after" commit hash, in order of preference
+if [ ! -z "$after_arg" -a -d "$after_arg" ] ; then
+	# Use provided directory
+	after_src_dir="$after_arg"
 	after_commit=
+else
+	_commit=
+	if [ ! -z "$after_arg" ] ; then
+		# Use provided commit hash
+		_commit=$(git rev-parse --verify "$after_arg")
+	fi
+	if [ ! -z "$_commit" ] ;then
+		after_src_dir=  # i.e. current tree
+		after_commit="$_commit"
+	else
+		# Local changes in current working directory
+		# ${cur_branch}
+		after_src_dir=$TOP
+		after_commit=
+	fi
 fi
 
-# Identify "before" commit hash
-before_src_dir=
-#before_commit=origin/master
-before_commit=origin/json-c-0.14
-if [ ! -z "$before_arg" ] ; then
-	# XXX decode this in more detail
+# Identify "before" commit hash, in order of preference
+if [ ! -z "$before_arg" -a -d "$before_arg" ] ; then
+   	# Use provided directory
 	before_src_dir="$before_arg"
 	before_commit=
+else
+	_commit=
+	if [ ! -z "$before_arg" ] ; then
+		# Use provided commit hash
+		_commit=$(git rev-parse --verify "$before_arg")
+	fi
+	if [ ! -z "$_commit" ] ;then
+		before_src_dir=  # i.e. current tree
+		before_commit="$_commit"
+	else
+		# Use origin/${cur_branch}, if different from ${after_commit}
+		_cur_branch=$(git rev-parse --abbrev-ref HEAD)
+		_commit=
+		if [ ! -z "${_cur_branch}" ] ; then
+			_commit=$(git rev-parse --verify "origin/${_cur_branch}")
+		fi
+		if [ "$_commit" = "${after_commit}" ] ; then
+			_commit=
+		fi
+	fi
+
+	if [ ! -z "$_commit" ] ; then
+		before_src_dir=  # i.e. current tree
+		before_commit="$_commit"
+	else
+		# Use previous release
+		before_src_dir=  # i.e. current tree
+		before_commit="$(git tag | sort | tail -1)"
+	fi
 fi
 
 compile_benchmark()
@@ -162,7 +202,7 @@ run_benchmark()
 	local inst_dir="${WORK}/$bname/install"
 	local bench_dir="${WORK}/$bname/bench"
 
-	local INPUT=${WORK}/../canada.json
+	local INPUT=${DATA}/canada.json
 
 	cd "${bench_dir}"
 	mkdir -p results
