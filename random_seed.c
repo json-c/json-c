@@ -43,12 +43,41 @@ static void do_cpuid(int regs[], int h)
 
 #if HAS_X86_CPUID
 
+static int get_rdrand_seed(void);
+
+// Valid values are -1 (haven't tested), 0 (no), and 1 (yes).
+static int _has_rdrand = -1;
+
 static int has_rdrand(void)
 {
-	// CPUID.01H:ECX.RDRAND[bit 30] == 1
-	int regs[4];
-	do_cpuid(regs, 1);
-	return (regs[2] & (1 << 30)) != 0;
+	if (_has_rdrand == -1)
+	{
+		// CPUID.01H:ECX.RDRAND[bit 30] == 1
+		int regs[4];
+		do_cpuid(regs, 1);
+		if (!(regs[2] & (1 << 30)))
+		{
+			_has_rdrand = 0;
+		} else
+		{
+			// Some CPUs advertise RDRAND in CPUID, but return 0xFFFFFFFF
+			// unconditionally. To avoid locking up later, test RDRAND here. If over
+			// 10 trials RDRAND has returned the same value, declare it broken.
+			_has_rdrand = 0;
+			int prev = get_rdrand_seed();
+			for (int i = 0; i < 10; i++) {
+				int temp = get_rdrand_seed();
+				if (temp != prev) {
+					_has_rdrand = 1;
+					break;
+				}
+
+				prev = temp;
+			}
+		}
+	}
+
+	return _has_rdrand;
 }
 
 #endif
