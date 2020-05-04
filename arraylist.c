@@ -136,6 +136,9 @@ int array_list_del_idx(struct array_list *arr, size_t idx, size_t count)
 {
 	size_t i, stop;
 
+	/* Avoid overflow in calculation with large indices. */
+	if (idx > SIZE_T_MAX - count)
+		return -1;
 	stop = idx + count;
 	if (idx >= arr->length || stop > arr->length)
 		return -1;
