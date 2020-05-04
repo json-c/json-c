@@ -45,36 +45,46 @@ static void do_cpuid(int regs[], int h)
 
 static int get_rdrand_seed(void);
 
-// Valid values are -1 (haven't tested), 0 (no), and 1 (yes).
+/* Valid values are -1 (haven't tested), 0 (no), and 1 (yes). */
 static int _has_rdrand = -1;
 
 static int has_rdrand(void)
 {
-	if (_has_rdrand == -1)
+	if (_has_rdrand != -1)
 	{
-		// CPUID.01H:ECX.RDRAND[bit 30] == 1
-		int regs[4];
-		do_cpuid(regs, 1);
-		if (!(regs[2] & (1 << 30)))
-		{
-			_has_rdrand = 0;
-		} else
-		{
-			// Some CPUs advertise RDRAND in CPUID, but return 0xFFFFFFFF
-			// unconditionally. To avoid locking up later, test RDRAND here. If over
-			// 10 trials RDRAND has returned the same value, declare it broken.
-			_has_rdrand = 0;
-			int prev = get_rdrand_seed();
-			for (int i = 0; i < 10; i++) {
-				int temp = get_rdrand_seed();
-				if (temp != prev) {
-					_has_rdrand = 1;
-					break;
-				}
+		return _has_rdrand;
+	}
 
-				prev = temp;
-			}
+	/* CPUID.01H:ECX.RDRAND[bit 30] == 1 */
+	int regs[4];
+	do_cpuid(regs, 1);
+	if (!(regs[2] & (1 << 30)))
+	{
+		_has_rdrand = 0;
+		return 0;
+	}
+
+	/*
+	 * Some CPUs advertise RDRAND in CPUID, but return 0xFFFFFFFF
+	 * unconditionally. To avoid locking up later, test RDRAND here. If over
+	 * 3 trials RDRAND has returned the same value, declare it broken.
+	 * Example CPUs are AMD Ryzen 3000 series
+	 * and much older AMD APUs, such as the E1-1500
+	 * https://github.com/systemd/systemd/issues/11810
+	 * https://linuxreviews.org/RDRAND_stops_returning_random_values_on_older_AMD_CPUs_after_suspend
+	 */
+	_has_rdrand = 0;
+	int prev = get_rdrand_seed();
+	for (int i = 0; i < 3; i++)
+	{
+		int temp = get_rdrand_seed();
+		if (temp != prev)
+		{
+			_has_rdrand = 1;
+			break;
 		}
+
+		prev = temp;
 	}
 
 	return _has_rdrand;
@@ -92,7 +102,7 @@ static int get_rdrand_seed(void)
 {
 	DEBUG_SEED("get_rdrand_seed");
 	int _eax;
-	// rdrand eax
+	/* rdrand eax */
 	/* clang-format off */
 	__asm__ __volatile__("1: .byte 0x0F\n"
 	                     "   .byte 0xC7\n"
@@ -132,7 +142,7 @@ static int get_rdrand_seed(void)
 	DEBUG_SEED("get_rdrand_seed");
 	int _eax;
 retry:
-	// rdrand eax
+	/* rdrand eax */
 	__asm _emit 0x0F __asm _emit 0xC7 __asm _emit 0xF0
 	__asm jnc retry
 	__asm mov _eax, eax
@@ -206,6 +216,10 @@ static int get_dev_random_seed(void)
 
 /* clang-format off */
 #include <windows.h>
+
+/* Caution: these blank lines must remain so clang-format doesn't reorder
+   includes to put windows.h after wincrypt.h */
+
 #include <wincrypt.h>
 /* clang-format on */
 #ifndef __GNUC__
