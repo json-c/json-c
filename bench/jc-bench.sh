@@ -80,9 +80,14 @@ mkdir -p "${WORK}"
 DATA="${RUNDIR}/data"
 mkdir -p "${DATA}"
 
-if [ ! -r "${DATA}/canada.json" ] ; then
-	curl -L -o "${DATA}/canada.json" 'https://github.com/mloskot/json_benchmark/raw/master/data/canada.json'
-fi
+for file in citm_catalog.json twitter.json canada.json ; do
+	if [ ! -r "${DATA}/${file}" ] ; then
+		echo "Fetching ${file} from github.com/mloskot/json_benchmark"
+		URL="https://github.com/mloskot/json_benchmark/raw/master/data/${file}"
+		curl -s -L -o "${DATA}/${file}" "$URL"
+	fi
+done
+echo
 
 # Identify "after" commit hash, in order of preference
 if [ ! -z "$after_arg" -a -d "$after_arg" ] ; then
@@ -180,8 +185,16 @@ compile_benchmark()
 	fi
 	# else, use the provided $src_dir
 
-	cd "${build_dir}"
-	cmake -DCMAKE_INSTALL_PREFIX="${inst_dir}" "${src_dir}"
+	if [ -e "${src_dir}/CMakeLists.txt" ] ; then
+		cd "${build_dir}"
+		cmake -DCMAKE_INSTALL_PREFIX="${inst_dir}" "${src_dir}"
+	else
+		# Old versions of json-c used automake/autoconf
+		cd "${src_dir}"
+		sh autogen.sh   # always run it, configure doesn't always work
+		cd "${build_dir}"
+		"${src_dir}/configure" --prefix="${inst_dir}"
+	fi
 	make all install
 
 	cd "${bench_dir}"
