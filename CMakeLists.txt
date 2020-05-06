@@ -400,6 +400,26 @@ target_include_directories(${PROJECT_NAME}
         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
 )
 
+# Allow to build static and shared libraries at the same time
+if (BUILD_STATIC_LIBS)
+    set(ORIGINAL_STATIC_LIB_NAME ${PROJECT_NAME}-static)
+    add_library(${ORIGINAL_STATIC_LIB_NAME} STATIC
+        ${JSON_C_SOURCES}
+        ${JSON_C_HEADERS}
+    )
+
+    # rename the static library
+    set_target_properties(${ORIGINAL_STATIC_LIB_NAME} PROPERTIES
+        OUTPUT_NAME ${PROJECT_NAME}
+    )
+
+    target_include_directories(${PROJECT_NAME}
+        PUBLIC
+            $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+            $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+    )
+endif ()
+
 # Always create new install dirs with 0755 permissions, regardless of umask
 set(CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
 	OWNER_READ
