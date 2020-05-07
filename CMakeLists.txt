@@ -403,14 +403,14 @@ target_include_directories(${PROJECT_NAME}
 
 # Allow to build static and shared libraries at the same time
 if (BUILD_STATIC_LIBS)
-    set(ORIGINAL_STATIC_LIB_NAME ${PROJECT_NAME}-static)
-    add_library(${ORIGINAL_STATIC_LIB_NAME} STATIC
+    set(STATIC_LIB ${PROJECT_NAME}-static)
+    add_library(${STATIC_LIB} STATIC
         ${JSON_C_SOURCES}
         ${JSON_C_HEADERS}
     )
 
     # rename the static library
-    set_target_properties(${ORIGINAL_STATIC_LIB_NAME} PROPERTIES
+    set_target_properties(${STATIC_LIB} PROPERTIES
         OUTPUT_NAME ${PROJECT_NAME}
     )
     list(APPEND CMAKE_TARGETS ${STATIC_LIB})
