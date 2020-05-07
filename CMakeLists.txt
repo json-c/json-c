@@ -65,6 +65,7 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 option(BUILD_SHARED_LIBS  "Default to building shared libraries" ON)
+option(BUILD_STATIC_LIBS  "Default to building static libraries" ON)
 
 # Generate a release merge and test it to verify the correctness of republishing the package.
 ADD_CUSTOM_TARGET(distcheck
@@ -403,12 +404,6 @@ if (BUILD_STATIC_LIBS)
     # rename the static library
     set_target_properties(${ORIGINAL_STATIC_LIB_NAME} PROPERTIES
         OUTPUT_NAME ${PROJECT_NAME}
-    )
-
-    target_include_directories(${PROJECT_NAME}
-        PUBLIC
-            $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
-            $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
     )
 endif ()
 
