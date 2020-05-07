@@ -384,7 +384,7 @@ add_library(${PROJECT_NAME}
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VERSION 5.0.0
     SOVERSION 5)
-
+list(APPEND CMAKE_TARGETS ${PROJECT_NAME})
 # If json-c is used as subroject it set to target correct interface -I flags and allow
 # to build external target without extra include_directories(...)
 target_include_directories(${PROJECT_NAME}
@@ -405,6 +405,7 @@ if (BUILD_STATIC_LIBS)
     set_target_properties(${ORIGINAL_STATIC_LIB_NAME} PROPERTIES
         OUTPUT_NAME ${PROJECT_NAME}
     )
+    list(APPEND CMAKE_TARGETS ${STATIC_LIB})
 endif ()
 
 # Always create new install dirs with 0755 permissions, regardless of umask
@@ -418,7 +419,7 @@ set(CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
 	WORLD_EXECUTE
    )
 
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS ${CMAKE_TARGETS}
     EXPORT ${PROJECT_NAME}-targets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
