@@ -31,7 +31,6 @@ static const char *fname = NULL;
 #define json_tokener_get_parse_end(tok) ((tok)->char_offset)
 #endif
 
-static void usage(int exitval, const char *errmsg);
 static void showmem(void);
 static int parseit(int fd, int (*callback)(struct json_object *));
 static int showobj(struct json_object *new_obj);
@@ -137,14 +136,15 @@ static int showobj(struct json_object *new_obj)
 	return 0;
 }
 
-static void usage(int exitval, const char *errmsg)
+static void usage(const char *argv0, int exitval, const char *errmsg)
 {
 	FILE *fp = stdout;
 	if (exitval != 0)
 		fp = stderr;
 	if (errmsg != NULL)
 		fprintf(fp, "ERROR: %s\n\n", errmsg);
-	fprintf(fp, "Usage: %s [-f] [-n] [-s]\n");
+
+	fprintf(fp, "Usage: %s [-f] [-n] [-s]\n", argv0);
 	fprintf(fp, "  -f - Format the output with JSON_C_TO_STRING_PRETTY\n");
 	fprintf(fp, "  -n - No output\n");
 	fprintf(fp, "  -s - Parse in strict mode, flags:\n");
@@ -167,16 +167,15 @@ int main(int argc, char **argv)
 		case 'f': formatted_output = 1; break;
 		case 'n': show_output = 0; break;
 		case 's': strict_mode = 1; break;
-		default: /* '?' */ fprintf(stderr, "Usage: %s [-f]\n", argv[0]); exit(EXIT_FAILURE);
+		default: /* '?' */ usage(argv[0], EXIT_FAILURE, NULL);
 		}
 	}
-
 	if (optind >= argc)
 	{
-		fprintf(stderr, "Expected argument after options\n");
-		exit(EXIT_FAILURE);
+		usage(argv[0], EXIT_FAILURE, "Expected argument after options");
 	}
 	fname = argv[optind];
+
 	int fd = open(argv[optind], O_RDONLY, 0);
 	showmem();
 	if (parseit(fd, showobj) != 0)
