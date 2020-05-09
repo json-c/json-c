@@ -168,16 +168,15 @@ int main(int argc, char **argv)
 		case 'n': show_output = 0; break;
 		case 's': strict_mode = 1; break;
 		case 'h': usage(argv[0], 0, NULL);
-		default: /* '?' */ usage(argv[0], 1, "Unknown arguments");
+		default: /* '?' */ usage(argv[0], EXIT_FAILURE, "Unknown arguments");
 		}
 	}
-
 	if (optind >= argc)
 	{
-		fprintf(stderr, "Expected argument after options\n");
-		exit(EXIT_FAILURE);
+		usage(argv[0], EXIT_FAILURE, "Expected argument after options");
 	}
 	fname = argv[optind];
+
 	int fd = open(argv[optind], O_RDONLY, 0);
 	showmem();
 	if (parseit(fd, showobj) != 0)

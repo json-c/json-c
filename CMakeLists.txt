@@ -69,6 +69,7 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 option(BUILD_SHARED_LIBS  "Default to building shared libraries" ON)
+option(BUILD_STATIC_LIBS  "Default to building static libraries" ON)
 
 # Generate a release merge and test it to verify the correctness of republishing the package.
 ADD_CUSTOM_TARGET(distcheck
@@ -391,7 +392,7 @@ add_library(${PROJECT_NAME}
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VERSION 5.0.0
     SOVERSION 5)
-
+list(APPEND CMAKE_TARGETS ${PROJECT_NAME})
 # If json-c is used as subroject it set to target correct interface -I flags and allow
 # to build external target without extra include_directories(...)
 target_include_directories(${PROJECT_NAME}
@@ -399,6 +400,21 @@ target_include_directories(${PROJECT_NAME}
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
 )
+
+# Allow to build static and shared libraries at the same time
+if (BUILD_STATIC_LIBS)
+    set(STATIC_LIB ${PROJECT_NAME}-static)
+    add_library(${STATIC_LIB} STATIC
+        ${JSON_C_SOURCES}
+        ${JSON_C_HEADERS}
+    )
+
+    # rename the static library
+    set_target_properties(${STATIC_LIB} PROPERTIES
+        OUTPUT_NAME ${PROJECT_NAME}
+    )
+    list(APPEND CMAKE_TARGETS ${STATIC_LIB})
+endif ()
 
 # Always create new install dirs with 0755 permissions, regardless of umask
 set(CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
@@ -411,7 +427,7 @@ set(CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
 	WORLD_EXECUTE
    )
 
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS ${CMAKE_TARGETS}
     EXPORT ${PROJECT_NAME}-targets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

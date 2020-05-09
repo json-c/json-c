@@ -97,7 +97,8 @@ Variable             | Type   | Description
 ---------------------|--------|--------------
 CMAKE_INSTALL_PREFIX | String | The install location.
 CMAKE_BUILD_TYPE     | String | Defaults to "debug"
-BUILD_SHARED_LIBS    | Bool   | The default build generates a dynamic (dll/so) library.  Set this to OFF to create a static library instead.
+BUILD_SHARED_LIBS    | Bool   | The default build generates a dynamic (dll/so) library.  Set this to OFF to create a static library only.
+BUILD_STATIC_LIBS    | Bool   | The default build generates a static (lib/a) library.  Set this to OFF to create a shared library only.
 ENABLE_RDRAND        | Bool   | Enable RDRAND Hardware RNG Hash Seed
 ENABLE_THREADING     | Bool   | Enable partial threading support
 DISABLE_WERROR       | Bool   | Disable use of -Werror
@@ -106,7 +107,8 @@ DISABLE_BSYMBOLIC    | Bool   | Disable use of -Bsymbolic-functions
 Pass these options as `-D` on CMake's command-line.
 
 ```sh
-cmake -DBUILD_SHARED_LIBS=OFF ...
+# build a static library only
+cmake -DBUILD_SHARED_LIBS=OFF ..
 ```
 
 ### Building with partial threading support

@@ -77,29 +77,74 @@ done
 WORK="${RUNDIR}/work"
 mkdir -p "${WORK}"
 
-# XAX use a different data dir
-if [ ! -r "${WORK}/../canada.json" ] ; then
-	curl -L -o "${WORK}/../canada.json" 'https://github.com/mloskot/json_benchmark/raw/master/data/canada.json'
-fi
+DATA="${RUNDIR}/data"
+mkdir -p "${DATA}"
 
-# Identify "after" commit hash
-after_src_dir=$TOP
-after_commit=
-if [ ! -z "$after_arg" ] ; then
-	# XXX decode this in more detail.
-	# XXX for now, just assume it's a path
-	after_src_dir=$after_arg
+for file in citm_catalog.json twitter.json canada.json ; do
+	if [ ! -r "${DATA}/${file}" ] ; then
+		echo "Fetching ${file} from github.com/mloskot/json_benchmark"
+		URL="https://github.com/mloskot/json_benchmark/raw/master/data/${file}"
+		curl -s -L -o "${DATA}/${file}" "$URL"
+	fi
+done
+echo
+
+# Identify "after" commit hash, in order of preference
+if [ ! -z "$after_arg" -a -d "$after_arg" ] ; then
+	# Use provided directory
+	after_src_dir="$after_arg"
 	after_commit=
+else
+	_commit=
+	if [ ! -z "$after_arg" ] ; then
+		# Use provided commit hash
+		_commit=$(git rev-parse --verify "$after_arg")
+	fi
+	if [ ! -z "$_commit" ] ;then
+		after_src_dir=  # i.e. current tree
+		after_commit="$_commit"
+	else
+		# Local changes in current working directory
+		# ${cur_branch}
+		after_src_dir=$TOP
+		after_commit=
+	fi
 fi
 
-# Identify "before" commit hash
-before_src_dir=
-#before_commit=origin/master
-before_commit=origin/json-c-0.14
-if [ ! -z "$before_arg" ] ; then
-	# XXX decode this in more detail
+# Identify "before" commit hash, in order of preference
+if [ ! -z "$before_arg" -a -d "$before_arg" ] ; then
+   	# Use provided directory
 	before_src_dir="$before_arg"
 	before_commit=
+else
+	_commit=
+	if [ ! -z "$before_arg" ] ; then
+		# Use provided commit hash
+		_commit=$(git rev-parse --verify "$before_arg")
+	fi
+	if [ ! -z "$_commit" ] ;then
+		before_src_dir=  # i.e. current tree
+		before_commit="$_commit"
+	else
+		# Use origin/${cur_branch}, if different from ${after_commit}
+		_cur_branch=$(git rev-parse --abbrev-ref HEAD)
+		_commit=
+		if [ ! -z "${_cur_branch}" ] ; then
+			_commit=$(git rev-parse --verify "origin/${_cur_branch}")
+		fi
+		if [ "$_commit" = "${after_commit}" ] ; then
+			_commit=
+		fi
+	fi
+
+	if [ ! -z "$_commit" ] ; then
+		before_src_dir=  # i.e. current tree
+		before_commit="$_commit"
+	else
+		# Use previous release
+		before_src_dir=  # i.e. current tree
+		before_commit="$(git tag | sort | tail -1)"
+	fi
 fi
 
 compile_benchmark()
@@ -140,8 +185,16 @@ compile_benchmark()
 	fi
 	# else, use the provided $src_dir
 
-	cd "${build_dir}"
-	cmake -DCMAKE_INSTALL_PREFIX="${inst_dir}" "${src_dir}"
+	if [ -e "${src_dir}/CMakeLists.txt" ] ; then
+		cd "${build_dir}"
+		cmake -DCMAKE_INSTALL_PREFIX="${inst_dir}" "${src_dir}"
+	else
+		# Old versions of json-c used automake/autoconf
+		cd "${src_dir}"
+		sh autogen.sh   # always run it, configure doesn't always work
+		cd "${build_dir}"
+		"${src_dir}/configure" --prefix="${inst_dir}"
+	fi
 	make all install
 
 	cd "${bench_dir}"
@@ -162,7 +215,7 @@ run_benchmark()
 	local inst_dir="${WORK}/$bname/install"
 	local bench_dir="${WORK}/$bname/bench"
 
-	local INPUT=${WORK}/../canada.json
+	local INPUT=${DATA}/canada.json
 
 	cd "${bench_dir}"
 	mkdir -p results
