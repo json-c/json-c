@@ -5,8 +5,8 @@
 #include "config.h"
 #include <assert.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "json_inttypes.h"
 #include "json_object.h"
@@ -48,7 +48,6 @@ static void test_lot_of_adds()
 	assert(json_object_object_length(jobj) == 500);
 	json_object_put(jobj);
 }
-
 
 int main(void)
 {
