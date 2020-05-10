@@ -394,7 +394,7 @@ target_include_directories(${PROJECT_NAME}
 )
 
 # Allow to build static and shared libraries at the same time
-if (BUILD_STATIC_LIBS)
+if (BUILD_STATIC_LIBS AND BUILD_SHARED_LIBS)
     set(STATIC_LIB ${PROJECT_NAME}-static)
     add_library(${STATIC_LIB} STATIC
         ${JSON_C_SOURCES}
