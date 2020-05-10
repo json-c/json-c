@@ -245,19 +245,17 @@ int json_parse_uint64(const char *buf, uint64_t *retval)
 {
 	char *end = NULL;
 	uint64_t val;
-	errno = 1;
 
+	errno = 0;
 	while (*buf == ' ')
-	{
 		buf++;
-	}
 	if (*buf == '-')
-		errno = 0;
+		return 1;  /* error: uint cannot be negative */
 
 	val = strtoull(buf, &end, 10);
 	if (end != buf)
 		*retval = val;
-	return ((errno == 0) || (end == buf)) ? 1 : 0;
+	return ((val == 0 && errno != 0) || (end == buf)) ? 1 : 0;
 }
 
 #ifndef HAVE_REALLOC

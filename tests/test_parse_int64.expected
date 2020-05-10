@@ -34,13 +34,13 @@ buf=123 parseit=0, value=123
 ==========json_parse_uint64() test===========
 buf=x parseit=1, value=666 
 buf=0 parseit=0, value=0 
-buf=-0 parseit=1, value=0 
+buf=-0 parseit=1, value=666 
 buf=00000000 parseit=0, value=0 
-buf=-00000000 parseit=1, value=0 
+buf=-00000000 parseit=1, value=666 
 buf=1 parseit=0, value=1 
 buf=2147483647 parseit=0, value=2147483647 
-buf=-1 parseit=1, value=18446744073709551615 
-buf=-9223372036854775808 parseit=1, value=9223372036854775808 
+buf=-1 parseit=1, value=666 
+buf=-9223372036854775808 parseit=1, value=666 
 buf=   1 parseit=0, value=1 
 buf=00001234 parseit=0, value=1234 
 buf=0001234x parseit=0, value=1234 
