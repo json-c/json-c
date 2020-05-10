@@ -3,8 +3,10 @@
  */
 
 #include "config.h"
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "json_inttypes.h"
 #include "json_object.h"
@@ -23,6 +25,30 @@ void print_hex(const char *s)
 	}
 	putchar('\n');
 }
+
+static void test_lot_of_adds(void);
+static void test_lot_of_adds()
+{
+	int ii;
+	char key[50];
+	json_object *jobj = json_object_new_object();
+	assert(jobj != NULL);
+	for (ii = 0; ii < 500; ii++)
+	{
+		snprintf(key, sizeof(key), "k%d", ii);
+		json_object *iobj = json_object_new_int(ii);
+		assert(iobj != NULL);
+		if (json_object_object_add(jobj, key, iobj))
+		{
+			fprintf(stderr, "FAILED to add object #%d\n", ii);
+			abort();
+		}
+	}
+	printf("%s\n", json_object_to_json_string(jobj));
+	assert(json_object_object_length(jobj) == 500);
+	json_object_put(jobj);
+}
+
 
 int main(void)
 {
@@ -52,5 +78,8 @@ int main(void)
 		retval = 1;
 	}
 	json_object_put(parse_result);
+
+	test_lot_of_adds();
+
 	return retval;
 }
