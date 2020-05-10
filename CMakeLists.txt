@@ -410,9 +410,11 @@ if (BUILD_STATIC_LIBS AND BUILD_SHARED_LIBS)
     )
 
     # rename the static library
+    if (NOT MSVC)
     set_target_properties(${STATIC_LIB} PROPERTIES
         OUTPUT_NAME ${PROJECT_NAME}
     )
+    endif()
     list(APPEND CMAKE_TARGETS ${STATIC_LIB})
 endif ()
 
