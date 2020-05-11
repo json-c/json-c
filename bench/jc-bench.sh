@@ -94,6 +94,7 @@ if [ ! -z "$after_arg" -a -d "$after_arg" ] ; then
 	# Use provided directory
 	after_src_dir="$after_arg"
 	after_commit=
+	echo "Using provided directory [$after_arg] as 'after'"
 else
 	_commit=
 	if [ ! -z "$after_arg" ] ; then
@@ -103,11 +104,13 @@ else
 	if [ ! -z "$_commit" ] ;then
 		after_src_dir=  # i.e. current tree
 		after_commit="$_commit"
+		echo "Using provided commit [$after_arg => $_commit] as 'after'"
 	else
 		# Local changes in current working directory
 		# ${cur_branch}
 		after_src_dir=$TOP
 		after_commit=
+		echo "Using local changes in $TOP as 'after'"
 	fi
 fi
 
@@ -116,6 +119,7 @@ if [ ! -z "$before_arg" -a -d "$before_arg" ] ; then
    	# Use provided directory
 	before_src_dir="$before_arg"
 	before_commit=
+	echo "Using provided directory [$before_arg] as 'before'"
 else
 	_commit=
 	if [ ! -z "$before_arg" ] ; then
@@ -125,12 +129,14 @@ else
 	if [ ! -z "$_commit" ] ;then
 		before_src_dir=  # i.e. current tree
 		before_commit="$_commit"
+		echo "Using provided commit [$before_arg => $_commit] as 'before'"
 	else
 		# Use origin/${cur_branch}, if different from ${after_commit}
 		_cur_branch=$(git rev-parse --abbrev-ref HEAD)
 		_commit=
 		if [ ! -z "${_cur_branch}" ] ; then
 			_commit=$(git rev-parse --verify "origin/${_cur_branch}")
+			echo "Using origin/${_cur_branch} [$_commit] as 'before'"
 		fi
 		if [ "$_commit" = "${after_commit}" ] ; then
 			_commit=
@@ -144,8 +150,11 @@ else
 		# Use previous release
 		before_src_dir=  # i.e. current tree
 		before_commit="$(git tag | sort | tail -1)"
+		echo "Using previous release [$before_commit] as 'before'"
 	fi
 fi
+
+echo
 
 compile_benchmark()
 {
@@ -205,6 +214,8 @@ compile_benchmark()
 # XXX TODO: name "after" and "before" uniquely using the dir & commit
 
 if [ $do_all -ne 0 -o $do_build -ne 0 ] ; then
+	sleep 5   # Wait slightly, to allow the human to read the message
+	          #  about what exactly we're doing to benchmark.
 	compile_benchmark "after" "${after_src_dir}" "${after_commit}"
 	compile_benchmark "before" "${before_src_dir}" "${before_commit}"
 fi
