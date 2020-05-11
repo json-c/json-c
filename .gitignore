@@ -87,3 +87,7 @@
 /libjson-c.a
 /libjson-c.so
 /libjson-c.so.*
+
+# Benchmarking input and output
+/bench/data
+/bench/work
