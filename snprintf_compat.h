@@ -13,7 +13,7 @@
 
 #include <stdarg.h>
 
-#if !defined(HAVE_SNPRINTF) && defined(_MSC_VER)
+#if !defined(HAVE_SNPRINTF) && (defined(_MSC_VER) || defined(__MINGW32__))
 static int json_c_vsnprintf(char *str, size_t size, const char *format, va_list ap)
 {
 	int ret;
