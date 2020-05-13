@@ -58,6 +58,8 @@ static json_object_to_json_string_fn _json_object_userdata_to_json_string;
 #ifndef JSON_NORETURN
 #if defined(_MSC_VER)
 #define JSON_NORETURN __declspec(noreturn)
+#elif defined(__OS400__)
+#define JSON_NORETURN
 #else
 /* 'cold' attribute is for optimization, telling the computer this code
  * path is unlikely.
@@ -901,11 +903,15 @@ static int json_object_double_to_json_string_format(struct json_object *jso, str
 	 * ECMA 262 section 9.8.1 defines
 	 * how to handle these cases as strings
 	 */
+#ifdef HAVE_DECL_ISNAN
 	if (isnan(jso->o.c_double))
 	{
 		size = snprintf(buf, sizeof(buf), "NaN");
 	}
-	else if (isinf(jso->o.c_double))
+	else
+#endif
+#ifdef HAVE_DECL_ISINF
+	if (isinf(jso->o.c_double))
 	{
 		if (jso->o.c_double > 0)
 			size = snprintf(buf, sizeof(buf), "Infinity");
@@ -913,6 +919,7 @@ static int json_object_double_to_json_string_format(struct json_object *jso, str
 			size = snprintf(buf, sizeof(buf), "-Infinity");
 	}
 	else
+#endif
 	{
 		const char *std_format = "%.17g";
 		int format_drops_decimals = 0;

@@ -40,6 +40,9 @@
 #ifdef HAVE_XLOCALE_H
 #include <xlocale.h>
 #endif
+#ifdef HAVE_STRINGS_H
+#include <strings.h>
+#endif /* HAVE_STRINGS_H */
 
 #define jt_hexdigit(x) (((x) <= '9') ? (x) - '0' : ((x)&7) + 9)
 
