@@ -12,12 +12,13 @@
 
 #include "config.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include <assert.h>
+#include <limits.h>
 #include <stdarg.h>
 #include <stddef.h>
-#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifdef HAVE_ENDIAN_H
 # include <endian.h>    /* attempt to define endianness */
@@ -28,8 +29,8 @@
 # include <windows.h>   /* Get InterlockedCompareExchange */
 #endif
 
-#include "random_seed.h"
 #include "linkhash.h"
+#include "random_seed.h"
 
 /* hash functions */
 static unsigned long lh_char_hash(const void *k);
@@ -498,7 +499,9 @@ struct lh_table* lh_table_new(int size,
 	int i;
 	struct lh_table *t;
 
-	t = (struct lh_table*)calloc(1, sizeof(struct lh_table));
+	/* Allocate space for elements to avoid divisions by zero. */
+	assert(size > 0);
+	t = (struct lh_table *)calloc(1, sizeof(struct lh_table));
 	if (!t)
 		return NULL;
 
@@ -577,8 +580,12 @@ int lh_table_insert_w_hash(struct lh_table *t, const void *k, const void *v, con
 	unsigned long n;
 
 	if (t->count >= t->size * LH_LOAD_FACTOR)
-		if (lh_table_resize(t, t->size * 2) != 0)
+	{
+		/* Avoid signed integer overflow with large tables. */
+		int new_size = (t->size > INT_MAX / 2) ? INT_MAX : (t->size * 2);
+		if (t->size == INT_MAX || lh_table_resize(t, new_size) != 0)
 			return -1;
+	}
 
 	n = h % t->size;
 
