@@ -10,6 +10,7 @@
  *
  */
 
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -62,6 +63,8 @@ struct lh_table* lh_table_new(int size, const char *name,
 	int i;
 	struct lh_table *t;
 
+	/* Allocate space for elements to avoid divisions by zero. */
+	assert(size > 0);
 	t = (struct lh_table*)calloc(1, sizeof(struct lh_table));
 	if(!t) lh_abort("lh_table_new: calloc failed\n");
 	t->count = 0;
@@ -126,7 +129,14 @@ int lh_table_insert(struct lh_table *t, void *k, const void *v)
 	unsigned long h, n;
 
 	t->inserts++;
-	if(t->count >= t->size * LH_LOAD_FACTOR) lh_table_resize(t, t->size * 2);
+	if (t->count >= t->size * LH_LOAD_FACTOR) {
+		/* Avoid signed integer overflow with large tables. */
+		int new_size = (t->size > INT_MAX / 2) ? INT_MAX : (t->size * 2);
+		if (t->size == INT_MAX)
+			return -1;
+
+		lh_table_resize(t, new_size);
+	}
 
 	h = t->hash_fn(k);
 	n = h % t->size;
