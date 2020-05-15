@@ -584,7 +584,7 @@ int lh_table_insert_w_hash(struct lh_table *t, const void *k, const void *v, con
 	{
 		/* Avoid signed integer overflow with large tables. */
 		int new_size = (t->size > INT_MAX / 2) ? INT_MAX : (t->size * 2);
-		if (t->size == INT_MAX || lh_table_resize(t, new_size) != 0)
+		if (new_size == INT_MAX || lh_table_resize(t, new_size) != 0)
 			return -1;
 	}
 
