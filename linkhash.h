@@ -18,7 +18,6 @@
  */
 #ifndef _linkhash_h_
 #define _linkhash_h_
-
 #include "json_object.h"
 
 #ifdef __cplusplus
@@ -92,7 +91,7 @@ struct lh_entry
 	 * A flag for users of linkhash to know whether or not they
 	 * need to free k.
 	 */
-	int k_is_constant;
+	unsigned int k_is_constant;
 	/**
 	 * The value.  Use lh_entry_v() instead of accessing this directly.
 	 */
@@ -115,11 +114,11 @@ struct lh_table
 	/**
 	 * Size of our hash.
 	 */
-	int size;
+	size_t size;
 	/**
 	 * Numbers of entries.
 	 */
-	int count;
+	unsigned int count;
 
 	/**
 	 * The first entry.
