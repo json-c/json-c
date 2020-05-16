@@ -26,7 +26,7 @@ static int custom_serializer(struct json_object *o, struct printbuf *pb, int lev
 
 int main(int argc, char **argv)
 {
-	json_object *my_object;
+	json_object *my_object, *my_sub_object;
 
 	MC_SET_DEBUG(1);
 
@@ -66,6 +66,18 @@ int main(int argc, char **argv)
 	freeit_was_called = 0;
 	json_object_put(my_object);
 	assert(freeit_was_called);
+
+	// ============================================
+
+	my_object = json_object_new_object();
+	my_sub_object = json_object_new_double(1.0);
+	json_object_object_add(my_object, "double", my_sub_object);
+	printf("Check that the custom serializer does not include nul byte:\n");
+	json_object_set_serializer(my_sub_object, json_object_double_to_json_string, "%125.0f,", NULL);
+	printf("my_object.to_string(custom serializer)=%s\n",
+	       json_object_to_json_string_ext(my_object, JSON_C_TO_STRING_NOZERO));
+
+	json_object_put(my_object);
 
 	return 0;
 }
