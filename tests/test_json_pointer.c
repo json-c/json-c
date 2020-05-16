@@ -60,7 +60,7 @@ static const char *rec_input_json_str =
 /* clang-format on */
 
 /* Example from RFC */
-static void test_example_get()
+static void test_example_get(void)
 {
 	int i;
 	struct json_object *jo1, *jo2, *jo3;
@@ -126,7 +126,7 @@ static void test_example_get()
 }
 
 /* I'm not too happy with the RFC example to test the recusion of the json_pointer_get() function */
-static void test_recursion_get()
+static void test_recursion_get(void)
 {
 	struct json_object *jo2, *jo1 = json_tokener_parse(rec_input_json_str);
 
@@ -161,7 +161,7 @@ static void test_recursion_get()
 	json_object_put(jo1);
 }
 
-static void test_wrong_inputs_get()
+static void test_wrong_inputs_get(void)
 {
 	struct json_object *jo2, *jo1 = json_tokener_parse(input_json_str);
 
@@ -231,7 +231,7 @@ static void test_wrong_inputs_get()
 	json_object_put(jo1);
 }
 
-static void test_example_set()
+static void test_example_set(void)
 {
 	struct json_object *jo2, *jo1 = json_tokener_parse(input_json_str);
 
@@ -272,7 +272,7 @@ static void test_example_set()
 	json_object_put(jo1);
 }
 
-static void test_wrong_inputs_set()
+static void test_wrong_inputs_set(void)
 {
 	struct json_object *jo2, *jo1 = json_tokener_parse(input_json_str);
 

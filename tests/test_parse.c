@@ -149,8 +149,8 @@ static void test_utf8_parse()
 	// json_tokener_parse doesn't support checking for byte order marks.
 	// It's the responsibility of the caller to detect and skip a BOM.
 	// Both of these checks return null.
-	char utf8_bom[] = {0xEF, 0xBB, 0xBF, 0x00};
-	char utf8_bom_and_chars[] = {0xEF, 0xBB, 0xBF, '{', '}', 0x00};
+	char* utf8_bom = "\xEF\xBB\xBF";
+	char* utf8_bom_and_chars = "\xEF\xBB\xBF{}";
 	single_basic_parse(utf8_bom, 0);
 	single_basic_parse(utf8_bom_and_chars, 0);
 }
@@ -446,7 +446,7 @@ static void test_incremental_parse()
 		json_tokener_set_flags(tok, step->tok_flags);
 
 		if (length == -1)
-			length = strlen(step->string_to_parse);
+			length = (int)strlen(step->string_to_parse);
 		if (step->char_offset == -1)
 			expected_char_offset = length;
 		else

@@ -24,10 +24,10 @@
 
 static void test_read_valid_with_fd(const char *testdir);
 static void test_read_valid_nested_with_fd(const char *testdir);
-static void test_read_nonexistant();
+static void test_read_nonexistant(void);
 static void test_read_closed(void);
 
-static void test_write_to_file();
+static void test_write_to_file(void);
 static void stat_and_cat(const char *file);
 static void test_read_fd_equal(const char *testdir);
 
