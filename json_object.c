@@ -969,7 +969,8 @@ static int json_object_double_to_json_string_format(struct json_object *jso, str
 					p = q;
 			}
 			/* drop trailing zeroes */
-			*(++p) = 0;
+			if (*p != 0)
+				*(++p) = 0;
 			size = p - buf;
 		}
 	}
