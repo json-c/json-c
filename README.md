@@ -93,16 +93,17 @@ CMake Options <a name="CMake"></a>
 The json-c library is built with [CMake](https://cmake.org/cmake-tutorial/),
 which can take a few options.
 
-Variable             | Type   | Description
----------------------|--------|--------------
-CMAKE_INSTALL_PREFIX | String | The install location.
-CMAKE_BUILD_TYPE     | String | Defaults to "debug"
-BUILD_SHARED_LIBS    | Bool   | The default build generates a dynamic (dll/so) library.  Set this to OFF to create a static library only.
-BUILD_STATIC_LIBS    | Bool   | The default build generates a static (lib/a) library.  Set this to OFF to create a shared library only.
-ENABLE_RDRAND        | Bool   | Enable RDRAND Hardware RNG Hash Seed
-ENABLE_THREADING     | Bool   | Enable partial threading support
-DISABLE_WERROR       | Bool   | Disable use of -Werror
-DISABLE_BSYMBOLIC    | Bool   | Disable use of -Bsymbolic-functions
+Variable                     | Type   | Description
+-----------------------------|--------|--------------
+CMAKE_INSTALL_PREFIX         | String | The install location.
+CMAKE_BUILD_TYPE             | String | Defaults to "debug".
+BUILD_SHARED_LIBS            | Bool   | The default build generates a dynamic (dll/so) library.  Set this to OFF to create a static library only.
+BUILD_STATIC_LIBS            | Bool   | The default build generates a static (lib/a) library.  Set this to OFF to create a shared library only.
+DISABLE_BSYMBOLIC            | Bool   | Disable use of -Bsymbolic-functions.
+DISABLE_THREAD_LOCAL_STORAGE | Bool   | Disable use of Thread-Local Storage (HAVE___THREAD).
+DISABLE_WERROR               | Bool   | Disable use of -Werror.
+ENABLE_RDRAND                | Bool   | Enable RDRAND Hardware RNG Hash Seed.
+ENABLE_THREADING             | Bool   | Enable partial threading support.
 
 Pass these options as `-D` on CMake's command-line.
 
