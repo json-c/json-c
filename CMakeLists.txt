@@ -368,12 +368,13 @@ option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation(
 
 if (DOXYGEN_FOUND)
 
-	add_custom_target(doc
-	COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_SOURCE_DIR}/Doxyfile
-		WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+	configure_file(${PROJECT_SOURCE_DIR}/Doxyfile.in
+	  ${PROJECT_BINARY_DIR}/Doxyfile)
+	message(STATUS "Written ${PROJECT_BINARY_DIR}/Doxyfile")
 
-	# request to configure the file
-	configure_file(Doxyfile Doxyfile)
+	add_custom_target(doc
+	COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
+		WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 
 else (DOXYGEN_FOUND)
 	message("Warning: doxygen not found, the 'doc' target will not be included")
