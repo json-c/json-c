@@ -54,6 +54,11 @@ extern "C" {
  * memory is managed by the json_object.
  */
 #define JSON_C_NEW_STRING_LENGTH (1 << 1)
+/**
+ * No copy of the string is made, the given string buffer must be heap-allocated,
+ * and not be free'd, as its memory will be managed by the json_object then.
+ */
+#define JSON_C_NEW_STRING_NO_STRDUP (1 << 2)
 
 /**
  * A flag for the json_object_to_json_string_ext() and
@@ -912,6 +917,21 @@ JSON_EXPORT struct json_object *json_object_new_string(const char *s);
  * @see json_object_new_string_ext()
  */
 JSON_EXPORT struct json_object *json_object_new_string_len(const char *s, const int len);
+
+/** Create a new empty json_object of type json_type_string without allocating
+ * new memory.
+ *
+ * Create a new json_object of type json_type_string and use the given string
+ * buffer as is, without allocating new memory nor duplication. The ownership
+ * of the string buffer will be transferred to the newly created json_object.
+ * The buffer will be freed when the last instance of this object will be
+ * destroyed by calling json_object_put().
+ *
+ * @param s the string buffer, must be heap alloacted and must not be freed.
+ * @returns a json_object of type json_type_string
+ * @see json_object_new_string_ext()
+ */
+JSON_EXPORT struct json_object *json_object_new_string_noalloc(const char *s);
 
 /** Get the string value of a json_object
  *

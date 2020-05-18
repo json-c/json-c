@@ -1158,6 +1158,14 @@ struct json_object *json_object_new_string_ext(const char *s, const int len,
 		dstbuf = jso->o.c_string.str.data;
 		memcpy(dstbuf, s, jso->o.c_string.len);
 		dstbuf[len] = '\0';
+		if (flags & JSON_C_NEW_STRING_NO_STRDUP)
+		{
+			/* a little hack to get rid of constness */
+			memcpy(&dstbuf, &s, sizeof(char *));
+			/* string buffer must be free'd here
+			   to avoid memory leaks */
+			free(dstbuf);
+		}
 		return jso;
 	}
 
@@ -1172,6 +1180,9 @@ struct json_object *json_object_new_string_ext(const char *s, const int len,
 			dstbuf[len] = '\0';
 		}
 	}
+	else if (flags & JSON_C_NEW_STRING_NO_STRDUP)
+		/* a little hack to get rid of constness */
+		memcpy(&dstbuf, &s, sizeof(char *));
 
 	/* cannot be reached if o.c_string.str.data is used */
 	if (!dstbuf)
@@ -1193,6 +1204,11 @@ struct json_object *json_object_new_string(const char *s)
 struct json_object *json_object_new_string_len(const char *s, const int len)
 {
 	return json_object_new_string_ext(s, len, JSON_C_NEW_STRING_LENGTH);
+}
+
+struct json_object *json_object_new_string_noalloc(const char *s)
+{
+	return json_object_new_string_ext(s, strlen(s), JSON_C_NEW_STRING_NO_STRDUP);
 }
 
 const char *json_object_get_string(struct json_object *jso)
