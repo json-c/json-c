@@ -87,6 +87,7 @@ option(ENABLE_RDRAND                "Enable RDRAND Hardware RNG Hash Seed"      
 option(ENABLE_THREADING             "Enable partial threading support."             OFF)
 option(DISABLE_WERROR               "Avoid treating compiler warnings as fatal errors"    OFF)
 option(DISABLE_BSYMBOLIC            "Avoid linking with -Bsymbolic-function"   OFF)
+option(DISABLE_THREAD_LOCAL_STORAGE "Disable Thread-Local Storage (HAVE___THREAD)"   OFF)
 
 if (UNIX OR MINGW OR CYGWIN)
     list(APPEND CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
@@ -217,14 +218,16 @@ check_c_source_compiles(
   "int main() { int i, x = 0; i = __sync_add_and_fetch(&x,1); return x; }"
   HAVE_ATOMIC_BUILTINS)
 
-check_c_source_compiles(
-  "__thread int x = 0; int main() { return 0; }"
-  HAVE___THREAD)
+if (NOT DISABLE_THREAD_LOCAL_STORAGE)
+  check_c_source_compiles(
+    "__thread int x = 0; int main() { return 0; }"
+    HAVE___THREAD)
 
-if (HAVE___THREAD)
-    set(SPEC___THREAD __thread)
-elseif (MSVC)
-    set(SPEC___THREAD __declspec(thread))
+  if (HAVE___THREAD)
+      set(SPEC___THREAD __thread)
+  elseif (MSVC)
+      set(SPEC___THREAD __declspec(thread))
+  endif()
 endif()
 
 # Hardware random number is not available on Windows? Says, config.h.win32. Best to preserve compatibility.
