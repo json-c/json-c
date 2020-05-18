@@ -46,6 +46,16 @@ extern "C" {
 #define JSON_OBJECT_DEF_HASH_ENTRIES 16
 
 /**
+ * A copy of the string is made and the memory is managed by the json_object.
+ */
+#define JSON_C_NEW_STRING_STRDUP (1 << 0)
+/**
+ * A copy of the string with a maximum of len characters is made and the
+ * memory is managed by the json_object.
+ */
+#define JSON_C_NEW_STRING_LENGTH (1 << 1)
+
+/**
  * A flag for the json_object_to_json_string_ext() and
  * json_object_to_file_ext() functions which causes the output
  * to have no extra whitespace or formatting applied.
@@ -867,13 +877,27 @@ JSON_EXPORT int json_object_set_double(struct json_object *obj, double new_value
 
 /* string type methods */
 
+/** Create a new json_object of type json_type_string in a configurable way
+ *
+ * The string will be embedded into the new object as specified by the given
+ * flags parameter.
+ *
+ * @param s the string
+ * @param len the size of the string buffer in bytes
+ * @param flags process-modifying options, MUST NOT equal zero, and only one
+ * option can be specified.
+ * @returns a json_object of type json_type_string
+ */
+JSON_EXPORT struct json_object *json_object_new_string_ext(const char *s, const int len,
+                                                           int flags);
+
 /** Create a new empty json_object of type json_type_string
  *
  * A copy of the string is made and the memory is managed by the json_object
  *
  * @param s the string
  * @returns a json_object of type json_type_string
- * @see json_object_new_string_len()
+ * @see json_object_new_string_ext()
  */
 JSON_EXPORT struct json_object *json_object_new_string(const char *s);
 
@@ -883,9 +907,9 @@ JSON_EXPORT struct json_object *json_object_new_string(const char *s);
  * A copy of the string is made and the memory is managed by the json_object
  *
  * @param s the string
- * @param len max length of the new string
+ * @param len max length of the new string, must be >= 1
  * @returns a json_object of type json_type_string
- * @see json_object_new_string()
+ * @see json_object_new_string_ext()
  */
 JSON_EXPORT struct json_object *json_object_new_string_len(const char *s, const int len);
 

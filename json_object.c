@@ -1138,58 +1138,61 @@ static void json_object_string_delete(struct json_object *jso)
 	json_object_generic_delete(jso);
 }
 
-struct json_object *json_object_new_string(const char *s)
+struct json_object *json_object_new_string_ext(const char *s, const int len,
+                                               int flags)
 {
+	if (len <= 0 || flags == 0)
+		return NULL;
+
 	struct json_object *jso = json_object_new(json_type_string);
 	if (!jso)
 		return NULL;
+	char *dstbuf = NULL;
 	jso->_delete = &json_object_string_delete;
 	jso->_to_json_string = &json_object_string_to_json_string;
-	jso->o.c_string.len = strlen(s);
-	if (jso->o.c_string.len < LEN_DIRECT_STRING_DATA)
+	jso->o.c_string.len = len;
+
+	/* short cut if the internal string buffer of jso is big enough */
+	if (len < LEN_DIRECT_STRING_DATA)
 	{
-		memcpy(jso->o.c_string.str.data, s, jso->o.c_string.len);
+		dstbuf = jso->o.c_string.str.data;
+		memcpy(dstbuf, s, jso->o.c_string.len);
+		dstbuf[len] = '\0';
+		return jso;
 	}
-	else
+
+	if (flags & JSON_C_NEW_STRING_STRDUP)
+		dstbuf = strdup(s);
+	else if (flags & JSON_C_NEW_STRING_LENGTH)
 	{
-		jso->o.c_string.str.ptr = strdup(s);
-		if (!jso->o.c_string.str.ptr)
+		dstbuf = malloc(len + 1);
+		if (dstbuf)
 		{
-			json_object_generic_delete(jso);
-			errno = ENOMEM;
-			return NULL;
+			memcpy(dstbuf, s, len);
+			dstbuf[len] = '\0';
 		}
 	}
+
+	/* cannot be reached if o.c_string.str.data is used */
+	if (!dstbuf)
+	{
+		/* errno has already been set by malloc or strdup */
+		json_object_generic_delete(jso);
+		return NULL;
+	}
+
+	jso->o.c_string.str.ptr = dstbuf;
 	return jso;
+}
+
+struct json_object *json_object_new_string(const char *s)
+{
+	return json_object_new_string_ext(s, strlen(s), JSON_C_NEW_STRING_STRDUP);
 }
 
 struct json_object *json_object_new_string_len(const char *s, const int len)
 {
-	char *dstbuf;
-	struct json_object *jso = json_object_new(json_type_string);
-	if (!jso)
-		return NULL;
-	jso->_delete = &json_object_string_delete;
-	jso->_to_json_string = &json_object_string_to_json_string;
-	if (len < LEN_DIRECT_STRING_DATA)
-	{
-		dstbuf = jso->o.c_string.str.data;
-	}
-	else
-	{
-		jso->o.c_string.str.ptr = (char *)malloc(len + 1);
-		if (!jso->o.c_string.str.ptr)
-		{
-			json_object_generic_delete(jso);
-			errno = ENOMEM;
-			return NULL;
-		}
-		dstbuf = jso->o.c_string.str.ptr;
-	}
-	memcpy(dstbuf, (const void *)s, len);
-	dstbuf[len] = '\0';
-	jso->o.c_string.len = len;
-	return jso;
+	return json_object_new_string_ext(s, len, JSON_C_NEW_STRING_LENGTH);
 }
 
 const char *json_object_get_string(struct json_object *jso)
