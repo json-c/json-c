@@ -237,9 +237,9 @@ endif()
 
 # Once we've done basic symbol/header searches let's add them in.
 configure_file(${PROJECT_SOURCE_DIR}/cmake/config.h.in        ${PROJECT_BINARY_DIR}/config.h)
-message(STATUS "Written ${PROJECT_BINARY_DIR}/config.h")
+message(STATUS "Wrote ${PROJECT_BINARY_DIR}/config.h")
 configure_file(${PROJECT_SOURCE_DIR}/cmake/json_config.h.in   ${PROJECT_BINARY_DIR}/json_config.h)
-message(STATUS "Written ${PROJECT_BINARY_DIR}/json_config.h")
+message(STATUS "Wrote ${PROJECT_BINARY_DIR}/json_config.h")
 
 if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections")
@@ -361,24 +361,7 @@ set(JSON_C_SOURCES
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_BINARY_DIR})
 
-# generate doxygen documentation for json-c API
-
-find_package(Doxygen)
-option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation(requires Doxygen)" ${DOXYGEN_FOUND})
-
-if (DOXYGEN_FOUND)
-
-	configure_file(${PROJECT_SOURCE_DIR}/Doxyfile.in
-	  ${PROJECT_BINARY_DIR}/Doxyfile)
-	message(STATUS "Written ${PROJECT_BINARY_DIR}/Doxyfile")
-
-	add_custom_target(doc
-	COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
-		WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
-
-else (DOXYGEN_FOUND)
-	message("Warning: doxygen not found, the 'doc' target will not be included")
-endif(DOXYGEN_FOUND)
+add_subdirectory(doc)
 
 # uninstall
 add_custom_target(uninstall

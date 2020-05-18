@@ -83,7 +83,7 @@
 /Testing/
 
 # ...and build artifacts.
-/doc
+/doc/html
 /libjson-c.a
 /libjson-c.so
 /libjson-c.so.*
