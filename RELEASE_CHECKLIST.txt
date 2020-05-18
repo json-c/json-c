@@ -52,7 +52,6 @@ Make any fixes/changes *before* branching.
 
 Using ${release}:
 	Update the version in json_c_version.h
-	Update the version in Doxyfile (PROJECT_NUMBER)
 	Update the version in CMakeLists.txt (VERSION in the project(...) line)
 	Update the version in config.h.win32 (several places)
 
@@ -114,7 +113,6 @@ Add new section to ChangeLog for ${release}+1
 
 Use ${release}.99 to indicate a version "newer" than anything on the branch:
 	Update the version in json_c_version.h
-	Update the version in Doxyfile
 	Update the version in CMakeLists.txt
 	Update the version in config.h.win32
 
