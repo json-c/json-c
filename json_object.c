@@ -665,10 +665,11 @@ static void json_object_object_delete(struct json_object_base *jso_base)
 struct json_object *json_object_new_object(void)
 {
 	struct json_object_base *jso_base;
+	struct json_object_object *jso;
 	jso_base = JSON_OBJECT_NEW(object, &json_object_object_delete);
 	if (!jso_base)
 		return NULL;
-	struct json_object_object *jso = (struct json_object_object *)jso_base;
+	jso = (struct json_object_object *)jso_base;
 	jso->c_object =
 	    lh_kchar_table_new(JSON_OBJECT_DEF_HASH_ENTRIES, &json_object_lh_entry_free);
 	if (!jso->c_object)
@@ -805,10 +806,11 @@ static int json_object_boolean_to_json_string(struct json_object *jso, struct pr
 struct json_object *json_object_new_boolean(json_bool b)
 {
 	struct json_object_base *jso_base;
+	struct json_object_boolean *jso;
 	jso_base = JSON_OBJECT_NEW(boolean, &json_object_generic_delete);
 	if (!jso_base)
 		return NULL;
-	struct json_object_boolean *jso = (struct json_object_boolean *)jso_base;
+	jso = (struct json_object_boolean *)jso_base;
 	jso->c_boolean = b;
 	return PUBLIC(jso_base);
 }
@@ -1549,10 +1551,11 @@ static void json_object_array_delete(struct json_object *jso)
 struct json_object *json_object_new_array(void)
 {
 	struct json_object_base *jso_base;
+	struct json_object_array *jso;
 	jso_base = JSON_OBJECT_NEW(array, &json_object_array_delete);
 	if (!jso_base)
 		return NULL;
-	struct json_object_array *jso = (struct json_object_array *)jso_base;
+	jso = (struct json_object_array *)jso_base;
 	jso->c_array = array_list_new(&json_object_array_entry_free);
 	if (jso->c_array == NULL)
 	{
