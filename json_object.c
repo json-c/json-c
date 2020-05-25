@@ -45,7 +45,63 @@ const char *json_number_chars = "0123456789.+-eE";
 const char *json_hex_chars = "0123456789abcdefABCDEF";
 
 static void json_object_generic_delete(struct json_object *jso);
+static void Xjson_object_generic_delete(struct json_object_base *jso);
 static struct json_object *json_object_new(enum json_type o_type);
+
+// XAX kill this once json_object_base is renamed back to json_object
+static inline struct json_object *PUBLIC(struct json_object_base *jso)
+{
+	return (struct json_object *)jso;
+}
+static inline const struct json_object *PUBLIC_C(const struct json_object_base *jso)
+{
+	return (const struct json_object *)jso;
+}
+
+/*
+ * Helper functions to more safely cast to a particular type of json_object
+ */
+static inline struct json_object_object *JC_OBJECT(struct json_object_base *jso)
+{
+	return (void *)jso;
+}
+static inline const struct json_object_object *JC_OBJECT_C(const struct json_object_base *jso)
+{
+	return (const void *)jso;
+}
+static inline struct json_object_array *JC_ARRAY(struct json_object_base *jso)
+{
+	return (void *)jso;
+}
+static inline struct json_object_boolean *JC_BOOL(struct json_object_base *jso)
+{
+	return (void *)jso;
+}
+static inline struct json_object_double *JC_DOUBLE(struct json_object_base *jso)
+{
+	return (void *)jso;
+}
+static inline struct json_object_int *JC_INT(struct json_object_base *jso)
+{
+	return (void *)jso;
+}
+static inline struct json_object_string *JC_STRING(struct json_object_base *jso)
+{
+	return (void *)jso;
+}
+
+#define JC_CONCAT(a,b) a##b
+#define JC_CONCAT3(a,b,c) a##b##c
+
+#define JSON_OBJECT_NEW(jtype, delete_fn) \
+	Xjson_object_new(JC_CONCAT(json_type_,jtype), \
+		sizeof(struct JC_CONCAT(json_object_,jtype)), \
+		&JC_CONCAT3(json_object_,jtype,_to_json_string), \
+		(void *)delete_fn) // XAX drop cast
+static inline struct json_object_base *Xjson_object_new(enum json_type o_type,
+	size_t alloc_size,
+	json_object_to_json_string_fn *to_json_string,
+	json_object_private_delete_fn *delete_fn);
 
 static json_object_to_json_string_fn json_object_object_to_json_string;
 static json_object_to_json_string_fn json_object_boolean_to_json_string;
@@ -111,10 +167,14 @@ static void json_object_fini(void)
 
 /* helper for accessing the optimized string data component in json_object
  */
+// XAX drop this function
 static const char *get_string_component(const struct json_object *jso)
 {
+	if (jso->newold)
+		return ((const struct json_object_string *)jso)->data;
 	return (jso->o.c_string.len < LEN_DIRECT_STRING_DATA) ? jso->o.c_string.str.data
-	                                                      : jso->o.c_string.str.ptr;
+							 : jso->o.c_string.str.ptr;
+
 }
 
 /* string escaping */
@@ -204,10 +264,42 @@ struct json_object *json_object_get(struct json_object *jso)
 	return jso;
 }
 
+// XAX remove this Xjson_object_put function once conversion is done
+static int Xjson_object_put(struct json_object_base *jso)
+{
+	if (!jso)
+		return 0;
+
+	/* Avoid invalid free and crash explicitly instead of (silently)
+	 * segfaulting.
+	 */
+	assert(jso->_ref_count > 0);
+
+#if defined(HAVE_ATOMIC_BUILTINS) && defined(ENABLE_THREADING)
+	/* Note: this only allow the refcount to remain correct
+	 * when multiple threads are adjusting it.  It is still an error
+	 * for a thread to decrement the refcount if it doesn't "own" it,
+	 * as that can result in the thread that loses the race to 0
+	 * operating on an already-freed object.
+	 */
+	if (__sync_sub_and_fetch(&jso->_ref_count, 1) > 0)
+		return 0;
+#else
+	if (--jso->_ref_count > 0)
+		return 0;
+#endif
+
+	if (jso->_user_delete)
+		jso->_user_delete(PUBLIC(jso), jso->_userdata);
+	jso->_delete(PUBLIC(jso));
+	return 1;
+}
 int json_object_put(struct json_object *jso)
 {
 	if (!jso)
 		return 0;
+	if (jso->newold)
+		return Xjson_object_put((struct json_object_base *)jso);
 
 	/* Avoid invalid free and crash explicitly instead of (silently)
 	 * segfaulting.
@@ -234,9 +326,14 @@ int json_object_put(struct json_object *jso)
 	return 1;
 }
 
+
 /* generic object construction and destruction parts */
 
 static void json_object_generic_delete(struct json_object *jso)
+{
+	Xjson_object_generic_delete((void *)jso);
+}
+static void Xjson_object_generic_delete(struct json_object_base *jso)
 {
 #ifdef REFCOUNT_DEBUG
 	MC_DEBUG("json_object_delete_%s: %p\n", json_type_to_name(jso->o_type), jso);
@@ -246,7 +343,8 @@ static void json_object_generic_delete(struct json_object *jso)
 	free(jso);
 }
 
-static struct json_object *json_object_new(enum json_type o_type)
+// XAX remove this once all is using new api
+static inline struct json_object *json_object_new(enum json_type o_type)
 {
 	struct json_object *jso;
 
@@ -256,6 +354,35 @@ static struct json_object *json_object_new(enum json_type o_type)
 	jso->o_type = o_type;
 	jso->_ref_count = 1;
 	jso->_delete = &json_object_generic_delete;
+
+#ifdef REFCOUNT_DEBUG
+	lh_table_insert(json_object_table, jso, jso);
+	MC_DEBUG("json_object_new_%s: %p\n", json_type_to_name(jso->o_type), jso);
+#endif /* REFCOUNT_DEBUG */
+	return jso;
+}
+
+static inline struct json_object_base *Xjson_object_new(enum json_type o_type,
+	size_t alloc_size,
+	json_object_to_json_string_fn *to_json_string,
+	json_object_private_delete_fn *delete_fn)
+{
+	struct json_object_base *jso;
+
+	jso = (struct json_object_base *)malloc(alloc_size);
+	if (!jso)
+		return NULL;
+
+	jso->newold = 1; // XAX cut this after conversion
+	jso->o_type = o_type;
+	jso->_ref_count = 1;
+	jso->_delete = delete_fn;
+	jso->_to_json_string = to_json_string;
+	jso->_pb = NULL;
+	jso->_user_delete = NULL;
+	jso->_userdata= NULL;
+	//jso->...   // Type-specific fields must be set by caller
+
 #ifdef REFCOUNT_DEBUG
 	lh_table_insert(json_object_table, jso, jso);
 	MC_DEBUG("json_object_new_%s: %p\n", json_type_to_name(jso->o_type), jso);
@@ -267,24 +394,30 @@ static struct json_object *json_object_new(enum json_type o_type)
 
 int json_object_is_type(const struct json_object *jso, enum json_type type)
 {
+#define jso ((const struct json_object_base *)jso)
 	if (!jso)
 		return (type == json_type_null);
 	return (jso->o_type == type);
+#undef jso
 }
 
 enum json_type json_object_get_type(const struct json_object *jso)
 {
+#define jso ((const struct json_object_base *)jso)
 	if (!jso)
 		return json_type_null;
 	return jso->o_type;
+#undef jso
 }
 
 void *json_object_get_userdata(json_object *jso)
 {
+#define jso ((const struct json_object_base *)jso)
 	return jso ? jso->_userdata : NULL;
+#undef jso
 }
 
-void json_object_set_userdata(json_object *jso, void *userdata, json_object_delete_fn *user_delete)
+static void Xjson_object_set_userdata(json_object *jso, void *userdata, json_object_delete_fn *user_delete)
 {
 	// Can't return failure, so abort if we can't perform the operation.
 	assert(jso != NULL);
@@ -296,10 +429,30 @@ void json_object_set_userdata(json_object *jso, void *userdata, json_object_dele
 	jso->_userdata = userdata;
 	jso->_user_delete = user_delete;
 }
+void json_object_set_userdata(json_object *jso, void *userdata, json_object_delete_fn *user_delete)
+{
+	// XAX call old code:
+	if (!jso->newold)
+	{
+		Xjson_object_set_userdata(jso, userdata, user_delete);
+		return;
+	}
+#define jso ((struct json_object_base *)jso)
+	// Can't return failure, so abort if we can't perform the operation.
+	assert(jso != NULL);
+
+	// First, clean up any previously existing user info
+	if (jso->_user_delete)
+		jso->_user_delete(PUBLIC(jso), jso->_userdata);
+
+	jso->_userdata = userdata;
+	jso->_user_delete = user_delete;
+#undef jso
+}
 
 /* set a custom conversion to string */
 
-void json_object_set_serializer(json_object *jso, json_object_to_json_string_fn *to_string_func,
+static void Xjson_object_set_serializer(json_object *jso, json_object_to_json_string_fn *to_string_func,
                                 void *userdata, json_object_delete_fn *user_delete)
 {
 	json_object_set_userdata(jso, userdata, user_delete);
@@ -333,10 +486,53 @@ void json_object_set_serializer(json_object *jso, json_object_to_json_string_fn 
 	jso->_to_json_string = to_string_func;
 }
 
+void json_object_set_serializer(json_object *jso, json_object_to_json_string_fn *to_string_func,
+                                void *userdata, json_object_delete_fn *user_delete)
+{
+	// XAX call old code, remove after conversion:
+	if (jso && !jso->newold)
+	{
+		Xjson_object_set_serializer(jso, to_string_func, userdata, user_delete);
+		return;
+	}
+#define jso ((struct json_object_base *)jso)
+	json_object_set_userdata(PUBLIC(jso), userdata, user_delete);
+
+	if (to_string_func == NULL)
+	{
+		// Reset to the standard serialization function
+		switch (jso->o_type)
+		{
+		case json_type_null: jso->_to_json_string = NULL; break;
+		case json_type_boolean:
+			jso->_to_json_string = &json_object_boolean_to_json_string;
+			break;
+		case json_type_double:
+			jso->_to_json_string = &json_object_double_to_json_string_default;
+			break;
+		case json_type_int: jso->_to_json_string = &json_object_int_to_json_string; break;
+		case json_type_object:
+			jso->_to_json_string = &json_object_object_to_json_string;
+			break;
+		case json_type_array:
+			jso->_to_json_string = &json_object_array_to_json_string;
+			break;
+		case json_type_string:
+			jso->_to_json_string = &json_object_string_to_json_string;
+			break;
+		}
+		return;
+	}
+
+	jso->_to_json_string = to_string_func;
+#undef jso
+}
+
 /* extended conversion to string */
 
 const char *json_object_to_json_string_length(struct json_object *jso, int flags, size_t *length)
 {
+#define jso ((struct json_object_base *)jso)
 	const char *r = NULL;
 	size_t s = 0;
 
@@ -349,7 +545,7 @@ const char *json_object_to_json_string_length(struct json_object *jso, int flags
 	{
 		printbuf_reset(jso->_pb);
 
-		if (jso->_to_json_string(jso, jso->_pb, 0, flags) >= 0)
+		if (jso->_to_json_string(PUBLIC(jso), jso->_pb, 0, flags) >= 0)
 		{
 			s = (size_t)jso->_pb->bpos;
 			r = jso->_pb->buf;
@@ -359,6 +555,7 @@ const char *json_object_to_json_string_length(struct json_object *jso, int flags
 	if (length)
 		*length = s;
 	return r;
+#undef jso
 }
 
 const char *json_object_to_json_string_ext(struct json_object *jso, int flags)
@@ -393,6 +590,7 @@ static void indent(struct printbuf *pb, int level, int flags)
 static int json_object_object_to_json_string(struct json_object *jso, struct printbuf *pb,
                                              int level, int flags)
 {
+#define jso ((struct json_object_base *)jso)
 	int had_children = 0;
 	struct json_object_iter iter;
 
@@ -432,6 +630,7 @@ static int json_object_object_to_json_string(struct json_object *jso, struct pri
 		return printbuf_strappend(pb, /*{*/ " }");
 	else
 		return printbuf_strappend(pb, /*{*/ "}");
+#undef jso
 }
 
 static void json_object_lh_entry_free(struct lh_entry *ent)
@@ -441,57 +640,62 @@ static void json_object_lh_entry_free(struct lh_entry *ent)
 	json_object_put((struct json_object *)lh_entry_v(ent));
 }
 
-static void json_object_object_delete(struct json_object *jso)
+static void json_object_object_delete(struct json_object_base *jso_base)
 {
-	lh_table_free(jso->o.c_object);
-	json_object_generic_delete(jso);
+	struct json_object_object *jso = (struct json_object_object *)jso_base;
+	lh_table_free(jso->c_object);
+	Xjson_object_generic_delete(jso_base);
 }
 
 struct json_object *json_object_new_object(void)
 {
-	struct json_object *jso = json_object_new(json_type_object);
-	if (!jso)
+	struct json_object_base *jso_base;
+	jso_base = JSON_OBJECT_NEW(object, &json_object_object_delete);
+	if (!jso_base)
 		return NULL;
-	jso->_delete = &json_object_object_delete;
-	jso->_to_json_string = &json_object_object_to_json_string;
-	jso->o.c_object =
+	struct json_object_object *jso = (struct json_object_object *)jso_base;
+	jso->c_object =
 	    lh_kchar_table_new(JSON_OBJECT_DEF_HASH_ENTRIES, &json_object_lh_entry_free);
-	if (!jso->o.c_object)
+	if (!jso->c_object)
 	{
-		json_object_generic_delete(jso);
+		Xjson_object_generic_delete(jso_base);
 		errno = ENOMEM;
 		return NULL;
 	}
-	return jso;
+	return PUBLIC(jso_base);
 }
 
 struct lh_table *json_object_get_object(const struct json_object *jso)
 {
+#define jso ((const struct json_object_base *)jso)
 	if (!jso)
 		return NULL;
 	switch (jso->o_type)
 	{
-	case json_type_object: return jso->o.c_object;
+	case json_type_object: return JC_OBJECT_C(jso)->c_object;
 	default: return NULL;
 	}
+#undef jso
 }
 
 int json_object_object_add_ex(struct json_object *jso, const char *const key,
                               struct json_object *const val, const unsigned opts)
 {
+#define jso ((struct json_object_base *)jso)
+#define val ((struct json_object_base *)val)
 	struct json_object *existing_value = NULL;
 	struct lh_entry *existing_entry;
 	unsigned long hash;
 
-	assert(json_object_get_type(jso) == json_type_object);
+	assert(json_object_get_type(PUBLIC(jso)) == json_type_object);
 
 	// We lookup the entry and replace the value, rather than just deleting
 	// and re-adding it, so the existing key remains valid.
-	hash = lh_get_hash(jso->o.c_object, (const void *)key);
+	hash = lh_get_hash(JC_OBJECT(jso)->c_object, (const void *)key);
 	existing_entry =
 	    (opts & JSON_C_OBJECT_ADD_KEY_IS_NEW)
 	        ? NULL
-	        : lh_table_lookup_entry_w_hash(jso->o.c_object, (const void *)key, hash);
+	        : lh_table_lookup_entry_w_hash(JC_OBJECT(jso)->c_object, (const void *)key, hash);
 
 	// The caller must avoid creating loops in the object tree, but do a
 	// quick check anyway to make sure we're not creating a trivial loop.
@@ -504,13 +708,15 @@ int json_object_object_add_ex(struct json_object *jso, const char *const key,
 		    (opts & JSON_C_OBJECT_KEY_IS_CONSTANT) ? (const void *)key : strdup(key);
 		if (k == NULL)
 			return -1;
-		return lh_table_insert_w_hash(jso->o.c_object, k, val, hash, opts);
+		return lh_table_insert_w_hash(JC_OBJECT(jso)->c_object, k, val, hash, opts);
 	}
 	existing_value = (json_object *)lh_entry_v(existing_entry);
 	if (existing_value)
 		json_object_put(existing_value);
 	existing_entry->v = val;
 	return 0;
+#undef jso
+#undef val
 }
 
 int json_object_object_add(struct json_object *jso, const char *key, struct json_object *val)
@@ -520,9 +726,12 @@ int json_object_object_add(struct json_object *jso, const char *key, struct json
 
 int json_object_object_length(const struct json_object *jso)
 {
-	assert(json_object_get_type(jso) == json_type_object);
-	return lh_table_length(jso->o.c_object);
+#define jso ((const struct json_object_base *)jso)
+	assert(json_object_get_type(PUBLIC_C(jso)) == json_type_object);
+	return lh_table_length(JC_OBJECT_C(jso)->c_object);
+#undef jso
 }
+
 
 size_t json_c_object_sizeof(void)
 {
@@ -539,6 +748,7 @@ struct json_object *json_object_object_get(const struct json_object *jso, const 
 json_bool json_object_object_get_ex(const struct json_object *jso, const char *key,
                                     struct json_object **value)
 {
+#define jso ((const struct json_object_base *)jso)
 	if (value != NULL)
 		*value = NULL;
 
@@ -548,20 +758,24 @@ json_bool json_object_object_get_ex(const struct json_object *jso, const char *k
 	switch (jso->o_type)
 	{
 	case json_type_object:
-		return lh_table_lookup_ex(jso->o.c_object, (const void *)key, (void **)value);
+		return lh_table_lookup_ex(JC_OBJECT_C(jso)->c_object, (const void *)key, (void **)value);
 	default:
 		if (value != NULL)
 			*value = NULL;
 		return 0;
 	}
+#undef jso
 }
 
 void json_object_object_del(struct json_object *jso, const char *key)
 {
-	assert(json_object_get_type(jso) == json_type_object);
-	lh_table_delete(jso->o.c_object, key);
+#define jso ((struct json_object_base *)jso)
+	assert(json_object_get_type(PUBLIC(jso)) == json_type_object);
+	lh_table_delete(JC_OBJECT(jso)->c_object, key);
+#undef jso
 }
 
+// XAX ------------------------------ start unconverted code:
 /* json_object_boolean */
 
 static int json_object_boolean_to_json_string(struct json_object *jso, struct printbuf *pb,
@@ -1398,17 +1612,18 @@ struct json_object *json_object_new_null(void)
 	return NULL;
 }
 
-static int json_object_all_values_equal(struct json_object *jso1, struct json_object *jso2)
+static int json_object_all_values_equal(struct json_object_base *jso1, struct json_object_base *jso2)
 {
 	struct json_object_iter iter;
 	struct json_object *sub;
 
-	assert(json_object_get_type(jso1) == json_type_object);
-	assert(json_object_get_type(jso2) == json_type_object);
+	assert(json_object_get_type(PUBLIC(jso1)) == json_type_object);
+	assert(json_object_get_type(PUBLIC(jso2)) == json_type_object);
 	/* Iterate over jso1 keys and see if they exist and are equal in jso2 */
 	json_object_object_foreachC(jso1, iter)
 	{
-		if (!lh_table_lookup_ex(jso2->o.c_object, (void *)iter.key, (void **)(void *)&sub))
+		struct json_object_object *jso2_object = (struct json_object_object *)jso2;
+		if (!lh_table_lookup_ex(jso2_object->c_object, (void *)iter.key, (void **)(void *)&sub))
 			return 0;
 		if (!json_object_equal(iter.val, sub))
 			return 0;
@@ -1417,14 +1632,15 @@ static int json_object_all_values_equal(struct json_object *jso1, struct json_ob
 	/* Iterate over jso2 keys to see if any exist that are not in jso1 */
 	json_object_object_foreachC(jso2, iter)
 	{
-		if (!lh_table_lookup_ex(jso1->o.c_object, (void *)iter.key, (void **)(void *)&sub))
+		struct json_object_object *jso1_object = (struct json_object_object *)jso1;
+		if (!lh_table_lookup_ex(jso1_object->c_object, (void *)iter.key, (void **)(void *)&sub))
 			return 0;
 	}
 
 	return 1;
 }
 
-int json_object_equal(struct json_object *jso1, struct json_object *jso2)
+static int Xjson_object_equal(struct json_object *jso1, struct json_object *jso2)
 {
 	if (jso1 == jso2)
 		return 1;
@@ -1463,7 +1679,7 @@ int json_object_equal(struct json_object *jso1, struct json_object *jso2)
 		        memcmp(get_string_component(jso1), get_string_component(jso2),
 		               jso1->o.c_string.len) == 0);
 
-	case json_type_object: return json_object_all_values_equal(jso1, jso2);
+	case json_type_object: assert(0); //return json_object_all_values_equal(jso1, jso2);
 
 	case json_type_array: return json_array_equal(jso1, jso2);
 
@@ -1471,6 +1687,70 @@ int json_object_equal(struct json_object *jso1, struct json_object *jso2)
 	};
 
 	return 0;
+}
+int json_object_equal(struct json_object *jso1, struct json_object *jso2)
+{
+	if (jso1 == jso2)
+		return 1;
+
+	if (!jso1 || !jso2)
+		return 0;
+
+	// XAX cut this after conversion
+	if (!jso1->newold && !jso2->newold)
+		return Xjson_object_equal(jso1, jso2); // call old code
+
+#define jso1 ((struct json_object_base *)jso1)
+#define jso2 ((struct json_object_base *)jso2)
+	if (jso1->o_type != jso2->o_type)
+		return 0;
+
+	switch (jso1->o_type)
+	{
+	case json_type_boolean: return (JC_BOOL(jso1)->c_boolean == JC_BOOL(jso2)->c_boolean);
+
+	case json_type_double: return (JC_DOUBLE(jso1)->c_double == JC_DOUBLE(jso2)->c_double);
+
+	case json_type_int:
+	{
+		struct json_object_int *int1 = JC_INT(jso1);
+		struct json_object_int *int2 = JC_INT(jso2);
+		if (int1->cint_type == json_object_int_type_int64)
+		{
+			if (int2->cint_type == json_object_int_type_int64)
+				return (int1->cint.c_int64 == int2->cint.c_int64);
+			if (int1->cint.c_int64 < 0)
+				return 0;
+			return ((uint64_t)int1->cint.c_int64 ==
+			        int2->cint.c_uint64);
+		}
+		// else jso1 is a uint64
+		if (int2->cint_type == json_object_int_type_uint64)
+			return (int1->cint.c_uint64 == int2->cint.c_uint64);
+		if (int2->cint.c_int64 < 0)
+			return 0;
+		return (int1->cint.c_uint64 == (uint64_t)int2->cint.c_int64);
+	}
+
+	case json_type_string:
+	{
+		struct json_object_string *str1 = JC_STRING(jso1);
+		struct json_object_string *str2 = JC_STRING(jso2);
+		return (str1->len == str2->len &&
+		        memcmp(str1->data, str2->data, str1->len) == 0);
+	}
+
+	case json_type_object: return json_object_all_values_equal(jso1, jso2);
+
+// XAX not actually
+	case json_type_array: return json_array_equal(PUBLIC(jso1), PUBLIC(jso2));
+
+	case json_type_null: return 1;
+	};
+
+	return 0;
+#undef jso1
+#undef jso2
 }
 
 static int json_object_copy_serializer_data(struct json_object *src, struct json_object *dst)
@@ -1550,16 +1830,16 @@ int json_c_shallow_copy_default(json_object *src, json_object *parent, const cha
  *
  * Note: caller is responsible for freeing *dst if this fails and returns -1.
  */
-static int json_object_deep_copy_recursive(struct json_object *src, struct json_object *parent,
+static int json_object_deep_copy_recursive(struct json_object_base *src, struct json_object_base *parent,
                                            const char *key_in_parent, size_t index_in_parent,
-                                           struct json_object **dst,
+                                           struct json_object_base **dst,
                                            json_c_shallow_copy_fn *shallow_copy)
 {
 	struct json_object_iter iter;
 	size_t src_array_len, ii;
 
 	int shallow_copy_rc = 0;
-	shallow_copy_rc = shallow_copy(src, parent, key_in_parent, index_in_parent, dst);
+	shallow_copy_rc = shallow_copy(PUBLIC(src), PUBLIC(parent), key_in_parent, index_in_parent, (struct json_object **)dst); // XAX remove cast too
 	/* -1=error, 1=object created ok, 2=userdata set */
 	if (shallow_copy_rc < 1)
 	{
@@ -1573,44 +1853,44 @@ static int json_object_deep_copy_recursive(struct json_object *src, struct json_
 	case json_type_object:
 		json_object_object_foreachC(src, iter)
 		{
-			struct json_object *jso = NULL;
+			struct json_object_base *jso = NULL;
 			/* This handles the `json_type_null` case */
 			if (!iter.val)
 				jso = NULL;
-			else if (json_object_deep_copy_recursive(iter.val, src, iter.key, -1, &jso,
+			else if (json_object_deep_copy_recursive((struct json_object_base *)/*XAX removecast*/iter.val, src, iter.key, -1, &jso,
 			                                         shallow_copy) < 0)
 			{
-				json_object_put(jso);
+				json_object_put(PUBLIC(jso));
 				return -1;
 			}
 
-			if (json_object_object_add(*dst, iter.key, jso) < 0)
+			if (json_object_object_add(PUBLIC(*dst), iter.key, PUBLIC(jso)) < 0)
 			{
-				json_object_put(jso);
+				json_object_put(PUBLIC(jso));
 				return -1;
 			}
 		}
 		break;
 
 	case json_type_array:
-		src_array_len = json_object_array_length(src);
+		src_array_len = json_object_array_length(PUBLIC(src));
 		for (ii = 0; ii < src_array_len; ii++)
 		{
-			struct json_object *jso = NULL;
-			struct json_object *jso1 = json_object_array_get_idx(src, ii);
+			struct json_object_base *jso = NULL;
+			struct json_object_base *jso1 = (struct json_object_base *)/*XAXremovecast*/json_object_array_get_idx(PUBLIC(src), ii);
 			/* This handles the `json_type_null` case */
 			if (!jso1)
 				jso = NULL;
 			else if (json_object_deep_copy_recursive(jso1, src, NULL, ii, &jso,
 			                                         shallow_copy) < 0)
 			{
-				json_object_put(jso);
+				json_object_put(PUBLIC(jso));
 				return -1;
 			}
 
-			if (json_object_array_add(*dst, jso) < 0)
+			if (json_object_array_add(PUBLIC(*dst), PUBLIC(jso)) < 0)
 			{
-				json_object_put(jso);
+				json_object_put(PUBLIC(jso));
 				return -1;
 			}
 		}
@@ -1622,7 +1902,7 @@ static int json_object_deep_copy_recursive(struct json_object *src, struct json_
 	}
 
 	if (shallow_copy_rc != 2)
-		return json_object_copy_serializer_data(src, *dst);
+		return json_object_copy_serializer_data(PUBLIC(src), PUBLIC(*dst));
 
 	return 0;
 }
@@ -1630,6 +1910,9 @@ static int json_object_deep_copy_recursive(struct json_object *src, struct json_
 int json_object_deep_copy(struct json_object *src, struct json_object **dst,
                           json_c_shallow_copy_fn *shallow_copy)
 {
+#define src ((struct json_object_base *)src)
+#define parent ((struct json_object_base *)parent)
+#define dst ((struct json_object_base **)dst)
 	int rc;
 
 	/* Check if arguments are sane ; *dst must not point to a non-NULL object */
@@ -1645,11 +1928,14 @@ int json_object_deep_copy(struct json_object *src, struct json_object **dst,
 	rc = json_object_deep_copy_recursive(src, NULL, NULL, -1, dst, shallow_copy);
 	if (rc < 0)
 	{
-		json_object_put(*dst);
+		json_object_put(PUBLIC(*dst));
 		*dst = NULL;
 	}
 
 	return rc;
+#undef src
+#undef parent
+#undef dst
 }
 
 static void json_abort(const char *message)

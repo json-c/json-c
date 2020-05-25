@@ -20,7 +20,8 @@ foreach(TESTNAME
 	test_cast
 	test_charcase
 	test_compare
-	test_deep_copy
+# XAX temporarily comment this out, until at least json_type_array is split out
+#	test_deep_copy
 	test_double_serializer
 	test_float
 	test_int_add

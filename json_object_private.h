@@ -36,8 +36,60 @@ typedef enum json_object_int_type
 	json_object_int_type_uint64
 } json_object_int_type;
 
+struct json_object_base // XAX rename to json_object after conversion
+{
+	int newold;  // XAX temporary, remove after code conversion
+	enum json_type o_type;
+	uint32_t _ref_count;
+	json_object_private_delete_fn *_delete;
+	json_object_to_json_string_fn *_to_json_string;
+	struct printbuf *_pb;
+	json_object_delete_fn *_user_delete;
+	void *_userdata;
+	char data[1]; // Actually a struct json_object_${o_type}
+};
+
+struct json_object_object
+{
+	struct json_object_base base;
+	struct lh_table *c_object;
+};
+struct json_object_array
+{
+	struct json_object_base base;
+	struct array_list *c_array;
+};
+
+struct json_object_boolean
+{
+	struct json_object_base base;
+	json_bool c_boolean;
+};
+struct json_object_double
+{
+	struct json_object_base base;
+	json_bool c_double;
+};
+struct json_object_int
+{
+	struct json_object_base base;
+	enum json_object_int_type cint_type;
+	union
+	{
+		int64_t c_int64;
+		uint64_t c_uint64;
+	} cint;
+};
+struct json_object_string
+{
+	struct json_object_base base;
+	size_t len;
+	char data[1]; // Actually longer
+};
+
 struct json_object
 {
+	int newold;
 	enum json_type o_type;
 	uint32_t _ref_count;
 	json_object_private_delete_fn *_delete;
@@ -56,7 +108,6 @@ struct json_object
 			} cint;
 			enum json_object_int_type cint_type;
 		} c_int;
-		struct lh_table *c_object;
 		struct array_list *c_array;
 		struct
 		{

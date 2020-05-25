@@ -490,8 +490,9 @@ JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key
  * @param obj the json_object instance
  * @param iter the object iterator, use type json_object_iter
  */
+// XAX temporary workaround during code conversion:
 #define json_object_object_foreachC(obj, iter)                                                  \
-	for (iter.entry = json_object_get_object(obj)->head;                                    \
+	for (iter.entry = json_object_get_object(PUBLIC(obj))->head;                                    \
 	     (iter.entry ? (iter.key = (char *)lh_entry_k(iter.entry),                          \
 	                   iter.val = (struct json_object *)lh_entry_v(iter.entry), iter.entry) \
 	                 : 0);                                                                  \
