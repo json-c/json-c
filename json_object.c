@@ -48,6 +48,11 @@ static void json_object_generic_delete(struct json_object *jso);
 static void Xjson_object_generic_delete(struct json_object_base *jso);
 static struct json_object *json_object_new(enum json_type o_type);
 
+#if defined(_MSC_VER) && (_MSC_VER <= 1800)
+/* VS2013 doesn't know about "inline" */
+#define inline __inline
+#endif
+
 // XAX kill this once json_object_base is renamed back to json_object
 static inline struct json_object *PUBLIC(struct json_object_base *jso)
 {
