@@ -97,7 +97,6 @@ struct json_object
 	struct printbuf *_pb;
 	union data
 	{
-		json_bool c_boolean;
 		double c_double;
 		struct
 		{

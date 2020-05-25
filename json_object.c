@@ -86,6 +86,10 @@ static inline struct json_object_boolean *JC_BOOL(struct json_object_base *jso)
 {
 	return (void *)jso;
 }
+static inline const struct json_object_boolean *JC_BOOL_C(const struct json_object_base *jso)
+{
+	return (const void *)jso;
+}
 static inline struct json_object_double *JC_DOUBLE(struct json_object_base *jso)
 {
 	return (void *)jso;
@@ -786,25 +790,27 @@ void json_object_object_del(struct json_object *jso, const char *key)
 #undef jso
 }
 
-// XAX ------------------------------ start unconverted code:
 /* json_object_boolean */
 
 static int json_object_boolean_to_json_string(struct json_object *jso, struct printbuf *pb,
                                               int level, int flags)
 {
-	if (jso->o.c_boolean)
+#define jso ((struct json_object_base *)jso)
+	if (JC_BOOL(jso)->c_boolean)
 		return printbuf_strappend(pb, "true");
 	return printbuf_strappend(pb, "false");
+#undef jso
 }
 
 struct json_object *json_object_new_boolean(json_bool b)
 {
-	struct json_object *jso = json_object_new(json_type_boolean);
-	if (!jso)
+	struct json_object_base *jso_base;
+	jso_base = JSON_OBJECT_NEW(boolean, &json_object_generic_delete);
+	if (!jso_base)
 		return NULL;
-	jso->_to_json_string = &json_object_boolean_to_json_string;
-	jso->o.c_boolean = b;
-	return jso;
+	struct json_object_boolean *jso = (struct json_object_boolean *)jso_base;
+	jso->c_boolean = b;
+	return PUBLIC(jso_base);
 }
 
 json_bool json_object_get_boolean(const struct json_object *jso)
@@ -813,7 +819,9 @@ json_bool json_object_get_boolean(const struct json_object *jso)
 		return 0;
 	switch (jso->o_type)
 	{
-	case json_type_boolean: return jso->o.c_boolean;
+#define jso ((const struct json_object_base *)jso)
+	case json_type_boolean: return JC_BOOL_C(jso)->c_boolean;
+#undef jso
 	case json_type_int:
 		switch (jso->o.c_int.cint_type)
 		{
@@ -829,12 +837,15 @@ json_bool json_object_get_boolean(const struct json_object *jso)
 
 int json_object_set_boolean(struct json_object *jso, json_bool new_value)
 {
+#define jso ((struct json_object_base *)jso)
 	if (!jso || jso->o_type != json_type_boolean)
 		return 0;
-	jso->o.c_boolean = new_value;
+	JC_BOOL(jso)->c_boolean = new_value;
 	return 1;
+#undef jso
 }
 
+// XAX ------------------------------ start unconverted code:
 /* json_object_int */
 
 static int json_object_int_to_json_string(struct json_object *jso, struct printbuf *pb, int level,
@@ -907,7 +918,9 @@ int32_t json_object_get_int(const struct json_object *jso)
 		if (jso->o.c_double >= INT32_MAX)
 			return INT32_MAX;
 		return (int32_t)jso->o.c_double;
-	case json_type_boolean: return jso->o.c_boolean;
+#define jso ((const struct json_object_base *)jso)
+	case json_type_boolean: return JC_BOOL_C(jso)->c_boolean;
+#undef jso
 	default: return 0;
 	}
 }
@@ -965,7 +978,9 @@ int64_t json_object_get_int64(const struct json_object *jso)
 		if (jso->o.c_double <= INT64_MIN)
 			return INT64_MIN;
 		return (int64_t)jso->o.c_double;
-	case json_type_boolean: return jso->o.c_boolean;
+#define jso ((const struct json_object_base *)jso)
+	case json_type_boolean: return JC_BOOL_C(jso)->c_boolean;
+#undef jso
 	case json_type_string:
 		if (json_parse_int64(get_string_component(jso), &cint) == 0)
 			return cint;
@@ -1000,7 +1015,9 @@ uint64_t json_object_get_uint64(const struct json_object *jso)
 		if (jso->o.c_double < 0)
 			return 0;
 		return (uint64_t)jso->o.c_double;
-	case json_type_boolean: return jso->o.c_boolean;
+#define jso ((const struct json_object_base *)jso)
+	case json_type_boolean: return JC_BOOL_C(jso)->c_boolean;
+#undef jso
 	case json_type_string:
 		if (json_parse_uint64(get_string_component(jso), &cuint) == 0)
 			return cuint;
@@ -1294,7 +1311,9 @@ double json_object_get_double(const struct json_object *jso)
 		case json_object_int_type_uint64: return jso->o.c_int.cint.c_uint64;
 		default: json_abort("invalid cint_type");
 		}
-	case json_type_boolean: return jso->o.c_boolean;
+#define jso ((const struct json_object_base *)jso)
+	case json_type_boolean: return JC_BOOL_C(jso)->c_boolean;
+#undef jso
 	case json_type_string:
 		errno = 0;
 		cdouble = strtod(get_string_component(jso), &errPtr);
@@ -1684,7 +1703,7 @@ static int Xjson_object_equal(struct json_object *jso1, struct json_object *jso2
 
 	switch (jso1->o_type)
 	{
-	case json_type_boolean: return (jso1->o.c_boolean == jso2->o.c_boolean);
+	case json_type_boolean: assert(0); //return (jso1->o.c_boolean == jso2->o.c_boolean);
 
 	case json_type_double: return (jso1->o.c_double == jso2->o.c_double);
 
@@ -1846,7 +1865,9 @@ int json_c_shallow_copy_default(json_object *src, json_object *parent, const cha
 {
 	switch (src->o_type)
 	{
-	case json_type_boolean: *dst = json_object_new_boolean(src->o.c_boolean); break;
+#define src ((struct json_object_base *)src)
+	case json_type_boolean: *dst = json_object_new_boolean(JC_BOOL(src)->c_boolean); break;
+#undef src
 
 	case json_type_double: *dst = json_object_new_double(src->o.c_double); break;
 
