@@ -108,7 +108,6 @@ struct json_object
 			} cint;
 			enum json_object_int_type cint_type;
 		} c_int;
-		struct array_list *c_array;
 		struct
 		{
 			union

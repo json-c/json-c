@@ -73,6 +73,10 @@ static inline struct json_object_array *JC_ARRAY(struct json_object_base *jso)
 {
 	return (void *)jso;
 }
+static inline const struct json_object_array *JC_ARRAY_C(const struct json_object_base *jso)
+{
+	return (const void *)jso;
+}
 static inline struct json_object_boolean *JC_BOOL(struct json_object_base *jso)
 {
 	return (void *)jso;
@@ -412,6 +416,8 @@ enum json_type json_object_get_type(const struct json_object *jso)
 
 void *json_object_get_userdata(json_object *jso)
 {
+	if (!jso->newold)
+		return jso ? jso->_userdata : NULL;
 #define jso ((const struct json_object_base *)jso)
 	return jso ? jso->_userdata : NULL;
 #undef jso
@@ -1464,13 +1470,14 @@ int json_object_set_string_len(json_object *jso, const char *s, int len)
 static int json_object_array_to_json_string(struct json_object *jso, struct printbuf *pb, int level,
                                             int flags)
 {
+#define jso ((struct json_object_base *)jso)
 	int had_children = 0;
 	size_t ii;
 
 	printbuf_strappend(pb, "[");
 	if (flags & JSON_C_TO_STRING_PRETTY)
 		printbuf_strappend(pb, "\n");
-	for (ii = 0; ii < json_object_array_length(jso); ii++)
+	for (ii = 0; ii < json_object_array_length(PUBLIC(jso)); ii++)
 	{
 		struct json_object *val;
 		if (had_children)
@@ -1483,7 +1490,7 @@ static int json_object_array_to_json_string(struct json_object *jso, struct prin
 		if (flags & JSON_C_TO_STRING_SPACED && !(flags & JSON_C_TO_STRING_PRETTY))
 			printbuf_strappend(pb, " ");
 		indent(pb, level + 1, flags);
-		val = json_object_array_get_idx(jso, ii);
+		val = json_object_array_get_idx(PUBLIC(jso), ii);
 		if (val == NULL)
 			printbuf_strappend(pb, "null");
 		else if (val->_to_json_string(val, pb, level + 1, flags) < 0)
@@ -1499,6 +1506,7 @@ static int json_object_array_to_json_string(struct json_object *jso, struct prin
 	if (flags & JSON_C_TO_STRING_SPACED && !(flags & JSON_C_TO_STRING_PRETTY))
 		return printbuf_strappend(pb, " ]");
 	return printbuf_strappend(pb, "]");
+#undef jso
 }
 
 static void json_object_array_entry_free(void *data)
@@ -1508,86 +1516,104 @@ static void json_object_array_entry_free(void *data)
 
 static void json_object_array_delete(struct json_object *jso)
 {
-	array_list_free(jso->o.c_array);
-	json_object_generic_delete(jso);
+#define jso ((struct json_object_base *)jso)
+	array_list_free(JC_ARRAY(jso)->c_array);
+	json_object_generic_delete(PUBLIC(jso));
+#undef jso
 }
 
 struct json_object *json_object_new_array(void)
 {
-	struct json_object *jso = json_object_new(json_type_array);
-	if (!jso)
+	struct json_object_base *jso_base;
+	jso_base = JSON_OBJECT_NEW(array, &json_object_array_delete);
+	if (!jso_base)
 		return NULL;
-	jso->_delete = &json_object_array_delete;
-	jso->_to_json_string = &json_object_array_to_json_string;
-	jso->o.c_array = array_list_new(&json_object_array_entry_free);
-	if (jso->o.c_array == NULL)
+	struct json_object_array *jso = (struct json_object_array *)jso_base;
+	jso->c_array = array_list_new(&json_object_array_entry_free);
+	if (jso->c_array == NULL)
 	{
 		free(jso);
 		return NULL;
 	}
-	return jso;
+	return PUBLIC(jso_base);
 }
 
 struct array_list *json_object_get_array(const struct json_object *jso)
 {
+#define jso ((const struct json_object_base *)jso)
 	if (!jso)
 		return NULL;
 	switch (jso->o_type)
 	{
-	case json_type_array: return jso->o.c_array;
+	case json_type_array: return JC_ARRAY_C(jso)->c_array;
 	default: return NULL;
 	}
+#undef jso
 }
 
 void json_object_array_sort(struct json_object *jso, int (*sort_fn)(const void *, const void *))
 {
-	assert(json_object_get_type(jso) == json_type_array);
-	array_list_sort(jso->o.c_array, sort_fn);
+#define jso ((struct json_object_base *)jso)
+	assert(json_object_get_type(PUBLIC(jso)) == json_type_array);
+	array_list_sort(JC_ARRAY(jso)->c_array, sort_fn);
+#undef jso
 }
 
 struct json_object *json_object_array_bsearch(const struct json_object *key,
                                               const struct json_object *jso,
                                               int (*sort_fn)(const void *, const void *))
 {
+#define jso ((const struct json_object_base *)jso)
 	struct json_object **result;
 
-	assert(json_object_get_type(jso) == json_type_array);
+	assert(json_object_get_type(PUBLIC_C(jso)) == json_type_array);
 	result = (struct json_object **)array_list_bsearch((const void **)(void *)&key,
-	                                                   jso->o.c_array, sort_fn);
+	                                                   JC_ARRAY_C(jso)->c_array, sort_fn);
 
 	if (!result)
 		return NULL;
 	return *result;
+#undef jso
 }
 
 size_t json_object_array_length(const struct json_object *jso)
 {
-	assert(json_object_get_type(jso) == json_type_array);
-	return array_list_length(jso->o.c_array);
+#define jso ((const struct json_object_base *)jso)
+	assert(json_object_get_type(PUBLIC_C(jso)) == json_type_array);
+	return array_list_length(JC_ARRAY_C(jso)->c_array);
+#undef jso
 }
 
 int json_object_array_add(struct json_object *jso, struct json_object *val)
 {
-	assert(json_object_get_type(jso) == json_type_array);
-	return array_list_add(jso->o.c_array, val);
+#define jso ((struct json_object_base *)jso)
+	assert(json_object_get_type(PUBLIC_C(jso)) == json_type_array);
+	return array_list_add(JC_ARRAY(jso)->c_array, val);
+#undef jso
 }
 
 int json_object_array_put_idx(struct json_object *jso, size_t idx, struct json_object *val)
 {
-	assert(json_object_get_type(jso) == json_type_array);
-	return array_list_put_idx(jso->o.c_array, idx, val);
+#define jso ((struct json_object_base *)jso)
+	assert(json_object_get_type(PUBLIC_C(jso)) == json_type_array);
+	return array_list_put_idx(JC_ARRAY(jso)->c_array, idx, val);
+#undef jso
 }
 
 int json_object_array_del_idx(struct json_object *jso, size_t idx, size_t count)
 {
-	assert(json_object_get_type(jso) == json_type_array);
-	return array_list_del_idx(jso->o.c_array, idx, count);
+#define jso ((struct json_object_base *)jso)
+	assert(json_object_get_type(PUBLIC_C(jso)) == json_type_array);
+	return array_list_del_idx(JC_ARRAY(jso)->c_array, idx, count);
+#undef jso
 }
 
 struct json_object *json_object_array_get_idx(const struct json_object *jso, size_t idx)
 {
-	assert(json_object_get_type(jso) == json_type_array);
-	return (struct json_object *)array_list_get_idx(jso->o.c_array, idx);
+#define jso ((const struct json_object_base *)jso)
+	assert(json_object_get_type(PUBLIC_C(jso)) == json_type_array);
+	return (struct json_object *)array_list_get_idx(JC_ARRAY_C(jso)->c_array, idx);
+#undef jso
 }
 
 static int json_array_equal(struct json_object *jso1, struct json_object *jso2)
@@ -1681,7 +1707,7 @@ static int Xjson_object_equal(struct json_object *jso1, struct json_object *jso2
 
 	case json_type_object: assert(0); //return json_object_all_values_equal(jso1, jso2);
 
-	case json_type_array: return json_array_equal(jso1, jso2);
+	case json_type_array: assert(0); //return json_array_equal(jso1, jso2);
 
 	case json_type_null: return 1;
 	};
@@ -1742,7 +1768,6 @@ int json_object_equal(struct json_object *jso1, struct json_object *jso2)
 
 	case json_type_object: return json_object_all_values_equal(jso1, jso2);
 
-// XAX not actually
 	case json_type_array: return json_array_equal(PUBLIC(jso1), PUBLIC(jso2));
 
 	case json_type_null: return 1;
@@ -1753,7 +1778,8 @@ int json_object_equal(struct json_object *jso1, struct json_object *jso2)
 #undef jso2
 }
 
-static int json_object_copy_serializer_data(struct json_object *src, struct json_object *dst)
+// XAX remove this function after code conversion
+static int Xjson_object_copy_serializer_data(struct json_object *src, struct json_object *dst)
 {
 	if (!src->_userdata && !src->_user_delete)
 		return 0;
@@ -1773,6 +1799,33 @@ static int json_object_copy_serializer_data(struct json_object *src, struct json
 	}
 	dst->_user_delete = src->_user_delete;
 	return 0;
+}
+static int json_object_copy_serializer_data(struct json_object *src, struct json_object *dst)
+{
+	if (!src->newold)
+		return Xjson_object_copy_serializer_data(src, dst);
+#define src ((struct json_object_base *)src)
+#define dst ((struct json_object_base *)dst)
+	if (!src->_userdata && !src->_user_delete)
+		return 0;
+
+	if (dst->_to_json_string == json_object_userdata_to_json_string ||
+	    dst->_to_json_string == _json_object_userdata_to_json_string)
+	{
+		dst->_userdata = strdup(src->_userdata);
+	}
+	// else if ... other supported serializers ...
+	else
+	{
+		_json_c_set_last_err(
+		    "json_object_deep_copy: unable to copy unknown serializer data: %p\n",
+		    dst->_to_json_string);
+		return -1;
+	}
+	dst->_user_delete = src->_user_delete;
+	return 0;
+#undef src
+#undef dst
 }
 
 /**
