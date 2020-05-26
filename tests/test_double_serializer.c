@@ -20,7 +20,7 @@ int main()
 	printf("obj.to_string(standard)=%s\n", json_object_to_json_string(obj));
 
 	printf("Test default serializer with custom userdata:\n");
-	obj->_userdata = udata;
+	((struct json_object_base *)obj)->_userdata = udata;
 	printf("obj.to_string(userdata)=%s\n", json_object_to_json_string(obj));
 
 	printf("Test explicit serializer with custom userdata:\n");

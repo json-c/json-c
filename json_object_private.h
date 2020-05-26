@@ -68,7 +68,7 @@ struct json_object_boolean
 struct json_object_double
 {
 	struct json_object_base base;
-	json_bool c_double;
+	double c_double;
 };
 struct json_object_int
 {
@@ -97,16 +97,6 @@ struct json_object
 	struct printbuf *_pb;
 	union data
 	{
-		double c_double;
-		struct
-		{
-			union
-			{
-				int64_t c_int64;
-				uint64_t c_uint64;
-			} cint;
-			enum json_object_int_type cint_type;
-		} c_int;
 		struct
 		{
 			union
