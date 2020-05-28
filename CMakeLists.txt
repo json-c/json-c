@@ -1,9 +1,28 @@
 #Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 cmake_minimum_required(VERSION 2.8.7)
-cmake_policy(SET CMP0048 NEW)
-project(json-c VERSION 0.13.1)
 
+# Fixes for CMake 2.8.12
+# Reference: https://github.com/Tencent/rapidjson/issues/1154
+set(LIB_MAJOR_VERSION "0")
+set(LIB_MINOR_VERSION "13")
+set(LIB_PATCH_VERSION "1")
+set(LIB_VERSION_STRING "${LIB_MAJOR_VERSION}.${LIB_MINOR_VERSION}.${LIB_PATCH_VERSION}")
+
+if(POLICY CMP0048)
+  cmake_policy(SET CMP0048 NEW)
+endif()
+
+set(LIB_MAJOR_VERSION "0")
+set(LIB_MINOR_VERSION "13")
+set(LIB_PATCH_VERSION "1")
+set(LIB_VERSION_STRING "${LIB_MAJOR_VERSION}.${LIB_MINOR_VERSION}.${LIB_PATCH_VERSION}")
+
+if (CMAKE_VERSION VERSION_LESS 3.0)
+  project(json-c)
+else()
+  project(json-c VERSION 0.13.1)
+endif()
 
 include(CheckSymbolExists)
 
