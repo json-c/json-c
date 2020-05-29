@@ -7,13 +7,6 @@ if(POLICY CMP0048)
 endif()
 
 if (CMAKE_VERSION VERSION_LESS 3.0)
-  # Fixes for CMake 2.8.12
-  # Reference: https://github.com/Tencent/rapidjson/issues/1154
-  set(LIB_MAJOR_VERSION "0")
-  set(LIB_MINOR_VERSION "13")
-  set(LIB_PATCH_VERSION "1")
-  set(LIB_VERSION_STRING "${LIB_MAJOR_VERSION}.${LIB_MINOR_VERSION}.${LIB_PATCH_VERSION}")
-
   project(json-c)
 else()
   project(json-c VERSION 0.13.1)
