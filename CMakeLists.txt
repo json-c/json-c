@@ -131,6 +131,18 @@ set_property(TARGET json-c PROPERTY C_STANDARD 99)
 set_property(TARGET json-c-static PROPERTY C_STANDARD 99)
 set_target_properties(json-c-static PROPERTIES OUTPUT_NAME json-c)
 
+if (CMAKE_VERSION VERSION_LESS 3.0)
+  # Fixes for CMake 2.8.12
+  # Reference: https://github.com/Tencent/rapidjson/issues/1154
+  set(LIB_MAJOR_VERSION "0")
+  set(LIB_MINOR_VERSION "13")
+  set(LIB_PATCH_VERSION "1")
+  set(LIB_VERSION_STRING "${LIB_MAJOR_VERSION}.${LIB_MINOR_VERSION}.${LIB_PATCH_VERSION}")
+
+  set_target_properties(json-c PROPERTIES VERSION ${LIB_VERSION_STRING})
+  set_target_properties(json-c-static PROPERTIES VERSION ${LIB_VERSION_STRING})
+endif ()
+
 install(TARGETS json-c json-c-static
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
