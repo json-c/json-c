@@ -1,8 +1,21 @@
 #Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 cmake_minimum_required(VERSION 2.8.7)
-cmake_policy(SET CMP0048 NEW)
-project(json-c VERSION 0.13.1)
+if(POLICY CMP0048)
+	cmake_policy(SET CMP0048 NEW)
+endif()
+
+# JSON-C library is C only project.
+if (CMAKE_VERSION VERSION_LESS 3.0)
+	project(json-c)
+	set(PROJECT_VERSION_MAJOR "0")
+	set(PROJECT_VERSION_MINOR "13")
+	set(PROJECT_VERSION_PATCH "1")
+	set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+else()
+	project(json-c LANGUAGES C VERSION 0.13.1)
+endif()
+
 
 
 include(CheckSymbolExists)
