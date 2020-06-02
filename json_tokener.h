@@ -111,7 +111,7 @@ struct json_tokener
 	 * @deprecated See json_tokener_get_error() instead.
 	 */
 	enum json_tokener_error err;
-	unsigned int ucs_char;
+	unsigned int ucs_char, got_hi_surrogate;
 	char quote_char;
 	struct json_tokener_srec *stack;
 	int flags;
