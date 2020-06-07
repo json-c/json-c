@@ -24,6 +24,11 @@ struct json_object;
 #include "json_inttypes.h"
 #include "json_types.h"
 
+#ifdef _MSC_VER
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
+#endif
+
 typedef void (json_object_private_delete_fn)(struct json_object *o);
 
 /* json object int type, support extension*/
