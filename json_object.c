@@ -1431,9 +1431,9 @@ static int json_object_string_to_json_string(struct json_object *jso, struct pri
                                              int level, int flags)
 {
 #define jso ((struct json_object_base *)jso)
-	printbuf_strappend(pb, "\"");
 	ssize_t len = JC_STRING(jso)->len;
-	json_escape_str(pb, get_string_component(jso), len < 0 ? -len : len, flags);
+	printbuf_strappend(pb, "\"");
+	json_escape_str(pb, get_string_component(jso), len < 0 ? -(ssize_t)len : len, flags);
 	printbuf_strappend(pb, "\"");
 	return 0;
 #undef jso
@@ -1517,7 +1517,7 @@ int json_object_get_string_len(const struct json_object *jso)
 	{
 	case json_type_string:
 		len = JC_STRING_C(jso)->len;
-		return (len < 0) ? -len : len;
+		return (len < 0) ? -(ssize_t)len : len;
 	default: return 0;
 	}
 #undef jso
@@ -1554,13 +1554,13 @@ static int _json_object_set_string_len(json_object *jso, const char *s, size_t l
 		if (JC_STRING(jso)->len < 0)
 			free(JC_STRING(jso)->c_string.pdata);
 		JC_STRING(jso)->c_string.pdata = dstbuf;
-		newlen = -len;
+		newlen = -(ssize_t)len;
 	}
 	else if (JC_STRING(jso)->len < 0)
 	{
 		// We've got enough room in the separate allocated buffer,
 		// so use it as-is and continue to indicate that pdata is used.
-		newlen = -len;
+		newlen = -(ssize_t)len;
 	}
 
 	memcpy(dstbuf, (const void *)s, len);
