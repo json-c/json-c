@@ -20,14 +20,11 @@
 extern "C" {
 #endif
 
-/**< how many bytes are directly stored in json_object for strings? */
-#define LEN_DIRECT_STRING_DATA 32
-
 struct json_object;
 #include "json_inttypes.h"
 #include "json_types.h"
 
-typedef void(json_object_private_delete_fn)(struct json_object *o);
+typedef void (json_object_private_delete_fn)(struct json_object *o);
 
 /* json object int type, support extension*/
 typedef enum json_object_int_type
@@ -36,9 +33,8 @@ typedef enum json_object_int_type
 	json_object_int_type_uint64
 } json_object_int_type;
 
-struct json_object_base // XAX rename to json_object after conversion
+struct json_object
 {
-	int newold;  // XAX temporary, remove after code conversion
 	enum json_type o_type;
 	uint32_t _ref_count;
 	json_object_private_delete_fn *_delete;
@@ -51,28 +47,28 @@ struct json_object_base // XAX rename to json_object after conversion
 
 struct json_object_object
 {
-	struct json_object_base base;
+	struct json_object base;
 	struct lh_table *c_object;
 };
 struct json_object_array
 {
-	struct json_object_base base;
+	struct json_object base;
 	struct array_list *c_array;
 };
 
 struct json_object_boolean
 {
-	struct json_object_base base;
+	struct json_object base;
 	json_bool c_boolean;
 };
 struct json_object_double
 {
-	struct json_object_base base;
+	struct json_object base;
 	double c_double;
 };
 struct json_object_int
 {
-	struct json_object_base base;
+	struct json_object base;
 	enum json_object_int_type cint_type;
 	union
 	{
@@ -82,7 +78,7 @@ struct json_object_int
 };
 struct json_object_string
 {
-	struct json_object_base base;
+	struct json_object base;
 	ssize_t len;  // Signed b/c negative lengths indicate data is a pointer
 	// Consider adding an "alloc" field here, if json_object_set_string calls
 	// to expand the length of a string are common operations to perform.
@@ -91,21 +87,6 @@ struct json_object_string
 		char idata[1]; // Immediate data.  Actually longer
 		char *pdata;   // Only when len < 0
 	} c_string;
-};
-
-struct json_object
-{
-	int newold;
-	enum json_type o_type;
-	uint32_t _ref_count;
-	json_object_private_delete_fn *_delete;
-	json_object_to_json_string_fn *_to_json_string;
-	struct printbuf *_pb;
-		int dummyval; // XAX temp spacer to catch casting errors
-		int du1mmyval; // XAX spacer
-		int d2ummyval; // XAX spacer
-	json_object_delete_fn *_user_delete;
-	void *_userdata;
 };
 
 void _json_c_set_last_err(const char *err_fmt, ...);
