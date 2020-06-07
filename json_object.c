@@ -16,6 +16,9 @@
 
 #include <assert.h>
 #include <ctype.h>
+#ifdef HAVE_LIMITS_H
+#include <limits.h>
+#endif
 #include <math.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -38,6 +41,18 @@
 #error "The long long type isn't 64-bits"
 #endif
 
+#ifndef SSIZE_T_MAX
+#if SIZEOF_SSIZE_T == SIZEOF_INT
+#define SSIZE_T_MAX UINT_MAX
+#elif SIZEOF_SSIZE_T == SIZEOF_LONG
+#define SSIZE_T_MAX ULONG_MAX
+#elif SIZEOF_SSIZE_T == SIZEOF_LONG_LONG
+#define SSIZE_T_MAX ULLONG_MAX
+#else
+#error Unable to determine size of ssize_t
+#endif
+#endif
+
 // Don't define this.  It's not thread-safe.
 /* #define REFCOUNT_DEBUG 1 */
 
@@ -51,6 +66,8 @@ static struct json_object *json_object_new(enum json_type o_type);
 #if defined(_MSC_VER) && (_MSC_VER <= 1800)
 /* VS2013 doesn't know about "inline" */
 #define inline __inline
+#elif defined(AIX_CC)
+#define inline
 #endif
 
 // XAX kill this once json_object_base is renamed back to json_object
@@ -192,19 +209,23 @@ static void json_object_fini(void)
 
 /* helper for accessing the optimized string data component in json_object
  */
-// XAX drop this function
-static const char *get_string_component(const struct json_object *jso)
+static inline char *get_string_component_mutable(struct json_object_base *jso)
 {
-	if (jso->newold)
-		return ((const struct json_object_string *)jso)->data;
-	return (jso->o.c_string.len < LEN_DIRECT_STRING_DATA) ? jso->o.c_string.str.data
-							 : jso->o.c_string.str.ptr;
-
+	if (JC_STRING_C(jso)->len < 0)
+	{
+		/* Due to json_object_str_string(), we might have a pointer */
+		return JC_STRING(jso)->c_string.pdata;
+	}
+	return JC_STRING(jso)->c_string.idata;
+}
+static inline const char *get_string_component(const struct json_object_base *jso)
+{
+	return get_string_component_mutable((void *)(uintptr_t)(const void *)jso);
 }
 
 /* string escaping */
 
-static int json_escape_str(struct printbuf *pb, const char *str, int len, int flags)
+static int json_escape_str(struct printbuf *pb, const char *str, size_t len, int flags)
 {
 	int pos = 0, start_offset = 0;
 	unsigned char c;
@@ -836,10 +857,10 @@ json_bool json_object_get_boolean(const struct json_object *jso)
 		default: json_abort("invalid cint_type");
 		}
 	case json_type_double: return (JC_DOUBLE_C(jso)->c_double != 0);
-#undef jso
-	case json_type_string: return (jso->o.c_string.len != 0);
+	case json_type_string: return (JC_STRING_C(jso)->len != 0);
 	default: return 0;
 	}
+#undef jso
 }
 
 int json_object_set_boolean(struct json_object *jso, json_bool new_value)
@@ -905,7 +926,7 @@ int32_t json_object_get_int(const struct json_object *jso)
 		 * Parse strings into 64-bit numbers, then use the
 		 * 64-to-32-bit number handling below.
 		 */
-		if (json_parse_int64(get_string_component(PUBLIC_C(jso)), &cint64) != 0)
+		if (json_parse_int64(get_string_component(jso), &cint64) != 0)
 			return 0; /* whoops, it didn't work. */
 		o_type = json_type_int;
 	}
@@ -989,7 +1010,7 @@ int64_t json_object_get_int64(const struct json_object *jso)
 		return (int64_t)JC_DOUBLE_C(jso)->c_double;
 	case json_type_boolean: return JC_BOOL_C(jso)->c_boolean;
 	case json_type_string:
-		if (json_parse_int64(get_string_component(PUBLIC_C(jso)), &cint) == 0)
+		if (json_parse_int64(get_string_component(jso), &cint) == 0)
 			return cint;
 		/* FALLTHRU */
 	default: return 0;
@@ -1029,7 +1050,7 @@ uint64_t json_object_get_uint64(const struct json_object *jso)
 		return (uint64_t)JC_DOUBLE_C(jso)->c_double;
 	case json_type_boolean: return JC_BOOL_C(jso)->c_boolean;
 	case json_type_string:
-		if (json_parse_uint64(get_string_component(PUBLIC_C(jso)), &cuint) == 0)
+		if (json_parse_uint64(get_string_component(jso), &cuint) == 0)
 			return cuint;
 		/* FALLTHRU */
 	default: return 0;
@@ -1353,10 +1374,10 @@ double json_object_get_double(const struct json_object *jso)
 	case json_type_boolean: return JC_BOOL_C(jso)->c_boolean;
 	case json_type_string:
 		errno = 0;
-		cdouble = strtod(get_string_component(PUBLIC_C(jso)), &errPtr);
+		cdouble = strtod(get_string_component(jso), &errPtr);
 
 		/* if conversion stopped at the first character, return 0.0 */
-		if (errPtr == get_string_component(PUBLIC_C(jso)))
+		if (errPtr == get_string_component(jso))
 		{
 			errno = EINVAL;
 			return 0.0;
@@ -1409,124 +1430,154 @@ int json_object_set_double(struct json_object *jso, double new_value)
 static int json_object_string_to_json_string(struct json_object *jso, struct printbuf *pb,
                                              int level, int flags)
 {
+#define jso ((struct json_object_base *)jso)
 	printbuf_strappend(pb, "\"");
-	json_escape_str(pb, get_string_component(jso), jso->o.c_string.len, flags);
+	ssize_t len = JC_STRING(jso)->len;
+	json_escape_str(pb, get_string_component(jso), len < 0 ? -len : len, flags);
 	printbuf_strappend(pb, "\"");
 	return 0;
+#undef jso
 }
 
 static void json_object_string_delete(struct json_object *jso)
 {
-	if (jso->o.c_string.len >= LEN_DIRECT_STRING_DATA)
-		free(jso->o.c_string.str.ptr);
-	json_object_generic_delete(jso);
+#define jso ((struct json_object_base *)jso)
+	if (JC_STRING(jso)->len < 0)
+		free(JC_STRING(jso)->c_string.pdata);
+	Xjson_object_generic_delete(jso);
+#undef jso
+}
+
+static struct json_object *_json_object_new_string(const char *s, const size_t len)
+{
+	size_t objsize;
+	struct json_object_string *jso;
+
+	/*
+     * Structures           Actual memory layout
+     * -------------------  --------------------
+	 * [json_object_string  [json_object_string
+	 *  [json_object_base]   [json_object_base]
+     *  ...other fields...   ...other fields...
+	 *  c_string]            len
+     *                       bytes
+	 *                       of
+	 *                       string
+	 *                       data
+     *                       \0]
+	 */
+	if (len > (SSIZE_T_MAX - (sizeof(*jso) - sizeof(jso->c_string)) - 1))
+		return NULL;
+	objsize = (sizeof(*jso) - sizeof(jso->c_string)) + len + 1;
+	if (len < sizeof(void *))
+		// We need a minimum size to support json_object_set_string() mutability
+		// so we can stuff a pointer into pdata :(
+		objsize += sizeof(void *) - len;
+
+    jso = (struct json_object_string *)Xjson_object_new(json_type_string, objsize,
+		&json_object_string_to_json_string, &json_object_string_delete);
+
+	if (!jso)
+		return NULL;
+	jso->len = len;
+	memcpy(jso->c_string.idata, s, len);
+	jso->c_string.idata[len] = '\0';
+	return PUBLIC(&jso->base);
 }
 
 struct json_object *json_object_new_string(const char *s)
 {
-	struct json_object *jso = json_object_new(json_type_string);
-	if (!jso)
-		return NULL;
-	jso->_delete = &json_object_string_delete;
-	jso->_to_json_string = &json_object_string_to_json_string;
-	jso->o.c_string.len = strlen(s);
-	if (jso->o.c_string.len < LEN_DIRECT_STRING_DATA)
-	{
-		memcpy(jso->o.c_string.str.data, s, jso->o.c_string.len);
-	}
-	else
-	{
-		jso->o.c_string.str.ptr = strdup(s);
-		if (!jso->o.c_string.str.ptr)
-		{
-			json_object_generic_delete(jso);
-			errno = ENOMEM;
-			return NULL;
-		}
-	}
-	return jso;
+	return _json_object_new_string(s, strlen(s));
 }
 
 struct json_object *json_object_new_string_len(const char *s, const int len)
 {
-	char *dstbuf;
-	struct json_object *jso = json_object_new(json_type_string);
-	if (!jso)
-		return NULL;
-	jso->_delete = &json_object_string_delete;
-	jso->_to_json_string = &json_object_string_to_json_string;
-	if (len < LEN_DIRECT_STRING_DATA)
-	{
-		dstbuf = jso->o.c_string.str.data;
-	}
-	else
-	{
-		jso->o.c_string.str.ptr = (char *)malloc(len + 1);
-		if (!jso->o.c_string.str.ptr)
-		{
-			json_object_generic_delete(jso);
-			errno = ENOMEM;
-			return NULL;
-		}
-		dstbuf = jso->o.c_string.str.ptr;
-	}
-	memcpy(dstbuf, (const void *)s, len);
-	dstbuf[len] = '\0';
-	jso->o.c_string.len = len;
-	return jso;
+	return _json_object_new_string(s, len);
 }
 
 const char *json_object_get_string(struct json_object *jso)
 {
+#define jso ((struct json_object_base *)jso)
 	if (!jso)
 		return NULL;
 	switch (jso->o_type)
 	{
 	case json_type_string: return get_string_component(jso);
-	default: return json_object_to_json_string(jso);
+	default: return json_object_to_json_string(PUBLIC(jso));
 	}
+#undef jso
 }
-
 int json_object_get_string_len(const struct json_object *jso)
 {
+#define jso ((const struct json_object_base *)jso)
+	ssize_t len;
 	if (!jso)
 		return 0;
 	switch (jso->o_type)
 	{
-	case json_type_string: return jso->o.c_string.len;
+	case json_type_string:
+		len = JC_STRING_C(jso)->len;
+		return (len < 0) ? -len : len;
 	default: return 0;
 	}
+#undef jso
+}
+
+static int _json_object_set_string_len(json_object *jso, const char *s, size_t len)
+{
+#define jso ((struct json_object_base *)jso)
+	char *dstbuf;
+	ssize_t curlen;
+	ssize_t newlen;
+	if (jso == NULL || jso->o_type != json_type_string)
+		return 0;
+
+	if (len >= SSIZE_T_MAX - 1)
+		// jso->len is a signed ssize_t, so it can't hold the
+		// full size_t range.
+		return 0;
+
+	dstbuf = get_string_component_mutable(jso);
+	curlen = JC_STRING(jso)->len;
+	if (curlen < 0)
+		curlen = -curlen;
+	newlen = len;
+
+	if ((ssize_t)len > curlen)
+	{
+		// We have no way to return the new ptr from realloc(jso, newlen)
+		// and we have no way of knowing whether there's extra room available
+		// so we need to stuff a pointer in to pdata :(
+		dstbuf = (char *)malloc(len + 1);
+		if (dstbuf == NULL)
+			return 0;
+		if (JC_STRING(jso)->len < 0)
+			free(JC_STRING(jso)->c_string.pdata);
+		JC_STRING(jso)->c_string.pdata = dstbuf;
+		newlen = -len;
+	}
+	else if (JC_STRING(jso)->len < 0)
+	{
+		// We've got enough room in the separate allocated buffer,
+		// so use it as-is and continue to indicate that pdata is used.
+		newlen = -len;
+	}
+
+	memcpy(dstbuf, (const void *)s, len);
+	dstbuf[len] = '\0';
+	JC_STRING(jso)->len = newlen;
+	return 1;
+#undef jso
 }
 
 int json_object_set_string(json_object *jso, const char *s)
 {
-	return json_object_set_string_len(jso, s, (int)(strlen(s)));
+	return _json_object_set_string_len(jso, s, strlen(s));
 }
 
 int json_object_set_string_len(json_object *jso, const char *s, int len)
 {
-	char *dstbuf;
-	if (jso == NULL || jso->o_type != json_type_string)
-		return 0;
-	if (len < LEN_DIRECT_STRING_DATA)
-	{
-		dstbuf = jso->o.c_string.str.data;
-		if (jso->o.c_string.len >= LEN_DIRECT_STRING_DATA)
-			free(jso->o.c_string.str.ptr);
-	}
-	else
-	{
-		dstbuf = (char *)malloc(len + 1);
-		if (dstbuf == NULL)
-			return 0;
-		if (jso->o.c_string.len >= LEN_DIRECT_STRING_DATA)
-			free(jso->o.c_string.str.ptr);
-		jso->o.c_string.str.ptr = dstbuf;
-	}
-	jso->o.c_string.len = len;
-	memcpy(dstbuf, (const void *)s, len);
-	dstbuf[len] = '\0';
-	return 1;
+	return _json_object_set_string_len(jso, s, len);
 }
 
 /* json_object_array */
@@ -1582,7 +1633,7 @@ static void json_object_array_delete(struct json_object *jso)
 {
 #define jso ((struct json_object_base *)jso)
 	array_list_free(JC_ARRAY(jso)->c_array);
-	json_object_generic_delete(PUBLIC(jso));
+	Xjson_object_generic_delete(jso);
 #undef jso
 }
 
@@ -1762,10 +1813,12 @@ static int Xjson_object_equal(struct json_object *jso1, struct json_object *jso2
 		return (jso1->o.c_int.cint.c_uint64 == (uint64_t)jso2->o.c_int.cint.c_int64);
 	*/
 
-	case json_type_string:
+	case json_type_string: assert(0);
+	/*
 		return (jso1->o.c_string.len == jso2->o.c_string.len &&
 		        memcmp(get_string_component(jso1), get_string_component(jso2),
 		               jso1->o.c_string.len) == 0);
+	*/
 
 	case json_type_object: assert(0); //return json_object_all_values_equal(jso1, jso2);
 
@@ -1822,10 +1875,8 @@ int json_object_equal(struct json_object *jso1, struct json_object *jso2)
 
 	case json_type_string:
 	{
-		struct json_object_string *str1 = JC_STRING(jso1);
-		struct json_object_string *str2 = JC_STRING(jso2);
-		return (str1->len == str2->len &&
-		        memcmp(str1->data, str2->data, str1->len) == 0);
+		return (json_object_get_string_len(PUBLIC(jso1)) == json_object_get_string_len(PUBLIC(jso2)) &&
+		        memcmp(get_string_component(jso1), get_string_component(jso2), json_object_get_string_len(PUBLIC(jso1))) == 0);
 	}
 
 	case json_type_object: return json_object_all_values_equal(jso1, jso2);
@@ -1920,7 +1971,6 @@ int json_c_shallow_copy_default(json_object *src, json_object *parent, const cha
 		default: json_abort("invalid cint_type");
 		}
 		break;
-#undef src
 
 	case json_type_string: *dst = json_object_new_string(get_string_component(src)); break;
 
@@ -1939,6 +1989,7 @@ int json_c_shallow_copy_default(json_object *src, json_object *parent, const cha
 	(*dst)->_to_json_string = src->_to_json_string;
 	// _userdata and _user_delete are copied later
 	return 1;
+#undef src
 }
 
 /*

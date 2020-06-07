@@ -194,6 +194,9 @@
 /* The number of bytes in type size_t */
 #cmakedefine SIZEOF_SIZE_T @SIZEOF_SIZE_T@
 
+/* The number of bytes in type ssize_t */
+#cmakedefine SIZEOF_SSIZE_T @SIZEOF_SSIZE_T@
+
 /* Specifier for __thread */
 #cmakedefine SPEC___THREAD @SPEC___THREAD@
 

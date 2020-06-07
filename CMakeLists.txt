@@ -205,6 +205,7 @@ check_type_size(int64_t             SIZEOF_INT64_T)
 check_type_size(long                SIZEOF_LONG)
 check_type_size("long long"         SIZEOF_LONG_LONG)
 check_type_size("size_t"            SIZEOF_SIZE_T)
+check_type_size("ssize_t"           SIZEOF_SSIZE_T)
 
 check_c_source_compiles(
 [=[
