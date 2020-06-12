@@ -1,0 +1,5 @@
+{ "files": ["input.c"],
+  "mhdep": "g64",
+  "main": "main"
+}cc_x
+}

@@ -1,0 +1,4 @@
+{ "files": ["input.c"],
+  "macidep": "gcc_x86_64",
+  "mail": "main"
+}

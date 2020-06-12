@@ -1,0 +1,4 @@
+{ "filcs": ["input.c"],
+  "maimachdep": "gcc_x86_64",
+  "main": "main"
+}

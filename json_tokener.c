@@ -120,6 +120,7 @@ enum json_tokener_error json_tokener_get_error(struct json_tokener *tok)
 #define DECODE_SURROGATE_PAIR(hi, lo) ((((hi)&0x3FF) << 10) + ((lo)&0x3FF) + 0x10000)
 static unsigned char utf8_replacement_char[3] = {0xEF, 0xBF, 0xBD};
 
+/*@ requires depth_is_non_negative: depth >= 0; */
 struct json_tokener *json_tokener_new_ex(int depth)
 {
 	struct json_tokener *tok;

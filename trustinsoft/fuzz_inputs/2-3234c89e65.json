@@ -1,0 +1,3 @@
+{ "files": ["input.c"],
+  "machdep": "gcc_x86_64",
+  "main": "main",}
