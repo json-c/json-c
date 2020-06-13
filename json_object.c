@@ -199,7 +199,7 @@ static inline char *get_string_component_mutable(struct json_object *jso)
 {
 	if (JC_STRING_C(jso)->len < 0)
 	{
-		/* Due to json_object_str_string(), we might have a pointer */
+		/* Due to json_object_set_string(), we might have a pointer */
 		return JC_STRING(jso)->c_string.pdata;
 	}
 	return JC_STRING(jso)->c_string.idata;

@@ -47,7 +47,8 @@ struct json_object
 	struct printbuf *_pb;
 	json_object_delete_fn *_user_delete;
 	void *_userdata;
-	char data[1]; // Actually the rest of a struct json_object_${o_type}
+	// Actually longer, always malloc'd as some more-specific type.
+	// The rest of a struct json_object_${o_type} follows
 };
 
 struct json_object_object
