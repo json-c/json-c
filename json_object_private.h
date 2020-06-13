@@ -29,8 +29,6 @@ struct json_object;
 typedef SSIZE_T ssize_t;
 #endif
 
-typedef void (json_object_private_delete_fn)(struct json_object *o);
-
 /* json object int type, support extension*/
 typedef enum json_object_int_type
 {
@@ -42,7 +40,6 @@ struct json_object
 {
 	enum json_type o_type;
 	uint32_t _ref_count;
-	json_object_private_delete_fn *_delete;
 	json_object_to_json_string_fn *_to_json_string;
 	struct printbuf *_pb;
 	json_object_delete_fn *_user_delete;

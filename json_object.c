@@ -121,15 +121,17 @@ static inline const struct json_object_string *JC_STRING_C(const struct json_obj
 #define JC_CONCAT(a,b) a##b
 #define JC_CONCAT3(a,b,c) a##b##c
 
-#define JSON_OBJECT_NEW(jtype, delete_fn) \
+#define JSON_OBJECT_NEW(jtype) \
     (struct JC_CONCAT(json_object_,jtype) *)json_object_new(JC_CONCAT(json_type_,jtype), \
 		sizeof(struct JC_CONCAT(json_object_,jtype)), \
-		&JC_CONCAT3(json_object_,jtype,_to_json_string), \
-		delete_fn)
+		&JC_CONCAT3(json_object_,jtype,_to_json_string))
 static inline struct json_object *json_object_new(enum json_type o_type,
 	size_t alloc_size,
-	json_object_to_json_string_fn *to_json_string,
-	json_object_private_delete_fn *delete_fn);
+	json_object_to_json_string_fn *to_json_string);
+
+static void json_object_object_delete(struct json_object *jso_base);
+static void json_object_string_delete(struct json_object *jso);
+static void json_object_array_delete(struct json_object *jso);
 
 static json_object_to_json_string_fn json_object_object_to_json_string;
 static json_object_to_json_string_fn json_object_boolean_to_json_string;
@@ -322,7 +324,21 @@ int json_object_put(struct json_object *jso)
 
 	if (jso->_user_delete)
 		jso->_user_delete(jso, jso->_userdata);
-	jso->_delete(jso);
+	switch(jso->o_type)
+	{
+	case json_type_object:
+		json_object_object_delete(jso);
+		break;
+	case json_type_array:
+		json_object_array_delete(jso);
+		break;
+	case json_type_string:
+		json_object_string_delete(jso);
+		break;
+	default:
+		json_object_generic_delete(jso);
+		break;
+	}
 	return 1;
 }
 
@@ -341,8 +357,7 @@ static void json_object_generic_delete(struct json_object *jso)
 
 static inline struct json_object *json_object_new(enum json_type o_type,
 	size_t alloc_size,
-	json_object_to_json_string_fn *to_json_string,
-	json_object_private_delete_fn *delete_fn)
+	json_object_to_json_string_fn *to_json_string)
 {
 	struct json_object *jso;
 
@@ -352,7 +367,6 @@ static inline struct json_object *json_object_new(enum json_type o_type,
 
 	jso->o_type = o_type;
 	jso->_ref_count = 1;
-	jso->_delete = delete_fn;
 	jso->_to_json_string = to_json_string;
 	jso->_pb = NULL;
 	jso->_user_delete = NULL;
@@ -552,7 +566,7 @@ static void json_object_object_delete(struct json_object *jso_base)
 
 struct json_object *json_object_new_object(void)
 {
-	struct json_object_object *jso = JSON_OBJECT_NEW(object, &json_object_object_delete);
+	struct json_object_object *jso = JSON_OBJECT_NEW(object);
 	if (!jso)
 		return NULL;
 	jso->c_object =
@@ -676,7 +690,7 @@ static int json_object_boolean_to_json_string(struct json_object *jso, struct pr
 
 struct json_object *json_object_new_boolean(json_bool b)
 {
-	struct json_object_boolean *jso = JSON_OBJECT_NEW(boolean, &json_object_generic_delete);
+	struct json_object_boolean *jso = JSON_OBJECT_NEW(boolean);
 	if (!jso)
 		return NULL;
 	jso->c_boolean = b;
@@ -794,7 +808,7 @@ int json_object_set_int(struct json_object *jso, int new_value)
 
 struct json_object *json_object_new_int64(int64_t i)
 {
-	struct json_object_int *jso = JSON_OBJECT_NEW(int, &json_object_generic_delete);
+	struct json_object_int *jso = JSON_OBJECT_NEW(int);
 	if (!jso)
 		return NULL;
 	jso->cint.c_int64 = i;
@@ -804,7 +818,7 @@ struct json_object *json_object_new_int64(int64_t i)
 
 struct json_object *json_object_new_uint64(uint64_t i)
 {
-	struct json_object_int *jso = JSON_OBJECT_NEW(int, &json_object_generic_delete);
+	struct json_object_int *jso = JSON_OBJECT_NEW(int);
 	if (!jso)
 		return NULL;
 	jso->cint.c_uint64 = i;
@@ -1108,7 +1122,7 @@ int json_object_double_to_json_string(struct json_object *jso, struct printbuf *
 
 struct json_object *json_object_new_double(double d)
 {
-	struct json_object_double *jso = JSON_OBJECT_NEW(double, &json_object_generic_delete);
+	struct json_object_double *jso = JSON_OBJECT_NEW(double);
 	if (!jso)
 		return NULL;
 	jso->base._to_json_string = &json_object_double_to_json_string_default;
@@ -1273,7 +1287,7 @@ static struct json_object *_json_object_new_string(const char *s, const size_t l
 		objsize += sizeof(void *) - len;
 
     jso = (struct json_object_string *)json_object_new(json_type_string, objsize,
-		&json_object_string_to_json_string, &json_object_string_delete);
+		&json_object_string_to_json_string);
 
 	if (!jso)
 		return NULL;
@@ -1427,7 +1441,7 @@ static void json_object_array_delete(struct json_object *jso)
 
 struct json_object *json_object_new_array(void)
 {
-	struct json_object_array *jso = JSON_OBJECT_NEW(array, &json_object_array_delete);
+	struct json_object_array *jso = JSON_OBJECT_NEW(array);
 	if (!jso)
 		return NULL;
 	jso->c_array = array_list_new(&json_object_array_entry_free);
