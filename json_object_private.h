@@ -24,6 +24,10 @@ struct json_object;
 #include "json_inttypes.h"
 #include "json_types.h"
 
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif /* HAVE_UNISTD_H */
+
 #ifdef _MSC_VER
 #include <BaseTsd.h>
 typedef SSIZE_T ssize_t;
