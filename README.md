@@ -99,6 +99,7 @@ CMAKE_INSTALL_PREFIX         | String | The install location.
 CMAKE_BUILD_TYPE             | String | Defaults to "debug".
 BUILD_SHARED_LIBS            | Bool   | The default build generates a dynamic (dll/so) library.  Set this to OFF to create a static library only.
 BUILD_STATIC_LIBS            | Bool   | The default build generates a static (lib/a) library.  Set this to OFF to create a shared library only.
+DISABLE_STATIC_FPIC          | Bool   | The default builds position independent code.  Set this to OFF to create a shared library only.
 DISABLE_BSYMBOLIC            | Bool   | Disable use of -Bsymbolic-functions.
 DISABLE_THREAD_LOCAL_STORAGE | Bool   | Disable use of Thread-Local Storage (HAVE___THREAD).
 DISABLE_WERROR               | Bool   | Disable use of -Werror.

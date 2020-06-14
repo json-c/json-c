@@ -110,6 +110,14 @@ if (MSVC)
     list(APPEND CMAKE_REQUIRED_FLAGS /wd4996)
 endif()
 
+if (NOT DISABLE_STATIC_FPIC)
+    # Use '-fPIC'/'-fPIE' option.
+    # This will allow other libraries to statically link in libjson-c.a
+    # which in turn prevents crashes in downstream apps that may use
+    # a different JSON library with identical symbol names.
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+endif()
+
 check_include_file("fcntl.h"        HAVE_FCNTL_H)
 check_include_file("inttypes.h"     HAVE_INTTYPES_H)
 check_include_file(stdarg.h         HAVE_STDARG_H)
