@@ -118,16 +118,16 @@ static inline const struct json_object_string *JC_STRING_C(const struct json_obj
 	return (const void *)jso;
 }
 
-#define JC_CONCAT(a,b) a##b
-#define JC_CONCAT3(a,b,c) a##b##c
+#define JC_CONCAT(a, b) a##b
+#define JC_CONCAT3(a, b, c) a##b##c
 
-#define JSON_OBJECT_NEW(jtype) \
-    (struct JC_CONCAT(json_object_,jtype) *)json_object_new(JC_CONCAT(json_type_,jtype), \
-		sizeof(struct JC_CONCAT(json_object_,jtype)), \
-		&JC_CONCAT3(json_object_,jtype,_to_json_string))
-static inline struct json_object *json_object_new(enum json_type o_type,
-	size_t alloc_size,
-	json_object_to_json_string_fn *to_json_string);
+#define JSON_OBJECT_NEW(jtype)                                                           \
+	(struct JC_CONCAT(json_object_, jtype) *)json_object_new(                        \
+	    JC_CONCAT(json_type_, jtype), sizeof(struct JC_CONCAT(json_object_, jtype)), \
+	    &JC_CONCAT3(json_object_, jtype, _to_json_string))
+
+static inline struct json_object *json_object_new(enum json_type o_type, size_t alloc_size,
+                                                  json_object_to_json_string_fn *to_json_string);
 
 static void json_object_object_delete(struct json_object *jso_base);
 static void json_object_string_delete(struct json_object *jso);
@@ -324,24 +324,15 @@ int json_object_put(struct json_object *jso)
 
 	if (jso->_user_delete)
 		jso->_user_delete(jso, jso->_userdata);
-	switch(jso->o_type)
+	switch (jso->o_type)
 	{
-	case json_type_object:
-		json_object_object_delete(jso);
-		break;
-	case json_type_array:
-		json_object_array_delete(jso);
-		break;
-	case json_type_string:
-		json_object_string_delete(jso);
-		break;
-	default:
-		json_object_generic_delete(jso);
-		break;
+	case json_type_object: json_object_object_delete(jso); break;
+	case json_type_array: json_object_array_delete(jso); break;
+	case json_type_string: json_object_string_delete(jso); break;
+	default: json_object_generic_delete(jso); break;
 	}
 	return 1;
 }
-
 
 /* generic object construction and destruction parts */
 
@@ -355,9 +346,8 @@ static void json_object_generic_delete(struct json_object *jso)
 	free(jso);
 }
 
-static inline struct json_object *json_object_new(enum json_type o_type,
-	size_t alloc_size,
-	json_object_to_json_string_fn *to_json_string)
+static inline struct json_object *json_object_new(enum json_type o_type, size_t alloc_size,
+                                                  json_object_to_json_string_fn *to_json_string)
 {
 	struct json_object *jso;
 
@@ -370,7 +360,7 @@ static inline struct json_object *json_object_new(enum json_type o_type,
 	jso->_to_json_string = to_json_string;
 	jso->_pb = NULL;
 	jso->_user_delete = NULL;
-	jso->_userdata= NULL;
+	jso->_userdata = NULL;
 	//jso->...   // Type-specific fields must be set by caller
 
 #ifdef REFCOUNT_DEBUG
@@ -639,7 +629,6 @@ int json_object_object_length(const struct json_object *jso)
 	return lh_table_length(JC_OBJECT_C(jso)->c_object);
 }
 
-
 size_t json_c_object_sizeof(void)
 {
 	return sizeof(struct json_object);
@@ -664,7 +653,8 @@ json_bool json_object_object_get_ex(const struct json_object *jso, const char *k
 	switch (jso->o_type)
 	{
 	case json_type_object:
-		return lh_table_lookup_ex(JC_OBJECT_C(jso)->c_object, (const void *)key, (void **)value);
+		return lh_table_lookup_ex(JC_OBJECT_C(jso)->c_object, (const void *)key,
+		                          (void **)value);
 	default:
 		if (value != NULL)
 			*value = NULL;
@@ -931,8 +921,7 @@ int json_object_int_inc(struct json_object *jso, int64_t val)
 	case json_object_int_type_int64:
 		if (val > 0 && jsoint->cint.c_int64 > INT64_MAX - val)
 		{
-			jsoint->cint.c_uint64 =
-			    (uint64_t)jsoint->cint.c_int64 + (uint64_t)val;
+			jsoint->cint.c_uint64 = (uint64_t)jsoint->cint.c_int64 + (uint64_t)val;
 			jsoint->cint_type = json_object_int_type_uint64;
 		}
 		else if (val < 0 && jsoint->cint.c_int64 < INT64_MIN - val)
@@ -1286,8 +1275,8 @@ static struct json_object *_json_object_new_string(const char *s, const size_t l
 		// so we can stuff a pointer into pdata :(
 		objsize += sizeof(void *) - len;
 
-    jso = (struct json_object_string *)json_object_new(json_type_string, objsize,
-		&json_object_string_to_json_string);
+	jso = (struct json_object_string *)json_object_new(json_type_string, objsize,
+	                                                   &json_object_string_to_json_string);
 
 	if (!jso)
 		return NULL;
@@ -1325,8 +1314,10 @@ int json_object_get_string_len(const struct json_object *jso)
 	switch (jso->o_type)
 	{
 	case json_type_string:
+	{
 		len = JC_STRING_C(jso)->len;
 		return (len < 0) ? -(ssize_t)len : len;
+	}
 	default: return 0;
 	}
 }
@@ -1547,7 +1538,8 @@ static int json_object_all_values_equal(struct json_object *jso1, struct json_ob
 	/* Iterate over jso1 keys and see if they exist and are equal in jso2 */
 	json_object_object_foreachC(jso1, iter)
 	{
-		if (!lh_table_lookup_ex(JC_OBJECT(jso2)->c_object, (void *)iter.key, (void **)(void *)&sub))
+		if (!lh_table_lookup_ex(JC_OBJECT(jso2)->c_object, (void *)iter.key,
+		                        (void **)(void *)&sub))
 			return 0;
 		if (!json_object_equal(iter.val, sub))
 			return 0;
@@ -1556,7 +1548,8 @@ static int json_object_all_values_equal(struct json_object *jso1, struct json_ob
 	/* Iterate over jso2 keys to see if any exist that are not in jso1 */
 	json_object_object_foreachC(jso2, iter)
 	{
-		if (!lh_table_lookup_ex(JC_OBJECT(jso1)->c_object, (void *)iter.key, (void **)(void *)&sub))
+		if (!lh_table_lookup_ex(JC_OBJECT(jso1)->c_object, (void *)iter.key,
+		                        (void **)(void *)&sub))
 			return 0;
 	}
 
@@ -1590,8 +1583,7 @@ int json_object_equal(struct json_object *jso1, struct json_object *jso2)
 				return (int1->cint.c_int64 == int2->cint.c_int64);
 			if (int1->cint.c_int64 < 0)
 				return 0;
-			return ((uint64_t)int1->cint.c_int64 ==
-			        int2->cint.c_uint64);
+			return ((uint64_t)int1->cint.c_int64 == int2->cint.c_uint64);
 		}
 		// else jso1 is a uint64
 		if (int2->cint_type == json_object_int_type_uint64)
@@ -1604,7 +1596,8 @@ int json_object_equal(struct json_object *jso1, struct json_object *jso2)
 	case json_type_string:
 	{
 		return (json_object_get_string_len(jso1) == json_object_get_string_len(jso2) &&
-		        memcmp(get_string_component(jso1), get_string_component(jso2), json_object_get_string_len(jso1)) == 0);
+		        memcmp(get_string_component(jso1), get_string_component(jso2),
+		               json_object_get_string_len(jso1)) == 0);
 	}
 
 	case json_type_object: return json_object_all_values_equal(jso1, jso2);
