@@ -32,6 +32,7 @@ foreach(TESTNAME
 	test_printbuf
 	test_set_serializer
 	test_set_value
+	test_string_noalloc
 	test_util_file
 	test_visit
 	test_object_iterator)
