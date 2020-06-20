@@ -1432,10 +1432,14 @@ static void json_object_array_delete(struct json_object *jso)
 
 struct json_object *json_object_new_array(void)
 {
+	return json_object_new_array_ext(ARRAY_LIST_DEFAULT_SIZE);
+}
+struct json_object *json_object_new_array_ext(int initial_size)
+{
 	struct json_object_array *jso = JSON_OBJECT_NEW(array);
 	if (!jso)
 		return NULL;
-	jso->c_array = array_list_new(&json_object_array_entry_free);
+	jso->c_array = array_list_new2(&json_object_array_entry_free, initial_size);
 	if (jso->c_array == NULL)
 	{
 		free(jso);
@@ -1521,6 +1525,13 @@ static int json_array_equal(struct json_object *jso1, struct json_object *jso2)
 			return 0;
 	}
 	return 1;
+}
+
+int json_object_array_shrink(struct json_object *jso, int empty_slots)
+{
+	if (empty_slots < 0)
+		json_abort("json_object_array_shrink called with negative empty_slots");
+	return array_list_shrink(JC_ARRAY(jso)->c_array, empty_slots);
 }
 
 struct json_object *json_object_new_null(void)

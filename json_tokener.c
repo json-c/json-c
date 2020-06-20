@@ -964,6 +964,9 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 		case json_tokener_state_array:
 			if (c == ']')
 			{
+				// Minimize memory usage; assume parsed objs are unlikely to be changed
+				json_object_array_shrink(current, 0);
+
 				if (state == json_tokener_state_array_after_sep &&
 				    (tok->flags & JSON_TOKENER_STRICT))
 				{
@@ -997,6 +1000,9 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 		case json_tokener_state_array_sep:
 			if (c == ']')
 			{
+				// Minimize memory usage; assume parsed objs are unlikely to be changed
+				json_object_array_shrink(current, 0);
+
 				saved_state = json_tokener_state_finish;
 				state = json_tokener_state_eatws;
 			}

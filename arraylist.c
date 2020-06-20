@@ -38,12 +38,17 @@
 
 struct array_list *array_list_new(array_list_free_fn *free_fn)
 {
+	return array_list_new2(free_fn, ARRAY_LIST_DEFAULT_SIZE);
+}
+
+struct array_list *array_list_new2(array_list_free_fn *free_fn, int initial_size)
+{
 	struct array_list *arr;
 
 	arr = (struct array_list *)malloc(sizeof(struct array_list));
 	if (!arr)
 		return NULL;
-	arr->size = ARRAY_LIST_DEFAULT_SIZE;
+	arr->size = initial_size;
 	arr->length = 0;
 	arr->free_fn = free_fn;
 	if (!(arr->array = (void **)malloc(arr->size * sizeof(void *))))
@@ -89,6 +94,26 @@ static int array_list_expand_internal(struct array_list *arr, size_t max)
 	}
 	if (new_size > (~((size_t)0)) / sizeof(void *))
 		return -1;
+	if (!(t = realloc(arr->array, new_size * sizeof(void *))))
+		return -1;
+	arr->array = (void **)t;
+	arr->size = new_size;
+	return 0;
+}
+
+int array_list_shrink(struct array_list *arr, size_t empty_slots)
+{
+	void *t;
+	size_t new_size;
+
+	new_size = arr->length + empty_slots;
+	if (new_size == arr->size)
+		return 0;
+	if (new_size > arr->size)
+		return array_list_expand_internal(arr, new_size);
+	if (new_size == 0)
+		new_size = 1;
+
 	if (!(t = realloc(arr->array, new_size * sizeof(void *))))
 		return -1;
 	arr->array = (void **)t;
@@ -165,6 +190,8 @@ int array_list_del_idx(struct array_list *arr, size_t idx, size_t count)
 		return -1;
 	for (i = idx; i < stop; ++i)
 	{
+		// Because put_idx can skip entries, we need to check if
+		// there's actually anything in each slot we're erasing.
 		if (arr->array[i])
 			arr->free_fn(arr->array[i]);
 	}

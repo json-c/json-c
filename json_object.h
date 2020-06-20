@@ -500,9 +500,15 @@ JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key
 /* Array type methods */
 
 /** Create a new empty json_object of type json_type_array
+ * If you know the array size you'll need ahead of time, use
+ * json_object_new_array_ext() instead.
+ * @see json_object_new_array_ext()
+ * @see json_object_array_shrink()
  * @returns a json_object of type json_type_array
  */
 JSON_EXPORT struct json_object *json_object_new_array(void);
+
+JSON_EXPORT struct json_object *json_object_new_array_ext(int initial_size);
 
 /** Get the arraylist of a json_object of type json_type_array
  * @param obj the json_object instance
@@ -594,6 +600,15 @@ JSON_EXPORT struct json_object *json_object_array_get_idx(const struct json_obje
  * @returns 0 if the elements were successfully deleted
  */
 JSON_EXPORT int json_object_array_del_idx(struct json_object *obj, size_t idx, size_t count);
+
+/**
+ * Shrink the internal memory allocation of the array to just
+ * enough to fit the number of elements in it, plus empty_slots.
+ *
+ * @param jso the json_object instance, must be json_type_array
+ * @param empty_slots the number of empty slots to leave allocated
+ */
+JSON_EXPORT int json_object_array_shrink(struct json_object *jso, int empty_slots);
 
 /* json_bool type methods */
 

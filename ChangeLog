@@ -4,7 +4,7 @@ Next Release 0.15
 
 Deprecated and removed features:
 --------------------------------
-...none yet...
+* array_list_new() has been deprecated in favor of array_list_new2()
 
 Other changes
 --------------
@@ -19,6 +19,12 @@ Other changes
    less memory usage.
   Memory used just for json_object structures decreased 27%, so use cases
    with fewer arrays and/or strings would benefit more.
+* Minimize memory usage in array handling in json_tokener by shrinking
+   arrays to the exact number of elements parsed.  On bench/ benchmark:
+   9% faster test time, 39%(max RSS)-50%(peak heap) less memory usage.
+   Add json_object_array_shrink() and array_list_shrink() functions.
+* Add json_object_new_array_ext(int) and array_list_new_2(int) to allow
+   arrays to be allocated with the exact size needed, when known.
 
 
 ***
