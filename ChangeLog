@@ -12,6 +12,13 @@ Other changes
 * Issue #471: always create directories with mode 0755, regardless of umask.
 * Added a JSON_TOKENER_ALLOW_TRAILING_CHARS flag to allow multiple objects
   to be parsed even when JSON_TOKENER_STRICT is set.
+* Split the internal json_object structure into several sub-types, one for
+   each json_type (json_object_object, json_object_string, etc...).
+  This improves memory usage and speed, with the benchmark under
+   bench/ report 5.8% faster test time and 6%(max RSS)-12%(peak heap)
+   less memory usage.
+  Memory used just for json_object structures decreased 27%, so use cases
+   with fewer arrays and/or strings would benefit more.
 
 
 ***
