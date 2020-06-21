@@ -33,6 +33,47 @@ int main(void)
 static json_c_visit_userfunc clear_serializer;
 static void do_clear_serializer(json_object *jso);
 
+static void single_incremental_parse(const char *test_string, int clear_serializer)
+{
+	int ii;
+	int chunksize = atoi(getenv("TEST_PARSE_CHUNKSIZE"));
+	struct json_tokener *tok;
+	enum json_tokener_error jerr;
+	json_object *all_at_once_obj, *new_obj;
+	const char *all_at_once_str, *new_str;
+
+	all_at_once_obj = json_tokener_parse(test_string);
+	if (clear_serializer)
+		do_clear_serializer(all_at_once_obj);
+	all_at_once_str = json_object_to_json_string(all_at_once_obj);
+
+	tok = json_tokener_new();
+	int test_string_len = strlen(test_string) + 1; // Including '\0' !
+	for (ii = 0; ii < test_string_len; ii += chunksize)
+	{
+		int len_to_parse = chunksize;
+		if (ii + chunksize > test_string_len)
+			len_to_parse = test_string_len - ii;
+
+		if (getenv("TEST_PARSE_DEBUG") != NULL)
+			printf(" chunk: %.*s\n", len_to_parse, &test_string[ii]);
+		new_obj = json_tokener_parse_ex(tok, &test_string[ii], len_to_parse);
+		jerr = json_tokener_get_error(tok);
+		if (jerr != json_tokener_continue || new_obj)
+			break;
+	}
+	if (clear_serializer && new_obj)
+		do_clear_serializer(new_obj);
+	new_str = json_object_to_json_string(new_obj);
+
+	if (strcmp(all_at_once_str, new_str) != 0)
+	{
+		printf("ERROR: failed to parse (%s) in %d byte chunks: %s != %s\n",
+		    test_string, chunksize, all_at_once_str, new_str);
+	}
+	json_tokener_free(tok);
+}
+
 static void single_basic_parse(const char *test_string, int clear_serializer)
 {
 	json_object *new_obj;
@@ -42,6 +83,9 @@ static void single_basic_parse(const char *test_string, int clear_serializer)
 		do_clear_serializer(new_obj);
 	printf("new_obj.to_string(%s)=%s\n", test_string, json_object_to_json_string(new_obj));
 	json_object_put(new_obj);
+
+	if (getenv("TEST_PARSE_CHUNKSIZE") != NULL)
+		single_incremental_parse(test_string, clear_serializer);
 }
 static void test_basic_parse()
 {
@@ -353,14 +397,17 @@ struct incremental_step
 	 * the next few tests check that parsing multiple sequential
 	 * json objects in the input works as expected
 	 */
-    {"null123", 9, 4, json_tokener_success, 0},
+    {"null123", 8, 4, json_tokener_success, 0},
     {&"null123"[4], 4, 3, json_tokener_success, 1},
-    {"nullx", 5, 4, json_tokener_success, 0},
+    {"nullx", 6, 4, json_tokener_success, 0},
     {&"nullx"[4], 2, 0, json_tokener_error_parse_unexpected, 1},
     {"{\"a\":1}{\"b\":2}", 15, 7, json_tokener_success, 0},
     {&"{\"a\":1}{\"b\":2}"[7], 8, 7, json_tokener_success, 1},
 
-    /* Some bad formatting. Check we get the correct error status */
+    /* Some bad formatting. Check we get the correct error status
+     * XXX this means we can't have two numbers in the incremental parse
+     * XXX stream with the second one being a negative number!
+     */
     {"2015-01-15", 10, 4, json_tokener_error_parse_number, 1},
 
     /* Strings have a well defined end point, so we can stop at the quote */

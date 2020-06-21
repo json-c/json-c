@@ -184,9 +184,9 @@ json_tokener_parse_ex(tok, noodle      ,   7) ... OK: got correct error: null ex
 json_tokener_parse_ex(tok, naodle      ,   7) ... OK: got correct error: null expected
 json_tokener_parse_ex(tok, track       ,   6) ... OK: got correct error: boolean expected
 json_tokener_parse_ex(tok, fail        ,   5) ... OK: got correct error: boolean expected
-json_tokener_parse_ex(tok, null123     ,   9) ... OK: got object of type [null]: null
+json_tokener_parse_ex(tok, null123     ,   8) ... OK: got object of type [null]: null
 json_tokener_parse_ex(tok, 123         ,   4) ... OK: got object of type [int]: 123
-json_tokener_parse_ex(tok, nullx       ,   5) ... OK: got object of type [null]: null
+json_tokener_parse_ex(tok, nullx       ,   6) ... OK: got object of type [null]: null
 json_tokener_parse_ex(tok, x           ,   2) ... OK: got correct error: unexpected character
 json_tokener_parse_ex(tok, {"a":1}{"b":2},  15) ... OK: got object of type [object]: { "a": 1 }
 json_tokener_parse_ex(tok, {"b":2}     ,   8) ... OK: got object of type [object]: { "b": 2 }
