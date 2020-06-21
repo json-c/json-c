@@ -124,6 +124,12 @@ json_tokener_parse_ex(tok, "\ud834\    ,   8) ... OK: got correct error: continu
 json_tokener_parse_ex(tok, udd1e"      ,   6) ... OK: got object of type [string]: "ùÑû"
 json_tokener_parse_ex(tok, "\ud834\u   ,   9) ... OK: got correct error: continue
 json_tokener_parse_ex(tok, dd1e"       ,   5) ... OK: got object of type [string]: "ùÑû"
+json_tokener_parse_ex(tok, "fff \ud834\ud,  14) ... OK: got correct error: continue
+json_tokener_parse_ex(tok, d1e bar"    ,   8) ... OK: got object of type [string]: "fff ùÑû bar"
+json_tokener_parse_ex(tok, "fff \ud834\udd,  15) ... OK: got correct error: continue
+json_tokener_parse_ex(tok, 1e bar"     ,   7) ... OK: got object of type [string]: "fff ùÑû bar"
+json_tokener_parse_ex(tok, "fff \ud83d\ude,  15) ... OK: got correct error: continue
+json_tokener_parse_ex(tok, 00 bar"     ,   7) ... OK: got object of type [string]: "fff üòÄ bar"
 json_tokener_parse_ex(tok, { "foo      ,   6) ... OK: got correct error: continue
 json_tokener_parse_ex(tok, : "bar"}    ,   8) ... OK: got correct error: unexpected character
 json_tokener_parse_ex(tok, { "foo      ,   6) ... OK: got correct error: continue
@@ -240,5 +246,5 @@ json_tokener_parse_ex(tok, "\ud855¿udc55",  14) ... OK: got correct error: inval
 json_tokener_parse_ex(tok, "\ud0031¿"  ,  10) ... OK: got correct error: invalid utf-8 string
 json_tokener_parse_ex(tok, 11Å11       ,   5) ... OK: got correct error: invalid utf-8 string
 json_tokener_parse_ex(tok, {"1Å":1}    ,   8) ... OK: got correct error: invalid utf-8 string
-End Incremental Tests OK=154 ERROR=0
+End Incremental Tests OK=160 ERROR=0
 ==================================

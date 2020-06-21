@@ -59,6 +59,8 @@ enum json_tokener_state
 	json_tokener_state_string,
 	json_tokener_state_string_escape,
 	json_tokener_state_escape_unicode,
+	json_tokener_state_escape_unicode_need_escape,
+	json_tokener_state_escape_unicode_need_u,
 	json_tokener_state_boolean,
 	json_tokener_state_number,
 	json_tokener_state_array,

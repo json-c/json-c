@@ -68,8 +68,8 @@ static void single_incremental_parse(const char *test_string, int clear_serializ
 
 	if (strcmp(all_at_once_str, new_str) != 0)
 	{
-		printf("ERROR: failed to parse (%s) in %d byte chunks: %s != %s\n",
-		    test_string, chunksize, all_at_once_str, new_str);
+		printf("ERROR: failed to parse (%s) in %d byte chunks: %s != %s\n", test_string,
+		       chunksize, all_at_once_str, new_str);
 	}
 	json_tokener_free(tok);
 }
@@ -193,8 +193,8 @@ static void test_utf8_parse()
 	// json_tokener_parse doesn't support checking for byte order marks.
 	// It's the responsibility of the caller to detect and skip a BOM.
 	// Both of these checks return null.
-	char* utf8_bom = "\xEF\xBB\xBF";
-	char* utf8_bom_and_chars = "\xEF\xBB\xBF{}";
+	char *utf8_bom = "\xEF\xBB\xBF";
+	char *utf8_bom_and_chars = "\xEF\xBB\xBF{}";
 	single_basic_parse(utf8_bom, 0);
 	single_basic_parse(utf8_bom_and_chars, 0);
 }
@@ -245,7 +245,7 @@ struct incremental_step
 	int char_offset;
 	enum json_tokener_error expected_error;
 	int reset_tokener; /* Set to 1 to call json_tokener_reset() after parsing */
-	int tok_flags; /* JSON_TOKENER_* flags to pass to json_tokener_set_flags() */
+	int tok_flags;     /* JSON_TOKENER_* flags to pass to json_tokener_set_flags() */
 } incremental_steps[] = {
 
     /* Check that full json messages can be parsed, both w/ and w/o a reset */
@@ -268,7 +268,11 @@ struct incremental_step
     {"\": {\"bar", -1, -1, json_tokener_continue, 0},
     {"\":13}}", -1, -1, json_tokener_success, 1},
 
-    /* Check the UTF-16 surrogate pair */
+    /* Check the UTF-16 surrogate pair handling in various ways.
+	 * Note: \ud843\udd1e is u+1D11E, Musical Symbol G Clef
+	 * Your terminal may not display these correctly, in particular
+	 *  PuTTY doesn't currently show this character.
+	 */
     /* parse one char at every time */
     {"\"\\", -1, -1, json_tokener_continue, 0},
     {"u", -1, -1, json_tokener_continue, 0},
@@ -296,6 +300,16 @@ struct incremental_step
     {"udd1e\"", -1, -1, json_tokener_success, 1},
     {"\"\\ud834\\u", -1, -1, json_tokener_continue, 0},
     {"dd1e\"", -1, -1, json_tokener_success, 1},
+    {"\"fff \\ud834\\ud", -1, -1, json_tokener_continue, 0},
+    {"d1e bar\"", -1, -1, json_tokener_success, 1},
+    {"\"fff \\ud834\\udd", -1, -1, json_tokener_continue, 0},
+    {"1e bar\"", -1, -1, json_tokener_success, 1},
+
+    /* \ud83d\ude00 is U+1F600, Grinning Face
+	 * Displays fine in PuTTY, though you may need "less -r"
+	 */
+    {"\"fff \\ud83d\\ude", -1, -1, json_tokener_continue, 0},
+    {"00 bar\"", -1, -1, json_tokener_success, 1},
 
     /* Check that json_tokener_reset actually resets */
     {"{ \"foo", -1, -1, json_tokener_continue, 1},

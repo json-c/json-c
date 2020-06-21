@@ -25,6 +25,8 @@ Other changes
    Add json_object_array_shrink() and array_list_shrink() functions.
 * Add json_object_new_array_ext(int) and array_list_new_2(int) to allow
    arrays to be allocated with the exact size needed, when known.
+* Parsing of surrogate pairs in unicode escapes now properly handles
+   incremental parsing.
 
 
 ***
