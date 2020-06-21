@@ -224,6 +224,35 @@ struct incremental_step
     {"\": {\"bar", -1, -1, json_tokener_continue, 0},
     {"\":13}}", -1, -1, json_tokener_success, 1},
 
+    /* Check the UTF-16 surrogate pair */
+    /* parse one char at every time */
+    {"\"\\", -1, -1, json_tokener_continue, 0},
+    {"u", -1, -1, json_tokener_continue, 0},
+    {"d", -1, -1, json_tokener_continue, 0},
+    {"8", -1, -1, json_tokener_continue, 0},
+    {"3", -1, -1, json_tokener_continue, 0},
+    {"4", -1, -1, json_tokener_continue, 0},
+    {"\\", -1, -1, json_tokener_continue, 0},
+    {"u", -1, -1, json_tokener_continue, 0},
+    {"d", -1, -1, json_tokener_continue, 0},
+    {"d", -1, -1, json_tokener_continue, 0},
+    {"1", -1, -1, json_tokener_continue, 0},
+    {"e\"", -1, -1, json_tokener_success, 1},
+    /* parse two char at every time */
+    {"\"\\u", -1, -1, json_tokener_continue, 0},
+    {"d8", -1, -1, json_tokener_continue, 0},
+    {"34", -1, -1, json_tokener_continue, 0},
+    {"\\u", -1, -1, json_tokener_continue, 0},
+    {"dd", -1, -1, json_tokener_continue, 0},
+    {"1e\"", -1, -1, json_tokener_success, 1},
+    /* check the low surrogate pair */
+    {"\"\\ud834", -1, -1, json_tokener_continue, 0},
+    {"\\udd1e\"", -1, -1, json_tokener_success, 1},
+    {"\"\\ud834\\", -1, -1, json_tokener_continue, 0},
+    {"udd1e\"", -1, -1, json_tokener_success, 1},
+    {"\"\\ud834\\u", -1, -1, json_tokener_continue, 0},
+    {"dd1e\"", -1, -1, json_tokener_success, 1},
+
     /* Check that json_tokener_reset actually resets */
     {"{ \"foo", -1, -1, json_tokener_continue, 1},
     {": \"bar\"}", -1, 0, json_tokener_error_parse_unexpected, 1},
@@ -239,11 +268,13 @@ struct incremental_step
     {"\"Y\"", -1, -1, json_tokener_success, 1},
 
     /* Trailing characters should cause a failure in strict mode */
-    {"{\"foo\":9}{\"bar\":8}", -1, 9, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT },
+    {"{\"foo\":9}{\"bar\":8}", -1, 9, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
 
     /* ... unless explicitly allowed. */
-    {"{\"foo\":9}{\"bar\":8}", -1, 9, json_tokener_success, 0, JSON_TOKENER_STRICT|JSON_TOKENER_ALLOW_TRAILING_CHARS },
-    {"{\"b\":8}ignored garbage", -1, 7, json_tokener_success, 1, JSON_TOKENER_STRICT|JSON_TOKENER_ALLOW_TRAILING_CHARS },
+    {"{\"foo\":9}{\"bar\":8}", -1, 9, json_tokener_success, 0,
+     JSON_TOKENER_STRICT | JSON_TOKENER_ALLOW_TRAILING_CHARS},
+    {"{\"b\":8}ignored garbage", -1, 7, json_tokener_success, 1,
+     JSON_TOKENER_STRICT | JSON_TOKENER_ALLOW_TRAILING_CHARS},
 
     /* To stop parsing a number we need to reach a non-digit, e.g. a \0 */
     {"1", 1, 1, json_tokener_continue, 0},
@@ -251,7 +282,7 @@ struct incremental_step
     {"2", 2, 1, json_tokener_success, 0},
     {"12{", 3, 2, json_tokener_success, 1},
     /* Parse number in strict model */
-    {"[02]", -1, 3, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT },
+    {"[02]", -1, 3, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
 
     /* Similar tests for other kinds of objects: */
     /* These could all return success immediately, since regardless of
@@ -267,8 +298,8 @@ struct incremental_step
     {"Infinity", 9, 8, json_tokener_success, 1},
     {"infinity", 9, 8, json_tokener_success, 1},
     {"-infinity", 10, 9, json_tokener_success, 1},
-    {"infinity", 9, 0, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT },
-    {"-infinity", 10, 1, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT },
+    {"infinity", 9, 0, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
+    {"-infinity", 10, 1, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
 
     {"inf", 3, 3, json_tokener_continue, 0},
     {"inity", 6, 5, json_tokener_success, 1},
@@ -350,7 +381,7 @@ struct incremental_step
     {"\"\\a\"", -1, 2, json_tokener_error_parse_string, 1},
 
     /* Check '\'' in strict model */
-    {"\'foo\'", -1, 0, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT },
+    {"\'foo\'", -1, 0, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
 
     /* Parse array/object */
     {"[1,2,3]", -1, -1, json_tokener_success, 0},
@@ -372,42 +403,54 @@ struct incremental_step
     {"[1,2,3,]", -1, -1, json_tokener_success, 0},
     {"[1,2,,3,]", -1, 5, json_tokener_error_parse_unexpected, 0},
 
-    {"[1,2,3,]", -1, 7, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT },
-    {"{\"a\":1,}", -1, 7, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT },
+    {"[1,2,3,]", -1, 7, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
+    {"{\"a\":1,}", -1, 7, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
 
     // utf-8 test
     // acsll encoding
-    {"\x22\x31\x32\x33\x61\x73\x63\x24\x25\x26\x22", -1, -1, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8 },
+    {"\x22\x31\x32\x33\x61\x73\x63\x24\x25\x26\x22", -1, -1, json_tokener_success, 1,
+     JSON_TOKENER_VALIDATE_UTF8},
     {"\x22\x31\x32\x33\x61\x73\x63\x24\x25\x26\x22", -1, -1, json_tokener_success, 1},
     // utf-8 encoding
-    {"\x22\xe4\xb8\x96\xe7\x95\x8c\x22", -1, -1, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8 },
-    {"\x22\xe4\xb8", -1, 3, json_tokener_error_parse_utf8_string, 0, JSON_TOKENER_VALIDATE_UTF8 },
-    {"\x96\xe7\x95\x8c\x22", -1, 0, json_tokener_error_parse_utf8_string, 1, JSON_TOKENER_VALIDATE_UTF8 },
+    {"\x22\xe4\xb8\x96\xe7\x95\x8c\x22", -1, -1, json_tokener_success, 1,
+     JSON_TOKENER_VALIDATE_UTF8},
+    {"\x22\xe4\xb8", -1, 3, json_tokener_error_parse_utf8_string, 0, JSON_TOKENER_VALIDATE_UTF8},
+    {"\x96\xe7\x95\x8c\x22", -1, 0, json_tokener_error_parse_utf8_string, 1,
+     JSON_TOKENER_VALIDATE_UTF8},
     {"\x22\xe4\xb8\x96\xe7\x95\x8c\x22", -1, -1, json_tokener_success, 1},
-    {"\x22\xcf\x80\xcf\x86\x22", -1, -1, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8 },
-    {"\x22\xf0\xa5\x91\x95\x22", -1, -1, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8 },
+    {"\x22\xcf\x80\xcf\x86\x22", -1, -1, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8},
+    {"\x22\xf0\xa5\x91\x95\x22", -1, -1, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8},
     // wrong utf-8 encoding
-    {"\x22\xe6\x9d\x4e\x22", -1, 3, json_tokener_error_parse_utf8_string, 1, JSON_TOKENER_VALIDATE_UTF8 },
+    {"\x22\xe6\x9d\x4e\x22", -1, 3, json_tokener_error_parse_utf8_string, 1,
+     JSON_TOKENER_VALIDATE_UTF8},
     {"\x22\xe6\x9d\x4e\x22", -1, 5, json_tokener_success, 1},
     // GBK encoding
-    {"\x22\xc0\xee\xc5\xf4\x22", -1, 2, json_tokener_error_parse_utf8_string, 1, JSON_TOKENER_VALIDATE_UTF8 },
+    {"\x22\xc0\xee\xc5\xf4\x22", -1, 2, json_tokener_error_parse_utf8_string, 1,
+     JSON_TOKENER_VALIDATE_UTF8},
     {"\x22\xc0\xee\xc5\xf4\x22", -1, 6, json_tokener_success, 1},
     // char after space
-    {"\x20\x20\x22\xe4\xb8\x96\x22", -1, -1, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8 },
-    {"\x20\x20\x81\x22\xe4\xb8\x96\x22", -1, 2, json_tokener_error_parse_utf8_string, 1, JSON_TOKENER_VALIDATE_UTF8 },
-    {"\x5b\x20\x81\x31\x5d", -1, 2, json_tokener_error_parse_utf8_string, 1, JSON_TOKENER_VALIDATE_UTF8 },
+    {"\x20\x20\x22\xe4\xb8\x96\x22", -1, -1, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8},
+    {"\x20\x20\x81\x22\xe4\xb8\x96\x22", -1, 2, json_tokener_error_parse_utf8_string, 1,
+     JSON_TOKENER_VALIDATE_UTF8},
+    {"\x5b\x20\x81\x31\x5d", -1, 2, json_tokener_error_parse_utf8_string, 1,
+     JSON_TOKENER_VALIDATE_UTF8},
     // char in state inf
     {"\x49\x6e\x66\x69\x6e\x69\x74\x79", 9, 8, json_tokener_success, 1},
-    {"\x49\x6e\x66\x81\x6e\x69\x74\x79", -1, 3, json_tokener_error_parse_utf8_string, 1, JSON_TOKENER_VALIDATE_UTF8 },
+    {"\x49\x6e\x66\x81\x6e\x69\x74\x79", -1, 3, json_tokener_error_parse_utf8_string, 1,
+     JSON_TOKENER_VALIDATE_UTF8},
     // char in escape unicode
-    {"\x22\x5c\x75\x64\x38\x35\x35\x5c\x75\x64\x63\x35\x35\x22", 15, 14, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8 },
+    {"\x22\x5c\x75\x64\x38\x35\x35\x5c\x75\x64\x63\x35\x35\x22", 15, 14, json_tokener_success, 1,
+     JSON_TOKENER_VALIDATE_UTF8},
     {"\x22\x5c\x75\x64\x38\x35\x35\xc0\x75\x64\x63\x35\x35\x22", -1, 8,
-     json_tokener_error_parse_utf8_string, 1, JSON_TOKENER_VALIDATE_UTF8 },
-    {"\x22\x5c\x75\x64\x30\x30\x33\x31\xc0\x22", -1, 9, json_tokener_error_parse_utf8_string, 1, JSON_TOKENER_VALIDATE_UTF8 },
+     json_tokener_error_parse_utf8_string, 1, JSON_TOKENER_VALIDATE_UTF8},
+    {"\x22\x5c\x75\x64\x30\x30\x33\x31\xc0\x22", -1, 9, json_tokener_error_parse_utf8_string, 1,
+     JSON_TOKENER_VALIDATE_UTF8},
     // char in number
-    {"\x31\x31\x81\x31\x31", -1, 2, json_tokener_error_parse_utf8_string, 1, JSON_TOKENER_VALIDATE_UTF8 },
+    {"\x31\x31\x81\x31\x31", -1, 2, json_tokener_error_parse_utf8_string, 1,
+     JSON_TOKENER_VALIDATE_UTF8},
     // char in object
-    {"\x7b\x22\x31\x81\x22\x3a\x31\x7d", -1, 3, json_tokener_error_parse_utf8_string, 1, JSON_TOKENER_VALIDATE_UTF8 },
+    {"\x7b\x22\x31\x81\x22\x3a\x31\x7d", -1, 3, json_tokener_error_parse_utf8_string, 1,
+     JSON_TOKENER_VALIDATE_UTF8},
 
     {NULL, -1, -1, json_tokener_success, 0},
 };

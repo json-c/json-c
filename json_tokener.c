@@ -630,8 +630,6 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 
 		case json_tokener_state_escape_unicode:
 		{
-			unsigned int got_hi_surrogate = 0;
-
 			/* Handle a 4-byte sequence, or two sequences if a surrogate pair */
 			while (1)
 			{
@@ -643,14 +641,24 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 					{
 						unsigned char unescaped_utf[4];
 
-						if (got_hi_surrogate)
+						if (tok->got_hi_surrogate)
 						{
 							if (IS_LOW_SURROGATE(tok->ucs_char))
 							{
+								/* remove the utf8_replacement_char */
+								/* which may generate during */
+								/* parsing the high surrogate pair. */
+								if (!strcmp(
+								        tok->pb->buf,
+								        (char *)
+								            utf8_replacement_char))
+								{
+									printbuf_reset(tok->pb);
+								}
 								/* Recalculate the ucs_char, then fall thru to process normally */
 								tok->ucs_char =
 								    DECODE_SURROGATE_PAIR(
-								        got_hi_surrogate,
+								        tok->got_hi_surrogate,
 								        tok->ucs_char);
 							}
 							else
@@ -662,7 +670,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 								    (char *)utf8_replacement_char,
 								    3);
 							}
-							got_hi_surrogate = 0;
+							tok->got_hi_surrogate = 0;
 						}
 
 						if (tok->ucs_char < 0x80)
@@ -686,7 +694,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 							 * the beginning of another sequence, which
 							 * should be the low surrogate.
 							 */
-							got_hi_surrogate = tok->ucs_char;
+							tok->got_hi_surrogate = tok->ucs_char;
 							/* Not at end, and the next two chars should be "\u" */
 							if ((len == -1 ||
 							     len > (tok->char_offset + 2)) &&
@@ -717,6 +725,8 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 									    (char *)
 									        utf8_replacement_char,
 									    3);
+									tok->ucs_char = 0;
+									tok->st_pos = 0;
 									goto out;
 								}
 								tok->ucs_char = 0;
@@ -786,7 +796,8 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				if (!ADVANCE_CHAR(str, tok) || !PEEK_CHAR(c, tok))
 				{
 					/* Clean up any pending chars */
-					if (got_hi_surrogate)
+					if (tok->got_hi_surrogate &&
+					    strcmp(tok->pb->buf, (char *)utf8_replacement_char))
 						printbuf_memappend_fast(
 						    tok->pb, (char *)utf8_replacement_char, 3);
 					goto out;
