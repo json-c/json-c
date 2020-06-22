@@ -72,6 +72,10 @@ static void single_incremental_parse(const char *test_string, int clear_serializ
 		       chunksize, all_at_once_str, new_str);
 	}
 	json_tokener_free(tok);
+	if (all_at_once_obj)
+		json_object_put(all_at_once_obj);
+	if (new_obj)
+		json_object_put(new_obj);
 }
 
 static void single_basic_parse(const char *test_string, int clear_serializer)
