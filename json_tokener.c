@@ -646,7 +646,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				if (tok->st_pos >= 4)
 					break;
 
-				ADVANCE_CHAR(str, tok);
+				(void)ADVANCE_CHAR(str, tok);
 				if (!PEEK_CHAR(c, tok))
 				{
 					/*
