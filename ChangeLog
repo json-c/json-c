@@ -27,6 +27,9 @@ Other changes
    arrays to be allocated with the exact size needed, when known.
 * Parsing of surrogate pairs in unicode escapes now properly handles
    incremental parsing.
+* Fix incremental parsing of numbers, especially those with exponents, e.g.
+   so parsing "[0", "e+", "-]" now properly returns an error.
+  Strict mode now rejects missing exponents ("0e").
 
 
 ***

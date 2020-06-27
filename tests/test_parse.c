@@ -343,8 +343,33 @@ struct incremental_step
     /* This should parse as the number 12, since it continues the "1" */
     {"2", 2, 1, json_tokener_success, 0},
     {"12{", 3, 2, json_tokener_success, 1},
-    /* Parse number in strict model */
+    /* Parse number in strict mode */
     {"[02]", -1, 3, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+
+    {"0e+0", 5, 4, json_tokener_success, 1},
+    {"[0e+0]", -1, -1, json_tokener_success, 1},
+
+    /* The behavior when missing the exponent varies slightly */
+    {"0e", 2, 2, json_tokener_continue, 1},
+    {"0e", 3, 2, json_tokener_success, 1},
+    {"0e", 3, 2, json_tokener_error_parse_eof, 1, JSON_TOKENER_STRICT},
+    {"[0e]", -1, -1, json_tokener_success, 1},
+    {"[0e]", -1, 3, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+
+    {"0e+", 3, 3, json_tokener_continue, 1},
+    {"0e+", 4, 3, json_tokener_success, 1},
+    {"0e+", 4, 3, json_tokener_error_parse_eof, 1, JSON_TOKENER_STRICT},
+    {"[0e+]", -1, -1, json_tokener_success, 1},
+    {"[0e+]", -1, 4, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+
+    {"0e-", 3, 3, json_tokener_continue, 1},
+    {"0e-", 4, 3, json_tokener_success, 1},
+    {"0e-", 4, 3, json_tokener_error_parse_eof, 1, JSON_TOKENER_STRICT},
+    {"[0e-]", -1, -1, json_tokener_success, 1},
+    {"[0e-]", -1, 4, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+
+    {"0e+-", 5, 3, json_tokener_error_parse_number, 1},
+    {"[0e+-]", -1, 4, json_tokener_error_parse_number, 1},
 
     /* Similar tests for other kinds of objects: */
     /* These could all return success immediately, since regardless of

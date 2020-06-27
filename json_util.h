@@ -103,6 +103,9 @@ JSON_EXPORT const char *json_util_get_last_err(void);
 /* these parsing helpers return zero on success */
 JSON_EXPORT int json_parse_int64(const char *buf, int64_t *retval);
 JSON_EXPORT int json_parse_uint64(const char *buf, uint64_t *retval);
+/**
+ * @deprecated
+ */
 JSON_EXPORT int json_parse_double(const char *buf, double *retval);
 
 /**

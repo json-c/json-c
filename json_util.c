@@ -222,6 +222,7 @@ int json_object_to_file(const char *filename, struct json_object *obj)
 	return json_object_to_file_ext(filename, obj, JSON_C_TO_STRING_PLAIN);
 }
 
+// Deprecated json_parse_double function.  See json_tokener_parse_double instead.
 int json_parse_double(const char *buf, double *retval)
 {
 	char *end;
@@ -250,7 +251,7 @@ int json_parse_uint64(const char *buf, uint64_t *retval)
 	while (*buf == ' ')
 		buf++;
 	if (*buf == '-')
-		return 1;  /* error: uint cannot be negative */
+		return 1; /* error: uint cannot be negative */
 
 	val = strtoull(buf, &end, 10);
 	if (end != buf)
