@@ -202,7 +202,7 @@ struct json_object *json_tokener_parse_verbose(const char *str, enum json_tokene
 		 */
 	    || json_tokener_get_parse_end(tok) != strlen(str)
 #endif
-	   )
+	)
 
 	{
 		if (obj != NULL)
@@ -874,13 +874,10 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				}
 			}
 
-			while (c &&
-			    ((c >= '0' && c <= '9') ||
-				 (!is_exponent && (c=='e' || c=='E')) ||
-				 (neg_sign_ok && c=='-') ||
-				 (pos_sign_ok && c=='+') ||
-				 (!tok->is_double && c=='.')
-			 ))
+			while (c && ((c >= '0' && c <= '9') ||
+			             (!is_exponent && (c == 'e' || c == 'E')) ||
+			             (neg_sign_ok && c == '-') || (pos_sign_ok && c == '+') ||
+			             (!tok->is_double && c == '.')))
 			{
 				pos_sign_ok = neg_sign_ok = 0;
 				++case_len;
@@ -922,10 +919,8 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 			    because c can be part of a new object to parse on the
 				next call to json_tokener_parse().
 			 */
-			if (tok->depth > 0 &&
-			    c != ',' && c != ']' && c != '}' && c != '/' &&
-				c != 'I' && c != 'i' &&
-			    !isspace((unsigned char)c))
+			if (tok->depth > 0 && c != ',' && c != ']' && c != '}' && c != '/' &&
+			    c != 'I' && c != 'i' && !isspace((unsigned char)c))
 			{
 				tok->err = json_tokener_error_parse_number;
 				goto out;

@@ -371,7 +371,7 @@ struct incremental_step
     {"[0e-]", -1, -1, json_tokener_success, 1},
     {"[0e-]", -1, 4, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
 
-	/* You might expect this to fail, but it won't because
+    /* You might expect this to fail, but it won't because
 	   it's a valid partial parse; note the char_offset: */
     {"0e+-", 5, 3, json_tokener_success, 1},
     {"0e+-", 5, 3, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
@@ -453,7 +453,7 @@ struct incremental_step
     {"{\"a\":1}{\"b\":2}", 15, 7, json_tokener_success, 0},
     {&"{\"a\":1}{\"b\":2}"[7], 8, 7, json_tokener_success, 1},
 
-	/*
+    /*
 	 * Though this may seem invalid at first glance, it
 	 * parses as three separate numbers, 2015, -1 and -15
 	 * Of course, simply pasting together a stream of arbitrary
