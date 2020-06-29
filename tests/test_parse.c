@@ -42,6 +42,7 @@ static void single_incremental_parse(const char *test_string, int clear_serializ
 	json_object *all_at_once_obj, *new_obj;
 	const char *all_at_once_str, *new_str;
 
+	assert(chunksize > 0);
 	all_at_once_obj = json_tokener_parse(test_string);
 	if (clear_serializer)
 		do_clear_serializer(all_at_once_obj);
