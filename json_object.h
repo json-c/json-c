@@ -500,6 +500,7 @@ JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key
 /* Array type methods */
 
 /** Create a new empty json_object of type json_type_array
+ * with 32 slots allocated.
  * If you know the array size you'll need ahead of time, use
  * json_object_new_array_ext() instead.
  * @see json_object_new_array_ext()
@@ -508,6 +509,12 @@ JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key
  */
 JSON_EXPORT struct json_object *json_object_new_array(void);
 
+/** Create a new empty json_object of type json_type_array
+ * with the desired number of slots allocated.
+ * @see json_object_array_shrink()
+ * @param initial_size the number of slots to allocate
+ * @returns a json_object of type json_type_array
+ */
 JSON_EXPORT struct json_object *json_object_new_array_ext(int initial_size);
 
 /** Get the arraylist of a json_object of type json_type_array
