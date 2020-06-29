@@ -30,6 +30,9 @@ Other changes
 * Fix incremental parsing of numbers, especially those with exponents, e.g.
    so parsing "[0", "e+", "-]" now properly returns an error.
   Strict mode now rejects missing exponents ("0e").
+* Successfully return number objects at the top level even when they are
+   followed by a "-", "." or "e".  This makes parsing things like "123-45"
+   behave consistently with things like "123xyz".
 
 
 ***

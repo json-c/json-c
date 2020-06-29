@@ -98,7 +98,6 @@ struct json_object_string
 
 void _json_c_set_last_err(const char *err_fmt, ...);
 
-extern const char *json_number_chars;
 extern const char *json_hex_chars;
 
 #ifdef __cplusplus
