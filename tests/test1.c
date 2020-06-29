@@ -250,7 +250,7 @@ int main(int argc, char **argv)
 	test_array_del_idx();
 	test_array_list_expand_internal();
 
-	my_array = json_object_new_array();
+	my_array = json_object_new_array_ext(5);
 	json_object_array_add(my_array, json_object_new_int(3));
 	json_object_array_add(my_array, json_object_new_int(1));
 	json_object_array_add(my_array, json_object_new_int(2));
