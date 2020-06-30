@@ -39,13 +39,13 @@
 #error "The long long type isn't 64-bits"
 #endif
 
-#ifndef SSIZE_T_MAX
+#ifndef SSIZE_MAX
 #if SIZEOF_SSIZE_T == SIZEOF_INT
-#define SSIZE_T_MAX UINT_MAX
+#define SSIZE_MAX INT_MAX
 #elif SIZEOF_SSIZE_T == SIZEOF_LONG
-#define SSIZE_T_MAX ULONG_MAX
+#define SSIZE_MAX LONG_MAX
 #elif SIZEOF_SSIZE_T == SIZEOF_LONG_LONG
-#define SSIZE_T_MAX ULLONG_MAX
+#define SSIZE_MAX LLONG_MAX
 #else
 #error Unable to determine size of ssize_t
 #endif
@@ -1266,7 +1266,7 @@ static struct json_object *_json_object_new_string(const char *s, const size_t l
 	 *                       data
      *                       \0]
 	 */
-	if (len > (SSIZE_T_MAX - (sizeof(*jso) - sizeof(jso->c_string)) - 1))
+	if (len > (SSIZE_MAX - (sizeof(*jso) - sizeof(jso->c_string)) - 1))
 		return NULL;
 	objsize = (sizeof(*jso) - sizeof(jso->c_string)) + len + 1;
 	if (len < sizeof(void *))
@@ -1329,7 +1329,7 @@ static int _json_object_set_string_len(json_object *jso, const char *s, size_t l
 	if (jso == NULL || jso->o_type != json_type_string)
 		return 0;
 
-	if (len >= SSIZE_T_MAX - 1)
+	if (len >= SSIZE_MAX - 1)
 		// jso->len is a signed ssize_t, so it can't hold the
 		// full size_t range.
 		return 0;
