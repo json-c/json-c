@@ -41,11 +41,11 @@
 
 #ifndef SSIZE_T_MAX
 #if SIZEOF_SSIZE_T == SIZEOF_INT
-#define SSIZE_T_MAX UINT_MAX
+#define SSIZE_T_MAX INT_MAX
 #elif SIZEOF_SSIZE_T == SIZEOF_LONG
-#define SSIZE_T_MAX ULONG_MAX
+#define SSIZE_T_MAX LONG_MAX
 #elif SIZEOF_SSIZE_T == SIZEOF_LONG_LONG
-#define SSIZE_T_MAX ULLONG_MAX
+#define SSIZE_T_MAX LLONG_MAX
 #else
 #error Unable to determine size of ssize_t
 #endif
