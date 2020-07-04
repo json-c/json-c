@@ -18,6 +18,8 @@
         * https://github.com/lvc/abi-compliance-checker
         * If the new release is not backwards compatible, then this is a MAJOR release.
         * Mention removed features in ChangeLog
+		* Consider re-adding backwards compatible support, through symbol
+		  aliases and appropriate entries in json-c.sym
     * Update the AUTHORS file
     * Exclude mentioning changes that have already been included in a point 
       release of the previous release branch.
@@ -62,6 +64,11 @@ to
 	VERSION x.y+1.z
 
     git commit -a -m "Bump version to ${release}"
+
+If we're doing a major release (SONAME bump), also bump the version
+ of ALL symbols in json-c.sym.
+ See explanation at https://github.com/json-c/json-c/issues/621
+ More info at: https://software.intel.com/sites/default/files/m/a/1/e/dsohowto.pdf
 
 ------------
 

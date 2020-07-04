@@ -1,17 +1,53 @@
-JSONC_0.14 {
-  global:
-    _json_c_set_last_err;
-    _json_c_strerror;
-    _json_c_strerror_enable;
+
+/*
+ * Symbol versioning for libjson-c.
+ * All exported symbols must be listed here.
+ *
+ * See 
+ *   https://software.intel.com/sites/default/files/m/a/1/e/dsohowto.pdf
+ */
+
+/*
+ * Symbols in JSONC_PRIVATE are exported for historical
+ * reasons, but should not be used outside of json-c.
+ */
+JSONC_PRIVATE {
     array_list_add;
-    array_list_bsearch;
     array_list_del_idx;
     array_list_free;
-    array_list_get_idx;
-    array_list_length;
     array_list_new;
     array_list_put_idx;
     array_list_sort;
+    json_hex_chars;
+    json_parse_double;
+    json_parse_int64;
+    json_parse_uint64;
+    lh_table_delete;
+    lh_table_delete_entry;
+    lh_table_free;
+    lh_table_insert;
+    lh_table_insert_w_hash;
+    lh_table_new;
+    lh_table_resize;
+    mc_debug;
+    mc_error;
+    mc_get_debug;
+    mc_info;
+    mc_set_debug;
+    mc_set_syslog;
+    printbuf_free;
+    printbuf_memappend;
+    printbuf_memset;
+    printbuf_new;
+    printbuf_reset;
+    sprintbuf;
+};
+
+JSONC_0.14 {
+  global:
+    array_list_bsearch;
+    array_list_get_idx;
+    array_list_length;
     json_c_get_random_seed;
     json_c_object_sizeof;
     json_c_set_serialization_double_format;
@@ -20,7 +56,6 @@ JSONC_0.14 {
     json_c_version_num;
     json_c_visit;
     json_global_set_string_hash;
-    json_hex_chars;
     json_number_chars;
     json_object_array_add;
     json_object_array_bsearch;
@@ -91,9 +126,6 @@ JSONC_0.14 {
     json_object_to_json_string_ext;
     json_object_to_json_string_length;
     json_object_userdata_to_json_string;
-    json_parse_double;
-    json_parse_int64;
-    json_parse_uint64;
     json_pointer_get;
     json_pointer_getf;
     json_pointer_set;
@@ -115,30 +147,10 @@ JSONC_0.14 {
     lh_kchar_table_new;
     lh_kptr_table_new;
     lh_ptr_equal;
-    lh_table_delete;
-    lh_table_delete_entry;
-    lh_table_free;
-    lh_table_insert;
-    lh_table_insert_w_hash;
     lh_table_length;
-    lh_table_lookup;
     lh_table_lookup_entry;
     lh_table_lookup_entry_w_hash;
     lh_table_lookup_ex;
-    lh_table_new;
-    lh_table_resize;
-    mc_debug;
-    mc_error;
-    mc_get_debug;
-    mc_info;
-    mc_set_debug;
-    mc_set_syslog;
-    printbuf_free;
-    printbuf_memappend;
-    printbuf_memset;
-    printbuf_new;
-    printbuf_reset;
-    sprintbuf;
 
   local:
     *;
