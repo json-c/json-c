@@ -325,6 +325,22 @@ if (NOT ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC"))
 		# XXX need cmake>=3.13 for this:
 		#add_link_options("-Wl,-Bsymbolic-functions")
 	endif()
+
+	file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/check-version-script.sym" "TEST { global: *; };")
+	list(APPEND CMAKE_REQUIRED_LIBRARIES "-Wl,--version-script,${CMAKE_CURRENT_BINARY_DIR}/check-version-script.sym")
+	check_c_source_compiles(
+	"
+	int main (void)
+	{
+	  return 0;
+	}
+	"
+	VERSION_SCRIPT_WORKS
+	)
+	list(REMOVE_ITEM CMAKE_REQUIRED_LIBRARIES "-Wl,--version-script,${CMAKE_CURRENT_BINARY_DIR}/check-version-script.sym")
+	if (VERSION_SCRIPT_WORKS)
+		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--version-script,${CMAKE_CURRENT_SOURCE_DIR}/json-c.sym")
+	endif()
 endif()
 
 if ($ENV{VALGRIND})
