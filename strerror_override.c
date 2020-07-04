@@ -59,7 +59,8 @@ static struct
 /* clang-format on */
 
 // Enabled during tests
-int _json_c_strerror_enable = 0;
+static int _json_c_strerror_enable = 0;
+extern char *getenv(const char *name); // Avoid including stdlib.h
 
 #define PREFIX "ERRNO="
 static char errno_buf[128] = PREFIX;
@@ -70,6 +71,8 @@ char *_json_c_strerror(int errno_in)
 	int ii, jj;
 
 	if (!_json_c_strerror_enable)
+		_json_c_strerror_enable = (getenv("_JSON_C_STRERROR_ENABLE") == NULL) ? -1 : 1;
+	if (_json_c_strerror_enable == -1)
 		return strerror(errno_in);
 
 	// Avoid standard functions, so we don't need to include any
