@@ -196,11 +196,44 @@ JSON_EXPORT const char *json_tokener_error_desc(enum json_tokener_error jerr);
  */
 JSON_EXPORT enum json_tokener_error json_tokener_get_error(struct json_tokener *tok);
 
+/**
+ * Allocate a new json_tokener.
+ * When done using that to parse objects, free it with json_tokener_free().
+ * See json_tokener_parse_ex() for usage details.
+ */
 JSON_EXPORT struct json_tokener *json_tokener_new(void);
+
+/**
+ * Allocate a new json_tokener with a custom max nesting depth.
+ * @see JSON_TOKENER_DEFAULT_DEPTH
+ */
 JSON_EXPORT struct json_tokener *json_tokener_new_ex(int depth);
+
+/**
+ * Free a json_tokener previously allocated with json_tokener_new().
+ */
 JSON_EXPORT void json_tokener_free(struct json_tokener *tok);
+
+/**
+ * Reset the state of a json_tokener, to prepare to parse a 
+ * brand new JSON object.
+ */
 JSON_EXPORT void json_tokener_reset(struct json_tokener *tok);
+
+/**
+ * Parse a json_object out of the string `str`.
+ *
+ * If you need more control over how the parsing occurs,
+ * see json_tokener_parse_ex().
+ */
 JSON_EXPORT struct json_object *json_tokener_parse(const char *str);
+
+/**
+ * Parser a json_object out of the string `str`, but if it fails
+ * return the error in `*error`.
+ * @see json_tokener_parse()
+ * @see json_tokener_parse_ex()
+ */
 JSON_EXPORT struct json_object *json_tokener_parse_verbose(const char *str,
                                                            enum json_tokener_error *error);
 

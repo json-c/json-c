@@ -347,15 +347,21 @@ JSON_C_CONST_FUNCTION(JSON_EXPORT size_t json_c_object_sizeof(void));
 
 /** Add an object field to a json_object of type json_type_object
  *
- * The reference count will *not* be incremented. This is to make adding
- * fields to objects in code more compact. If you want to retain a reference
- * to an added object, independent of the lifetime of obj, you must wrap the
- * passed object with json_object_get.
+ * The reference count of `val` will *not* be incremented, in effect 
+ * transferring ownership that object to `obj`, and thus `val` will be
+ * freed when `obj` is.  (i.e. through `json_object_put(obj)`)
  *
- * Upon calling this, the ownership of val transfers to obj.  Thus you must
- * make sure that you do in fact have ownership over this object.  For instance,
- * json_object_new_object will give you ownership until you transfer it,
- * whereas json_object_object_get does not.
+ * If you want to retain a reference to the added object, independent
+ * of the lifetime of obj, you must increment the refcount with
+ * `json_object_get(val)` (and later release it with json_object_put()).
+ *
+ * Since ownership transfers to `obj`, you must make sure
+ * that you do in fact have ownership over `val`.  For instance,
+ * json_object_new_object() will give you ownership until you transfer it,
+ * whereas json_object_object_get() does not.
+ *
+ * Any previous object stored under `key` in `obj` will have its refcount
+ * decremented, and be freed normally if that drops to zero.
  *
  * @param obj the json_object instance
  * @param key the object field name (a private copy will be duplicated)
@@ -378,7 +384,7 @@ JSON_EXPORT int json_object_object_add(struct json_object *obj, const char *key,
  * @param key the object field name (a private copy will be duplicated)
  * @param val a json_object or NULL member to associate with the given field
  * @param opts process-modifying options. To specify multiple options, use
- *             arithmetic or (OPT1|OPT2)
+ *             (OPT1|OPT2)
  */
 JSON_EXPORT int json_object_object_add_ex(struct json_object *obj, const char *const key,
                                           struct json_object *const val, const unsigned opts);
