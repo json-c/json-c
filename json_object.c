@@ -1635,7 +1635,7 @@ static int json_object_copy_serializer_data(struct json_object *src, struct json
 	{
 		_json_c_set_last_err(
 		    "json_object_deep_copy: unable to copy unknown serializer data: %p\n",
-		    dst->_to_json_string);
+		    (void *)dst->_to_json_string);
 		return -1;
 	}
 	dst->_user_delete = src->_user_delete;
