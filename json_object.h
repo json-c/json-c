@@ -593,7 +593,15 @@ JSON_EXPORT int json_object_array_add(struct json_object *obj, struct json_objec
 JSON_EXPORT int json_object_array_put_idx(struct json_object *obj, size_t idx,
                                           struct json_object *val);
 
-/** Get the element at specified index of the array (a json_object of type json_type_array)
+/** Get the element at specified index of array `obj` (which must be a json_object of type json_type_array)
+ *
+ * *No* reference counts will be changed, and ownership of the returned
+ * object remains with `obj`.  See json_object_object_get() for additional
+ * implications of this behavior.
+ *
+ * Calling this with anything other than a json_type_array will trigger
+ * an assert.
+ *
  * @param obj the json_object instance
  * @param idx the index to get the element at
  * @returns the json_object at the specified index (or NULL)
