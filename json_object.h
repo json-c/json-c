@@ -133,21 +133,43 @@ extern "C" {
 /* reference counting functions */
 
 /**
- * Increment the reference count of json_object, thereby grabbing shared
- * ownership of obj.
+ * Increment the reference count of json_object, thereby taking ownership of it.
+ *
+ * Cases where you might need to increase the refcount include:
+ * - Using an object field or array index (retrieved through
+ *    `json_object_object_get()` or `json_object_array_get_idx()`)
+ *    beyond the lifetime of the parent object.
+ * - Detaching an object field or array index from its parent object
+ *    (using `json_object_object_del()` or `json_object_array_del_idx()`)
+ * - Sharing a json_object with multiple (not necesarily parallel) threads
+ *    of execution that all expect to free it (with `json_object_put()`) when
+ *    they're done.
  *
  * @param obj the json_object instance
+ * @see json_object_put()
+ * @see json_object_object_get()
+ * @see json_object_array_get_idx()
  */
 JSON_EXPORT struct json_object *json_object_get(struct json_object *obj);
 
 /**
  * Decrement the reference count of json_object and free if it reaches zero.
+ *
  * You must have ownership of obj prior to doing this or you will cause an
- * imbalance in the reference count.
- * An obj of NULL may be passed; in that case this call is a no-op.
+ * imbalance in the reference count, leading to a classic use-after-free bug.
+ * In particular, you normally do not need to call `json_object_put()` on the
+ * json_object returned by `json_object_object_get()` or `json_object_array_get_idx()`.
+ *
+ * Just like after calling `free()` on a block of memory, you must not use
+ * `obj` after calling `json_object_put()` on it or any object that it
+ * is a member of (unless you know you've called `json_object_get(obj)` to
+ * explicitly increment the refcount).
+ *
+ * NULL may be passed, which which case this is a no-op.
  *
  * @param obj the json_object instance
  * @returns 1 if the object was freed.
+ * @see json_object_get()
  */
 JSON_EXPORT int json_object_put(struct json_object *obj);
 
@@ -347,7 +369,7 @@ JSON_C_CONST_FUNCTION(JSON_EXPORT size_t json_c_object_sizeof(void));
 
 /** Add an object field to a json_object of type json_type_object
  *
- * The reference count of `val` will *not* be incremented, in effect 
+ * The reference count of `val` will *not* be incremented, in effect
  * transferring ownership that object to `obj`, and thus `val` will be
  * freed when `obj` is.  (i.e. through `json_object_put(obj)`)
  *
