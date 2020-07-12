@@ -10,23 +10,35 @@ For information about building json-c, see the <a href="https://github.com/json-
 
 <h2>Versions:</h2>
 
-Note: for the very latest development docs <a href="https://github.com/json-c/json-c">clone the source</a> and run "doxygen", then look in the doc directory.
-<br>
-
-Current release: <a href="json-c-0.14/doc/html/index.html">json-c-0.14</a>
+<p>Current release: <a href="json-c-current-release/doc/html/index.html">json-c-0.14</a>
 <br>Best starting points:
-<a href="json-c-0.14/doc/html/json__object_8h.html">json_object.h</a> or
-<a href="json-c-0.14/doc/html/json__tokener_8h.html">json_tokener.h</a>
+<a href="json-c-current-releaes/doc/html/json__object_8h.html">json_object.h</a> or
+<a href="json-c-current-releaes/doc/html/json__tokener_8h.html">json_tokener.h</a>
 
 You can also look at the tests in <a href="https://github.com/json-c/json-c/blob/json-c-0.14/tests/">the tests directory</a> for some examples.<br>
 One of the simplest examples is
 <a href="https://github.com/json-c/json-c/blob/json-c-0.14-20200419/tests/test2.c">test2.c</a>.
+</p>
+
+<p>Note: for the most recent development docs <a href="https://github.com/json-c/json-c">clone the source</a> and run:
+
+<pre>sed -e's/@CMAKE_CURRENT_BINARY_DIR@/doc/' doc/Doxyfile.in | doxygen -</pre>
+
+Then look in the doc/html directory.
+</p>
+
 
 <hr>
 
-<h3>Older releases</h3>
+<h3>All releases</h3>
 
 <ul>
+
+<li><a href="json-c-0.14/doc/html/index.html">json-c-0.14</a>
+<br>Best starting points:
+<a href="json-c-0.14/doc/html/json__object_8h.html">json_object.h</a> or
+<a href="json-c-0.14/doc/html/json__tokener_8h.html">json_tokener.h</a>
+</li>
 
 <li><a href="json-c-0.13.1/doc/html/index.html">json-c-0.13.1</a>
 <br>Best starting points:
