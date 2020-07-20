@@ -4,14 +4,36 @@ Next Release 0.15
 
 Deprecated and removed features:
 --------------------------------
-* array_list_new() has been deprecated in favor of array_list_new2()
+* Deprecate `array_list_new()` in favor of `array_list_new2()`
+* Remove the THIS_FUNCTION_IS_DEPRECATED define.
+* Remove config.h.win32
 
-Other changes
---------------
-* Add a json_parse binary, for use in testing changes (not installed).
-* Issue #471: always create directories with mode 0755, regardless of umask.
-* Added a JSON_TOKENER_ALLOW_TRAILING_CHARS flag to allow multiple objects
-  to be parsed even when JSON_TOKENER_STRICT is set.
+New features
+------------
+* Add a `JSON_TOKENER_ALLOW_TRAILING_CHARS` flag to allow multiple objects
+  to be parsed even when `JSON_TOKENER_STRICT` is set.
+* Add `json_object_new_array_ext(int)` and `array_list_new_2(int)` to allow
+   arrays to be allocated with the exact size needed, when known.
+* Add `json_object_array_shrink()` (and `array_list_shrink()`) and use it in 
+   json_tokener to minimize the amount of memory used.
+* Add a json_parse binary, for use in testing changes (not installed, but 
+   available in the apps directory).
+
+Build changes
+-------------
+* #639/#621 - Add symbol versions to all exported symbols
+* #508/#634 - Always enable -fPIC to allow use of the json-c static library in
+   other libraries
+* Build both static and shared libraries at the same time.
+* #626 - Restore compatibility with cmake 2.8 
+* #471 - Always create directories with mode 0755, regardless of umask.
+* #606/#604 - Improve support for OSes like AIX and IBM i, as well as for
+   MINGW32 and old versions of MSVC
+* #451/#617 - Add a DISABLE_THREAD_LOCAL_STORAGE cmake option to disable 
+   the use of thread-local storage.
+
+Significant changes and bug fixes
+---------------------------------
 * Split the internal json_object structure into several sub-types, one for
    each json_type (json_object_object, json_object_string, etc...).
   This improves memory usage and speed, with the benchmark under
@@ -23,9 +45,7 @@ Other changes
    arrays to the exact number of elements parsed.  On bench/ benchmark:
    9% faster test time, 39%(max RSS)-50%(peak heap) less memory usage.
    Add json_object_array_shrink() and array_list_shrink() functions.
-* Add json_object_new_array_ext(int) and array_list_new_2(int) to allow
-   arrays to be allocated with the exact size needed, when known.
-* Parsing of surrogate pairs in unicode escapes now properly handles
+* #616 - Parsing of surrogate pairs in unicode escapes now properly handles
    incremental parsing.
 * Fix incremental parsing of numbers, especially those with exponents, e.g.
    so parsing "[0", "e+", "-]" now properly returns an error.
@@ -33,6 +53,16 @@ Other changes
 * Successfully return number objects at the top level even when they are
    followed by a "-", "." or "e".  This makes parsing things like "123-45"
    behave consistently with things like "123xyz".
+
+Other changes
+-------------
+* #589 - Detect broken RDRAND during initialization; also, fix segfault
+    in the CPUID check.
+* #592 - Fix integer overflows to prevert out of bounds write on large input.
+* Protect against division by zero in linkhash, when creaed with zero size.
+* #602 - Fix json_parse_uint64() internal error checking, leaving the retval
+    untouched in more failure cases.
+* #614 - Prevent truncation when custom double formatters insert extra \0's
 
 
 ***
