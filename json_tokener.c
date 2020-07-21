@@ -430,7 +430,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 			{
 				char inf_char = *str;
 				if (!(tok->flags & JSON_TOKENER_STRICT))
-					inf_char = tolower((int)*str);
+					inf_char = tolower((unsigned char)*str);
 				if (inf_char != _json_inf_str[tok->st_pos])
 				{
 					tok->err = json_tokener_error_parse_unexpected;
