@@ -107,6 +107,7 @@ DISABLE_THREAD_LOCAL_STORAGE | Bool   | Disable use of Thread-Local Storage (HAV
 DISABLE_WERROR               | Bool   | Disable use of -Werror.
 ENABLE_RDRAND                | Bool   | Enable RDRAND Hardware RNG Hash Seed.
 ENABLE_THREADING             | Bool   | Enable partial threading support.
+OVERRIDE_GET_RANDOM_SEED     | String | A block of code to use instead of the default implementation of json_c_get_random_seed(), e.g. on embedded platforms where not even the fallback to time() works.  Must be a single line.
 
 Pass these options as `-D` on CMake's command-line.
 

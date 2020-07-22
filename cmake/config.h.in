@@ -2,6 +2,9 @@
 /* Enable RDRAND Hardware RNG Hash Seed */
 #cmakedefine ENABLE_RDRAND "@ENABLE_RDRAND@"
 
+/* Override json_c_get_random_seed() with custom code */
+#cmakedefine OVERRIDE_GET_RANDOM_SEED @OVERRIDE_GET_RANDOM_SEED@
+
 /* Enable partial threading support */
 #cmakedefine ENABLE_THREADING "@@"
 

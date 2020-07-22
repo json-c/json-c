@@ -96,6 +96,8 @@ option(DISABLE_THREAD_LOCAL_STORAGE   "Disable using Thread-Local Storage (HAVE_
 option(DISABLE_WERROR                 "Avoid treating compiler warnings as fatal errors."     OFF)
 option(ENABLE_RDRAND                  "Enable RDRAND Hardware RNG Hash Seed."                 OFF)
 option(ENABLE_THREADING               "Enable partial threading support."                     OFF)
+option(OVERRIDE_GET_RANDOM_SEED       "Override json_c_get_random_seed() with custom code."   OFF)
+
 
 if (UNIX OR MINGW OR CYGWIN)
     list(APPEND CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)

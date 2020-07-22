@@ -276,6 +276,9 @@ static int get_time_seed(void)
 
 int json_c_get_random_seed(void)
 {
+#ifdef OVERRIDE_GET_RANDOM_SEED
+	OVERRIDE_GET_RANDOM_SEED;
+#endif
 #if defined HAVE_RDRAND && HAVE_RDRAND
 	if (has_rdrand())
 		return get_rdrand_seed();
