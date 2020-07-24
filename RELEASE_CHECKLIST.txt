@@ -21,6 +21,10 @@
 		* Consider re-adding backwards compatible support, through symbol
 		  aliases and appropriate entries in json-c.sym
     * Update the AUTHORS file
+
+        git log -r 31ab57ca..HEAD | grep Author: | sed -e's/Author: //' ; cat AUTHORS ) | sort -u > A1
+        mv A1 AUTHORS
+
     * Exclude mentioning changes that have already been included in a point 
       release of the previous release branch.
 
@@ -40,7 +44,7 @@ Start creating the new release:
     cd distcheck
     # Note, the build directory *must* be entirely separate from
     # the source tree for distcheck to work properly.
-    cmake ../json-c-${release}
+    cmake -DCMAKE_BUILD_TYPE=Release ../json-c-${release}
     make distcheck
     cd ..
 
@@ -55,7 +59,6 @@ Make any fixes/changes *before* branching.
 Using ${release}:
 	Update the version in json_c_version.h
 	Update the version in CMakeLists.txt (VERSION in the project(...) line)
-	Update the version in config.h.win32 (several places)
 
 Update the set_target_properties() line in CmakeLists.txt to set the shared
 library version.  Generally, unless we're doing a major release, change:
@@ -121,7 +124,6 @@ Add new section to ChangeLog for ${release}+1
 Use ${release}.99 to indicate a version "newer" than anything on the branch:
 	Update the version in json_c_version.h
 	Update the version in CMakeLists.txt
-	Update the version in config.h.win32
 
 Update RELEASE_CHECKLIST.txt, set release=${release}+1
 
