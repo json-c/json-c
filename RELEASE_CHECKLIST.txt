@@ -20,6 +20,8 @@
         * Mention removed features in ChangeLog
 		* Consider re-adding backwards compatible support, through symbol
 		  aliases and appropriate entries in json-c.sym
+		* Be sure any new symbols are listed in json-c.sym as part of
+		  the _new_ release version.
     * Update the AUTHORS file
 
         git log -r 31ab57ca..HEAD | grep Author: | sed -e's/Author: //' ; cat AUTHORS ) | sort -u > A1
@@ -37,7 +39,7 @@
 ## Release creation
 
 Start creating the new release:
-    release=0.15
+    release=0.16
     git clone https://github.com/json-c/json-c json-c-${release}
 
     mkdir distcheck
@@ -77,9 +79,10 @@ If we're doing a major release (SONAME bump), also bump the version
 
 Generate the doxygen documentation:
 
-    doxygen
+    (cd ../distcheck && make doc)
+    cp -r -p ../distcheck/doc/{html,Doxyfile} doc/.
     git add -f doc
-    git commit doc
+    git commit doc -m "Generate docs for the ${release} release"
 
 ------------
 
@@ -107,7 +110,7 @@ Tag the branch:
 Go to Amazon S3 service at:
     https://console.aws.amazon.com/s3/
 
-Upload the two tarballs in the json-c_releases folder.
+Upload the two tarballs in the json-c_releases/releases folder.
 	When uploading, use "Standard" storage class, and make the uploaded files publicly accessible.
 
 Logout of Amazon S3, and verify that the files are visible.
@@ -127,9 +130,11 @@ Use ${release}.99 to indicate a version "newer" than anything on the branch:
 
 Update RELEASE_CHECKLIST.txt, set release=${release}+1
 
+Add a new empty section to the json-c.sym file, for ${release}+1
+
 Update the set_target_properties() line in CmakeLists.txt to match the release branch.
 
-    git commit -a -m "Update the master branch to version 0.${release}.99"
+    git commit -a -m "Update the master branch to version ${release}.99"
     git push
 
 ------------

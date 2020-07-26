@@ -163,3 +163,8 @@ JSONC_0.15 {
     json_object_array_shrink;
     json_object_new_array_ext;
 } JSONC_0.14;
+
+JSONC_0.16 {
+#  global:
+#      ...new symbols here...
+} JSONC_0.15;
