@@ -150,6 +150,8 @@ Update the gh-pages branch with new docs:
     mkdir json-c-${release}
     cp -R ../json-c-${release}/doc json-c-${release}/.
     git add json-c-${release}
+    rm json-c-current-release
+    ln -s json-c-${release} json-c-current-release
     git commit -a -m "Add the ${release} docs."
 
     vi index.html
