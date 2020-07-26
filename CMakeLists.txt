@@ -10,11 +10,11 @@ endif()
 if (CMAKE_VERSION VERSION_LESS 3.0)
 	project(json-c)
 	set(PROJECT_VERSION_MAJOR "0")
-	set(PROJECT_VERSION_MINOR "14")
-	set(PROJECT_VERSION_PATCH "99")
+	set(PROJECT_VERSION_MINOR "15")
+	set(PROJECT_VERSION_PATCH "0")
 	set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 else()
-	project(json-c LANGUAGES C VERSION 0.14.99)
+	project(json-c LANGUAGES C VERSION 0.15)
 endif()
 
 # If we've got 3.0 then it's good, let's provide support. Otherwise, leave it be.
@@ -417,7 +417,7 @@ add_library(${PROJECT_NAME}
     ${JSON_C_HEADERS}
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    VERSION 5.0.0
+    VERSION 5.1.0
     SOVERSION 5)
 list(APPEND CMAKE_TARGETS ${PROJECT_NAME})
 # If json-c is used as subroject it set to target correct interface -I flags and allow

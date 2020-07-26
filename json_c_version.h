@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012,2017 Eric Haszlakiewicz
+ * Copyright (c) 2012,2017,2019,2020 Eric Hawicz
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the MIT license. See COPYING for details.
@@ -17,11 +17,11 @@ extern "C" {
 #endif
 
 #define JSON_C_MAJOR_VERSION 0
-#define JSON_C_MINOR_VERSION 14
-#define JSON_C_MICRO_VERSION 99
+#define JSON_C_MINOR_VERSION 15
+#define JSON_C_MICRO_VERSION 0
 #define JSON_C_VERSION_NUM \
 	((JSON_C_MAJOR_VERSION << 16) | (JSON_C_MINOR_VERSION << 8) | JSON_C_MICRO_VERSION)
-#define JSON_C_VERSION "0.14.99"
+#define JSON_C_VERSION "0.15"
 
 #ifndef JSON_EXPORT
 #if defined(_MSC_VER)
