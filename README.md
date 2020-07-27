@@ -37,7 +37,7 @@ Home page for json-c: https://github.com/json-c/json-c/wiki
 
  - `gcc`, `clang`, or another C compiler
 
- - cmake>=2.8, >=3.16 recommended
+ - `cmake>=2.8`, `>=3.16` recommended
 
 To generate docs you'll also need:
  - `doxygen>=1.8.13`
@@ -80,7 +80,7 @@ $ make install
 
 ### Generating documentation with Doxygen:
 
-The libray documentation can be generated directly from the source codes using Doxygen tool:
+The library documentation can be generated directly from the source code using Doxygen tool:
 
 ```sh
 # in build directory
@@ -241,7 +241,7 @@ following more specific header files:
                    objects from a json-c object tree.
 * json_object_iterator.h - Methods for iterating over single json_object instances.  (See also `json_object_object_foreach()` in json_object.h)
 * json_visit.h   - Methods for walking a tree of json-c objects.
-* json_util.h    - Miscelleanous utility functions.
+* json_util.h    - Miscellaneous utility functions.
 
 For a full list of headers see [files.html](http://json-c.github.io/json-c/json-c-current-release/doc/html/files.html)
 
@@ -251,7 +251,7 @@ json_tokener (i.e. `json_tokener_parse_ex()`), or by creating
 (with `json_object_new_object()`, `json_object_new_int()`, etc...) and adding
 (with `json_object_object_add()`, `json_object_array_add()`, etc...) them 
 individually.
-Typically, every object in the tree will have one reference, from it's parent.
+Typically, every object in the tree will have one reference, from its parent.
 When you are done with the tree of objects, you call json_object_put() on just
 the root object to free it, which recurses down through any child objects
 calling json_object_put() on each one of those in turn.
@@ -266,7 +266,7 @@ the parent being freed or it being removed from its parent
 
 When parsing text, the json_tokener object is independent from the json_object
 that it returns.  It can be allocated (`json_tokener_new()`)
-used ones or multiple times (`json_tokener_parse_ex()`, and
+used one or multiple times (`json_tokener_parse_ex()`, and
 freed (`json_tokener_free()`) while the json_object objects live on.
 
 A json_object tree can be serialized back into a string with 
