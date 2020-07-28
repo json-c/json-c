@@ -81,6 +81,7 @@ Generate the doxygen documentation:
 
     (cd ../distcheck && make doc)
     cp -r -p ../distcheck/doc/{html,Doxyfile} doc/.
+	rm doc/Doxyfile   # Remove generated file w/ hardcoded paths
     git add -f doc
     git commit doc -m "Generate docs for the ${release} release"
 
