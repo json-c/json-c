@@ -56,6 +56,9 @@
 /* Define to 1 if you have the <sys/param.h> header file. */
 #cmakedefine HAVE_SYS_PARAM_H @HAVE_SYS_PARAM_H@
 
+/* Define to 1 if you have the <sys/random.h> header file. */
+#cmakedefine HAVE_SYS_RANDOM_H
+
 /* Define to 1 if you have the <sys/resource.h> header file. */
 #cmakedefine HAVE_SYS_RESOURCE_H
 
@@ -139,6 +142,9 @@
 
 /* Define to 1 if you have the `vsyslog' function. */
 #cmakedefine HAVE_VSYSLOG @HAVE_VSYSLOG@
+
+/* Define if you have the `getrandom' function. */
+#cmakedefine HAVE_GETRANDOM
 
 /* Define if you have the `getrusage' function. */
 #cmakedefine HAVE_GETRUSAGE

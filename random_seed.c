@@ -155,6 +155,40 @@ retry:
 
 #endif /* defined ENABLE_RDRAND */
 
+#ifdef HAVE_GETRANDOM
+
+#include <stdlib.h>
+#ifdef HAVE_SYS_RANDOM_H
+#include <sys/random.h>
+#endif
+
+static int get_getrandom_seed(void)
+{
+	DEBUG_SEED("get_dev_random_seed");
+
+	int r;
+	ssize_t ret;
+
+	do {
+		ret = getrandom(&r, sizeof(r), 0);
+	} while ((ret == -1) && (errno == EINTR));
+
+	if (ret == -1)
+	{
+		if (errno == ENOSYS) /* syscall not available in kernel */
+			return -1;
+
+		fprintf(stderr, "error from getrandom(): %s", strerror(errno));
+		exit(1);
+	}
+
+	if (ret != sizeof(r))
+		return -1;
+
+	return r;
+}
+#endif /* defined HAVE_GETRANDOM */
+
 /* has_dev_urandom */
 
 #if defined(__APPLE__) || defined(__unix__) || defined(__linux__)
@@ -282,6 +316,13 @@ int json_c_get_random_seed(void)
 #if defined HAVE_RDRAND && HAVE_RDRAND
 	if (has_rdrand())
 		return get_rdrand_seed();
+#endif
+#ifdef HAVE_GETRANDOM
+	{
+		int seed = get_getrandom_seed();
+		if (seed != -1)
+			return seed;
+	}
 #endif
 #if defined HAVE_DEV_RANDOM && HAVE_DEV_RANDOM
 	if (has_dev_urandom())
