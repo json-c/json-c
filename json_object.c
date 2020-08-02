@@ -735,7 +735,7 @@ struct json_object *json_object_new_int(int32_t i)
 
 int32_t json_object_get_int(const struct json_object *jso)
 {
-	int64_t cint64=0;
+	int64_t cint64 = 0;
 	double cdouble;
 	enum json_type o_type;
 
@@ -1305,18 +1305,20 @@ const char *json_object_get_string(struct json_object *jso)
 	default: return json_object_to_json_string(jso);
 	}
 }
-int json_object_get_string_len(const struct json_object *jso)
+
+static inline ssize_t _json_object_get_string_len(const struct json_object_string *jso)
 {
 	ssize_t len;
+	len = jso->len;
+	return (len < 0) ? -(ssize_t)len : len;
+}
+int json_object_get_string_len(const struct json_object *jso)
+{
 	if (!jso)
 		return 0;
 	switch (jso->o_type)
 	{
-	case json_type_string:
-	{
-		len = JC_STRING_C(jso)->len;
-		return (len < 0) ? -(ssize_t)len : len;
-	}
+	case json_type_string: return _json_object_get_string_len(JC_STRING_C(jso));
 	default: return 0;
 	}
 }
@@ -1605,9 +1607,10 @@ int json_object_equal(struct json_object *jso1, struct json_object *jso2)
 
 	case json_type_string:
 	{
-		return (json_object_get_string_len(jso1) == json_object_get_string_len(jso2) &&
+		return (_json_object_get_string_len(JC_STRING(jso1)) ==
+		            _json_object_get_string_len(JC_STRING(jso2)) &&
 		        memcmp(get_string_component(jso1), get_string_component(jso2),
-		               json_object_get_string_len(jso1)) == 0);
+		               _json_object_get_string_len(JC_STRING(jso1))) == 0);
 	}
 
 	case json_type_object: return json_object_all_values_equal(jso1, jso2);
@@ -1672,7 +1675,10 @@ int json_c_shallow_copy_default(json_object *src, json_object *parent, const cha
 		}
 		break;
 
-	case json_type_string: *dst = json_object_new_string(get_string_component(src)); break;
+	case json_type_string:
+		*dst = json_object_new_string_len(get_string_component(src),
+		                                  _json_object_get_string_len(JC_STRING(src)));
+		break;
 
 	case json_type_object: *dst = json_object_new_object(); break;
 
