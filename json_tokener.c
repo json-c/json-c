@@ -59,17 +59,15 @@
  * compiler will also inline these functions, providing an additional
  * speedup by saving on function calls.
  */
-static int is_ws_char(char c)
+static inline int is_ws_char(char c)
 {
 	return c == ' '
 	    || c == '\t'
 	    || c == '\n'
-	    || c == '\v'
-	    || c == '\f'
 	    || c == '\r';
 }
 
-static int is_hex_char(char c)
+static inline int is_hex_char(char c)
 {
 	return (c >= '0' && c <= '9')
 	    || (c >= 'A' && c <= 'F')
