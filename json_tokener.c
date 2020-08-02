@@ -53,6 +53,29 @@
 #error You do not have strncasecmp on your system.
 #endif /* HAVE_STRNCASECMP */
 
+/* The following helper functions are used to speed up parsing. They
+ * are faster than their ctype counterparts because they assume that
+ * the input is in ASCII and that the locale is set to "C". The
+ * compiler will also inline these functions, providing an additional
+ * speedup by saving on function calls.
+ */
+static int is_ws_char(char c)
+{
+	return c == ' '
+	    || c == '\t'
+	    || c == '\n'
+	    || c == '\v'
+	    || c == '\f'
+	    || c == '\r';
+}
+
+static int is_hex_char(char c)
+{
+	return (c >= '0' && c <= '9')
+	    || (c >= 'A' && c <= 'F')
+	    || (c >= 'a' && c <= 'f');
+}
+
 /* Use C99 NAN by default; if not available, nan("") should work too. */
 #ifndef NAN
 #define NAN nan("")
@@ -316,7 +339,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 
 		case json_tokener_state_eatws:
 			/* Advance until we change state */
-			while (isspace((unsigned char)c))
+			while (is_ws_char(c))
 			{
 				if ((!ADVANCE_CHAR(str, tok)) || (!PEEK_CHAR(c, tok)))
 					goto out;
@@ -647,7 +670,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 			/* Handle a 4-byte \uNNNN sequence, or two sequences if a surrogate pair */
 			while (1)
 			{
-				if (!c || !strchr(json_hex_chars, c))
+				if (!c || !is_hex_char(c))
 				{
 					tok->err = json_tokener_error_parse_string;
 					goto out;
@@ -920,7 +943,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				next call to json_tokener_parse().
 			 */
 			if (tok->depth > 0 && c != ',' && c != ']' && c != '}' && c != '/' &&
-			    c != 'I' && c != 'i' && !isspace((unsigned char)c))
+			    c != 'I' && c != 'i' && !is_ws_char(c))
 			{
 				tok->err = json_tokener_error_parse_number;
 				goto out;
