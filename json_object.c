@@ -13,7 +13,6 @@
 #include "strerror_override.h"
 
 #include <assert.h>
-#include <ctype.h>
 #ifdef HAVE_LIMITS_H
 #include <limits.h>
 #endif
@@ -34,6 +33,9 @@
 #include "printbuf.h"
 #include "snprintf_compat.h"
 #include "strdup_compat.h"
+
+/* Avoid ctype.h and locale overhead */
+#define is_plain_digit(c) ((c) >= '0' && (c) <= '9')
 
 #if SIZEOF_LONG_LONG != SIZEOF_INT64_T
 #error "The long long type isn't 64-bits"
@@ -1056,8 +1058,8 @@ static int json_object_double_to_json_string_format(struct json_object *jso, str
 			format_drops_decimals = 1;
 
 		looks_numeric = /* Looks like *some* kind of number */
-		    isdigit((unsigned char)buf[0]) ||
-		    (size > 1 && buf[0] == '-' && isdigit((unsigned char)buf[1]));
+		    is_plain_digit(buf[0]) ||
+		    (size > 1 && buf[0] == '-' && is_plain_digit(buf[1]));
 
 		if (size < (int)sizeof(buf) - 2 && looks_numeric && !p && /* Has no decimal point */
 		    strchr(buf, 'e') == NULL && /* Not scientific notation */

@@ -17,7 +17,6 @@
 
 #include "math_compat.h"
 #include <assert.h>
-#include <ctype.h>
 #include <limits.h>
 #include <math.h>
 #include <stddef.h>
@@ -82,7 +81,8 @@ static inline int is_hex_char(char c)
 static const char json_null_str[] = "null";
 static const int json_null_str_len = sizeof(json_null_str) - 1;
 static const char json_inf_str[] = "Infinity";
-static const char json_inf_str_lower[] = "infinity";
+/* Swapped case "Infinity" to avoid need to call tolower() on input chars: */
+static const char json_inf_str_invert[] = "iNFINITY";
 static const unsigned int json_inf_str_len = sizeof(json_inf_str) - 1;
 static const char json_nan_str[] = "NaN";
 static const int json_nan_str_len = sizeof(json_nan_str) - 1;
@@ -442,17 +442,15 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 			 * complicated with likely little performance benefit.
 			 */
 			int is_negative = 0;
-			const char *_json_inf_str = json_inf_str;
-			if (!(tok->flags & JSON_TOKENER_STRICT))
-				_json_inf_str = json_inf_str_lower;
 
 			/* Note: tok->st_pos must be 0 when state is set to json_tokener_state_inf */
 			while (tok->st_pos < (int)json_inf_str_len)
 			{
 				char inf_char = *str;
-				if (!(tok->flags & JSON_TOKENER_STRICT))
-					inf_char = tolower((unsigned char)*str);
-				if (inf_char != _json_inf_str[tok->st_pos])
+				if (inf_char != json_inf_str[tok->st_pos] &&
+				    ((tok->flags & JSON_TOKENER_STRICT) ||
+				      inf_char != json_inf_str_invert[tok->st_pos])
+				   )
 				{
 					tok->err = json_tokener_error_parse_unexpected;
 					goto out;

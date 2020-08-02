@@ -14,7 +14,6 @@
 
 #include "strerror_override.h"
 
-#include <ctype.h>
 #include <limits.h>
 #include <stdarg.h>
 #include <stddef.h>
