@@ -82,7 +82,8 @@ static int parseit(int fd, int (*callback)(struct json_object *))
 			int parse_end = json_tokener_get_parse_end(tok);
 			if (obj == NULL && jerr != json_tokener_continue)
 			{
-				char *aterr = &buf[start_pos + parse_end];
+				char *aterr = (start_pos + parse_end < sizeof(buf)) ?
+					&buf[start_pos + parse_end] : "";
 				fflush(stdout);
 				int fail_offset = total_read - ret + start_pos + parse_end;
 				fprintf(stderr, "Failed at offset %d: %s %c\n", fail_offset,
