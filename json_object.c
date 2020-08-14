@@ -1724,7 +1724,7 @@ static int json_object_deep_copy_recursive(struct json_object *src, struct json_
 			/* This handles the `json_type_null` case */
 			if (!iter.val)
 				jso = NULL;
-			else if (json_object_deep_copy_recursive(iter.val, src, iter.key, -1, &jso,
+			else if (json_object_deep_copy_recursive(iter.val, src, iter.key, UINT_MAX, &jso,
 			                                         shallow_copy) < 0)
 			{
 				json_object_put(jso);
@@ -1789,7 +1789,7 @@ int json_object_deep_copy(struct json_object *src, struct json_object **dst,
 	if (shallow_copy == NULL)
 		shallow_copy = json_c_shallow_copy_default;
 
-	rc = json_object_deep_copy_recursive(src, NULL, NULL, -1, dst, shallow_copy);
+	rc = json_object_deep_copy_recursive(src, NULL, NULL, UINT_MAX, dst, shallow_copy);
 	if (rc < 0)
 	{
 		json_object_put(*dst);
