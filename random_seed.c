@@ -164,18 +164,20 @@ retry:
 
 static int get_getrandom_seed(void)
 {
-	DEBUG_SEED("get_dev_random_seed");
+	DEBUG_SEED("get_getrandom_seed");
 
 	int r;
 	ssize_t ret;
 
 	do {
-		ret = getrandom(&r, sizeof(r), 0);
+		ret = getrandom(&r, sizeof(r), GRND_NONBLOCK);
 	} while ((ret == -1) && (errno == EINTR));
 
 	if (ret == -1)
 	{
 		if (errno == ENOSYS) /* syscall not available in kernel */
+			return -1;
+		if (errno == EAGAIN) /* entropy not yet initialized */
 			return -1;
 
 		fprintf(stderr, "error from getrandom(): %s", strerror(errno));
