@@ -702,7 +702,8 @@ json_bool json_object_get_boolean(const struct json_object *jso)
 		}
 	case json_type_double: return (JC_DOUBLE_C(jso)->c_double != 0);
 	case json_type_string: return (JC_STRING_C(jso)->len != 0);
-	default: return 0;
+	case json_type_null: return 0;
+	default: return 1;
 	}
 }
 
