@@ -656,8 +656,9 @@ JSON_EXPORT struct json_object *json_object_new_boolean(json_bool b);
  * The type is coerced to a json_bool if the passed object is not a json_bool.
  * integer and double objects will return 0 if there value is zero
  * or 1 otherwise. If the passed object is a string it will return
- * 1 if it has a non zero length. If any other object type is passed
- * 1 will be returned if the object is not NULL.
+ * 1 if it has a non zero length. 
+ * If any other object type is passed 0 will be returned, even non-empty
+ *  json_type_array and json_type_object objects.
  *
  * @param obj the json_object instance
  * @returns a json_bool
