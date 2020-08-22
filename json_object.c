@@ -1254,17 +1254,17 @@ static struct json_object *_json_object_new_string(const char *s, const size_t l
 	struct json_object_string *jso;
 
 	/*
-     * Structures           Actual memory layout
-     * -------------------  --------------------
+	 * Structures           Actual memory layout
+	 * -------------------  --------------------
 	 * [json_object_string  [json_object_string
 	 *  [json_object]        [json_object]
-     *  ...other fields...   ...other fields...
+	 *  ...other fields...   ...other fields...
 	 *  c_string]            len
-     *                       bytes
+	 *                       bytes
 	 *                       of
 	 *                       string
 	 *                       data
-     *                       \0]
+	 *                       \0]
 	 */
 	if (len > (SSIZE_T_MAX - (sizeof(*jso) - sizeof(jso->c_string)) - 1))
 		return NULL;
