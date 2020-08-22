@@ -292,5 +292,5 @@ const char *json_type_to_name(enum json_type o_type)
 		                     NELEM(json_type_name));
 		return NULL;
 	}
-	return json_type_name[o_type];
+	return json_type_name[o_type_int];
 }
