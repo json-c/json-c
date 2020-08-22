@@ -94,7 +94,7 @@ char *_json_c_strerror(int errno_in)
 	}
 
 	// It's not one of the known errno values, return the numeric value.
-	for (ii = 0; errno_in > 10; errno_in /= 10, ii++)
+	for (ii = 0; errno_in >= 10; errno_in /= 10, ii++)
 	{
 		digbuf[ii] = "0123456789"[(errno_in % 10)];
 	}
@@ -105,5 +105,6 @@ char *_json_c_strerror(int errno_in)
 	{
 		errno_buf[start_idx] = digbuf[ii];
 	}
+	errno_buf[start_idx] = '\0';
 	return errno_buf;
 }

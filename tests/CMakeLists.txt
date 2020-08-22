@@ -32,12 +32,13 @@ foreach(TESTNAME
 	test_printbuf
 	test_set_serializer
 	test_set_value
+	test_strerror
 	test_util_file
 	test_visit
 	test_object_iterator)
 
 add_executable(${TESTNAME} ${TESTNAME}.c)
-if(${TESTNAME} STREQUAL test_util_file)
+if(${TESTNAME} STREQUAL test_strerror OR ${TESTNAME} STREQUAL test_util_file)
 # For output consistency, we need _json_c_strerror() in some tests:
 target_sources(${TESTNAME} PRIVATE ../strerror_override.c)
 endif()
