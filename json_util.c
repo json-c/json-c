@@ -185,9 +185,9 @@ int json_object_to_fd(int fd, struct json_object *obj, int flags)
 }
 static int _json_object_to_fd(int fd, struct json_object *obj, int flags, const char *filename)
 {
-	int ret;
+	ssize_t ret;
 	const char *json_str;
-	unsigned int wpos, wsize;
+	size_t wpos, wsize;
 
 	filename = filename ? filename : "(fd)";
 
@@ -196,8 +196,7 @@ static int _json_object_to_fd(int fd, struct json_object *obj, int flags, const 
 		return -1;
 	}
 
-	/* CAW: probably unnecessary, but the most 64bit safe */
-	wsize = (unsigned int)(strlen(json_str) & UINT_MAX);
+	wsize = strlen(json_str);
 	wpos = 0;
 	while (wpos < wsize)
 	{
@@ -209,7 +208,7 @@ static int _json_object_to_fd(int fd, struct json_object *obj, int flags, const 
 		}
 
 		/* because of the above check for ret < 0, we can safely cast and add */
-		wpos += (unsigned int)ret;
+		wpos += (size_t)ret;
 	}
 
 	return 0;
