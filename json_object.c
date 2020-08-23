@@ -214,7 +214,7 @@ static inline const char *get_string_component(const struct json_object *jso)
 
 static int json_escape_str(struct printbuf *pb, const char *str, size_t len, int flags)
 {
-	int pos = 0, start_offset = 0;
+	size_t pos = 0, start_offset = 0;
 	unsigned char c;
 	while (len--)
 	{
@@ -1254,17 +1254,17 @@ static struct json_object *_json_object_new_string(const char *s, const size_t l
 	struct json_object_string *jso;
 
 	/*
-     * Structures           Actual memory layout
-     * -------------------  --------------------
+	 * Structures           Actual memory layout
+	 * -------------------  --------------------
 	 * [json_object_string  [json_object_string
 	 *  [json_object]        [json_object]
-     *  ...other fields...   ...other fields...
+	 *  ...other fields...   ...other fields...
 	 *  c_string]            len
-     *                       bytes
+	 *                       bytes
 	 *                       of
 	 *                       string
 	 *                       data
-     *                       \0]
+	 *                       \0]
 	 */
 	if (len > (SSIZE_T_MAX - (sizeof(*jso) - sizeof(jso->c_string)) - 1))
 		return NULL;
@@ -1329,9 +1329,10 @@ static int _json_object_set_string_len(json_object *jso, const char *s, size_t l
 	if (jso == NULL || jso->o_type != json_type_string)
 		return 0;
 
-	if (len >= SSIZE_T_MAX - 1)
+	if (len >= INT_MAX - 1)
 		// jso->len is a signed ssize_t, so it can't hold the
-		// full size_t range.
+		// full size_t range. json_object_get_string_len returns
+		// length as int, cap length at INT_MAX.
 		return 0;
 
 	dstbuf = get_string_component_mutable(jso);
