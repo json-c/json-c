@@ -305,7 +305,7 @@ static int get_time_seed(void)
 {
 	DEBUG_SEED("get_time_seed");
 
-	return (int)time(NULL) * 433494437;
+	return (unsigned)time(NULL) * 433494437;
 }
 
 /* json_c_get_random_seed */
