@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "config.h"
+
 #include "json.h"
 #include "parse_flags.h"
 
