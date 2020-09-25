@@ -1,3 +1,4 @@
+import fnmatch
 from conans import ConanFile, CMake, tools
 
 class JsonclibConan(ConanFile):
@@ -6,7 +7,7 @@ class JsonclibConan(ConanFile):
     description = "JSON-C - A JSON implementation in C"
     topics = ("conan", "json-c", "json", "encoding", "decoding", "manipulation")
     url = "https://github.com/elear-solutions/json-c"
-    license = "<Put the package license here>"
+    license = "MIT"
     generators = "cmake"
     settings = "os", "compiler", "build_type", "arch"
     options = {
@@ -16,6 +17,15 @@ class JsonclibConan(ConanFile):
     default_options = {key: False for key in options.keys()}
     default_options ["shared"] = False
     default_options ["fPIC"] = True
+
+    @property
+    def _targets(self):
+        return {
+            "iOS-armv7-*": "arm-apple-darwin",
+            "iOS-armv8-*": "aarch64-apple-darwin",
+            "iOS-x86-*": "i386-apple-darwin",
+            "iOS-x86_64-*": "x86_64-apple-darwin"
+        }
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -27,7 +37,11 @@ class JsonclibConan(ConanFile):
 
     def _configure_cmake(self):
         if tools.cross_building(self.settings) and self.settings.os != "Windows":
-            host = tools.get_gnu_triplet(str(self.settings.os), str(self.settings.arch))
+            if tools.is_apple_os(self.settings.os):
+                query = "%s-%s-%s" % (self.settings.os, self.settings.arch, self.settings.compiler)
+                host = next((self._targets[i] for i in self._targets if fnmatch.fnmatch(query, i)), None)
+            else:
+                host = tools.get_gnu_triplet(str(self.settings.os), str(self.settings.arch))
             tools.replace_in_file("../CMakeLists.txt",
                                   "execute_process(COMMAND ./configure ",
                                   "execute_process(COMMAND ./configure --host %s " % host)
