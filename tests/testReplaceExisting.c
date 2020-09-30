@@ -73,6 +73,6 @@ int main(int argc, char **argv)
 	}
 
 	json_object_put(my_object);
-
+getch();
 	return retval;
 }
