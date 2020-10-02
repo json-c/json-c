@@ -1,0 +1,49 @@
+#include<stdio.h>
+#include<conio.h>
+#include<stdlib.h>
+main()
+{int ch, i,n,fact=1, c = 0,a;
+while(1) // condition is always true, thus an infinite loop
+{
+printf("\n1. Factorial of a number");
+printf("\n2. Prime or not");
+printf("\n3. Odd or even ");
+printf("\n4. Exit");
+printf("\n\nEnter your choice");
+scanf("%d",&ch);
+ switch(ch)
+{ case 1:printf("\n Enter a number :");
+scanf("%d",&n);
+for(i=1;i<=n;i++)
+{
+fact=fact*i;
+}
+printf("\n The factorial of %d is %d ",n,fact);
+break; //it is used to move control out of switch body
+case 2:printf("Enter any number n:");
+scanf("%d", &n);
+for (i = 1; i <= n; i++)
+{
+if (n % i == 0)
+{
+c++;
+}
+}
+if (c == 2) {
+printf("%d is a Prime number",n);
+}
+else {
+printf("%d is not a Prime number",n);
+break; //it is used to move control out of switch body
+case 3:printf("\n Enter a number :");
+scanf("%d",&a);
+if(a%2==0)
+printf("\nthe number %d is even ",a);
+else
+printf("\n The number %d is odd ",a);
+break; //it is used to move control out of switch body
+case 4:exit(0);
+default:printf("Invalid Entry") 
+}
+}
+}
