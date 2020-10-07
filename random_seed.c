@@ -162,15 +162,14 @@ retry:
 #include <sys/random.h>
 #endif
 
-static int get_getrandom_seed(void)
+static int get_getrandom_seed(int *seed)
 {
 	DEBUG_SEED("get_getrandom_seed");
 
-	int r;
 	ssize_t ret;
 
 	do {
-		ret = getrandom(&r, sizeof(r), GRND_NONBLOCK);
+		ret = getrandom(seed, sizeof(*seed), GRND_NONBLOCK);
 	} while ((ret == -1) && (errno == EINTR));
 
 	if (ret == -1)
@@ -181,17 +180,17 @@ static int get_getrandom_seed(void)
 			return -1;
 
 		fprintf(stderr, "error from getrandom(): %s", strerror(errno));
-		exit(1);
+		return -1;
 	}
 
-	if (ret != sizeof(r))
+	if (ret != sizeof(*seed))
 		return -1;
 
-	return r;
+	return 0;
 }
 #endif /* defined HAVE_GETRANDOM */
 
-/* has_dev_urandom */
+/* get_dev_random_seed */
 
 #if defined(__APPLE__) || defined(__unix__) || defined(__linux__)
 
@@ -207,39 +206,32 @@ static int get_getrandom_seed(void)
 
 static const char *dev_random_file = "/dev/urandom";
 
-static int has_dev_urandom(void)
-{
-	struct stat buf;
-	if (stat(dev_random_file, &buf))
-	{
-		return 0;
-	}
-	return ((buf.st_mode & S_IFCHR) != 0);
-}
-
-/* get_dev_random_seed */
-
-static int get_dev_random_seed(void)
+static int get_dev_random_seed(int *seed)
 {
 	DEBUG_SEED("get_dev_random_seed");
+
+	struct stat buf;
+	if (stat(dev_random_file, &buf))
+		return -1;
+	if ((buf.st_mode & S_IFCHR) == 0)
+		return -1;
 
 	int fd = open(dev_random_file, O_RDONLY);
 	if (fd < 0)
 	{
 		fprintf(stderr, "error opening %s: %s", dev_random_file, strerror(errno));
-		exit(1);
+		return -1;
 	}
 
-	int r;
-	ssize_t nread = read(fd, &r, sizeof(r));
-	if (nread != sizeof(r))
+	ssize_t nread = read(fd, seed, sizeof(*seed));
+	if (nread != sizeof(*seed))
 	{
 		fprintf(stderr, "error short read %s: %s", dev_random_file, strerror(errno));
-		exit(1);
+		return -1;
 	}
 
 	close(fd);
-	return r;
+	return 0;
 }
 
 #endif
@@ -262,9 +254,7 @@ static int get_dev_random_seed(void)
 #pragma comment(lib, "advapi32.lib")
 #endif
 
-static int get_time_seed(void);
-
-static int get_cryptgenrandom_seed(void)
+static int get_cryptgenrandom_seed(int *seed)
 {
 	HCRYPTPROV hProvider = 0;
 	DWORD dwFlags = CRYPT_VERIFYCONTEXT;
@@ -279,20 +269,20 @@ static int get_cryptgenrandom_seed(void)
 	if (!CryptAcquireContextA(&hProvider, 0, 0, PROV_RSA_FULL, dwFlags))
 	{
 		fprintf(stderr, "error CryptAcquireContextA 0x%08lx", GetLastError());
-		r = get_time_seed();
+		return -1;
 	}
 	else
 	{
-		BOOL ret = CryptGenRandom(hProvider, sizeof(r), (BYTE*)&r);
+		BOOL ret = CryptGenRandom(hProvider, sizeof(*seed), (BYTE*)seed);
 		CryptReleaseContext(hProvider, 0);
 		if (!ret)
 		{
 			fprintf(stderr, "error CryptGenRandom 0x%08lx", GetLastError());
-			r = get_time_seed();
+			return -1;
 		}
 	}
 
-	return r;
+	return 0;
 }
 
 #endif
@@ -312,6 +302,7 @@ static int get_time_seed(void)
 
 int json_c_get_random_seed(void)
 {
+	int seed;
 #ifdef OVERRIDE_GET_RANDOM_SEED
 	OVERRIDE_GET_RANDOM_SEED;
 #endif
@@ -320,18 +311,16 @@ int json_c_get_random_seed(void)
 		return get_rdrand_seed();
 #endif
 #ifdef HAVE_GETRANDOM
-	{
-		int seed = get_getrandom_seed();
-		if (seed != -1)
-			return seed;
-	}
+	if (get_getrandom_seed(&seed) == 0)
+		return seed;
 #endif
 #if defined HAVE_DEV_RANDOM && HAVE_DEV_RANDOM
-	if (has_dev_urandom())
-		return get_dev_random_seed();
+	if (get_dev_random_seed(&seed) == 0)
+		return seed;
 #endif
 #if defined HAVE_CRYPTGENRANDOM && HAVE_CRYPTGENRANDOM
-	return get_cryptgenrandom_seed();
+	if (get_cryptgenrandom_seed(&seed) == 0)
+		return seed;
 #endif
 	return get_time_seed();
 }
