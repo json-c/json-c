@@ -274,3 +274,4 @@ A json_object tree can be serialized back into a string with
 is only valid until the next "to_json_string" call on that same object.
 Also, it is freed when the json_object is freed.
 
+Note : For Linux OS only.
