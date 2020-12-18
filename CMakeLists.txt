@@ -269,7 +269,7 @@ message(STATUS "Wrote ${PROJECT_BINARY_DIR}/config.h")
 configure_file(${PROJECT_SOURCE_DIR}/cmake/json_config.h.in   ${PROJECT_BINARY_DIR}/json_config.h)
 message(STATUS "Wrote ${PROJECT_BINARY_DIR}/json_config.h")
 
-if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
+if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections")
 	if ("${DISABLE_WERROR}" STREQUAL "OFF")
 	    set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -Werror")
