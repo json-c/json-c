@@ -13,6 +13,10 @@
 #include "config.h"
 #include "strerror_override.h"
 #include <stdio.h>
+#include <stdlib.h>
+#ifdef HAVE_BSD_STDLIB_H
+#include <bsd/stdlib.h>
+#endif
 
 #define DEBUG_SEED(s)
 
@@ -168,7 +172,8 @@ static int get_getrandom_seed(int *seed)
 
 	ssize_t ret;
 
-	do {
+	do
+	{
 		ret = getrandom(seed, sizeof(*seed), GRND_NONBLOCK);
 	} while ((ret == -1) && (errno == EINTR));
 
@@ -273,7 +278,7 @@ static int get_cryptgenrandom_seed(int *seed)
 	}
 	else
 	{
-		BOOL ret = CryptGenRandom(hProvider, sizeof(*seed), (BYTE*)seed);
+		BOOL ret = CryptGenRandom(hProvider, sizeof(*seed), (BYTE *)seed);
 		CryptReleaseContext(hProvider, 0);
 		if (!ret)
 		{
@@ -309,6 +314,10 @@ int json_c_get_random_seed(void)
 #if defined HAVE_RDRAND && HAVE_RDRAND
 	if (has_rdrand())
 		return get_rdrand_seed();
+#endif
+#ifdef HAVE_ARC4RANDOM
+	/* arc4random never fails, so use it if it's available */
+	return arc4random();
 #endif
 #ifdef HAVE_GETRANDOM
 	if (get_getrandom_seed(&seed) == 0)
