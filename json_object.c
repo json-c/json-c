@@ -235,7 +235,7 @@ static int json_escape_str(struct printbuf *pb, const char *str, size_t len, int
 				break;
 			}
 
-			if (pos - start_offset > 0)
+			if (pos > start_offset)
 				printbuf_memappend(pb, str + start_offset, pos - start_offset);
 
 			if (c == '\b')
@@ -261,7 +261,7 @@ static int json_escape_str(struct printbuf *pb, const char *str, size_t len, int
 			if (c < ' ')
 			{
 				char sbuf[7];
-				if (pos - start_offset > 0)
+				if (pos > start_offset)
 					printbuf_memappend(pb, str + start_offset,
 					                   pos - start_offset);
 				snprintf(sbuf, sizeof(sbuf), "\\u00%c%c", json_hex_chars[c >> 4],
@@ -273,7 +273,7 @@ static int json_escape_str(struct printbuf *pb, const char *str, size_t len, int
 				pos++;
 		}
 	}
-	if (pos - start_offset > 0)
+	if (pos > start_offset)
 		printbuf_memappend(pb, str + start_offset, pos - start_offset);
 	return 0;
 }
