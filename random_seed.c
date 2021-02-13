@@ -20,6 +20,16 @@
 
 #define DEBUG_SEED(s)
 
+#if defined(__APPLE__) || defined(__unix__) || defined(__linux__)
+#define HAVE_DEV_RANDOM 1
+#endif
+
+#ifdef HAVE_ARC4RANDOM
+#undef HAVE_GETRANDOM
+#undef HAVE_DEV_RANDOM
+#undef HAVE_CRYPTGENRANDOM
+#endif
+
 #if defined ENABLE_RDRAND
 
 /* cpuid */
@@ -197,7 +207,7 @@ static int get_getrandom_seed(int *seed)
 
 /* get_dev_random_seed */
 
-#if defined(__APPLE__) || defined(__unix__) || defined(__linux__)
+#ifdef HAVE_DEV_RANDOM
 
 #include <fcntl.h>
 #include <string.h>
@@ -206,8 +216,6 @@ static int get_getrandom_seed(int *seed)
 #endif /* HAVE_UNISTD_H */
 #include <stdlib.h>
 #include <sys/stat.h>
-
-#define HAVE_DEV_RANDOM 1
 
 static const char *dev_random_file = "/dev/urandom";
 
@@ -294,6 +302,7 @@ static int get_cryptgenrandom_seed(int *seed)
 
 /* get_time_seed */
 
+#ifndef HAVE_ARC4RANDOM
 #include <time.h>
 
 static int get_time_seed(void)
@@ -302,12 +311,12 @@ static int get_time_seed(void)
 
 	return (unsigned)time(NULL) * 433494437;
 }
+#endif
 
 /* json_c_get_random_seed */
 
 int json_c_get_random_seed(void)
 {
-	int seed;
 #ifdef OVERRIDE_GET_RANDOM_SEED
 	OVERRIDE_GET_RANDOM_SEED;
 #endif
@@ -318,18 +327,28 @@ int json_c_get_random_seed(void)
 #ifdef HAVE_ARC4RANDOM
 	/* arc4random never fails, so use it if it's available */
 	return arc4random();
-#endif
+#else
 #ifdef HAVE_GETRANDOM
-	if (get_getrandom_seed(&seed) == 0)
-		return seed;
+	{
+		int seed;
+		if (get_getrandom_seed(&seed) == 0)
+			return seed;
+	}
 #endif
 #if defined HAVE_DEV_RANDOM && HAVE_DEV_RANDOM
-	if (get_dev_random_seed(&seed) == 0)
-		return seed;
+	{
+		int seed;
+		if (get_dev_random_seed(&seed) == 0)
+			return seed;
+	}
 #endif
 #if defined HAVE_CRYPTGENRANDOM && HAVE_CRYPTGENRANDOM
-	if (get_cryptgenrandom_seed(&seed) == 0)
-		return seed;
+	{
+		int seed;
+		if (get_cryptgenrandom_seed(&seed) == 0)
+			return seed;
+	}
 #endif
 	return get_time_seed();
+#endif /* !HAVE_ARC4RANDOM */
 }
