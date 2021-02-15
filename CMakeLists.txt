@@ -97,6 +97,7 @@ option(DISABLE_WERROR                 "Avoid treating compiler warnings as fatal
 option(ENABLE_RDRAND                  "Enable RDRAND Hardware RNG Hash Seed."                 OFF)
 option(ENABLE_THREADING               "Enable partial threading support."                     OFF)
 option(OVERRIDE_GET_RANDOM_SEED       "Override json_c_get_random_seed() with custom code."   OFF)
+option(DISABLE_EXTRA_LIBS             "Avoid linking against extra libraries, such as libbsd." OFF)
 
 
 if (UNIX OR MINGW OR CYGWIN)
@@ -171,7 +172,7 @@ check_symbol_exists(vsnprintf       "stdio.h" HAVE_VSNPRINTF)
 check_symbol_exists(vprintf         "stdio.h" HAVE_VPRINTF)
 
 check_symbol_exists(arc4random      "stdlib.h" HAVE_ARC4RANDOM)
-if (NOT HAVE_ARC4RANDOM)
+if (NOT HAVE_ARC4RANDOM AND DISABLE_EXTRA_LIBS STREQUAL "OFF")
     check_include_file(bsd/stdlib.h HAVE_BSD_STDLIB_H)
     if (HAVE_BSD_STDLIB_H)
 		list(APPEND CMAKE_REQUIRED_LIBRARIES "-lbsd")

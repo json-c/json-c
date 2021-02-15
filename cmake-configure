@@ -30,6 +30,7 @@ $0 [<configure_options>] [-- [<cmake options>]]
   --enable-static         build static libraries [default=yes]
   --disable-Bsymbolic     Avoid linking with -Bsymbolic-function
   --disable-werror        Avoid treating compiler warnings as fatal errors
+  --disable-extra-libs    Avoid linking against extra libraries, such as libbsd
 
 EOF
 	exit
@@ -72,6 +73,9 @@ while [ $# -gt 0 ] ; do
 		;;
 	--disable-werror)
 		FLAGS+=(-DDISABLE_WERROR=ON)
+		;;
+	--disable-extra-libs)
+		FLAGS+=(-DDISABLE_EXTRA_LIBS=ON)
 		;;
 	--)
 		shift
