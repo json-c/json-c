@@ -24,7 +24,7 @@
 #define _printbuf_h_
 
 #ifndef JSON_EXPORT
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && defined(JSON_C_DLL)
 #define JSON_EXPORT __declspec(dllexport)
 #else
 #define JSON_EXPORT extern

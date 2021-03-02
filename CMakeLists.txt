@@ -79,6 +79,10 @@ include(CMakePackageConfigHelpers)
 option(BUILD_SHARED_LIBS  "Default to building shared libraries" ON)
 option(BUILD_STATIC_LIBS  "Default to building static libraries" ON)
 
+if (BUILD_SHARED_LIBS)
+    add_definitions(-D JSON_C_DLL)
+endif()
+
 # Generate a release merge and test it to verify the correctness of republishing the package.
 ADD_CUSTOM_TARGET(distcheck
 COMMAND make package_source
