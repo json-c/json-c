@@ -271,7 +271,6 @@ static int get_cryptgenrandom_seed(int *seed)
 {
 	HCRYPTPROV hProvider = 0;
 	DWORD dwFlags = CRYPT_VERIFYCONTEXT;
-	int r;
 
 	DEBUG_SEED("get_cryptgenrandom_seed");
 
