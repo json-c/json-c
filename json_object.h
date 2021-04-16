@@ -622,6 +622,25 @@ JSON_EXPORT int json_object_array_add(struct json_object *obj, struct json_objec
 JSON_EXPORT int json_object_array_put_idx(struct json_object *obj, size_t idx,
                                           struct json_object *val);
 
+/** Insert an element at a specified index in an array (a json_object of type json_type_array)
+ *
+ * The reference count will *not* be incremented. This is to make adding
+ * fields to objects in code more compact. If you want to retain a reference
+ * to an added object you must wrap the passed object with json_object_get
+ *
+ * The array size will be automatically be expanded to the size of the
+ * index if the index is larger than the current size.
+ * If the index is within the existing array limits, then the element will be
+ * inserted and all elements will be shifted. This is the only difference between
+ * this function and json_object_array_put_idx().
+ *
+ * @param obj the json_object instance
+ * @param idx the index to insert the element at
+ * @param val the json_object to be added
+ */
+JSON_EXPORT int json_object_array_insert_idx(struct json_object *obj, size_t idx,
+                                             struct json_object *val);
+
 /** Get the element at specified index of array `obj` (which must be a json_object of type json_type_array)
  *
  * *No* reference counts will be changed, and ownership of the returned

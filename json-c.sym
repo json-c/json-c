@@ -167,8 +167,8 @@ JSONC_0.15 {
 } JSONC_0.14;
 
 JSONC_0.16 {
-#  global:
-#      ...new symbols here...
+  global:
+    json_object_array_insert_idx;
 } JSONC_0.15;
 
 JSONC_0.17 {
