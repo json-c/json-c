@@ -24,7 +24,6 @@ set(ALL_TEST_NAMES
     test_double_serializer
     test_float
     test_int_add
-    test_json_pointer
     test_locale
     test_null
     test_parse
@@ -36,6 +35,10 @@ set(ALL_TEST_NAMES
     test_util_file
     test_visit
     test_object_iterator)
+
+if (NOT DISABLE_JSON_POINTER)
+    set(ALL_TEST_NAMES ${ALL_TEST_NAMES} test_json_pointer)
+endif()
 
 foreach(TESTNAME ${ALL_TEST_NAMES})
 

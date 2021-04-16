@@ -70,6 +70,7 @@
 # It's not good practice to build directly in the source tree
 # but ignore cmake auto-generated files anyway:
 /json_config.h
+/json.h
 /config.h
 /json-c.pc
 /Makefile
