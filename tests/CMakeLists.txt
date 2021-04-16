@@ -12,30 +12,32 @@ target_link_libraries(test2Formatted PRIVATE ${PROJECT_NAME})
 
 include_directories(PUBLIC ${CMAKE_SOURCE_DIR})
 
-foreach(TESTNAME
-	test1
-	test2
-	test4
-	testReplaceExisting
-	test_cast
-	test_charcase
-	test_compare
-	test_deep_copy
-	test_double_serializer
-	test_float
-	test_int_add
-	test_json_pointer
-	test_locale
-	test_null
-	test_parse
-	test_parse_int64
-	test_printbuf
-	test_set_serializer
-	test_set_value
-	test_strerror
-	test_util_file
-	test_visit
-	test_object_iterator)
+set(ALL_TEST_NAMES
+    test1
+    test2
+    test4
+    testReplaceExisting
+    test_cast
+    test_charcase
+    test_compare
+    test_deep_copy
+    test_double_serializer
+    test_float
+    test_int_add
+    test_json_pointer
+    test_locale
+    test_null
+    test_parse
+    test_parse_int64
+    test_printbuf
+    test_set_serializer
+    test_set_value
+    test_strerror
+    test_util_file
+    test_visit
+    test_object_iterator)
+
+foreach(TESTNAME ${ALL_TEST_NAMES})
 
 add_executable(${TESTNAME} ${TESTNAME}.c)
 if(${TESTNAME} STREQUAL test_strerror OR ${TESTNAME} STREQUAL test_util_file)
