@@ -98,6 +98,7 @@ option(ENABLE_RDRAND                  "Enable RDRAND Hardware RNG Hash Seed."   
 option(ENABLE_THREADING               "Enable partial threading support."                     OFF)
 option(OVERRIDE_GET_RANDOM_SEED       "Override json_c_get_random_seed() with custom code."   OFF)
 option(DISABLE_EXTRA_LIBS             "Avoid linking against extra libraries, such as libbsd." OFF)
+option(DISABLE_JSON_POINTER           "Disable JSON pointer (RFC6901) support."               OFF)
 
 
 if (UNIX OR MINGW OR CYGWIN)
@@ -370,14 +371,13 @@ set(JSON_C_PUBLIC_HEADERS
     # Note: config.h is _not_ included here
     ${PROJECT_BINARY_DIR}/json_config.h
 
-    ${PROJECT_SOURCE_DIR}/json.h
+    ${PROJECT_BINARY_DIR}/json.h
     ${PROJECT_SOURCE_DIR}/arraylist.h
     ${PROJECT_SOURCE_DIR}/debug.h
     ${PROJECT_SOURCE_DIR}/json_c_version.h
     ${PROJECT_SOURCE_DIR}/json_inttypes.h
     ${PROJECT_SOURCE_DIR}/json_object.h
     ${PROJECT_SOURCE_DIR}/json_object_iterator.h
-    ${PROJECT_SOURCE_DIR}/json_pointer.h
     ${PROJECT_SOURCE_DIR}/json_tokener.h
     ${PROJECT_SOURCE_DIR}/json_types.h
     ${PROJECT_SOURCE_DIR}/json_util.h
@@ -404,7 +404,6 @@ set(JSON_C_SOURCES
     ${PROJECT_SOURCE_DIR}/json_c_version.c
     ${PROJECT_SOURCE_DIR}/json_object.c
     ${PROJECT_SOURCE_DIR}/json_object_iterator.c
-    ${PROJECT_SOURCE_DIR}/json_pointer.c
     ${PROJECT_SOURCE_DIR}/json_tokener.c
     ${PROJECT_SOURCE_DIR}/json_util.c
     ${PROJECT_SOURCE_DIR}/json_visit.c
@@ -413,6 +412,16 @@ set(JSON_C_SOURCES
     ${PROJECT_SOURCE_DIR}/random_seed.c
     ${PROJECT_SOURCE_DIR}/strerror_override.c
 )
+
+if (NOT DISABLE_JSON_POINTER)
+    set(JSON_C_PUBLIC_HEADERS   ${JSON_C_PUBLIC_HEADERS}  ${PROJECT_SOURCE_DIR}/json_pointer.h)
+    set(JSON_C_SOURCES          ${JSON_C_SOURCES}         ${PROJECT_SOURCE_DIR}/json_pointer.c)
+    set(JSON_H_JSON_POINTER "#include \"json_pointer.h\"")
+else()
+    set(JSON_H_JSON_POINTER "")
+endif()
+
+configure_file(json.h.cmakein ${PROJECT_BINARY_DIR}/json.h @ONLY)
 
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_BINARY_DIR})
