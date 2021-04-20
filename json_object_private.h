@@ -100,6 +100,18 @@ void _json_c_set_last_err(const char *err_fmt, ...);
 
 extern const char *json_hex_chars;
 
+struct json_pointer_get_result {
+	struct json_object *parent;
+	struct json_object *obj;
+	union {
+		const char *key;
+		uint32_t index;
+	} id;
+};
+
+int json_pointer_get_internal(struct json_object *obj, const char *path,
+                              struct json_pointer_get_result *res);
+
 #ifdef __cplusplus
 }
 #endif

@@ -18,6 +18,7 @@ JSONC_PRIVATE {
     array_list_new;
     array_list_put_idx;
     array_list_sort;
+    json_pointer_get_internal;
     json_hex_chars;
     json_parse_double;
     json_parse_int64;
