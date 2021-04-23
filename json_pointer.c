@@ -42,7 +42,7 @@ static void string_replace_all_occurrences_with_char(char *s, const char *occur,
 	}
 }
 
-static int is_valid_index(struct json_object *jo, const char *path, size_t *idx)
+static int is_valid_index(const char *path, size_t *idx)
 {
 	size_t i, len = strlen(path);
 	/* this code-path optimizes a bit, for when we reference the 0-9 index range
@@ -53,7 +53,7 @@ static int is_valid_index(struct json_object *jo, const char *path, size_t *idx)
 		if (is_plain_digit(path[0]))
 		{
 			*idx = (path[0] - '0');
-			goto check_oob;
+			return 1;
 		}
 		errno = EINVAL;
 		return 0;
@@ -77,13 +77,6 @@ static int is_valid_index(struct json_object *jo, const char *path, size_t *idx)
 	// We know it's all digits, so the only error case here is overflow,
 	// but ULLONG_MAX will be longer than any array length so that's ok.
 	*idx = strtoull(path, NULL, 10);
-check_oob:
-	len = json_object_array_length(jo);
-	if (*idx >= len)
-	{
-		errno = ENOENT;
-		return 0;
-	}
 
 	return 1;
 }
@@ -93,8 +86,14 @@ static int json_pointer_get_single_path(struct json_object *obj, char *path,
 {
 	if (json_object_is_type(obj, json_type_array))
 	{
-		if (!is_valid_index(obj, path, idx))
+		if (!is_valid_index(path, idx))
 			return -1;
+		if (*idx >= json_object_array_length(obj))
+		{
+			errno = ENOENT;
+			return -1;
+		}
+
 		obj = json_object_array_get_idx(obj, *idx);
 		if (obj)
 		{
@@ -129,7 +128,7 @@ static int json_pointer_set_single_path(struct json_object *parent, const char *
 		/* RFC (Chapter 4) states that '-' may be used to add new elements to an array */
 		if (path[0] == '-' && path[1] == '\0')
 			return json_object_array_add(parent, value);
-		if (!is_valid_index(parent, path, &idx))
+		if (!is_valid_index(path, &idx))
 			return -1;
 		return json_object_array_put_idx(parent, idx, value);
 	}
