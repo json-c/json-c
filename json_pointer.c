@@ -119,8 +119,15 @@ static int json_pointer_get_single_path(struct json_object *obj, char *path,
 	return 0;
 }
 
+static int json_object_array_put_idx_cb(struct json_object *parent, size_t idx,
+					struct json_object *value, void *priv)
+{
+	return json_object_array_put_idx(parent, idx, value);
+}
+
 static int json_pointer_set_single_path(struct json_object *parent, const char *path,
-                                        struct json_object *value)
+                                        struct json_object *value,
+					json_pointer_array_set_cb array_set_cb, void *priv)
 {
 	if (json_object_is_type(parent, json_type_array))
 	{
@@ -130,7 +137,7 @@ static int json_pointer_set_single_path(struct json_object *parent, const char *
 			return json_object_array_add(parent, value);
 		if (!is_valid_index(path, &idx))
 			return -1;
-		return json_object_array_put_idx(parent, idx, value);
+		return array_set_cb(parent, idx, value, priv);
 	}
 
 	/* path replacements should have been done in json_pointer_get_single_path(),
@@ -291,7 +298,9 @@ out:
 	return rc;
 }
 
-int json_pointer_set(struct json_object **obj, const char *path, struct json_object *value)
+int json_pointer_set_with_array_cb(struct json_object **obj, const char *path,
+				   struct json_object *value,
+				   json_pointer_array_set_cb array_set_cb, void *priv)
 {
 	const char *endp;
 	char *path_copy = NULL;
@@ -321,7 +330,7 @@ int json_pointer_set(struct json_object **obj, const char *path, struct json_obj
 	if ((endp = strrchr(path, '/')) == path)
 	{
 		path++;
-		return json_pointer_set_single_path(*obj, path, value);
+		return json_pointer_set_single_path(*obj, path, value, array_set_cb, priv);
 	}
 
 	/* pass a working copy to the recursive call */
@@ -338,7 +347,12 @@ int json_pointer_set(struct json_object **obj, const char *path, struct json_obj
 		return rc;
 
 	endp++;
-	return json_pointer_set_single_path(set, endp, value);
+	return json_pointer_set_single_path(set, endp, value, array_set_cb, priv);
+}
+
+int json_pointer_set(struct json_object **obj, const char *path, struct json_object *value)
+{
+	return json_pointer_set_with_array_cb(obj, path, value, json_object_array_put_idx_cb, NULL);
 }
 
 int json_pointer_setf(struct json_object **obj, struct json_object *value, const char *path_fmt,
@@ -393,7 +407,8 @@ int json_pointer_setf(struct json_object **obj, struct json_object *value, const
 
 set_single_path:
 	endp++;
-	rc = json_pointer_set_single_path(set, endp, value);
+	rc = json_pointer_set_single_path(set, endp, value,
+					  json_object_array_put_idx_cb, NULL);
 out:
 	free(path_copy);
 	return rc;

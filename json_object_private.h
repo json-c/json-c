@@ -112,6 +112,13 @@ struct json_pointer_get_result {
 int json_pointer_get_internal(struct json_object *obj, const char *path,
                               struct json_pointer_get_result *res);
 
+typedef int(*json_pointer_array_set_cb)(json_object *parent, size_t idx,
+                                        json_object *value, void *priv);
+
+int json_pointer_set_with_array_cb(struct json_object **obj, const char *path,
+                                   struct json_object *value,
+                                   json_pointer_array_set_cb array_set_cb, void *priv);
+
 #ifdef __cplusplus
 }
 #endif
