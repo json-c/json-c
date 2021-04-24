@@ -44,7 +44,6 @@ static void string_replace_all_occurrences_with_char(char *s, const char *occur,
 static int is_valid_index(struct json_object *jo, const char *path, size_t *idx)
 {
 	size_t i, len = strlen(path);
-	long int idx_val = -1;
 	/* this code-path optimizes a bit, for when we reference the 0-9 index range
 	 * in a JSON array and because leading zeros not allowed
 	 */
@@ -74,14 +73,9 @@ static int is_valid_index(struct json_object *jo, const char *path, size_t *idx)
 		}
 	}
 
-	idx_val = strtol(path, NULL, 10);
-	if (idx_val < 0)
-	{
-		errno = EINVAL;
-		return 0;
-	}
-	*idx = idx_val;
-
+	// We know it's all digits, so the only error case here is overflow,
+	// but ULLONG_MAX will be longer than any array length so that's ok.
+	*idx = strtoull(path, NULL, 10);
 check_oob:
 	len = json_object_array_length(jo);
 	if (*idx >= len)
