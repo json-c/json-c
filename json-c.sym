@@ -170,6 +170,7 @@ JSONC_0.15 {
 JSONC_0.16 {
   global:
     json_object_array_insert_idx;
+    json_patch_apply;
 } JSONC_0.15;
 
 JSONC_0.17 {
