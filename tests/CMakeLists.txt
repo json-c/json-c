@@ -38,6 +38,9 @@ set(ALL_TEST_NAMES
 
 if (NOT DISABLE_JSON_POINTER)
     set(ALL_TEST_NAMES ${ALL_TEST_NAMES} test_json_pointer)
+    if (NOT DISABLE_JSON_PATCH)
+        set(ALL_TEST_NAMES ${ALL_TEST_NAMES} test_json_patch)
+    endif()
 endif()
 
 foreach(TESTNAME ${ALL_TEST_NAMES})

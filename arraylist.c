@@ -125,6 +125,27 @@ int array_list_shrink(struct array_list *arr, size_t empty_slots)
 	return 0;
 }
 
+int array_list_insert_idx(struct array_list *arr, size_t idx, void *data)
+{
+	size_t move_amount;
+
+	if (idx >= arr->length)
+		return array_list_put_idx(arr, idx, data);
+
+	/* we're at full size, what size_t can support */
+	if (arr->length == SIZE_T_MAX)
+		return -1;
+
+	if (array_list_expand_internal(arr, arr->length + 1))
+		return -1;
+
+	move_amount = (arr->length - idx) * sizeof(void *);
+	memmove(arr->array + idx + 1, arr->array + idx, move_amount);
+	arr->array[idx] = data;
+	arr->length++;
+	return 0;
+}
+
 //static inline int _array_list_put_idx(struct array_list *arr, size_t idx, void *data)
 int array_list_put_idx(struct array_list *arr, size_t idx, void *data)
 {

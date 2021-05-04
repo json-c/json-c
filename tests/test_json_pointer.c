@@ -269,6 +269,22 @@ static void test_example_set(void)
 	printf("%s\n", json_object_get_string(jo1));
 
 	json_object_put(jo1);
+
+	jo1 = json_tokener_parse("[0, 1, 2, 3]");
+	jo2 = json_tokener_parse("[0, 1, 2, 3, null, null, null, 7]");
+
+	assert(0 == json_pointer_set(&jo1, "/7", json_object_new_int(7)));
+	assert(1 == json_object_equal(jo1, jo2));
+
+	json_object_put(jo1);
+
+	jo1 = json_tokener_parse("[0, 1, 2, 3]");
+
+	assert(0 == json_pointer_setf(&jo1, json_object_new_int(7), "/%u", 7));
+	assert(1 == json_object_equal(jo1, jo2));
+
+	json_object_put(jo1);
+	json_object_put(jo2);
 }
 
 static void test_wrong_inputs_set(void)
