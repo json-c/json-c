@@ -1,8 +1,11 @@
 #include <assert.h>
+#include <limits.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "config.h"
 
 #include "json.h"
 #include "parse_flags.h"
@@ -250,7 +253,7 @@ int main(int argc, char **argv)
 	test_array_del_idx();
 	test_array_list_expand_internal();
 
-	my_array = json_object_new_array();
+	my_array = json_object_new_array_ext(5);
 	json_object_array_add(my_array, json_object_new_int(3));
 	json_object_array_add(my_array, json_object_new_int(1));
 	json_object_array_add(my_array, json_object_new_int(2));
@@ -306,6 +309,27 @@ int main(int argc, char **argv)
 		printf("\t%s: %s\n", key, json_object_to_json_string(val));
 	}
 	printf("my_object.to_string()=%s\n", json_object_to_json_string(my_object));
+
+	json_object_put(my_array);
+	my_array = json_object_new_array_ext(INT_MIN + 1);
+	if (my_array != NULL)
+	{
+		printf("ERROR: able to allocate an array of negative size!\n");
+		fflush(stdout);
+		json_object_put(my_array);
+		my_array = NULL;
+	}
+
+#if SIZEOF_SIZE_T == SIZEOF_INT
+	my_array = json_object_new_array_ext(INT_MAX / 2 + 2);
+	if (my_array != NULL)
+	{
+		printf("ERROR: able to allocate an array of insufficient size!\n");
+		fflush(stdout);
+		json_object_put(my_array);
+		my_array = NULL;
+	}
+#endif
 
 	json_object_put(my_string);
 	json_object_put(my_int);

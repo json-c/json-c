@@ -126,7 +126,7 @@ int main(int argc, char **argv)
 	src3 = json_tokener_parse(json_str3);
 
 	assert(src1 != NULL);
-	assert(src1 != NULL);
+	assert(src2 != NULL);
 	assert(src3 != NULL);
 
 	printf("PASSED - loaded input data\n");

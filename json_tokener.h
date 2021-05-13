@@ -59,6 +59,8 @@ enum json_tokener_state
 	json_tokener_state_string,
 	json_tokener_state_string_escape,
 	json_tokener_state_escape_unicode,
+	json_tokener_state_escape_unicode_need_escape,
+	json_tokener_state_escape_unicode_need_u,
 	json_tokener_state_boolean,
 	json_tokener_state_number,
 	json_tokener_state_array,
@@ -111,7 +113,7 @@ struct json_tokener
 	 * @deprecated See json_tokener_get_error() instead.
 	 */
 	enum json_tokener_error err;
-	unsigned int ucs_char;
+	unsigned int ucs_char, high_surrogate;
 	char quote_char;
 	struct json_tokener_srec *stack;
 	int flags;
@@ -194,11 +196,44 @@ JSON_EXPORT const char *json_tokener_error_desc(enum json_tokener_error jerr);
  */
 JSON_EXPORT enum json_tokener_error json_tokener_get_error(struct json_tokener *tok);
 
+/**
+ * Allocate a new json_tokener.
+ * When done using that to parse objects, free it with json_tokener_free().
+ * See json_tokener_parse_ex() for usage details.
+ */
 JSON_EXPORT struct json_tokener *json_tokener_new(void);
+
+/**
+ * Allocate a new json_tokener with a custom max nesting depth.
+ * @see JSON_TOKENER_DEFAULT_DEPTH
+ */
 JSON_EXPORT struct json_tokener *json_tokener_new_ex(int depth);
+
+/**
+ * Free a json_tokener previously allocated with json_tokener_new().
+ */
 JSON_EXPORT void json_tokener_free(struct json_tokener *tok);
+
+/**
+ * Reset the state of a json_tokener, to prepare to parse a 
+ * brand new JSON object.
+ */
 JSON_EXPORT void json_tokener_reset(struct json_tokener *tok);
+
+/**
+ * Parse a json_object out of the string `str`.
+ *
+ * If you need more control over how the parsing occurs,
+ * see json_tokener_parse_ex().
+ */
 JSON_EXPORT struct json_object *json_tokener_parse(const char *str);
+
+/**
+ * Parser a json_object out of the string `str`, but if it fails
+ * return the error in `*error`.
+ * @see json_tokener_parse()
+ * @see json_tokener_parse_ex()
+ */
 JSON_EXPORT struct json_object *json_tokener_parse_verbose(const char *str,
                                                            enum json_tokener_error *error);
 
@@ -220,8 +255,8 @@ JSON_EXPORT void json_tokener_set_flags(struct json_tokener *tok, int flags);
  *
  * If json_tokener_parse_ex() returns NULL and the error is anything other than
  * json_tokener_continue, a fatal error has occurred and parsing must be
- * halted.  Then, the tok object must not be reused until json_tokener_reset() is
- * called.
+ * halted.  Then, the tok object must not be reused until json_tokener_reset()
+ * is called.
  *
  * When a valid JSON value is parsed, a non-NULL json_object will be
  * returned, with a reference count of one which belongs to the caller.  Also,
@@ -234,13 +269,18 @@ JSON_EXPORT void json_tokener_set_flags(struct json_tokener *tok, int flags);
  * error or to handle the additional characters, perhaps by parsing another
  * json value starting from that point.
  *
+ * If the caller knows that they are at the end of their input, the length
+ * passed MUST include the final '\0' character, so values with no inherent
+ * end (i.e. numbers) can be properly parsed, rather than just returning
+ * json_tokener_continue.
+ *
  * Extra characters can be detected by comparing the value returned by
  * json_tokener_get_parse_end() against
  * the length of the last len parameter passed in.
  *
  * The tokener does \b not maintain an internal buffer so the caller is
- * responsible for calling json_tokener_parse_ex with an appropriate str
- * parameter starting with the extra characters.
+ * responsible for a subsequent call to json_tokener_parse_ex with an 
+ * appropriate str parameter starting with the extra characters.
  *
  * This interface is presently not 64-bit clean due to the int len argument
  * so the function limits the maximum string size to INT32_MAX (2GB).
@@ -256,6 +296,8 @@ enum json_tokener_error jerr;
 do {
 	mystring = ...  // get JSON string, e.g. read from file, etc...
 	stringlen = strlen(mystring);
+	if (end_of_input)
+		stringlen++;  // Include the '\0' if we know we're at the end of input
 	jobj = json_tokener_parse_ex(tok, mystring, stringlen);
 } while ((jerr = json_tokener_get_error(tok)) == json_tokener_continue);
 if (jerr != json_tokener_success)

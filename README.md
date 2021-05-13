@@ -1,3 +1,5 @@
+\mainpage
+
 `json-c`
 ========
 
@@ -35,7 +37,7 @@ Home page for json-c: https://github.com/json-c/json-c/wiki
 
  - `gcc`, `clang`, or another C compiler
 
- - cmake>=2.8, >=3.16 recommended
+ - `cmake>=2.8`, `>=3.16` recommended
 
 To generate docs you'll also need:
  - `doxygen>=1.8.13`
@@ -78,7 +80,7 @@ $ make install
 
 ### Generating documentation with Doxygen:
 
-The libray documentation can be generated directly from the source codes using Doxygen tool:
+The library documentation can be generated directly from the source code using Doxygen tool:
 
 ```sh
 # in build directory
@@ -93,16 +95,19 @@ CMake Options <a name="CMake"></a>
 The json-c library is built with [CMake](https://cmake.org/cmake-tutorial/),
 which can take a few options.
 
-Variable             | Type   | Description
----------------------|--------|--------------
-CMAKE_INSTALL_PREFIX | String | The install location.
-CMAKE_BUILD_TYPE     | String | Defaults to "debug"
-BUILD_SHARED_LIBS    | Bool   | The default build generates a dynamic (dll/so) library.  Set this to OFF to create a static library only.
-BUILD_STATIC_LIBS    | Bool   | The default build generates a static (lib/a) library.  Set this to OFF to create a shared library only.
-ENABLE_RDRAND        | Bool   | Enable RDRAND Hardware RNG Hash Seed
-ENABLE_THREADING     | Bool   | Enable partial threading support
-DISABLE_WERROR       | Bool   | Disable use of -Werror
-DISABLE_BSYMBOLIC    | Bool   | Disable use of -Bsymbolic-functions
+Variable                     | Type   | Description
+-----------------------------|--------|--------------
+CMAKE_INSTALL_PREFIX         | String | The install location.
+CMAKE_BUILD_TYPE             | String | Defaults to "debug".
+BUILD_SHARED_LIBS            | Bool   | The default build generates a dynamic (dll/so) library.  Set this to OFF to create a static library only.
+BUILD_STATIC_LIBS            | Bool   | The default build generates a static (lib/a) library.  Set this to OFF to create a shared library only.
+DISABLE_STATIC_FPIC          | Bool   | The default builds position independent code.  Set this to OFF to create a shared library only.
+DISABLE_BSYMBOLIC            | Bool   | Disable use of -Bsymbolic-functions.
+DISABLE_THREAD_LOCAL_STORAGE | Bool   | Disable use of Thread-Local Storage (HAVE___THREAD).
+DISABLE_WERROR               | Bool   | Disable use of -Werror.
+ENABLE_RDRAND                | Bool   | Enable RDRAND Hardware RNG Hash Seed.
+ENABLE_THREADING             | Bool   | Enable partial threading support.
+OVERRIDE_GET_RANDOM_SEED     | String | A block of code to use instead of the default implementation of json_c_get_random_seed(), e.g. on embedded platforms where not even the fallback to time() works.  Must be a single line.
 
 Pass these options as `-D` on CMake's command-line.
 
@@ -234,8 +239,38 @@ following more specific header files:
 * json_tokener.h - Methods for parsing and serializing json-c object trees.
 * json_pointer.h - JSON Pointer (RFC 6901) implementation for retrieving
                    objects from a json-c object tree.
-* json_object_iterator.h - Methods for iterating over single json_object instances.
+* json_object_iterator.h - Methods for iterating over single json_object instances.  (See also `json_object_object_foreach()` in json_object.h)
 * json_visit.h   - Methods for walking a tree of json-c objects.
-* json_util.h    - Miscelleanous utility functions.
+* json_util.h    - Miscellaneous utility functions.
 
-For a full list of headers see [files.html](http://json-c.github.io/json-c/json-c-0.13.1/doc/html/files.html)
+For a full list of headers see [files.html](http://json-c.github.io/json-c/json-c-current-release/doc/html/files.html)
+
+The primary type in json-c is json_object.  It describes a reference counted
+tree of json objects which are created by either parsing text with a
+json_tokener (i.e. `json_tokener_parse_ex()`), or by creating
+(with `json_object_new_object()`, `json_object_new_int()`, etc...) and adding
+(with `json_object_object_add()`, `json_object_array_add()`, etc...) them 
+individually.
+Typically, every object in the tree will have one reference, from its parent.
+When you are done with the tree of objects, you call json_object_put() on just
+the root object to free it, which recurses down through any child objects
+calling json_object_put() on each one of those in turn.
+
+You can get a reference to a single child 
+(`json_object_object_get()` or `json_object_array_get_idx()`)
+and use that object as long as its parent is valid.  
+If you need a child object to live longer than its parent, you can
+increment the child's refcount (`json_object_get()`) to allow it to survive
+the parent being freed or it being removed from its parent
+(`json_object_object_del()` or `json_object_array_del_idx()`)
+
+When parsing text, the json_tokener object is independent from the json_object
+that it returns.  It can be allocated (`json_tokener_new()`)
+used one or multiple times (`json_tokener_parse_ex()`, and
+freed (`json_tokener_free()`) while the json_object objects live on.
+
+A json_object tree can be serialized back into a string with 
+`json_object_to_json_string_ext()`.  The string that is returned 
+is only valid until the next "to_json_string" call on that same object.
+Also, it is freed when the json_object is freed.
+

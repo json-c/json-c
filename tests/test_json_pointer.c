@@ -1,9 +1,8 @@
-#include "strerror_override.h"
-#include "strerror_override_private.h"
 #ifdef NDEBUG
 #undef NDEBUG
 #endif
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -320,8 +319,6 @@ static void test_wrong_inputs_set(void)
 
 int main(int argc, char **argv)
 {
-	_json_c_strerror_enable = 1;
-
 	test_example_get();
 	test_recursion_get();
 	test_wrong_inputs_get();

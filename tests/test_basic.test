@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export _JSON_C_STRERROR_ENABLE=1
+
 # Common definitions
 if test -z "$srcdir"; then
     srcdir="${0%/*}"
