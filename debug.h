@@ -14,8 +14,8 @@
  * @file
  * @brief Do not use, json-c internal, may be changed or removed at any time.
  */
-#ifndef _DEBUG_H_
-#define _DEBUG_H_
+#ifndef _JSON_C_DEBUG_H_
+#define _JSON_C_DEBUG_H_
 
 #include <stdlib.h>
 

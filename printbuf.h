@@ -20,8 +20,8 @@
  *        json_object_set_serializer() direct use of this is not
  *        recommended.
  */
-#ifndef _printbuf_h_
-#define _printbuf_h_
+#ifndef _json_c_printbuf_h_
+#define _json_c_printbuf_h_
 
 #ifndef JSON_EXPORT
 #if defined(_MSC_VER) && defined(JSON_C_DLL)
