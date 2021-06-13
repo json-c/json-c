@@ -154,7 +154,10 @@ check_include_file(sys/random.h     HAVE_SYS_RANDOM_H)
 check_include_file(sys/stat.h       HAVE_SYS_STAT_H)
 check_include_file(xlocale.h        HAVE_XLOCALE_H)
 
-if (HAVE_INTTYPES_H AND NOT MSVC)
+if (HAVE_INTTYPES_H)
+	# Set a json-c specific var to stamp into json_config.h
+	# in a way that hopefull ywon't conflict with other 
+	# projects that use json-c.
     set(JSON_C_HAVE_INTTYPES_H 1)
 endif()
 
