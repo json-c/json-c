@@ -1,0 +1,6 @@
+Parsed input: { "foo\u0000bar": "qwerty\u0000asdf" }
+Result is `json_type_object`
+Key was present and same for `json_object_object_get_ex_len` and `json_object_object_get_len`
+Value is right type, `json_type_string`
+Expected value matches actual
+PASS

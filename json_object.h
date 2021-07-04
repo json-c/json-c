@@ -387,6 +387,36 @@ JSON_EXPORT int json_object_object_add(struct json_object *obj, const char *key,
 
 /** Add an object field to a json_object of type json_type_object
  *
+ * The reference count of `val` will *not* be incremented, in effect
+ * transferring ownership that object to `obj`, and thus `val` will be
+ * freed when `obj` is.  (i.e. through `json_object_put(obj)`)
+ *
+ * If you want to retain a reference to the added object, independent
+ * of the lifetime of obj, you must increment the refcount with
+ * `json_object_get(val)` (and later release it with json_object_put()).
+ *
+ * Since ownership transfers to `obj`, you must make sure
+ * that you do in fact have ownership over `val`.  For instance,
+ * json_object_new_object() will give you ownership until you transfer it,
+ * whereas json_object_object_get() does not.
+ *
+ * Any previous object stored under `key` in `obj` will have its refcount
+ * decremented, and be freed normally if that drops to zero.
+ *
+ * @param obj the json_object instance
+ * @param key the object field name (a private copy will be duplicated),
+ *            which is not terminated by a NULL ( @c '\0' ) character
+ * @param len the length of @p key
+ * @param val a json_object or NULL member to associate with the given field
+ *
+ * @return On success, @c 0 is returned.
+ * 	On error, a negative value is returned.
+ */
+JSON_EXPORT int json_object_object_add_len(struct json_object *obj, const char *key, const int len,
+                                           struct json_object *val);
+
+/** Add an object field to a json_object of type json_type_object
+ *
  * The semantics are identical to json_object_object_add, except that an
  * additional flag fields gives you more control over some detail aspects
  * of processing. See the description of JSON_C_OBJECT_ADD_* flags for more
@@ -397,12 +427,50 @@ JSON_EXPORT int json_object_object_add(struct json_object *obj, const char *key,
  * @param val a json_object or NULL member to associate with the given field
  * @param opts process-modifying options. To specify multiple options, use
  *             (OPT1|OPT2)
+ *
+ * @return On success, @c 0 is returned.
+ * 	On error, a negative value is returned.
  */
 JSON_EXPORT int json_object_object_add_ex(struct json_object *obj, const char *const key,
                                           struct json_object *const val, const unsigned opts);
 
+/** Add an object field to a json_object of type json_type_object
+ *
+ * The semantics are identical to json_object_object_add, except that an
+ * additional flag fields gives you more control over some detail aspects
+ * of processing. See the description of JSON_C_OBJECT_ADD_* flags for more
+ * details.
+ *
+ * @param obj the json_object instance
+ * @param key the object field name (a private copy will be duplicated),
+ *            which is not terminated by a NULL ( @c '\0' ) character
+ * @param len the length of @p key
+ * @param val a json_object or NULL member to associate with the given field
+ * @param opts process-modifying options. To specify multiple options, use
+ *             (OPT1|OPT2)
+ *
+ * @return On success, @c 0 is returned.
+ * 	On error, a negative value is returned.
+ */
+JSON_EXPORT int json_object_object_add_ex_len(struct json_object *obj, const char *const key,
+                                              const int len, struct json_object *const val,
+                                              const unsigned opts);
+
 /** Get the json_object associate with a given object field.
  * Deprecated/discouraged: used json_object_object_get_ex instead.
+ *
+ * This functions exactly like calling
+ * @code json_object_object_get_len(obj, key, strlen(key)) @endcode
+ *
+ * @param obj the json_object instance
+ * @param key the object field name
+ * @returns the json_object associated with the given field name
+ * @see json_object_object_get_len()
+ */
+JSON_EXPORT struct json_object *json_object_object_get(const struct json_object *obj,
+                                                       const char *key);
+/** Get the json_object associate with a given object field.
+ * Deprecated/discouraged: used json_object_object_get_ex_len instead.
  *
  * This returns NULL if the field is found but its value is null, or if
  *  the field is not found, or if obj is not a json_type_object.  If you
@@ -419,11 +487,31 @@ JSON_EXPORT int json_object_object_add_ex(struct json_object *obj, const char *c
  * or transfer ownership to prevent a memory leak).
  *
  * @param obj the json_object instance
- * @param key the object field name
+ * @param key the object field name,
+ *            which is not terminated by a NULL ( @c '\0' ) character
+ * @param len the length of @p key
  * @returns the json_object associated with the given field name
  */
-JSON_EXPORT struct json_object *json_object_object_get(const struct json_object *obj,
-                                                       const char *key);
+
+JSON_EXPORT struct json_object *json_object_object_get_len(const struct json_object *obj,
+                                                           const char *key, const int len);
+
+/** Get the json_object associated with a given object field.
+ *
+ * This functions exactly like calling
+ * @code json_object_object_get_ex_len(obj, key, strlen(key), value) @endcode
+ *
+ * @param obj the json_object instance
+ * @param key the object field name
+ * @param value a pointer where to store a reference to the json_object
+ *              associated with the given field name.
+ *              \n
+ *              It is safe to pass a NULL value.
+ * @returns whether or not the key exists
+ * @see json_object_object_get_ex_len()
+ */
+JSON_EXPORT json_bool json_object_object_get_ex(const struct json_object *obj, const char *key,
+                                                struct json_object **value);
 
 /** Get the json_object associated with a given object field.
  *
@@ -436,15 +524,17 @@ JSON_EXPORT struct json_object *json_object_object_get(const struct json_object 
  * than the owning parent (obj).  Ownership of value is retained by obj.
  *
  * @param obj the json_object instance
- * @param key the object field name
+ * @param key the object field name,
+ *            which is not terminated by a NULL ( @c '\0' ) character
+ * @param len the length of @p key
  * @param value a pointer where to store a reference to the json_object
  *              associated with the given field name.
- *
+ *              \n
  *              It is safe to pass a NULL value.
  * @returns whether or not the key exists
  */
-JSON_EXPORT json_bool json_object_object_get_ex(const struct json_object *obj, const char *key,
-                                                struct json_object **value);
+JSON_EXPORT json_bool json_object_object_get_ex_len(const struct json_object *obj, const char *key,
+                                                    const int len, struct json_object **value);
 
 /** Delete the given json_object field
  *

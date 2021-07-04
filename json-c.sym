@@ -165,6 +165,9 @@ JSONC_0.15 {
 } JSONC_0.14;
 
 JSONC_0.16 {
-#  global:
-#      ...new symbols here...
+  global:
+    json_object_object_add_len;
+    json_object_object_add_ex_len;
+    json_object_object_get_len;
+    json_object_object_get_ex_len;
 } JSONC_0.15;

@@ -583,6 +583,12 @@ struct lh_table *json_object_get_object(const struct json_object *jso)
 int json_object_object_add_ex(struct json_object *jso, const char *const key,
                               struct json_object *const val, const unsigned opts)
 {
+	return json_object_object_add_ex_len(jso, key, strlen(key), val, opts);
+}
+
+int json_object_object_add_ex_len(struct json_object *jso, const char *const key, const int len,
+                                  struct json_object *const val, const unsigned opts)
+{
 	struct json_object *existing_value = NULL;
 	struct lh_entry *existing_entry;
 	unsigned long hash;
@@ -619,7 +625,13 @@ int json_object_object_add_ex(struct json_object *jso, const char *const key,
 
 int json_object_object_add(struct json_object *jso, const char *key, struct json_object *val)
 {
-	return json_object_object_add_ex(jso, key, val, 0);
+	return json_object_object_add_ex_len(jso, key, strlen(key), val, 0);
+}
+
+int json_object_object_add_len(struct json_object *jso, const char *key, const int len,
+                               struct json_object *val)
+{
+	return json_object_object_add_ex_len(jso, key, len, val, 0);
 }
 
 int json_object_object_length(const struct json_object *jso)
@@ -636,12 +648,26 @@ size_t json_c_object_sizeof(void)
 struct json_object *json_object_object_get(const struct json_object *jso, const char *key)
 {
 	struct json_object *result = NULL;
-	json_object_object_get_ex(jso, key, &result);
+	json_object_object_get_ex_len(jso, key, strlen(key), &result);
+	return result;
+}
+
+struct json_object *json_object_object_get_len(const struct json_object *jso, const char *key,
+                                               const int len)
+{
+	struct json_object *result = NULL;
+	json_object_object_get_ex_len(jso, key, len, &result);
 	return result;
 }
 
 json_bool json_object_object_get_ex(const struct json_object *jso, const char *key,
                                     struct json_object **value)
+{
+	return json_object_object_get_ex_len(jso, key, strlen(key), value);
+}
+
+json_bool json_object_object_get_ex_len(const struct json_object *jso, const char *key,
+                                        const int len, struct json_object **value)
 {
 	if (value != NULL)
 		*value = NULL;
