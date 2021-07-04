@@ -46,6 +46,7 @@ if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING AND
    (NOT MSVC OR NOT (MSVC_VERSION LESS 1800)) # Tests need at least VS2013
    )
 add_subdirectory(tests)
+add_subdirectory(fuzz)
 endif()
 
 if (NOT MSVC)  # cmd line apps don't built on Windows currently.
