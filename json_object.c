@@ -39,18 +39,6 @@
 #error "The long long type isn't 64-bits"
 #endif
 
-#ifndef SSIZE_T_MAX
-#if SIZEOF_SSIZE_T == SIZEOF_INT
-#define SSIZE_T_MAX INT_MAX
-#elif SIZEOF_SSIZE_T == SIZEOF_LONG
-#define SSIZE_T_MAX LONG_MAX
-#elif SIZEOF_SSIZE_T == SIZEOF_LONG_LONG
-#define SSIZE_T_MAX LLONG_MAX
-#else
-#error Unable to determine size of ssize_t
-#endif
-#endif
-
 // Don't define this.  It's not thread-safe.
 /* #define REFCOUNT_DEBUG 1 */
 
@@ -589,38 +577,53 @@ int json_object_object_add_ex(struct json_object *jso, const char *const key,
 int json_object_object_add_ex_len(struct json_object *jso, const char *const key, const int len,
                                   struct json_object *const val, const unsigned opts)
 {
-	struct json_object *existing_value = NULL;
+	struct json_object *existing_value;
 	struct lh_entry *existing_entry;
 	unsigned long hash;
+	/** Required due to the `lh_get_hash` function wanting a `const struct lh_string *` */
+	const struct lh_string hashable = {.length = len, .str = {.pdata = key}};
 
 	assert(json_object_get_type(jso) == json_type_object);
 
+	// The caller must avoid creating loops in the object tree, but do a
+	// quick check anyway to make sure we're not creating a trivial loop.
+	if (jso == val)
+	{
+		return -1;
+	}
+
 	// We lookup the entry and replace the value, rather than just deleting
 	// and re-adding it, so the existing key remains valid.
-	hash = lh_get_hash(JC_OBJECT(jso)->c_object, (const void *)key);
+	hash = lh_get_hash(JC_OBJECT(jso)->c_object, (const void *)&hashable);
 	existing_entry =
 	    (opts & JSON_C_OBJECT_ADD_KEY_IS_NEW)
 	        ? NULL
 	        : lh_table_lookup_entry_w_hash(JC_OBJECT(jso)->c_object, (const void *)key, hash);
 
-	// The caller must avoid creating loops in the object tree, but do a
-	// quick check anyway to make sure we're not creating a trivial loop.
-	if (jso == val)
-		return -1;
-
-	if (!existing_entry)
+	if (existing_entry == NULL)
 	{
-		const void *const k =
-		    (opts & JSON_C_OBJECT_KEY_IS_CONSTANT) ? (const void *)key : strdup(key);
+		const struct lh_string *k = (opts & JSON_C_OBJECT_KEY_IS_CONSTANT)
+		                                ? lh_string_new_ptr(len, key)
+		                                : lh_string_new_imm(len, key);
 		if (k == NULL)
+		{
 			return -1;
-		return lh_table_insert_w_hash(JC_OBJECT(jso)->c_object, k, val, hash, opts);
+		}
+		return lh_table_insert_w_hash(JC_OBJECT(jso)->c_object, k, val, hash,
+		                              opts & ~JSON_C_OBJECT_KEY_IS_CONSTANT);
+		// `struct lh_string` always needs to be freed,
+		// so JSON_C_OBJECT_KEY_IS_CONSTANT cannot be set
 	}
-	existing_value = (json_object *)lh_entry_v(existing_entry);
-	if (existing_value)
-		json_object_put(existing_value);
-	existing_entry->v = val;
-	return 0;
+	else
+	{
+		existing_value = (json_object *)lh_entry_v(existing_entry);
+		if (existing_value)
+		{
+			json_object_put(existing_value);
+		}
+		existing_entry->v = val;
+		return 0;
+	}
 }
 
 int json_object_object_add(struct json_object *jso, const char *key, struct json_object *val)
@@ -761,7 +764,7 @@ struct json_object *json_object_new_int(int32_t i)
 
 int32_t json_object_get_int(const struct json_object *jso)
 {
-	int64_t cint64=0;
+	int64_t cint64 = 0;
 	double cdouble;
 	enum json_type o_type;
 
@@ -1751,8 +1754,8 @@ static int json_object_deep_copy_recursive(struct json_object *src, struct json_
 			/* This handles the `json_type_null` case */
 			if (!iter.val)
 				jso = NULL;
-			else if (json_object_deep_copy_recursive(iter.val, src, iter.key, UINT_MAX, &jso,
-			                                         shallow_copy) < 0)
+			else if (json_object_deep_copy_recursive(iter.val, src, iter.key, UINT_MAX,
+			                                         &jso, shallow_copy) < 0)
 			{
 				json_object_put(jso);
 				return -1;
