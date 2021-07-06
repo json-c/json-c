@@ -1,5 +1,7 @@
 Parsed input: { "foo": 14.5, "bar": [] }
 Result is `json_type_object`
+Key "foo" parsed as right type
+Key "bar" parsed as right type
 Added the key "foo\0bar" successfully
 Key "foo" is still the same
 Key "bar" is still the same

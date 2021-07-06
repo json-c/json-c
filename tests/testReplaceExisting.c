@@ -24,10 +24,11 @@ int main(int argc, char **argv)
 	int orig_count = 0;
 	json_object_object_foreach(my_object, key0, val0)
 	{
-		printf("Key at index %d is [%s] %d", orig_count, key0, (val0 == NULL));
-		if (strcmp(key0, "deleteme") == 0)
+		printf("Key at index %d is [%s] %d", orig_count, lh_string_data(key0),
+		       (val0 == NULL));
+		if (strcmp(lh_string_data(key0), "deleteme") == 0)
 		{
-			json_object_object_del(my_object, key0);
+			json_object_object_del(my_object, lh_string_data(key0));
 			printf(" (deleted)\n");
 		}
 		else
@@ -37,17 +38,19 @@ int main(int argc, char **argv)
 
 	printf("==== replace-value first loop starting ====\n");
 
-	const char *original_key = NULL;
+	const struct lh_string *original_key = NULL;
 	orig_count = 0;
 	json_object_object_foreach(my_object, key, val)
 	{
-		printf("Key at index %d is [%s] %d\n", orig_count, key, (val == NULL));
+		printf("Key at index %d is [%s] %d\n", orig_count, lh_string_data(key),
+		       (val == NULL));
 		orig_count++;
-		if (strcmp(key, "foo2") != 0)
+		if (strcmp(lh_string_data(key), "foo2") != 0)
 			continue;
-		printf("replacing value for key [%s]\n", key);
+		printf("replacing value for key [%s]\n", lh_string_data(key));
 		original_key = key;
-		json_object_object_add(my_object, key, json_object_new_string("zzz"));
+		json_object_object_add(my_object, lh_string_data(key0),
+		                       json_object_new_string("zzz"));
 	}
 
 	printf("==== second loop starting ====\n");
@@ -56,11 +59,12 @@ int main(int argc, char **argv)
 	int retval = 0;
 	json_object_object_foreach(my_object, key2, val2)
 	{
-		printf("Key at index %d is [%s] %d\n", new_count, key2, (val2 == NULL));
+		printf("Key at index %d is [%s] %d\n", new_count, lh_string_data(key2),
+		       (val2 == NULL));
 		new_count++;
-		if (strcmp(key2, "foo2") != 0)
+		if (strcmp(lh_string_data(key2), "foo2") != 0)
 			continue;
-		printf("pointer for key [%s] does %smatch\n", key2,
+		printf("pointer for key [%s] does %smatch\n", lh_string_data(key2),
 		       (key2 == original_key) ? "" : "NOT ");
 		if (key2 != original_key)
 			retval = 1;

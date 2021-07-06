@@ -9,6 +9,7 @@
 #include "json_inttypes.h"
 #include "json_object.h"
 #include "json_tokener.h"
+#include "linkhash.h"
 
 int main(void)
 {
@@ -65,10 +66,33 @@ int main(void)
 		return 1;
 	}
 
+	// Check the previous keys are still the same present
+	struct json_object *foo = json_object_object_get(parsed, foo_key);
+	if (!json_object_is_type(foo, json_type_double))
+	{
+		printf("Key \"%s\" should be `json_type_double` (%d) but was %d (error!)\n",
+		       foo_key, (int)json_type_double, json_object_get_type(foo));
+		return 1;
+	}
+	else
+	{
+		printf("Key \"%s\" parsed as right type\n", foo_key);
+	}
+	struct json_object *bar = json_object_object_get(parsed, bar_key);
+	if (!json_object_is_type(bar, json_type_array))
+	{
+		printf("Key \"%s\" should be `json_type_array` (%d) but was %d (error!)\n", bar_key,
+		       (int)json_type_array, json_object_get_type(bar));
+		return 1;
+	}
+	else
+	{
+		printf("Key \"%s\" parsed as right type\n", bar_key);
+	}
+
 	// Add the new key
 	struct json_object *new_str = json_object_new_string_len(toadd_value, toadd_value_len);
-	if (json_object_object_add_ex(parsed, toadd_key, new_str,
-	                              JSON_C_OBJECT_ADD_KEY_IS_NEW |
+	if (json_object_object_add_ex_len(parsed, toadd_key, toadd_key_len, new_str,
 	                                  JSON_C_OBJECT_KEY_IS_CONSTANT) != 0)
 	{
 		printf("An error occured adding the key \"%s\" (error!)\n", toadd_key_printable);
@@ -86,6 +110,13 @@ int main(void)
 	{
 		printf("Have three keys, but don't have the right value in \"%s\" (error!)\n",
 		       toadd_key_printable);
+		printf("Keys :\n");
+		json_object_object_foreach(parsed, key, val)
+		{
+			putchar('\"');
+			fwrite(lh_string_data(key), lh_string_size(key), 1, stdout);
+			printf("\" (%zd)\n", lh_string_size(key));
+		}
 		return 1;
 	}
 	else
@@ -94,7 +125,7 @@ int main(void)
 	}
 
 	// Check the previous keys are still the same present
-	struct json_object *foo = json_object_object_get(parsed, foo_key);
+	foo = json_object_object_get(parsed, foo_key);
 	if (!json_object_is_type(foo, json_type_double))
 	{
 		printf("Key \"%s\" should be `json_type_double` (%d) but was %d (error!)\n",
@@ -105,11 +136,11 @@ int main(void)
 	{
 		printf("Key \"%s\" is still the same\n", foo_key);
 	}
-	struct json_object *bar = json_object_object_get(parsed, bar_key);
-	if (!json_object_is_type(foo, json_type_array))
+	bar = json_object_object_get(parsed, bar_key);
+	if (!json_object_is_type(bar, json_type_array))
 	{
 		printf("Key \"%s\" should be `json_type_array` (%d) but was %d (error!)\n", bar_key,
-		       (int)json_type_array, json_object_get_type(foo));
+		       (int)json_type_array, json_object_get_type(bar));
 		return 1;
 	}
 	else
