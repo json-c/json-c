@@ -17,6 +17,7 @@
 #define _json_tokener_h_
 
 #include "json_object.h"
+#include "linkhash.h"
 #include <stddef.h>
 
 #ifdef __cplusplus
@@ -85,7 +86,7 @@ struct json_tokener_srec
 	enum json_tokener_state state, saved_state;
 	struct json_object *obj;
 	struct json_object *current;
-	char *obj_field_name;
+	struct lh_string *obj_field_name;
 };
 
 #define JSON_TOKENER_DEFAULT_DEPTH 32
@@ -215,7 +216,7 @@ JSON_EXPORT struct json_tokener *json_tokener_new_ex(int depth);
 JSON_EXPORT void json_tokener_free(struct json_tokener *tok);
 
 /**
- * Reset the state of a json_tokener, to prepare to parse a 
+ * Reset the state of a json_tokener, to prepare to parse a
  * brand new JSON object.
  */
 JSON_EXPORT void json_tokener_reset(struct json_tokener *tok);
@@ -279,7 +280,7 @@ JSON_EXPORT void json_tokener_set_flags(struct json_tokener *tok, int flags);
  * the length of the last len parameter passed in.
  *
  * The tokener does \b not maintain an internal buffer so the caller is
- * responsible for a subsequent call to json_tokener_parse_ex with an 
+ * responsible for a subsequent call to json_tokener_parse_ex with an
  * appropriate str parameter starting with the extra characters.
  *
  * This interface is presently not 64-bit clean due to the int len argument

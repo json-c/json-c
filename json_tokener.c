@@ -1105,7 +1105,9 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				{
 					printbuf_memappend_fast(tok->pb, case_start,
 					                        str - case_start);
-					obj_field_name = strdup(tok->pb->buf);
+					obj_field_name =
+					    lh_string_new_imm(tok->pb->bpos, tok->pb->buf);
+					// lh_string_print(obj_field_name, stdout);
 					saved_state = json_tokener_state_object_field_end;
 					state = json_tokener_state_eatws;
 					break;
@@ -1153,7 +1155,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 			goto redo_char;
 
 		case json_tokener_state_object_value_add:
-			json_object_object_add(current, obj_field_name, obj);
+			json_object_object_add_internal(current, obj_field_name, obj, 0);
 			free(obj_field_name);
 			obj_field_name = NULL;
 			saved_state = json_tokener_state_object_sep;

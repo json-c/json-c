@@ -225,7 +225,7 @@ extern size_t lh_string_print(const struct lh_string *str, FILE *stream);
  * @param data The data to include
  * @return `NULL` on error
  */
-extern const struct lh_string *lh_string_new_ptr(const size_t length, const char *data);
+extern struct lh_string *lh_string_new_ptr(const size_t length, const char *data);
 
 /**
  * @brief Creates a new `struct lh_string` using the `idata` field.
@@ -234,7 +234,7 @@ extern const struct lh_string *lh_string_new_ptr(const size_t length, const char
  * @param data The data to include and copy into the returned value
  * @return `NULL` on error
  */
-extern const struct lh_string *lh_string_new_imm(const size_t length, const char *data);
+extern struct lh_string *lh_string_new_imm(const size_t length, const char *data);
 
 /**
  * Create a new linkhash table.

@@ -99,6 +99,22 @@ struct json_object_string
 void _json_c_set_last_err(const char *err_fmt, ...);
 
 /**
+ * @brief Add an object field to a json_object of type json_type_object
+ *
+ * The semantics are identical to json_object_object_add_ex, except that @p key
+ * contains both the data and the length.
+ *
+ * @param obj the json_object instance
+ * @param key the object field name (a private copy will be duplicated)
+ * @param val a json_object or NULL member to associate with the given field
+ * @param opts process-modifying options. To specify multiple options, use
+ *             (OPT1|OPT2)
+ * @return On success, @c 0 is returned.
+ *         On error, a negative value is returned.
+ */
+int json_object_object_add_internal(struct json_object *obj, const struct lh_string *key,
+                                    struct json_object *const val, const unsigned opts);
+/**
  * The characters that can make up hexadecimal numbers
  */
 extern const char *json_hex_chars;

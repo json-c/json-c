@@ -116,8 +116,6 @@ static inline const struct json_object_string *JC_STRING_C(const struct json_obj
 static inline struct json_object *json_object_new(enum json_type o_type, size_t alloc_size,
                                                   json_object_to_json_string_fn *to_json_string);
 
-static int json_object_object_add_internal(struct json_object *jso, const struct lh_string *key,
-                                           struct json_object *const val, const unsigned opts);
 static int json_object_object_del_internal(struct json_object *jso_base,
                                            const struct lh_string *key);
 static json_bool json_object_object_get_internal(const struct json_object *jso,

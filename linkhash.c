@@ -511,7 +511,7 @@ size_t lh_string_print(const struct lh_string *key, FILE *stream)
 	return fwrite(lh_string_data(key), lh_string_size(key), 1, stream);
 }
 
-const struct lh_string *lh_string_new_ptr(const size_t length, const char *data)
+struct lh_string *lh_string_new_ptr(const size_t length, const char *data)
 {
 	struct lh_string *result = malloc(sizeof(struct lh_string));
 	if (result == NULL)
@@ -523,7 +523,7 @@ const struct lh_string *lh_string_new_ptr(const size_t length, const char *data)
 	return result;
 }
 
-const struct lh_string *lh_string_new_imm(const size_t length, const char *data)
+struct lh_string *lh_string_new_imm(const size_t length, const char *data)
 {
 	struct lh_string *result;
 	if (length >
