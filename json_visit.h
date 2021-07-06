@@ -13,7 +13,8 @@ extern "C" {
 #endif
 
 typedef int(json_c_visit_userfunc)(json_object *jso, int flags, json_object *parent_jso,
-                                   const char *jso_key, size_t *jso_index, void *userarg);
+                                   const struct lh_string *jso_key, size_t *jso_index,
+                                   void *userarg);
 
 /**
  * Visit each object in the JSON hierarchy starting at jso.

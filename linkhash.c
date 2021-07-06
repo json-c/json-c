@@ -506,6 +506,11 @@ size_t lh_string_size(const struct lh_string *str)
 	return (str->length > 0) ? (size_t)str->length : (size_t)(-(str->length));
 }
 
+size_t lh_string_print(const struct lh_string *key, FILE *stream)
+{
+	return fwrite(lh_string_data(key), lh_string_size(key), 1, stream);
+}
+
 const struct lh_string *lh_string_new_ptr(const size_t length, const char *data)
 {
 	struct lh_string *result = malloc(sizeof(struct lh_string));
@@ -535,7 +540,7 @@ const struct lh_string *lh_string_new_imm(const size_t length, const char *data)
 	result->length = -length;
 	char *unconst = _LH_UNCONST(result->str.idata);
 	memcpy(unconst, data, length);
-	unconst = '\0';
+	unconst[length] = '\0';
 	return result;
 }
 

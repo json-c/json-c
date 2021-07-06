@@ -547,6 +547,19 @@ JSON_EXPORT json_bool json_object_object_get_ex_len(const struct json_object *ob
  */
 JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key);
 
+/** Delete the given json_object field
+ *
+ * The reference count will be decremented for the deleted object.  If there
+ * are no more owners of the value represented by this key, then the value is
+ * freed.  Otherwise, the reference to the value will remain in memory.
+ *
+ * @param obj the json_object instance
+ * @param key the object field name,
+ *            which is not terminated by a NULL ( @c '\0' ) character
+ * @param len the length of @p key
+ */
+void json_object_object_del_len(struct json_object *jso, const char *key, const int len);
+
 /**
  * Iterate through all keys and values of an object.
  *
@@ -560,17 +573,18 @@ JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key
  * @param val the local name for the json_object* object variable defined in
  *            the body
  */
-#if defined(__GNUC__) && !defined(__STRICT_ANSI__) && (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
+#if defined(__GNUC__) && !defined(__STRICT_ANSI__) && \
+    (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
 
 #define json_object_object_foreach(obj, key, val)                                \
-	char *key = NULL;                                                        \
+	struct lh_string *key = NULL;                                            \
 	struct json_object *val __attribute__((__unused__)) = NULL;              \
 	for (struct lh_entry *entry##key = json_object_get_object(obj)->head,    \
 	                     *entry_next##key = NULL;                            \
 	     ({                                                                  \
 		     if (entry##key)                                             \
 		     {                                                           \
-			     key = (char *)lh_entry_k(entry##key);               \
+			     key = (struct lh_string *)lh_entry_k(entry##key);   \
 			     val = (struct json_object *)lh_entry_v(entry##key); \
 			     entry_next##key = entry##key->next;                 \
 		     };                                                          \
@@ -600,7 +614,7 @@ JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key
  */
 #define json_object_object_foreachC(obj, iter)                                                  \
 	for (iter.entry = json_object_get_object(obj)->head;                                    \
-	     (iter.entry ? (iter.key = (char *)lh_entry_k(iter.entry),                          \
+	     (iter.entry ? (iter.key = (struct lh_string *)lh_entry_k(iter.entry),              \
 	                   iter.val = (struct json_object *)lh_entry_v(iter.entry), iter.entry) \
 	                 : 0);                                                                  \
 	     iter.entry = iter.entry->next)
@@ -746,7 +760,7 @@ JSON_EXPORT struct json_object *json_object_new_boolean(json_bool b);
  * The type is coerced to a json_bool if the passed object is not a json_bool.
  * integer and double objects will return 0 if there value is zero
  * or 1 otherwise. If the passed object is a string it will return
- * 1 if it has a non zero length. 
+ * 1 if it has a non zero length.
  * If any other object type is passed 0 will be returned, even non-empty
  *  json_type_array and json_type_object objects.
  *
@@ -1114,8 +1128,8 @@ JSON_EXPORT int json_object_equal(struct json_object *obj1, struct json_object *
  *
  * @return On success 1 or 2, -1 on errors
  */
-typedef int(json_c_shallow_copy_fn)(json_object *src, json_object *parent, const char *key,
-                                    size_t index, json_object **dst);
+typedef int(json_c_shallow_copy_fn)(json_object *src, json_object *parent,
+                                    const struct lh_string *key, size_t index, json_object **dst);
 
 /**
  * The default shallow copy implementation for use with json_object_deep_copy().
