@@ -1,0 +1,1 @@
+new_obj.to_string()={ "foo\u0000bar": "qwerty\u0000asdf" }

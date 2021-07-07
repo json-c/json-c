@@ -1,0 +1,5 @@
+Parsed input: { "biff\u0000": null, "\u0000zxcvbnm": 178 }
+Result is `json_type_object`
+Expected keys ("biff\0" and "\0zxcvbnm") present with expected values
+Key deleted properly
+PASS

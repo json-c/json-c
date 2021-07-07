@@ -19,7 +19,7 @@ int main(void)
 	const int expected_key_len = 7;
 	const char *expected_key_printable = "foo\\0bar";
 	const char *expected_value = "qwerty\0asdf";
-	const int expected_value_len = 12;
+	const int expected_value_len = 11;
 	const char *expected_value_printable = "qwerty\\0asdf";
 
 	struct json_object *parsed = json_tokener_parse(input);
