@@ -61,7 +61,7 @@ sudo apt install valgrind # optional
 $ git clone https://github.com/json-c/json-c.git
 $ mkdir json-c-build
 $ cd json-c-build
-$ cmake ../json-c   # See CMake section below for custom arguments
+$ cmake ../   # See CMake section below for custom arguments
 ```
 
 Note: it's also possible to put your build directory inside the json-c
