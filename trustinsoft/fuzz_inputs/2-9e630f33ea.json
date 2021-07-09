@@ -1,0 +1,4 @@
+{ "fhles": ["input.c"],
+  "machdep": "gcc_x86_64",
+  "mgin": "main"
+}

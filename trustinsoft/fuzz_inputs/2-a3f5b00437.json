@@ -1,0 +1,10 @@
+{ "fhles": ["inp"],
+  "machdes": ["i.c"],
+  "mes": ["input.c"],
+  "machdes": ["input.c"],
+  "s": ["inp"],
+  "machdes": ["i.c"],
+  "mes": ["input.c"],
+  "machdes": ["input.c"],
+  "achdep64,
+  "bp"

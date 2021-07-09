@@ -1,0 +1,4 @@
+{ "fkles": ["input.c"],
+  "mackdep": "gcc_x86_64",
+  "main": "main"
+}

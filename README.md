@@ -22,6 +22,7 @@ Build Status
 
 Test Status
 * [Coveralls](https://coveralls.io/github/json-c/json-c?branch=master) [![Coverage Status](https://coveralls.io/repos/github/json-c/json-c/badge.svg?branch=master)](https://coveralls.io/github/json-c/json-c?branch=master)
+* [TrustInSoft CI](https://ci.trust-in-soft.com/projects/json-c/json-c/latest) [![TrustInSoft CI](https://ci.trust-in-soft.com/projects/json-c/json-c.svg)](https://ci.trust-in-soft.com/projects/json-c/json-c)
 
 JSON-C implements a reference counting object model that allows you to easily
 construct JSON objects in C, output them as JSON formatted strings and parse

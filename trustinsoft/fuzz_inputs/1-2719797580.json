@@ -1,0 +1,2 @@
+{ "files": ["inpbt.c"],
+  "machdep": { "gcc_x86_64",

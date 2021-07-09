@@ -1,0 +1,4 @@
+{ "files": ["input.c"],
+  "mach@ep": "gcc_x86_64",
+  "mainmac": "main"
+}

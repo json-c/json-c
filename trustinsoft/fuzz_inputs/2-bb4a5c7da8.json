@@ -1,0 +1,4 @@
+{ "file^": ["inp”t.c"],
+  "machdep": "gcc_x86_64",
+  "mamacin": "main"
+}

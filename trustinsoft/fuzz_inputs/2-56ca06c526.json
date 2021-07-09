@@ -1,0 +1,4 @@
+{ "fileX": ["input.c"],
+  "machdep": "gc",
+  "maep": "gcc_x86_64",
+  "main": "in": "

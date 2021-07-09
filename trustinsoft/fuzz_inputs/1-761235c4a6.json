@@ -1,0 +1,4 @@
+{ "files": ["input.c"],
+  "mac5555hdep": "gcc_x86_64",
+  "mmacain": "main"
+}
