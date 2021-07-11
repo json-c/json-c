@@ -39,18 +39,6 @@
 #error "The long long type isn't 64-bits"
 #endif
 
-#ifndef SSIZE_T_MAX
-#if SIZEOF_SSIZE_T == SIZEOF_INT
-#define SSIZE_T_MAX INT_MAX
-#elif SIZEOF_SSIZE_T == SIZEOF_LONG
-#define SSIZE_T_MAX LONG_MAX
-#elif SIZEOF_SSIZE_T == SIZEOF_LONG_LONG
-#define SSIZE_T_MAX LLONG_MAX
-#else
-#error Unable to determine size of ssize_t
-#endif
-#endif
-
 // Don't define this.  It's not thread-safe.
 /* #define REFCOUNT_DEBUG 1 */
 
@@ -518,7 +506,7 @@ static int json_object_object_to_json_string(struct json_object *jso, struct pri
 			printbuf_strappend(pb, " ");
 		indent(pb, level + 1, flags);
 		printbuf_strappend(pb, "\"");
-		json_escape_str(pb, iter.key, strlen(iter.key), flags);
+		json_escape_str(pb, json_key_data(iter.key), json_key_size(iter.key), flags);
 		if (flags & JSON_C_TO_STRING_SPACED)
 			printbuf_strappend(pb, "\": ");
 		else
@@ -583,43 +571,85 @@ struct lh_table *json_object_get_object(const struct json_object *jso)
 int json_object_object_add_ex(struct json_object *jso, const char *const key,
                               struct json_object *const val, const unsigned opts)
 {
-	struct json_object *existing_value = NULL;
+	return json_object_object_add_ex_len(jso, key, strlen(key), val, opts);
+}
+
+int json_object_object_add_ex_len(struct json_object *jso, const char *const key, const size_t len,
+                                  struct json_object *const val, const unsigned opts)
+{
+	// Created on the stack rather than calling `json_key_new_ptr`
+	// or `json_key_new_imm` since this saves copying `key` if it turns
+	// out the value already exists in the hash table
+	struct json_key hashable = {len, {key}};
+	return json_object_object_add_key(jso, &hashable, val, opts);
+}
+
+int json_object_object_add_key(struct json_object *jso, const struct json_key *key,
+                               struct json_object *const val, const unsigned opts)
+{
+	struct json_object *existing_value;
 	struct lh_entry *existing_entry;
 	unsigned long hash;
+	/** Required due to the `lh_get_hash` function wanting a `const struct json_key *` */
 
 	assert(json_object_get_type(jso) == json_type_object);
 
+	// The caller must avoid creating loops in the object tree, but do a
+	// quick check anyway to make sure we're not creating a trivial loop.
+	if (jso == val)
+	{
+		return -1;
+	}
+
 	// We lookup the entry and replace the value, rather than just deleting
 	// and re-adding it, so the existing key remains valid.
-	hash = lh_get_hash(JC_OBJECT(jso)->c_object, (const void *)key);
+	hash = lh_get_hash(JC_OBJECT(jso)->c_object, key);
 	existing_entry =
 	    (opts & JSON_C_OBJECT_ADD_KEY_IS_NEW)
 	        ? NULL
 	        : lh_table_lookup_entry_w_hash(JC_OBJECT(jso)->c_object, (const void *)key, hash);
 
-	// The caller must avoid creating loops in the object tree, but do a
-	// quick check anyway to make sure we're not creating a trivial loop.
-	if (jso == val)
-		return -1;
-
-	if (!existing_entry)
+	if (existing_entry == NULL)
 	{
-		const void *const k =
-		    (opts & JSON_C_OBJECT_KEY_IS_CONSTANT) ? (const void *)key : strdup(key);
+		// need to copy `key` because the caller might have created it
+		// on the stack, which would be more efficient than copying
+		// `json_key_data` into `key->string.idata` if it had happened
+		// that `existing_entry` wasn't NULL.
+		const struct json_key *k =
+		    (opts & JSON_C_OBJECT_KEY_IS_CONSTANT)
+		        ? json_key_new_ptr(json_key_size(key), json_key_data(key))
+		        : json_key_new_imm(json_key_size(key), json_key_data(key));
+		// TODO some optimization where (opts & JSON_C_OBJECT_ADD_KEY_IS_NEW)
 		if (k == NULL)
+		{
 			return -1;
-		return lh_table_insert_w_hash(JC_OBJECT(jso)->c_object, k, val, hash, opts);
+		}
+		return lh_table_insert_w_hash(JC_OBJECT(jso)->c_object, k, val, hash,
+		                              opts & ~JSON_C_OBJECT_KEY_IS_CONSTANT);
+		// `struct json_key` always needs to be freed,
+		// so JSON_C_OBJECT_KEY_IS_CONSTANT cannot be set
 	}
-	existing_value = (json_object *)lh_entry_v(existing_entry);
-	if (existing_value)
-		json_object_put(existing_value);
-	existing_entry->v = val;
-	return 0;
+	else
+	{
+		existing_value = (json_object *)lh_entry_v(existing_entry);
+		if (existing_value)
+		{
+			json_object_put(existing_value);
+		}
+		existing_entry->v = val;
+		return 0;
+	}
 }
 
 int json_object_object_add(struct json_object *jso, const char *key, struct json_object *val)
 {
-	return json_object_object_add_ex(jso, key, val, 0);
+	return json_object_object_add_ex_len(jso, key, strlen(key), val, 0);
+}
+
+int json_object_object_add_len(struct json_object *jso, const char *key, const size_t len,
+                               struct json_object *val)
+{
+	return json_object_object_add_ex_len(jso, key, len, val, 0);
 }
 
 int json_object_object_length(const struct json_object *jso)
@@ -636,12 +666,26 @@ size_t json_c_object_sizeof(void)
 struct json_object *json_object_object_get(const struct json_object *jso, const char *key)
 {
 	struct json_object *result = NULL;
-	json_object_object_get_ex(jso, key, &result);
+	json_object_object_get_ex_len(jso, key, strlen(key), &result);
+	return result;
+}
+
+struct json_object *json_object_object_get_len(const struct json_object *jso, const char *key,
+                                               const size_t len)
+{
+	struct json_object *result = NULL;
+	json_object_object_get_ex_len(jso, key, len, &result);
 	return result;
 }
 
 json_bool json_object_object_get_ex(const struct json_object *jso, const char *key,
                                     struct json_object **value)
+{
+	return json_object_object_get_ex_len(jso, key, strlen(key), value);
+}
+
+json_bool json_object_object_get_ex_len(const struct json_object *jso, const char *key,
+                                        const size_t len, struct json_object **value)
 {
 	if (value != NULL)
 		*value = NULL;
@@ -652,8 +696,10 @@ json_bool json_object_object_get_ex(const struct json_object *jso, const char *k
 	switch (jso->o_type)
 	{
 	case json_type_object:
-		return lh_table_lookup_ex(JC_OBJECT_C(jso)->c_object, (const void *)key,
-		                          (void **)value);
+	{
+		const struct json_key hashable = {len, {key}};
+		return json_object_object_get_key(jso, &hashable, value);
+	}
 	default:
 		if (value != NULL)
 			*value = NULL;
@@ -661,10 +707,28 @@ json_bool json_object_object_get_ex(const struct json_object *jso, const char *k
 	}
 }
 
-void json_object_object_del(struct json_object *jso, const char *key)
+json_bool json_object_object_get_key(const struct json_object *jso, const struct json_key *key,
+                                     struct json_object **value)
 {
 	assert(json_object_get_type(jso) == json_type_object);
-	lh_table_delete(JC_OBJECT(jso)->c_object, key);
+	return lh_table_lookup_ex(JC_OBJECT_C(jso)->c_object, key, (void **)value);
+}
+
+void json_object_object_del(struct json_object *jso, const char *key)
+{
+	json_object_object_del_len(jso, key, strlen(key));
+}
+
+void json_object_object_del_len(struct json_object *jso, const char *key, const size_t len)
+{
+	const struct json_key hashable = {len, {key}};
+	json_object_object_del_key(jso, &hashable);
+}
+
+int json_object_object_del_key(struct json_object *jso, const struct json_key *key)
+{
+	assert(json_object_get_type(jso) == json_type_object);
+	return lh_table_delete(JC_OBJECT(jso)->c_object, key);
 }
 
 /* json_object_boolean */
@@ -735,7 +799,7 @@ struct json_object *json_object_new_int(int32_t i)
 
 int32_t json_object_get_int(const struct json_object *jso)
 {
-	int64_t cint64=0;
+	int64_t cint64 = 0;
 	double cdouble;
 	enum json_type o_type;
 
@@ -1651,7 +1715,7 @@ static int json_object_copy_serializer_data(struct json_object *src, struct json
  *
  * This always returns -1 or 1.  It will never return 2 since it does not copy the serializer.
  */
-int json_c_shallow_copy_default(json_object *src, json_object *parent, const char *key,
+int json_c_shallow_copy_default(json_object *src, json_object *parent, const struct json_key *key,
                                 size_t index, json_object **dst)
 {
 	switch (src->o_type)
@@ -1699,8 +1763,8 @@ int json_c_shallow_copy_default(json_object *src, json_object *parent, const cha
  * Note: caller is responsible for freeing *dst if this fails and returns -1.
  */
 static int json_object_deep_copy_recursive(struct json_object *src, struct json_object *parent,
-                                           const char *key_in_parent, size_t index_in_parent,
-                                           struct json_object **dst,
+                                           const struct json_key *key_in_parent,
+                                           size_t index_in_parent, struct json_object **dst,
                                            json_c_shallow_copy_fn *shallow_copy)
 {
 	struct json_object_iter iter;
@@ -1725,14 +1789,14 @@ static int json_object_deep_copy_recursive(struct json_object *src, struct json_
 			/* This handles the `json_type_null` case */
 			if (!iter.val)
 				jso = NULL;
-			else if (json_object_deep_copy_recursive(iter.val, src, iter.key, UINT_MAX, &jso,
-			                                         shallow_copy) < 0)
+			else if (json_object_deep_copy_recursive(iter.val, src, iter.key, UINT_MAX,
+			                                         &jso, shallow_copy) < 0)
 			{
 				json_object_put(jso);
 				return -1;
 			}
 
-			if (json_object_object_add(*dst, iter.key, jso) < 0)
+			if (json_object_object_add_key(*dst, iter.key, jso, 0) < 0)
 			{
 				json_object_put(jso);
 				return -1;
@@ -1805,4 +1869,46 @@ static void json_abort(const char *message)
 	if (message != NULL)
 		fprintf(stderr, "json-c aborts with error: %s\n", message);
 	abort();
+}
+
+size_t json_key_size(const struct json_key *str)
+{
+	return (str->length > 0) ? (size_t)str->length : (size_t)(-(str->length));
+}
+
+const char *json_key_data(const struct json_key *str)
+{
+	return (str->length > 0) ? str->str.pdata : str->str.idata;
+}
+
+struct json_key *json_key_new_ptr(const size_t length, const char *data)
+{
+	struct json_key *result = malloc(sizeof(struct json_key));
+	if (result == NULL)
+	{
+		return NULL;
+	}
+	result->length = (ssize_t)length;
+	result->str.pdata = data;
+	return result;
+}
+
+struct json_key *json_key_new_imm(const size_t length, const char *data)
+{
+	struct json_key *result;
+	if (length >
+	    SSIZE_T_MAX - (sizeof(struct json_key) - sizeof(((struct json_key *)NULL)->str)) - 1)
+	{
+		return NULL;
+	}
+	result =
+	    malloc(sizeof(struct json_key) - sizeof(((struct json_key *)NULL)->str) + length + 1);
+	if (result == NULL)
+	{
+		return NULL;
+	}
+	result->length = -((ssize_t)length);
+	memcpy(result->str.idata, data, length);
+	result->str.idata[length] = '\0';
+	return result;
 }

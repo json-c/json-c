@@ -30,6 +30,7 @@
 #endif
 
 #include "linkhash.h"
+#include "math_compat.h"
 #include "random_seed.h"
 
 /* hash functions */
@@ -485,13 +486,14 @@ static unsigned long lh_char_hash(const void *k)
 		random_seed = seed; /* potentially racy */
 #endif
 	}
-
-	return hashlittle((const char *)k, strlen((const char *)k), random_seed);
+	return hashlittle(json_key_data((const struct json_key *)k),
+	                  json_key_size((const struct json_key *)k), random_seed);
 }
 
 int lh_char_equal(const void *k1, const void *k2)
 {
-	return (strcmp((const char *)k1, (const char *)k2) == 0);
+	return json_key_size(k1) == json_key_size(k2) &&
+	       memcmp(json_key_data(k1), json_key_data(k2), json_key_size(k1)) == 0;
 }
 
 struct lh_table *lh_table_new(int size, lh_entry_free_fn *free_fn, lh_hash_fn *hash_fn,

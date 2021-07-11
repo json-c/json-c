@@ -26,6 +26,10 @@ set(ALL_TEST_NAMES
     test_int_add
     test_locale
     test_null
+    test_null_keys_add
+    test_null_keys_get
+    test_null_keys_del
+    test_null_keys_print
     test_parse
     test_parse_int64
     test_printbuf

@@ -137,7 +137,14 @@ struct lh_table
 	 * A pointer onto the function responsible for freeing an entry.
 	 */
 	lh_entry_free_fn *free_fn;
+	/**
+	 * A function that is capable of hashing entries in this table
+	 */
 	lh_hash_fn *hash_fn;
+	/**
+	 * A function that is capable of determining if entries in this table
+	 * are equal
+	 */
 	lh_equal_fn *equal_fn;
 };
 typedef struct lh_table lh_table;
@@ -311,7 +318,7 @@ int lh_table_resize(struct lh_table *t, int new_size);
 /**
  * @deprecated Don't use this outside of linkhash.h:
  */
-#if (defined(AIX_CC) || (defined(_MSC_VER) && (_MSC_VER <= 1800)) )
+#if (defined(AIX_CC) || (defined(_MSC_VER) && (_MSC_VER <= 1800)))
 /* VS2010 can't handle inline funcs, so skip it there */
 #define _LH_INLINE
 #else
