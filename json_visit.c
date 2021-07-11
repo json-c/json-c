@@ -13,7 +13,7 @@
 #include "json_visit.h"
 #include "linkhash.h"
 
-static int _json_c_visit(json_object *jso, json_object *parent_jso, const struct lh_string *jso_key,
+static int _json_c_visit(json_object *jso, json_object *parent_jso, const struct json_key *jso_key,
                          size_t *jso_index, json_c_visit_userfunc *userfunc, void *userarg);
 
 int json_c_visit(json_object *jso, int future_flags, json_c_visit_userfunc *userfunc, void *userarg)
@@ -28,7 +28,7 @@ int json_c_visit(json_object *jso, int future_flags, json_c_visit_userfunc *user
 	default: return JSON_C_VISIT_RETURN_ERROR;
 	}
 }
-static int _json_c_visit(json_object *jso, json_object *parent_jso, const struct lh_string *jso_key,
+static int _json_c_visit(json_object *jso, json_object *parent_jso, const struct json_key *jso_key,
                          size_t *jso_index, json_c_visit_userfunc *userfunc, void *userarg)
 {
 	int userret = userfunc(jso, 0, parent_jso, jso_key, jso_index, userarg);

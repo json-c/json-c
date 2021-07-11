@@ -31,7 +31,7 @@ int main(int atgc, char **argv)
 
 	while (!json_object_iter_equal(&it, &itEnd))
 	{
-		printf("%s\n", lh_string_data(json_object_iter_peek_name(&it)));
+		printf("%s\n", json_key_data(json_object_iter_peek_name(&it)));
 		printf("%s\n", json_object_to_json_string(json_object_iter_peek_value(&it)));
 		json_object_iter_next(&it);
 	}

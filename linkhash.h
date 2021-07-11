@@ -20,7 +20,6 @@
 #define _json_c_linkhash_h_
 
 #include "json_object.h"
-#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,34 +78,6 @@ typedef unsigned long(lh_hash_fn)(const void *k);
  * callback function prototypes
  */
 typedef int(lh_equal_fn)(const void *k1, const void *k2);
-
-/**
- * @brief A buffer of characters that may contain null charaters in the middle
- *
- * A buffer of data that can hold a normal null-terminated string
- * (in which case `length` should just be equal to `strlen`)
- * or a string with embedded null characters (in which case `length` reflects
- * all the characters that make up the "string").
- * Either way, this struct can be treated as if it contains null characters,
- * since the `length` member should always be equal to the proper size of the
- * buffer and the terminating null character wouldn't be included
- * (it wouldn't be counted by strlen).
- */
-struct lh_string
-{
-	/**
-	 * @brief Stores the length of the buffer
-	 *
-	 * If the length is positive, then `pdata` should be used.
-	 * Otherwise, idata should be used.
-	 */
-	ssize_t length;
-	union
-	{
-		const char *pdata;
-		const char idata[0];
-	} str;
-};
 
 /**
  * An entry in the hash table
@@ -192,49 +163,6 @@ typedef struct lh_table lh_table;
  */
 #define lh_foreach_safe(table, entry, tmp) \
 	for (entry = table->head; entry && ((tmp = entry->next) || 1); entry = tmp)
-
-/**
- * @brief Get the data from a `struct lh_string *`
- *
- * @param str value to retrieve the data from
- */
-extern const char *lh_string_data(const struct lh_string *str);
-
-/**
- * @brief Get the length of the data stored in a `struct lh_string *`
- *
- * @param str value to retrieve the length of
- */
-extern size_t lh_string_size(const struct lh_string *str);
-
-/**
- * @brief Print a `struct lh_string` to a given stream
- *
- * @param str value to print
- * @param stream Stream to write data to
- */
-extern size_t lh_string_print(const struct lh_string *str, FILE *stream);
-
-/**
- * @brief Creates a new `struct lh_string` using the `pdata` field.
- *
- * This avoids unneeded copying, for cases wher ethe key is in an area of
- * memory that will not be modified or freed until after this object is freed.
- *
- * @param length The length of the data located at @p data
- * @param data The data to include
- * @return `NULL` on error
- */
-extern struct lh_string *lh_string_new_ptr(const size_t length, const char *data);
-
-/**
- * @brief Creates a new `struct lh_string` using the `idata` field.
- *
- * @param length The length of the data to copy into the returned value
- * @param data The data to include and copy into the returned value
- * @return `NULL` on error
- */
-extern struct lh_string *lh_string_new_imm(const size_t length, const char *data);
 
 /**
  * Create a new linkhash table.

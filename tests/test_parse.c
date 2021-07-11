@@ -215,7 +215,7 @@ static void do_clear_serializer(json_object *jso)
 }
 
 static int clear_serializer(json_object *jso, int flags, json_object *parent_jso,
-                            const struct lh_string *jso_key, size_t *jso_index, void *userarg)
+                            const struct json_key *jso_key, size_t *jso_index, void *userarg)
 {
 	if (jso)
 		json_object_set_serializer(jso, NULL, NULL, NULL);

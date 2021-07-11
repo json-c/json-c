@@ -114,8 +114,8 @@ int main(void)
 		json_object_object_foreach(parsed, key, val)
 		{
 			putchar('\"');
-			fwrite(lh_string_data(key), lh_string_size(key), 1, stdout);
-			printf("\" (%zd)\n", lh_string_size(key));
+			fwrite(json_key_data(key), json_key_size(key), 1, stdout);
+			printf("\" (%zd)\n", json_key_size(key));
 		}
 		return 1;
 	}

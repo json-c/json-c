@@ -69,16 +69,16 @@ int main(void)
 }
 
 static int emit_object(json_object *jso, int flags, json_object *parent_jso,
-                       const struct lh_string *jso_key, size_t *jso_index, void *userarg)
+                       const struct json_key *jso_key, size_t *jso_index, void *userarg)
 {
 	printf("flags: 0x%x, key: %s, index: %ld, value: %s\n", flags,
-	       (jso_key ? lh_string_data(jso_key) : "(null)"), (jso_index ? (long)*jso_index : -1L),
+	       (jso_key ? json_key_data(jso_key) : "(null)"), (jso_index ? (long)*jso_index : -1L),
 	       json_object_to_json_string(jso));
 	return JSON_C_VISIT_RETURN_CONTINUE;
 }
 
 static int skip_arrays(json_object *jso, int flags, json_object *parent_jso,
-                       const struct lh_string *jso_key, size_t *jso_index, void *userarg)
+                       const struct json_key *jso_key, size_t *jso_index, void *userarg)
 {
 	(void)emit_object(jso, flags, parent_jso, jso_key, jso_index, userarg);
 	if (json_object_get_type(jso) == json_type_array)
@@ -87,15 +87,15 @@ static int skip_arrays(json_object *jso, int flags, json_object *parent_jso,
 }
 
 static int pop_and_stop(json_object *jso, int flags, json_object *parent_jso,
-                        const struct lh_string *jso_key, size_t *jso_index, void *userarg)
+                        const struct json_key *jso_key, size_t *jso_index, void *userarg)
 {
 	(void)emit_object(jso, flags, parent_jso, jso_key, jso_index, userarg);
-	if (jso_key != NULL && strcmp(lh_string_data(jso_key), "subobj1") == 0)
+	if (jso_key != NULL && strcmp(json_key_data(jso_key), "subobj1") == 0)
 	{
 		printf("POP after handling subobj1\n");
 		return JSON_C_VISIT_RETURN_POP;
 	}
-	if (jso_key != NULL && strcmp(lh_string_data(jso_key), "obj3") == 0)
+	if (jso_key != NULL && strcmp(json_key_data(jso_key), "obj3") == 0)
 	{
 		printf("STOP after handling obj3\n");
 		return JSON_C_VISIT_RETURN_STOP;
@@ -104,10 +104,10 @@ static int pop_and_stop(json_object *jso, int flags, json_object *parent_jso,
 }
 
 static int err_on_subobj2(json_object *jso, int flags, json_object *parent_jso,
-                          const struct lh_string *jso_key, size_t *jso_index, void *userarg)
+                          const struct json_key *jso_key, size_t *jso_index, void *userarg)
 {
 	(void)emit_object(jso, flags, parent_jso, jso_key, jso_index, userarg);
-	if (jso_key != NULL && strcmp(lh_string_data(jso_key), "subobj2") == 0)
+	if (jso_key != NULL && strcmp(json_key_data(jso_key), "subobj2") == 0)
 	{
 		printf("ERROR after handling subobj1\n");
 		return JSON_C_VISIT_RETURN_ERROR;
@@ -116,7 +116,7 @@ static int err_on_subobj2(json_object *jso, int flags, json_object *parent_jso,
 }
 
 static int pop_array(json_object *jso, int flags, json_object *parent_jso,
-                     const struct lh_string *jso_key, size_t *jso_index, void *userarg)
+                     const struct json_key *jso_key, size_t *jso_index, void *userarg)
 {
 	(void)emit_object(jso, flags, parent_jso, jso_key, jso_index, userarg);
 	if (jso_index != NULL && (*jso_index == 0))
@@ -128,7 +128,7 @@ static int pop_array(json_object *jso, int flags, json_object *parent_jso,
 }
 
 static int stop_array(json_object *jso, int flags, json_object *parent_jso,
-                      const struct lh_string *jso_key, size_t *jso_index, void *userarg)
+                      const struct json_key *jso_key, size_t *jso_index, void *userarg)
 {
 	(void)emit_object(jso, flags, parent_jso, jso_key, jso_index, userarg);
 	if (jso_index != NULL && (*jso_index == 0))
@@ -140,10 +140,10 @@ static int stop_array(json_object *jso, int flags, json_object *parent_jso,
 }
 
 static int err_return(json_object *jso, int flags, json_object *parent_jso,
-                      const struct lh_string *jso_key, size_t *jso_index, void *userarg)
+                      const struct json_key *jso_key, size_t *jso_index, void *userarg)
 {
 	printf("flags: 0x%x, key: %s, index: %ld, value: %s\n", flags,
-	       (jso_key ? lh_string_data(jso_key) : "(null)"), (jso_index ? (long)*jso_index : -1L),
+	       (jso_key ? json_key_data(jso_key) : "(null)"), (jso_index ? (long)*jso_index : -1L),
 	       json_object_to_json_string(jso));
 	return 100;
 }

@@ -13,7 +13,7 @@ extern "C" {
 #endif
 
 typedef int(json_c_visit_userfunc)(json_object *jso, int flags, json_object *parent_jso,
-                                   const struct lh_string *jso_key, size_t *jso_index,
+                                   const struct json_key *jso_key, size_t *jso_index,
                                    void *userarg);
 
 /**

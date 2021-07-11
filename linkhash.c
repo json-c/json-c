@@ -486,62 +486,14 @@ static unsigned long lh_char_hash(const void *k)
 		random_seed = seed; /* potentially racy */
 #endif
 	}
-	return hashlittle(lh_string_data((const struct lh_string *)k),
-	                  lh_string_size((const struct lh_string *)k), random_seed);
+	return hashlittle(json_key_data((const struct json_key *)k),
+	                  json_key_size((const struct json_key *)k), random_seed);
 }
 
 int lh_char_equal(const void *k1, const void *k2)
 {
-	return lh_string_size(k1) == lh_string_size(k2) &&
-	       memcmp(lh_string_data(k1), lh_string_data(k2), lh_string_size(k1)) == 0;
-}
-
-const char *lh_string_data(const struct lh_string *str)
-{
-	return (str->length > 0) ? str->str.pdata : str->str.idata;
-}
-
-size_t lh_string_size(const struct lh_string *str)
-{
-	return (str->length > 0) ? (size_t)str->length : (size_t)(-(str->length));
-}
-
-size_t lh_string_print(const struct lh_string *key, FILE *stream)
-{
-	return fwrite(lh_string_data(key), lh_string_size(key), 1, stream);
-}
-
-struct lh_string *lh_string_new_ptr(const size_t length, const char *data)
-{
-	struct lh_string *result = malloc(sizeof(struct lh_string));
-	if (result == NULL)
-	{
-		return NULL;
-	}
-	result->length = length;
-	result->str.pdata = data;
-	return result;
-}
-
-struct lh_string *lh_string_new_imm(const size_t length, const char *data)
-{
-	struct lh_string *result;
-	if (length >
-	    SSIZE_T_MAX - (sizeof(struct lh_string) - sizeof(((struct lh_string *)NULL)->str)) - 1)
-	{
-		return NULL;
-	}
-	result =
-	    malloc(sizeof(struct lh_string) - sizeof(((struct lh_string *)NULL)->str) + length + 1);
-	if (result == NULL)
-	{
-		return NULL;
-	}
-	result->length = -length;
-	char *unconst = _LH_UNCONST(result->str.idata);
-	memcpy(unconst, data, length);
-	unconst[length] = '\0';
-	return result;
+	return json_key_size(k1) == json_key_size(k2) &&
+	       memcmp(json_key_data(k1), json_key_data(k2), json_key_size(k1)) == 0;
 }
 
 struct lh_table *lh_table_new(int size, lh_entry_free_fn *free_fn, lh_hash_fn *hash_fn,

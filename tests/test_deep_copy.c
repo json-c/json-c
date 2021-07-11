@@ -93,14 +93,14 @@ int my_custom_serializer(struct json_object *jso, struct printbuf *pb, int level
 }
 
 json_c_shallow_copy_fn my_shallow_copy;
-int my_shallow_copy(json_object *src, json_object *parent, const struct lh_string *key,
-                    size_t index, json_object **dst)
+int my_shallow_copy(json_object *src, json_object *parent, const struct json_key *key, size_t index,
+                    json_object **dst)
 {
 	int rc;
 	rc = json_c_shallow_copy_default(src, parent, key, index, dst);
 	if (rc < 0)
 		return rc;
-	if (key != NULL && strcmp(lh_string_data(key), "with_serializer") == 0)
+	if (key != NULL && strcmp(json_key_data(key), "with_serializer") == 0)
 	{
 		printf("CALLED: my_shallow_copy on with_serializer object\n");
 		void *userdata = json_object_get_userdata(src);

@@ -17,7 +17,6 @@
 #define _json_tokener_h_
 
 #include "json_object.h"
-#include "linkhash.h"
 #include <stddef.h>
 
 #ifdef __cplusplus
@@ -86,7 +85,7 @@ struct json_tokener_srec
 	enum json_tokener_state state, saved_state;
 	struct json_object *obj;
 	struct json_object *current;
-	struct lh_string *obj_field_name;
+	struct json_key *obj_field_name;
 };
 
 #define JSON_TOKENER_DEFAULT_DEPTH 32

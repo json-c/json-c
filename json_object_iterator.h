@@ -168,7 +168,7 @@ JSON_EXPORT void json_object_iter_next(struct json_object_iterator *iter);
  *         deleted or modified, and MUST NOT be modified or
  *         freed by the user.
  */
-JSON_EXPORT const struct lh_string *
+JSON_EXPORT const struct json_key *
 json_object_iter_peek_name(const struct json_object_iterator *iter);
 
 /** Returns a pointer to the json-c instance representing the

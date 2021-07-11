@@ -99,25 +99,51 @@ struct json_object_string
 void _json_c_set_last_err(const char *err_fmt, ...);
 
 /**
- * @brief Add an object field to a json_object of type json_type_object
- *
- * The semantics are identical to json_object_object_add_ex, except that @p key
- * contains both the data and the length.
- *
- * @param obj the json_object instance
- * @param key the object field name (a private copy will be duplicated)
- * @param val a json_object or NULL member to associate with the given field
- * @param opts process-modifying options. To specify multiple options, use
- *             (OPT1|OPT2)
- * @return On success, @c 0 is returned.
- *         On error, a negative value is returned.
- */
-int json_object_object_add_internal(struct json_object *obj, const struct lh_string *key,
-                                    struct json_object *const val, const unsigned opts);
-/**
  * The characters that can make up hexadecimal numbers
  */
 extern const char *json_hex_chars;
+
+/**
+ * @brief A buffer of characters that may contain null charaters in the middle
+ *
+ * A buffer of data that can hold a normal null-terminated string
+ * (in which case `length` should just be equal to `strlen`)
+ * or a string with embedded null characters (in which case `length` reflects
+ * all the characters that make up the "string").
+ * Either way, this struct can be treated as if it contains null characters,
+ * since the `length` member should always be equal to the proper size of the
+ * buffer and the terminating null character wouldn't be included
+ * (it wouldn't be counted by strlen).
+ */
+struct json_key
+{
+	/**
+	 * @brief Stores the length of the buffer
+	 *
+	 * If the length is positive, then `pdata` should be used.
+	 * Otherwise, idata should be used.
+	 */
+	ssize_t length;
+	union
+	{
+		/**
+		 * @brief A pointer to data that is stored elsewhere
+		 *
+		 * If the data stored there will not change for the lifetime of
+		 * the key, use `pdata` rather than `idata`.
+		 */
+		const char *pdata;
+		/**
+		 * @brief Data stored inline
+		 *
+		 * If the data stored may be overwritten, such as if it is
+		 * copied from the stack, this struct should be allocated with
+		 * enough space to store the whole string (of length `len`)
+		 * and one additional null character.
+		 */
+		const char idata[0];
+	} str;
+};
 
 #ifdef __cplusplus
 }

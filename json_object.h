@@ -456,8 +456,27 @@ JSON_EXPORT int json_object_object_add_ex_len(struct json_object *obj, const cha
                                               const int len, struct json_object *const val,
                                               const unsigned opts);
 
-/** Get the json_object associate with a given object field.
- * Deprecated/discouraged: used json_object_object_get_ex instead.
+/**
+ * @brief Add an object field to a json_object of type json_type_object
+ *
+ * The semantics are identical to `json_object_object_add_ex`, except that @p key
+ * contains both the data and the length.
+ *
+ * @param obj the json_object instance
+ * @param key the object field name (a private copy will be duplicated)
+ * @param val a json_object or NULL member to associate with the given field
+ * @param opts process-modifying options. To specify multiple options, use
+ *             (OPT1|OPT2)
+ * @return On success, @c 0 is returned.
+ *         On error, a negative value is returned.
+ */
+JSON_EXPORT int json_object_object_add_key(struct json_object *obj, const struct json_key *key,
+                                           struct json_object *const val, const unsigned opts);
+
+/**
+ * @brief Get the json_object associate with a given object field.
+ *
+ * @deprecated Deprecated/discouraged: used json_object_object_get_ex instead.
  *
  * This functions exactly like calling
  * @code json_object_object_get_len(obj, key, strlen(key)) @endcode
@@ -469,8 +488,10 @@ JSON_EXPORT int json_object_object_add_ex_len(struct json_object *obj, const cha
  */
 JSON_EXPORT struct json_object *json_object_object_get(const struct json_object *obj,
                                                        const char *key);
-/** Get the json_object associate with a given object field.
- * Deprecated/discouraged: used json_object_object_get_ex_len instead.
+/**
+ * @brief Get the json_object associate with a given object field.
+ *
+ * @deprecated Deprecated/discouraged: used json_object_object_get_ex_len instead.
  *
  * This returns NULL if the field is found but its value is null, or if
  *  the field is not found, or if obj is not a json_type_object.  If you
@@ -496,7 +517,8 @@ JSON_EXPORT struct json_object *json_object_object_get(const struct json_object 
 JSON_EXPORT struct json_object *json_object_object_get_len(const struct json_object *obj,
                                                            const char *key, const int len);
 
-/** Get the json_object associated with a given object field.
+/**
+ * @brief Get the json_object associated with a given object field.
  *
  * This functions exactly like calling
  * @code json_object_object_get_ex_len(obj, key, strlen(key), value) @endcode
@@ -513,7 +535,8 @@ JSON_EXPORT struct json_object *json_object_object_get_len(const struct json_obj
 JSON_EXPORT json_bool json_object_object_get_ex(const struct json_object *obj, const char *key,
                                                 struct json_object **value);
 
-/** Get the json_object associated with a given object field.
+/**
+ * @brief Get the json_object associated with a given object field.
  *
  * This returns true if the key is found, false in all other cases (including
  * if obj isn't a json_type_object).
@@ -536,7 +559,29 @@ JSON_EXPORT json_bool json_object_object_get_ex(const struct json_object *obj, c
 JSON_EXPORT json_bool json_object_object_get_ex_len(const struct json_object *obj, const char *key,
                                                     const int len, struct json_object **value);
 
-/** Delete the given json_object field
+/**
+ * @brief Get the json_object associated with a given object field.
+ *
+ * *No* reference counts will be changed.  There is no need to manually adjust
+ * reference counts through the json_object_put/json_object_get methods unless
+ * you need to have the child (value) reference maintain a different lifetime
+ * than the owning parent (obj).  Ownership of value is retained by obj.
+ *
+ * @param obj the json_object instance
+ * @param key the object field name
+ * @param value a pointer where to store a reference to the json_object
+ *              associated with the given field name.
+ *              \n
+ *              It is safe to pass a NULL value.
+ * @returns true if the key is found, false in all other cases (including
+ * if obj isn't a json_type_object)
+ */
+JSON_EXPORT json_bool json_object_object_get_key(const struct json_object *jso,
+                                                 const struct json_key *key,
+                                                 struct json_object **value);
+
+/**
+ * @brief Delete the given json_object field
  *
  * The reference count will be decremented for the deleted object.  If there
  * are no more owners of the value represented by this key, then the value is
@@ -547,7 +592,8 @@ JSON_EXPORT json_bool json_object_object_get_ex_len(const struct json_object *ob
  */
 JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key);
 
-/** Delete the given json_object field
+/**
+ * @brief Delete the given json_object field
  *
  * The reference count will be decremented for the deleted object.  If there
  * are no more owners of the value represented by this key, then the value is
@@ -558,10 +604,24 @@ JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key
  *            which is not terminated by a NULL ( @c '\0' ) character
  * @param len the length of @p key
  */
-void json_object_object_del_len(struct json_object *jso, const char *key, const int len);
+JSON_EXPORT void json_object_object_del_len(struct json_object *jso, const char *key,
+                                            const int len);
 
 /**
- * Iterate through all keys and values of an object.
+ * @brief Delete the given json_object field
+ *
+ * The reference count will be decremented for the deleted object.  If there
+ * are no more owners of the value represented by this key, then the value is
+ * freed.  Otherwise, the reference to the value will remain in memory.
+ *
+ * @param obj the json_object instance
+ * @param key the object field name
+ */
+JSON_EXPORT int json_object_object_del_key(struct json_object *jso_base,
+                                           const struct json_key *key);
+
+/**
+ * @brief Iterate through all keys and values of an object.
  *
  * Adding keys to the object while iterating is NOT allowed.
  *
@@ -577,14 +637,14 @@ void json_object_object_del_len(struct json_object *jso, const char *key, const 
     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
 
 #define json_object_object_foreach(obj, key, val)                                \
-	struct lh_string *key = NULL;                                            \
+	struct json_key *key = NULL;                                             \
 	struct json_object *val __attribute__((__unused__)) = NULL;              \
 	for (struct lh_entry *entry##key = json_object_get_object(obj)->head,    \
 	                     *entry_next##key = NULL;                            \
 	     ({                                                                  \
 		     if (entry##key)                                             \
 		     {                                                           \
-			     key = (struct lh_string *)lh_entry_k(entry##key);   \
+			     key = (struct json_key *)lh_entry_k(entry##key);    \
 			     val = (struct json_object *)lh_entry_v(entry##key); \
 			     entry_next##key = entry##key->next;                 \
 		     };                                                          \
@@ -608,13 +668,14 @@ void json_object_object_del_len(struct json_object *jso, const char *key, const 
 
 #endif /* defined(__GNUC__) && !defined(__STRICT_ANSI__) && (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) */
 
-/** Iterate through all keys and values of an object (ANSI C Safe)
+/**
+ * @brief Iterate through all keys and values of an object (ANSI C Safe)
  * @param obj the json_object instance
  * @param iter the object iterator, use type json_object_iter
  */
 #define json_object_object_foreachC(obj, iter)                                                  \
 	for (iter.entry = json_object_get_object(obj)->head;                                    \
-	     (iter.entry ? (iter.key = (struct lh_string *)lh_entry_k(iter.entry),              \
+	     (iter.entry ? (iter.key = (struct json_key *)lh_entry_k(iter.entry),               \
 	                   iter.val = (struct json_object *)lh_entry_v(iter.entry), iter.entry) \
 	                 : 0);                                                                  \
 	     iter.entry = iter.entry->next)
@@ -1129,7 +1190,7 @@ JSON_EXPORT int json_object_equal(struct json_object *obj1, struct json_object *
  * @return On success 1 or 2, -1 on errors
  */
 typedef int(json_c_shallow_copy_fn)(json_object *src, json_object *parent,
-                                    const struct lh_string *key, size_t index, json_object **dst);
+                                    const struct json_key *key, size_t index, json_object **dst);
 
 /**
  * The default shallow copy implementation for use with json_object_deep_copy().
@@ -1166,6 +1227,53 @@ JSON_EXPORT json_c_shallow_copy_fn json_c_shallow_copy_default;
 
 JSON_EXPORT int json_object_deep_copy(struct json_object *src, struct json_object **dst,
                                       json_c_shallow_copy_fn *shallow_copy);
+
+/* Json Object Keys */
+
+/**
+ * @brief Get the length of the data stored in a `struct json_key *`
+ *
+ * @param str value to retrieve the length of
+ */
+JSON_EXPORT size_t json_key_size(const struct json_key *str);
+
+/**
+ * @brief Get the data from a `struct json_key *`
+ *
+ * @param str value to retrieve the data from
+ */
+JSON_EXPORT const char *json_key_data(const struct json_key *str);
+
+/**
+ * @brief Creates a new `struct json_key` that uses the `pdata` field.
+ *
+ * This avoids unneeded copying, for cases wher ethe key is in an area of
+ * memory that will not be modified or freed until after this object is freed.
+ *
+ * @param length The length of the data located at @p data
+ * @param data The data to include
+ * @return On success, a pointer to the new key is returned.
+ *         On error, a null pointer is returned.
+ */
+JSON_EXPORT struct json_key *json_key_new_ptr(const size_t length, const char *data);
+
+/**
+ * @brief Creates a new `struct json_key` that uses the `idata` field.
+ *
+ * @param length The length of the data to copy into the returned value
+ * @param data The data to include and copy into the returned value
+ * @return On success, a pointer to the new key is returned.
+ *         On error, a null pointer is returned.
+ */
+JSON_EXPORT struct json_key *json_key_new_imm(const size_t length, const char *data);
+
+/**
+ * @brief Frees the memory associated with a `struct json_key`
+ *
+ * @param key The data to free
+ */
+JSON_EXPORT void json_key_del(const struct json_key *key);
+
 #ifdef __cplusplus
 }
 #endif

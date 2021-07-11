@@ -166,12 +166,14 @@ JSONC_0.15 {
 
 JSONC_0.16 {
   global:
-    lh_string_data;
-    lh_string_size;
-    lh_string_print;
+    json_key_data;
+    json_key_size;
     json_object_object_add_len;
     json_object_object_add_ex_len;
+    json_object_object_add_key;
     json_object_object_del_len;
+    json_object_object_del_key;
     json_object_object_get_len;
     json_object_object_get_ex_len;
+    json_object_object_get_key;
 } JSONC_0.15;

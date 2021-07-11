@@ -307,7 +307,7 @@ int main(int argc, char **argv)
 	json_object_object_foreach(my_object, key, val)
 	{
 		putchar('\t');
-		lh_string_print(key, stdout);
+		fwrite(json_key_data(key), json_key_size(key), 1, stdout);
 		printf(": %s\n", json_object_to_json_string(val));
 	}
 	printf("my_object.to_string()=%s\n", json_object_to_json_string(my_object));
