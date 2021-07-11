@@ -574,13 +574,13 @@ int json_object_object_add_ex(struct json_object *jso, const char *const key,
 	return json_object_object_add_ex_len(jso, key, strlen(key), val, opts);
 }
 
-int json_object_object_add_ex_len(struct json_object *jso, const char *const key, const int len,
+int json_object_object_add_ex_len(struct json_object *jso, const char *const key, const size_t len,
                                   struct json_object *const val, const unsigned opts)
 {
 	// Created on the stack rather than calling `json_key_new_ptr`
 	// or `json_key_new_imm` since this saves copying `key` if it turns
 	// out the value already exists in the hash table
-	const struct json_key hashable = {.length = len, .str = {.pdata = key}};
+	struct json_key hashable = {len, {key}};
 	return json_object_object_add_key(jso, &hashable, val, opts);
 }
 
@@ -646,7 +646,7 @@ int json_object_object_add(struct json_object *jso, const char *key, struct json
 	return json_object_object_add_ex_len(jso, key, strlen(key), val, 0);
 }
 
-int json_object_object_add_len(struct json_object *jso, const char *key, const int len,
+int json_object_object_add_len(struct json_object *jso, const char *key, const size_t len,
                                struct json_object *val)
 {
 	return json_object_object_add_ex_len(jso, key, len, val, 0);
@@ -671,7 +671,7 @@ struct json_object *json_object_object_get(const struct json_object *jso, const 
 }
 
 struct json_object *json_object_object_get_len(const struct json_object *jso, const char *key,
-                                               const int len)
+                                               const size_t len)
 {
 	struct json_object *result = NULL;
 	json_object_object_get_ex_len(jso, key, len, &result);
@@ -685,7 +685,7 @@ json_bool json_object_object_get_ex(const struct json_object *jso, const char *k
 }
 
 json_bool json_object_object_get_ex_len(const struct json_object *jso, const char *key,
-                                        const int len, struct json_object **value)
+                                        const size_t len, struct json_object **value)
 {
 	if (value != NULL)
 		*value = NULL;
@@ -697,7 +697,7 @@ json_bool json_object_object_get_ex_len(const struct json_object *jso, const cha
 	{
 	case json_type_object:
 	{
-		const struct json_key hashable = {.length = len, .str = {.pdata = key}};
+		const struct json_key hashable = {len, {key}};
 		return json_object_object_get_key(jso, &hashable, value);
 	}
 	default:
@@ -719,9 +719,9 @@ void json_object_object_del(struct json_object *jso, const char *key)
 	json_object_object_del_len(jso, key, strlen(key));
 }
 
-void json_object_object_del_len(struct json_object *jso, const char *key, const int len)
+void json_object_object_del_len(struct json_object *jso, const char *key, const size_t len)
 {
-	const struct json_key hashable = {.length = len, .str = {.pdata = key}};
+	const struct json_key hashable = {len, {key}};
 	json_object_object_del_key(jso, &hashable);
 }
 
@@ -1888,7 +1888,7 @@ struct json_key *json_key_new_ptr(const size_t length, const char *data)
 	{
 		return NULL;
 	}
-	result->length = length;
+	result->length = (ssize_t)length;
 	result->str.pdata = data;
 	return result;
 }
@@ -1907,9 +1907,8 @@ struct json_key *json_key_new_imm(const size_t length, const char *data)
 	{
 		return NULL;
 	}
-	result->length = -length;
-	char *unconst = _LH_UNCONST(result->str.idata);
-	memcpy(unconst, data, length);
-	unconst[length] = '\0';
+	result->length = -((ssize_t)length);
+	memcpy(result->str.idata, data, length);
+	result->str.idata[length] = '\0';
 	return result;
 }

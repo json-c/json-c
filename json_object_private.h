@@ -141,7 +141,7 @@ struct json_key
 		 * enough space to store the whole string (of length `len`)
 		 * and one additional null character.
 		 */
-		const char idata[0];
+		char idata[0];
 	} str;
 };
 

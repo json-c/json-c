@@ -357,7 +357,8 @@ JSON_EXPORT int json_object_object_length(const struct json_object *obj);
  */
 JSON_C_CONST_FUNCTION(JSON_EXPORT size_t json_c_object_sizeof(void));
 
-/** Add an object field to a json_object of type json_type_object
+/**
+ * @brief Add an object field to a json_object of type json_type_object
  *
  * The reference count of `val` will *not* be incremented, in effect
  * transferring ownership that object to `obj`, and thus `val` will be
@@ -385,7 +386,8 @@ JSON_C_CONST_FUNCTION(JSON_EXPORT size_t json_c_object_sizeof(void));
 JSON_EXPORT int json_object_object_add(struct json_object *obj, const char *key,
                                        struct json_object *val);
 
-/** Add an object field to a json_object of type json_type_object
+/**
+ * @brief Add an object field to a json_object of type json_type_object
  *
  * The reference count of `val` will *not* be incremented, in effect
  * transferring ownership that object to `obj`, and thus `val` will be
@@ -412,10 +414,11 @@ JSON_EXPORT int json_object_object_add(struct json_object *obj, const char *key,
  * @return On success, @c 0 is returned.
  * 	On error, a negative value is returned.
  */
-JSON_EXPORT int json_object_object_add_len(struct json_object *obj, const char *key, const int len,
-                                           struct json_object *val);
+JSON_EXPORT int json_object_object_add_len(struct json_object *obj, const char *key,
+                                           const size_t len, struct json_object *val);
 
-/** Add an object field to a json_object of type json_type_object
+/**
+ * @brief Add an object field to a json_object of type json_type_object
  *
  * The semantics are identical to json_object_object_add, except that an
  * additional flag fields gives you more control over some detail aspects
@@ -434,7 +437,8 @@ JSON_EXPORT int json_object_object_add_len(struct json_object *obj, const char *
 JSON_EXPORT int json_object_object_add_ex(struct json_object *obj, const char *const key,
                                           struct json_object *const val, const unsigned opts);
 
-/** Add an object field to a json_object of type json_type_object
+/**
+ * @brief Add an object field to a json_object of type json_type_object
  *
  * The semantics are identical to json_object_object_add, except that an
  * additional flag fields gives you more control over some detail aspects
@@ -453,7 +457,7 @@ JSON_EXPORT int json_object_object_add_ex(struct json_object *obj, const char *c
  * 	On error, a negative value is returned.
  */
 JSON_EXPORT int json_object_object_add_ex_len(struct json_object *obj, const char *const key,
-                                              const int len, struct json_object *const val,
+                                              const size_t len, struct json_object *const val,
                                               const unsigned opts);
 
 /**
@@ -515,7 +519,7 @@ JSON_EXPORT struct json_object *json_object_object_get(const struct json_object 
  */
 
 JSON_EXPORT struct json_object *json_object_object_get_len(const struct json_object *obj,
-                                                           const char *key, const int len);
+                                                           const char *key, const size_t len);
 
 /**
  * @brief Get the json_object associated with a given object field.
@@ -557,7 +561,7 @@ JSON_EXPORT json_bool json_object_object_get_ex(const struct json_object *obj, c
  * @returns whether or not the key exists
  */
 JSON_EXPORT json_bool json_object_object_get_ex_len(const struct json_object *obj, const char *key,
-                                                    const int len, struct json_object **value);
+                                                    const size_t len, struct json_object **value);
 
 /**
  * @brief Get the json_object associated with a given object field.
@@ -605,7 +609,7 @@ JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key
  * @param len the length of @p key
  */
 JSON_EXPORT void json_object_object_del_len(struct json_object *jso, const char *key,
-                                            const int len);
+                                            const size_t len);
 
 /**
  * @brief Delete the given json_object field
@@ -617,8 +621,7 @@ JSON_EXPORT void json_object_object_del_len(struct json_object *jso, const char 
  * @param obj the json_object instance
  * @param key the object field name
  */
-JSON_EXPORT int json_object_object_del_key(struct json_object *jso_base,
-                                           const struct json_key *key);
+JSON_EXPORT int json_object_object_del_key(struct json_object *obj, const struct json_key *key);
 
 /**
  * @brief Iterate through all keys and values of an object.
@@ -655,12 +658,12 @@ JSON_EXPORT int json_object_object_del_key(struct json_object *jso_base,
 #else /* ANSI C or MSC */
 
 #define json_object_object_foreach(obj, key, val)                              \
-	char *key = NULL;                                                      \
+	struct json_key *key = NULL;                                           \
 	struct json_object *val = NULL;                                        \
 	struct lh_entry *entry##key;                                           \
 	struct lh_entry *entry_next##key = NULL;                               \
 	for (entry##key = json_object_get_object(obj)->head;                   \
-	     (entry##key ? (key = (char *)lh_entry_k(entry##key),              \
+	     (entry##key ? (key = (struct json_key *)lh_entry_k(entry##key),   \
 	                   val = (struct json_object *)lh_entry_v(entry##key), \
 	                   entry_next##key = entry##key->next, entry##key)     \
 	                 : 0);                                                 \
