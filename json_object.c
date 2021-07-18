@@ -39,6 +39,19 @@
 #error "The long long type isn't 64-bits"
 #endif
 
+#include <limits.h>
+#ifndef SSIZE_T_MAX
+#if SIZEOF_SSIZE_T == SIZEOF_INT
+#define SSIZE_T_MAX INT_MAX
+#elif SIZEOF_SSIZE_T == SIZEOF_LONG
+#define SSIZE_T_MAX LONG_MAX
+#elif SIZEOF_SSIZE_T == SIZEOF_LONG_LONG
+#define SSIZE_T_MAX LLONG_MAX
+#else
+#error Unable to determine size of ssize_t
+#endif
+#endif
+
 // Don't define this.  It's not thread-safe.
 /* #define REFCOUNT_DEBUG 1 */
 
@@ -1215,7 +1228,7 @@ static int _json_object_userdata_to_json_string(struct json_object *jso, struct 
 int json_object_userdata_to_json_string(struct json_object *jso, struct printbuf *pb, int level,
                                         int flags)
 {
-	int userdata_len = strlen((const char *)jso->_userdata);
+	size_t userdata_len = strlen((const char *)jso->_userdata);
 	printbuf_memappend(pb, (const char *)jso->_userdata, userdata_len);
 	return userdata_len;
 }
