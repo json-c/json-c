@@ -111,7 +111,7 @@ int main(void)
 		printf("Have three keys, but don't have the right value in \"%s\" (error!)\n",
 		       toadd_key_printable);
 		printf("Keys :\n");
-		json_object_object_foreach(parsed, key, val)
+		json_object_object_foreach_len(parsed, key, val)
 		{
 			putchar('\"');
 			fwrite(json_key_data(key), json_key_size(key), 1, stdout);

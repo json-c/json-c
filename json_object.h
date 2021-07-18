@@ -632,14 +632,61 @@ JSON_EXPORT int json_object_object_del_key(struct json_object *obj, const struct
  * new value IS allowed.
  *
  * @param obj the json_object instance
- * @param key the local name for the char* key variable defined in the body
- * @param val the local name for the json_object* object variable defined in
+ * @param key the local name for the `char *` key variable defined in the body
+ * @param val the local name for the `json_object *` object variable defined in
  *            the body
  */
 #if defined(__GNUC__) && !defined(__STRICT_ANSI__) && \
     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
 
-#define json_object_object_foreach(obj, key, val)                                \
+#define json_object_object_foreach(obj, key, val)                                            \
+	const char *key = NULL;                                                              \
+	struct json_object *val __attribute__((__unused__)) = NULL;                          \
+	for (struct lh_entry *entry##key = json_object_get_object(obj)->head,                \
+	                     *entry_next##key = NULL;                                        \
+	     ({                                                                              \
+		     if (entry##key)                                                         \
+		     {                                                                       \
+			     key = json_key_data((struct json_key *)lh_entry_k(entry##key)); \
+			     val = (struct json_object *)lh_entry_v(entry##key);             \
+			     entry_next##key = entry##key->next;                             \
+		     };                                                                      \
+		     entry##key;                                                             \
+	     });                                                                             \
+	     entry##key = entry_next##key)
+
+#else /* ANSI C or MSC */
+
+#define json_object_object_foreach(obj, key, val)                                           \
+	const char *key = NULL;                                                             \
+	struct json_object *val = NULL;                                                     \
+	struct lh_entry *entry##key;                                                        \
+	struct lh_entry *entry_next##key = NULL;                                            \
+	for (entry##key = json_object_get_object(obj)->head;                                \
+	     (entry##key ? (key = json_key_data((struct json_key *)lh_entry_k(entry##key)), \
+	                   val = (struct json_object *)lh_entry_v(entry##key),              \
+	                   entry_next##key = entry##key->next, entry##key)                  \
+	                 : 0);                                                              \
+	     entry##key = entry_next##key)
+
+#endif /* defined(__GNUC__) && !defined(__STRICT_ANSI__) && (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) */
+/**
+ * @brief Iterate through all keys and values of an object.
+ *
+ * Adding keys to the object while iterating is NOT allowed.
+ *
+ * Deleting an existing key, or replacing an existing key with a
+ * new value IS allowed.
+ *
+ * @param obj the json_object instance
+ * @param key the local name for the `struct json_key *` key variable defined in the body
+ * @param val the local name for the `json_object *` object variable defined in
+ *            the body
+ */
+#if defined(__GNUC__) && !defined(__STRICT_ANSI__) && \
+    (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
+
+#define json_object_object_foreach_len(obj, key, val)                            \
 	struct json_key *key = NULL;                                             \
 	struct json_object *val __attribute__((__unused__)) = NULL;              \
 	for (struct lh_entry *entry##key = json_object_get_object(obj)->head,    \
@@ -657,7 +704,7 @@ JSON_EXPORT int json_object_object_del_key(struct json_object *obj, const struct
 
 #else /* ANSI C or MSC */
 
-#define json_object_object_foreach(obj, key, val)                              \
+#define json_object_object_foreach_len(obj, key, val)                          \
 	struct json_key *key = NULL;                                           \
 	struct json_object *val = NULL;                                        \
 	struct lh_entry *entry##key;                                           \

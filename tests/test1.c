@@ -304,7 +304,7 @@ int main(int argc, char **argv)
 
 	/*json_object_object_add(my_object, "arr", my_array);*/
 	printf("my_object=\n");
-	json_object_object_foreach(my_object, key, val)
+	json_object_object_foreach_len(my_object, key, val)
 	{
 		putchar('\t');
 		fwrite(json_key_data(key), json_key_size(key), 1, stdout);

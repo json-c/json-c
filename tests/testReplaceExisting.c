@@ -24,11 +24,10 @@ int main(int argc, char **argv)
 	int orig_count = 0;
 	json_object_object_foreach(my_object, key0, val0)
 	{
-		printf("Key at index %d is [%s] %d", orig_count, json_key_data(key0),
-		       (val0 == NULL));
-		if (strcmp(json_key_data(key0), "deleteme") == 0)
+		printf("Key at index %d is [%s] %d", orig_count, key0, (val0 == NULL));
+		if (strcmp(key0, "deleteme") == 0)
 		{
-			json_object_object_del(my_object, json_key_data(key0));
+			json_object_object_del(my_object, key0);
 			printf(" (deleted)\n");
 		}
 		else
@@ -40,7 +39,7 @@ int main(int argc, char **argv)
 
 	const struct json_key *original_key = NULL;
 	orig_count = 0;
-	json_object_object_foreach(my_object, key, val)
+	json_object_object_foreach_len(my_object, key, val)
 	{
 		printf("Key at index %d is [%s] %d\n", orig_count, json_key_data(key),
 		       (val == NULL));
@@ -49,7 +48,7 @@ int main(int argc, char **argv)
 			continue;
 		printf("replacing value for key [%s]\n", json_key_data(key));
 		original_key = key;
-		json_object_object_add(my_object, json_key_data(key0),
+		json_object_object_add(my_object, json_key_data(key),
 		                       json_object_new_string("zzz"));
 	}
 
@@ -57,7 +56,7 @@ int main(int argc, char **argv)
 
 	int new_count = 0;
 	int retval = 0;
-	json_object_object_foreach(my_object, key2, val2)
+	json_object_object_foreach_len(my_object, key2, val2)
 	{
 		printf("Key at index %d is [%s] %d\n", new_count, json_key_data(key2),
 		       (val2 == NULL));

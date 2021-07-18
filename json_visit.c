@@ -57,7 +57,7 @@ static int _json_c_visit(json_object *jso, json_object *parent_jso, const struct
 
 	case json_type_object:
 	{
-		json_object_object_foreach(jso, key, child)
+		json_object_object_foreach_len(jso, key, child)
 		{
 			userret = _json_c_visit(child, jso, key, NULL, userfunc, userarg);
 			if (userret == JSON_C_VISIT_RETURN_POP)
