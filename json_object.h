@@ -1226,7 +1226,11 @@ JSON_EXPORT struct json_object *json_object_new_null(void);
 JSON_EXPORT int json_object_equal(struct json_object *obj1, struct json_object *obj2);
 
 /**
- * Perform a shallow copy of src into *dst as part of an overall json_object_deep_copy().
+ * @deprecated This type is provided for backward-compatability only.
+ * It is reccomended to use `json_c_shallow_copy_fn_len` instead, and
+ * properly handle copying of keys with embedded NULL (<c>'\0'</c>) characters.
+ *
+ * @brief Perform a shallow copy of src into *dst as part of an overall json_object_deep_copy().
  *
  * If src is part of a containing object or array, parent will be non-NULL,
  * and key or index will be provided.
@@ -1237,13 +1241,51 @@ JSON_EXPORT int json_object_equal(struct json_object *obj1, struct json_object *
  *  json_object_deep_copy that it should not attempt to use the standard userdata
  *  copy function.
  *
+ * @param src The source object to be copied
+ * @param parent The the parent of the current object
+ * @param key The key that <p>src</p> has in <p>parent</p>, if <p>parent</p>
+ * is an object
+ * @param index The index that <p>src</p> can be found at in <p>parent</p>,
+ * if <p>parent</p> is an array
+ * @param dst The destination object
+ *
  * @return On success 1 or 2, -1 on errors
+ *
+ * @since 0.13
+ *
+ * @see json_c_shallow_copy_fn_len
+ *
  */
-typedef int(json_c_shallow_copy_fn)(json_object *src, json_object *parent,
-                                    const struct json_key *key, size_t index, json_object **dst);
+typedef int(json_c_shallow_copy_fn)(json_object *src, json_object *parent, const char *key,
+                                    size_t index, json_object **dst);
 
 /**
- * The default shallow copy implementation for use with json_object_deep_copy().
+ * @brief Perform a shallow copy of src into *dst as part of an overall json_object_deep_copy().
+ *
+ * If src is part of a containing object or array, parent will be non-NULL,
+ * and key or index will be provided.
+ * When shallow_copy is called *dst will be NULL, and must be non-NULL when it returns.
+ * src will never be NULL.
+ *
+ * If shallow_copy sets the serializer on an object, return 2 to indicate to
+ *  json_object_deep_copy that it should not attempt to use the standard userdata
+ *  copy function.
+ *
+ * @since 0.16
+ *
+ * @return On success 1 or 2, -1 on errors
+ */
+typedef int(json_c_shallow_copy_fn_len)(json_object *src, json_object *parent,
+                                        const struct json_key *key, size_t index,
+                                        json_object **dst);
+
+/**
+ * @deprecated This type is provided for backward-compatability only.
+ * It is reccomended to use `json_c_shallow_copy_fn_len` instead, and
+ * properly handle copying of keys with embedded NULL (<c>'\0'</c>) characters.
+ *
+ * @brief The default shallow copy implementation for use with json_object_deep_copy().
+ *
  * This simply calls the appropriate json_object_new_<type>() function and
  * copies over the serializer function (_to_json_string internal field of
  * the json_object structure) but not any _userdata or _user_delete values.
@@ -1252,12 +1294,38 @@ typedef int(json_c_shallow_copy_fn)(json_object *src, json_object *parent,
  * your own custom serializer, you can call this first to create the new object
  * before customizing it with json_object_set_serializer().
  *
+ * @since 0.13
+ *
  * @return 1 on success, -1 on errors, but never 2.
+ *
+ * @see json_c_shallow_copy_fn_len
  */
 JSON_EXPORT json_c_shallow_copy_fn json_c_shallow_copy_default;
 
 /**
- * Copy the contents of the JSON object.
+ * @brief The default shallow copy implementation for use with json_object_deep_copy().
+ *
+ * This simply calls the appropriate json_object_new_<type>() function and
+ * copies over the serializer function (_to_json_string internal field of
+ * the json_object structure) but not any _userdata or _user_delete values.
+ *
+ * If you're writing a custom shallow_copy function, perhaps because you're using
+ * your own custom serializer, you can call this first to create the new object
+ * before customizing it with json_object_set_serializer().
+ *
+ * @since 0.16
+ *
+ * @return 1 on success, -1 on errors, but never 2.
+ */
+JSON_EXPORT json_c_shallow_copy_fn_len json_c_shallow_copy_default_len;
+
+/**
+ * @deprecated This function is provided for backward-compatability only.
+ * It is reccomended to use `json_object_deep_copy_len` instead, as it will
+ * properly handle copying of keys with embedded NULL (<c>'\0'</c>) characters.
+ *
+ * @brief Copy the contents of the JSON object.
+ *
  * The destination object must be initialized to NULL,
  * to make sure this function won't overwrite an existing JSON object.
  *
@@ -1271,12 +1339,37 @@ JSON_EXPORT json_c_shallow_copy_fn json_c_shallow_copy_default;
  *                     when custom serializers are in use.  See also
  *                     json_object set_serializer.
  *
+ * @since 0.13
+ *
  * @returns 0 if the copy went well, -1 if an error occured during copy
  *          or if the destination pointer is non-NULL
  */
-
 JSON_EXPORT int json_object_deep_copy(struct json_object *src, struct json_object **dst,
                                       json_c_shallow_copy_fn *shallow_copy);
+
+/**
+ * @brief Copy the contents of the JSON object.
+ *
+ * The destination object must be initialized to NULL,
+ * to make sure this function won't overwrite an existing JSON object.
+ *
+ * This does roughly the same thing as
+ * `json_tokener_parse(json_object_get_string(src))`.
+ *
+ * @param src source JSON object whose contents will be copied
+ * @param dst pointer to the destination object where the contents of `src`;
+ *            make sure this pointer is initialized to NULL
+ * @param shallow_copy an optional function to copy individual objects, needed
+ *                     when custom serializers are in use.  See also
+ *                     json_object set_serializer.
+ *
+ * @since 0.16
+ *
+ * @returns 0 if the copy went well, -1 if an error occured during copy
+ *          or if the destination pointer is non-NULL
+ */
+JSON_EXPORT int json_object_deep_copy_len(struct json_object *src, struct json_object **dst,
+                                          json_c_shallow_copy_fn_len *shallow_copy);
 
 /* Json Object Keys */
 

@@ -176,4 +176,6 @@ JSONC_0.16 {
     json_object_object_get_len;
     json_object_object_get_ex_len;
     json_object_object_get_key;
+    json_c_shallow_copy_default_len;
+    json_object_deep_copy_len;
 } JSONC_0.15;
