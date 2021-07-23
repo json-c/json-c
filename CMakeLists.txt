@@ -435,11 +435,7 @@ include_directories(${PROJECT_BINARY_DIR})
 
 add_subdirectory(doc)
 
-# uninstall
-add_custom_target(uninstall
-  COMMAND cat ${PROJECT_BINARY_DIR}/install_manifest.txt | xargs rm
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-)
+
 
 # XXX for a normal full distribution we'll need to figure out
 # XXX how to build both shared and static libraries.
