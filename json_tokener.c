@@ -52,6 +52,13 @@
 #error You do not have strncasecmp on your system.
 #endif /* HAVE_STRNCASECMP */
 
+#if defined(_MSC_VER) && (_MSC_VER <= 1800)
+/* VS2013 doesn't know about "inline" */
+#define inline __inline
+#elif defined(AIX_CC)
+#define inline
+#endif
+
 /* The following helper functions are used to speed up parsing. They
  * are faster than their ctype counterparts because they assume that
  * the input is in ASCII and that the locale is set to "C". The
