@@ -16,8 +16,8 @@
  *        this is exposed by the json_object_get_object() function and within the
  *        json_object_iter type, it is not recommended for direct use.
  */
-#ifndef _linkhash_h_
-#define _linkhash_h_
+#ifndef _json_c_linkhash_h_
+#define _json_c_linkhash_h_
 
 #include "json_object.h"
 

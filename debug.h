@@ -14,8 +14,8 @@
  * @file
  * @brief Do not use, json-c internal, may be changed or removed at any time.
  */
-#ifndef _DEBUG_H_
-#define _DEBUG_H_
+#ifndef _JSON_C_DEBUG_H_
+#define _JSON_C_DEBUG_H_
 
 #include <stdlib.h>
 
@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 #ifndef JSON_EXPORT
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && defined(JSON_C_DLL)
 #define JSON_EXPORT __declspec(dllexport)
 #else
 #define JSON_EXPORT extern

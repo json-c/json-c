@@ -74,6 +74,12 @@
 /* Define to 1 if you have the <xlocale.h> header file. */
 #cmakedefine HAVE_XLOCALE_H
 
+/* Define to 1 if you have the <bsd/stdlib.h> header file. */
+#cmakedefine HAVE_BSD_STDLIB_H
+
+/* Define to 1 if you have `arc4random' */
+#cmakedefine HAVE_ARC4RANDOM
+
 /* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
 #cmakedefine HAVE_DOPRNT
 

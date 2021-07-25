@@ -23,6 +23,8 @@ AllowShortFunctionsOnASingleLine:  Empty
 BreakBeforeBraces: Custom
 # Control of individual brace wrapping cases.
 BraceWrapping:
+  # Wrap brackets inside of a case
+  AfterCaseLabel: true
   # Wrap class definition.
   AfterClass: true
   # Wrap control statements

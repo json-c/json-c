@@ -470,7 +470,7 @@ JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key
  * @param val the local name for the json_object* object variable defined in
  *            the body
  */
-#if defined(__GNUC__) && !defined(__STRICT_ANSI__) && __STDC_VERSION__ >= 199901L
+#if defined(__GNUC__) && !defined(__STRICT_ANSI__) && (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
 
 #define json_object_object_foreach(obj, key, val)                                \
 	char *key = NULL;                                                        \
@@ -502,7 +502,7 @@ JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key
 	                 : 0);                                                 \
 	     entry##key = entry_next##key)
 
-#endif /* defined(__GNUC__) && !defined(__STRICT_ANSI__) && __STDC_VERSION__ >= 199901L */
+#endif /* defined(__GNUC__) && !defined(__STRICT_ANSI__) && (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) */
 
 /** Iterate through all keys and values of an object (ANSI C Safe)
  * @param obj the json_object instance
@@ -656,8 +656,9 @@ JSON_EXPORT struct json_object *json_object_new_boolean(json_bool b);
  * The type is coerced to a json_bool if the passed object is not a json_bool.
  * integer and double objects will return 0 if there value is zero
  * or 1 otherwise. If the passed object is a string it will return
- * 1 if it has a non zero length. If any other object type is passed
- * 1 will be returned if the object is not NULL.
+ * 1 if it has a non zero length. 
+ * If any other object type is passed 0 will be returned, even non-empty
+ *  json_type_array and json_type_object objects.
  *
  * @param obj the json_object instance
  * @returns a json_bool

@@ -216,7 +216,7 @@ static inline const char *get_string_component(const struct json_object *jso)
 
 static int json_escape_str(struct printbuf *pb, const char *str, size_t len, int flags)
 {
-	int pos = 0, start_offset = 0;
+	size_t pos = 0, start_offset = 0;
 	unsigned char c;
 	while (len--)
 	{
@@ -237,7 +237,7 @@ static int json_escape_str(struct printbuf *pb, const char *str, size_t len, int
 				break;
 			}
 
-			if (pos - start_offset > 0)
+			if (pos > start_offset)
 				printbuf_memappend(pb, str + start_offset, pos - start_offset);
 
 			if (c == '\b')
@@ -263,7 +263,7 @@ static int json_escape_str(struct printbuf *pb, const char *str, size_t len, int
 			if (c < ' ')
 			{
 				char sbuf[7];
-				if (pos - start_offset > 0)
+				if (pos > start_offset)
 					printbuf_memappend(pb, str + start_offset,
 					                   pos - start_offset);
 				snprintf(sbuf, sizeof(sbuf), "\\u00%c%c", json_hex_chars[c >> 4],
@@ -275,7 +275,7 @@ static int json_escape_str(struct printbuf *pb, const char *str, size_t len, int
 				pos++;
 		}
 	}
-	if (pos - start_offset > 0)
+	if (pos > start_offset)
 		printbuf_memappend(pb, str + start_offset, pos - start_offset);
 	return 0;
 }
@@ -1256,17 +1256,17 @@ static struct json_object *_json_object_new_string(const char *s, const size_t l
 	struct json_object_string *jso;
 
 	/*
-     * Structures           Actual memory layout
-     * -------------------  --------------------
+	 * Structures           Actual memory layout
+	 * -------------------  --------------------
 	 * [json_object_string  [json_object_string
 	 *  [json_object]        [json_object]
-     *  ...other fields...   ...other fields...
+	 *  ...other fields...   ...other fields...
 	 *  c_string]            len
-     *                       bytes
+	 *                       bytes
 	 *                       of
 	 *                       string
 	 *                       data
-     *                       \0]
+	 *                       \0]
 	 */
 	if (len > (SSIZE_T_MAX - (sizeof(*jso) - sizeof(jso->c_string)) - 1))
 		return NULL;
@@ -1333,9 +1333,10 @@ static int _json_object_set_string_len(json_object *jso, const char *s, size_t l
 	if (jso == NULL || jso->o_type != json_type_string)
 		return 0;
 
-	if (len >= SSIZE_T_MAX - 1)
+	if (len >= INT_MAX - 1)
 		// jso->len is a signed ssize_t, so it can't hold the
-		// full size_t range.
+		// full size_t range. json_object_get_string_len returns
+		// length as int, cap length at INT_MAX.
 		return 0;
 
 	dstbuf = get_string_component_mutable(jso);
@@ -1732,7 +1733,7 @@ static int json_object_deep_copy_recursive(struct json_object *src, struct json_
 			/* This handles the `json_type_null` case */
 			if (!iter.val)
 				jso = NULL;
-			else if (json_object_deep_copy_recursive(iter.val, src, iter.key, -1, &jso,
+			else if (json_object_deep_copy_recursive(iter.val, src, iter.key, UINT_MAX, &jso,
 			                                         shallow_copy) < 0)
 			{
 				json_object_put(jso);
@@ -1797,7 +1798,7 @@ int json_object_deep_copy(struct json_object *src, struct json_object **dst,
 	if (shallow_copy == NULL)
 		shallow_copy = json_c_shallow_copy_default;
 
-	rc = json_object_deep_copy_recursive(src, NULL, NULL, -1, dst, shallow_copy);
+	rc = json_object_deep_copy_recursive(src, NULL, NULL, UINT_MAX, dst, shallow_copy);
 	if (rc < 0)
 	{
 		json_object_put(*dst);

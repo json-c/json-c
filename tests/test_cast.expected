@@ -7,6 +7,11 @@ Parsed input: {
 		"int64_number": 2147483649,
 		"negative_number": -321321321,
 		"a_null": null,
+		"empty_array": [],
+		"nonempty_array": [ 123 ],
+		"array_with_zero": [ 0 ],
+		"empty_object": {},
+		"nonempty_object": { "a": 123 },
 	}
 Result is not NULL
 new_obj.string_of_digits json_object_get_type()=string
@@ -57,6 +62,36 @@ new_obj.a_null json_object_get_int64()=0
 new_obj.a_null json_object_get_uint64()=0
 new_obj.a_null json_object_get_boolean()=0
 new_obj.a_null json_object_get_double()=0.000000
+new_obj.empty_array json_object_get_type()=array
+new_obj.empty_array json_object_get_int()=0
+new_obj.empty_array json_object_get_int64()=0
+new_obj.empty_array json_object_get_uint64()=0
+new_obj.empty_array json_object_get_boolean()=0
+new_obj.empty_array json_object_get_double()=0.000000
+new_obj.nonempty_array json_object_get_type()=array
+new_obj.nonempty_array json_object_get_int()=0
+new_obj.nonempty_array json_object_get_int64()=0
+new_obj.nonempty_array json_object_get_uint64()=0
+new_obj.nonempty_array json_object_get_boolean()=0
+new_obj.nonempty_array json_object_get_double()=0.000000
+new_obj.array_with_zero json_object_get_type()=array
+new_obj.array_with_zero json_object_get_int()=0
+new_obj.array_with_zero json_object_get_int64()=0
+new_obj.array_with_zero json_object_get_uint64()=0
+new_obj.array_with_zero json_object_get_boolean()=0
+new_obj.array_with_zero json_object_get_double()=0.000000
+new_obj.empty_object json_object_get_type()=object
+new_obj.empty_object json_object_get_int()=0
+new_obj.empty_object json_object_get_int64()=0
+new_obj.empty_object json_object_get_uint64()=0
+new_obj.empty_object json_object_get_boolean()=0
+new_obj.empty_object json_object_get_double()=0.000000
+new_obj.nonempty_object json_object_get_type()=object
+new_obj.nonempty_object json_object_get_int()=0
+new_obj.nonempty_object json_object_get_int64()=0
+new_obj.nonempty_object json_object_get_uint64()=0
+new_obj.nonempty_object json_object_get_boolean()=0
+new_obj.nonempty_object json_object_get_double()=0.000000
 
 ================================
 json_object_is_type: null,boolean,double,int,object,array,string

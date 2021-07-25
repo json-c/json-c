@@ -79,6 +79,10 @@ include(CMakePackageConfigHelpers)
 option(BUILD_SHARED_LIBS  "Default to building shared libraries" ON)
 option(BUILD_STATIC_LIBS  "Default to building static libraries" ON)
 
+if (BUILD_SHARED_LIBS)
+    add_definitions(-D JSON_C_DLL)
+endif()
+
 # Generate a release merge and test it to verify the correctness of republishing the package.
 ADD_CUSTOM_TARGET(distcheck
 COMMAND make package_source
@@ -97,6 +101,8 @@ option(DISABLE_WERROR                 "Avoid treating compiler warnings as fatal
 option(ENABLE_RDRAND                  "Enable RDRAND Hardware RNG Hash Seed."                 OFF)
 option(ENABLE_THREADING               "Enable partial threading support."                     OFF)
 option(OVERRIDE_GET_RANDOM_SEED       "Override json_c_get_random_seed() with custom code."   OFF)
+option(DISABLE_EXTRA_LIBS             "Avoid linking against extra libraries, such as libbsd." OFF)
+option(DISABLE_JSON_POINTER           "Disable JSON pointer (RFC6901) support."               OFF)
 
 
 if (UNIX OR MINGW OR CYGWIN)
@@ -148,7 +154,10 @@ check_include_file(sys/random.h     HAVE_SYS_RANDOM_H)
 check_include_file(sys/stat.h       HAVE_SYS_STAT_H)
 check_include_file(xlocale.h        HAVE_XLOCALE_H)
 
-if (HAVE_INTTYPES_H AND NOT MSVC)
+if (HAVE_INTTYPES_H)
+	# Set a json-c specific var to stamp into json_config.h
+	# in a way that hopefull ywon't conflict with other 
+	# projects that use json-c.
     set(JSON_C_HAVE_INTTYPES_H 1)
 endif()
 
@@ -169,6 +178,17 @@ endif()
 check_symbol_exists(vasprintf       "stdio.h" HAVE_VASPRINTF)
 check_symbol_exists(vsnprintf       "stdio.h" HAVE_VSNPRINTF)
 check_symbol_exists(vprintf         "stdio.h" HAVE_VPRINTF)
+
+check_symbol_exists(arc4random      "stdlib.h" HAVE_ARC4RANDOM)
+if (NOT HAVE_ARC4RANDOM AND DISABLE_EXTRA_LIBS STREQUAL "OFF")
+    check_include_file(bsd/stdlib.h HAVE_BSD_STDLIB_H)
+    if (HAVE_BSD_STDLIB_H)
+		list(APPEND CMAKE_REQUIRED_LIBRARIES "-lbsd")
+		link_libraries(bsd)
+		unset(HAVE_ARC4RANDOM CACHE)
+        check_symbol_exists(arc4random   "bsd/stdlib.h" HAVE_ARC4RANDOM)
+    endif()
+endif()
 
 if (HAVE_FCNTL_H)
     check_symbol_exists(open        "fcntl.h" HAVE_OPEN)
@@ -269,7 +289,7 @@ message(STATUS "Wrote ${PROJECT_BINARY_DIR}/config.h")
 configure_file(${PROJECT_SOURCE_DIR}/cmake/json_config.h.in   ${PROJECT_BINARY_DIR}/json_config.h)
 message(STATUS "Wrote ${PROJECT_BINARY_DIR}/json_config.h")
 
-if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
+if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections")
 	if ("${DISABLE_WERROR}" STREQUAL "OFF")
 	    set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -Werror")
@@ -358,14 +378,13 @@ set(JSON_C_PUBLIC_HEADERS
     # Note: config.h is _not_ included here
     ${PROJECT_BINARY_DIR}/json_config.h
 
-    ${PROJECT_SOURCE_DIR}/json.h
+    ${PROJECT_BINARY_DIR}/json.h
     ${PROJECT_SOURCE_DIR}/arraylist.h
     ${PROJECT_SOURCE_DIR}/debug.h
     ${PROJECT_SOURCE_DIR}/json_c_version.h
     ${PROJECT_SOURCE_DIR}/json_inttypes.h
     ${PROJECT_SOURCE_DIR}/json_object.h
     ${PROJECT_SOURCE_DIR}/json_object_iterator.h
-    ${PROJECT_SOURCE_DIR}/json_pointer.h
     ${PROJECT_SOURCE_DIR}/json_tokener.h
     ${PROJECT_SOURCE_DIR}/json_types.h
     ${PROJECT_SOURCE_DIR}/json_util.h
@@ -392,7 +411,6 @@ set(JSON_C_SOURCES
     ${PROJECT_SOURCE_DIR}/json_c_version.c
     ${PROJECT_SOURCE_DIR}/json_object.c
     ${PROJECT_SOURCE_DIR}/json_object_iterator.c
-    ${PROJECT_SOURCE_DIR}/json_pointer.c
     ${PROJECT_SOURCE_DIR}/json_tokener.c
     ${PROJECT_SOURCE_DIR}/json_util.c
     ${PROJECT_SOURCE_DIR}/json_visit.c
@@ -402,16 +420,28 @@ set(JSON_C_SOURCES
     ${PROJECT_SOURCE_DIR}/strerror_override.c
 )
 
+if (NOT DISABLE_JSON_POINTER)
+    set(JSON_C_PUBLIC_HEADERS   ${JSON_C_PUBLIC_HEADERS}  ${PROJECT_SOURCE_DIR}/json_pointer.h)
+    set(JSON_C_SOURCES          ${JSON_C_SOURCES}         ${PROJECT_SOURCE_DIR}/json_pointer.c)
+    set(JSON_H_JSON_POINTER "#include \"json_pointer.h\"")
+else()
+    set(JSON_H_JSON_POINTER "")
+endif()
+
+configure_file(json.h.cmakein ${PROJECT_BINARY_DIR}/json.h @ONLY)
+
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_BINARY_DIR})
 
 add_subdirectory(doc)
 
 # uninstall
-add_custom_target(uninstall
-  COMMAND cat ${PROJECT_BINARY_DIR}/install_manifest.txt | xargs rm
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-)
+if(NOT TARGET uninstall)
+	add_custom_target(uninstall
+	  COMMAND cat ${PROJECT_BINARY_DIR}/install_manifest.txt | xargs rm
+	  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+	)
+endif()
 
 # XXX for a normal full distribution we'll need to figure out
 # XXX how to build both shared and static libraries.
