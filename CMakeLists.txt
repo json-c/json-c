@@ -435,12 +435,15 @@ include_directories(${PROJECT_BINARY_DIR})
 
 add_subdirectory(doc)
 
-# uninstall
-if(NOT TARGET uninstall)
-	add_custom_target(uninstall
-	  COMMAND cat ${PROJECT_BINARY_DIR}/install_manifest.txt | xargs rm
-	  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-	)
+# "uninstall" custom target for make generators in unix like operating systems
+# and if that target is not present
+if (CMAKE_GENERATOR STREQUAL "Unix Makefiles")
+    if(NOT TARGET uninstall)
+        add_custom_target(uninstall
+                COMMAND cat ${PROJECT_BINARY_DIR}/install_manifest.txt | xargs rm
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                )
+    endif()
 endif()
 
 # XXX for a normal full distribution we'll need to figure out
