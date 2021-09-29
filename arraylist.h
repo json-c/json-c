@@ -68,10 +68,11 @@ extern int array_list_add(struct array_list *al, void *data);
 
 extern size_t array_list_length(struct array_list *al);
 
-extern void array_list_sort(struct array_list *arr, int (*compar)(const void *, const void *));
+extern void array_list_sort(struct array_list *arr,
+                            int(__cdecl *compar)(const void *, const void *));
 
 extern void *array_list_bsearch(const void **key, struct array_list *arr,
-                                int (*compar)(const void *, const void *));
+                                int(__cdecl *compar)(const void *, const void *));
 
 extern int array_list_del_idx(struct array_list *arr, size_t idx, size_t count);
 

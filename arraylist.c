@@ -166,13 +166,13 @@ int array_list_add(struct array_list *arr, void *data)
 	return 0;
 }
 
-void array_list_sort(struct array_list *arr, int (*compar)(const void *, const void *))
+void array_list_sort(struct array_list *arr, int(__cdecl *compar)(const void *, const void *))
 {
 	qsort(arr->array, arr->length, sizeof(arr->array[0]), compar);
 }
 
 void *array_list_bsearch(const void **key, struct array_list *arr,
-                         int (*compar)(const void *, const void *))
+                         int(__cdecl *compar)(const void *, const void *))
 {
 	return bsearch(key, arr->array, arr->length, sizeof(arr->array[0]), compar);
 }

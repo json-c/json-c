@@ -60,7 +60,7 @@ static struct
 
 // Enabled during tests
 static int _json_c_strerror_enable = 0;
-extern char *getenv(const char *name); // Avoid including stdlib.h
+extern char * __cdecl getenv(const char *name); // Avoid including stdlib.h
 
 #define PREFIX "ERRNO="
 static char errno_buf[128] = PREFIX;
