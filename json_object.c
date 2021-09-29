@@ -1464,7 +1464,7 @@ struct array_list *json_object_get_array(const struct json_object *jso)
 }
 
 void json_object_array_sort(struct json_object *jso,
-                            int(__cdecl *sort_fn)(const void *, const void *))
+                            int(_cdecl *sort_fn)(const void *, const void *))
 {
 	assert(json_object_get_type(jso) == json_type_array);
 	array_list_sort(JC_ARRAY(jso)->c_array, sort_fn);
@@ -1472,7 +1472,7 @@ void json_object_array_sort(struct json_object *jso,
 
 struct json_object *json_object_array_bsearch(const struct json_object *key,
                                               const struct json_object *jso,
-                                              int(__cdecl *sort_fn)(const void *, const void *))
+                                              int(_cdecl *sort_fn)(const void *, const void *))
 {
 	struct json_object **result;
 
