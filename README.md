@@ -37,7 +37,7 @@ Home page for json-c: https://github.com/json-c/json-c/wiki
 
  - `gcc`, `clang`, or another C compiler
 
- - `cmake>=2.8`, `>=3.16` recommended
+ - `cmake>=2.8`, `>=3.16` recommended, `cmake=>3.1` for tests
 
 To generate docs you'll also need:
  - `doxygen>=1.8.13`
