@@ -103,6 +103,11 @@ extern "C" {
  *       JSON_C_OBJECT_KEY_IS_CONSTANT);
  */
 #define JSON_C_OBJECT_KEY_IS_CONSTANT (1 << 2)
+/**
+ * A flag for the json_object_object_add_ex function which
+ * cancel the add if the value is NULL.
+ */
+#define JSON_C_OBJECT_ADD_IF_NOT_NULL (1 << 3)
 
 /**
  * Set the global value of an option, which will apply to all

@@ -591,6 +591,9 @@ int json_object_object_add_ex(struct json_object *jso, const char *const key,
 
 	assert(json_object_get_type(jso) == json_type_object);
 
+	if (val == NULL && (opts & JSON_C_OBJECT_ADD_IF_NOT_NULL))
+		return 0;
+
 	// We lookup the entry and replace the value, rather than just deleting
 	// and re-adding it, so the existing key remains valid.
 	hash = lh_get_hash(JC_OBJECT(jso)->c_object, (const void *)key);
