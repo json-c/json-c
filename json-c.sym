@@ -3,7 +3,7 @@
  * Symbol versioning for libjson-c.
  * All exported symbols must be listed here.
  *
- * See 
+ * See
  *   https://software.intel.com/sites/default/files/m/a/1/e/dsohowto.pdf
  */
 
@@ -165,6 +165,17 @@ JSONC_0.15 {
 } JSONC_0.14;
 
 JSONC_0.16 {
-#  global:
-#      ...new symbols here...
+  global:
+    json_key_data;
+    json_key_size;
+    json_object_object_add_len;
+    json_object_object_add_ex_len;
+    json_object_object_add_key;
+    json_object_object_del_len;
+    json_object_object_del_key;
+    json_object_object_get_len;
+    json_object_object_get_ex_len;
+    json_object_object_get_key;
+    json_c_shallow_copy_default_len;
+    json_object_deep_copy_len;
 } JSONC_0.15;

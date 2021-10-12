@@ -37,30 +37,33 @@ int main(int argc, char **argv)
 
 	printf("==== replace-value first loop starting ====\n");
 
-	const char *original_key = NULL;
+	const struct json_key *original_key = NULL;
 	orig_count = 0;
-	json_object_object_foreach(my_object, key, val)
+	json_object_object_foreach_len(my_object, key, val)
 	{
-		printf("Key at index %d is [%s] %d\n", orig_count, key, (val == NULL));
+		printf("Key at index %d is [%s] %d\n", orig_count, json_key_data(key),
+		       (val == NULL));
 		orig_count++;
-		if (strcmp(key, "foo2") != 0)
+		if (strcmp(json_key_data(key), "foo2") != 0)
 			continue;
-		printf("replacing value for key [%s]\n", key);
+		printf("replacing value for key [%s]\n", json_key_data(key));
 		original_key = key;
-		json_object_object_add(my_object, key, json_object_new_string("zzz"));
+		json_object_object_add(my_object, json_key_data(key),
+		                       json_object_new_string("zzz"));
 	}
 
 	printf("==== second loop starting ====\n");
 
 	int new_count = 0;
 	int retval = 0;
-	json_object_object_foreach(my_object, key2, val2)
+	json_object_object_foreach_len(my_object, key2, val2)
 	{
-		printf("Key at index %d is [%s] %d\n", new_count, key2, (val2 == NULL));
+		printf("Key at index %d is [%s] %d\n", new_count, json_key_data(key2),
+		       (val2 == NULL));
 		new_count++;
-		if (strcmp(key2, "foo2") != 0)
+		if (strcmp(json_key_data(key2), "foo2") != 0)
 			continue;
-		printf("pointer for key [%s] does %smatch\n", key2,
+		printf("pointer for key [%s] does %smatch\n", json_key_data(key2),
 		       (key2 == original_key) ? "" : "NOT ");
 		if (key2 != original_key)
 			retval = 1;

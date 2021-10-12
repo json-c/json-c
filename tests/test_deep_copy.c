@@ -92,15 +92,16 @@ int my_custom_serializer(struct json_object *jso, struct printbuf *pb, int level
 	return 0;
 }
 
-json_c_shallow_copy_fn my_shallow_copy;
-int my_shallow_copy(json_object *src, json_object *parent, const char *key, size_t index,
+json_c_shallow_copy_fn_len my_shallow_copy;
+int my_shallow_copy(json_object *src, json_object *parent, const struct json_key *key, size_t index,
                     json_object **dst)
 {
 	int rc;
-	rc = json_c_shallow_copy_default(src, parent, key, index, dst);
+	rc = json_c_shallow_copy_default_len(src, parent, key, index, dst);
 	if (rc < 0)
 		return rc;
-	if (key != NULL && strcmp(key, "with_serializer") == 0)
+	if (key != NULL && json_key_size(key) == 15 &&
+	    strcmp(json_key_data(key), "with_serializer") == 0)
 	{
 		printf("CALLED: my_shallow_copy on with_serializer object\n");
 		void *userdata = json_object_get_userdata(src);
@@ -199,7 +200,7 @@ int main(int argc, char **argv)
 	dst1 = NULL;
 	/* With a custom serializer in use, a custom shallow_copy function must also be used */
 	assert(-1 == json_object_deep_copy(src1, &dst1, NULL));
-	assert(0 == json_object_deep_copy(src1, &dst1, my_shallow_copy));
+	assert(0 == json_object_deep_copy_len(src1, &dst1, my_shallow_copy));
 
 	json_object *dest_with_serializer = json_object_object_get(dst1, "with_serializer");
 	assert(dest_with_serializer != NULL);

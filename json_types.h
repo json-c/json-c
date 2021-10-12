@@ -33,7 +33,7 @@ struct printbuf;
  */
 struct json_object_iter
 {
-	char *key;
+	struct json_key *key;
 	struct json_object *val;
 	struct lh_entry *entry;
 };
@@ -70,6 +70,8 @@ typedef enum json_type
 	json_type_array,
 	json_type_string
 } json_type;
+
+typedef struct json_key json_key;
 
 #ifdef __cplusplus
 }
