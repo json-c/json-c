@@ -546,7 +546,7 @@ int lh_table_resize(struct lh_table *t, int new_size)
 		unsigned long h = lh_get_hash(new_t, ent->k);
 		unsigned int opts = 0;
 		if (ent->k_is_constant)
-			opts = JSON_C_OBJECT_KEY_IS_CONSTANT;
+			opts = JSON_C_OBJECT_ADD_CONSTANT_KEY;
 		if (lh_table_insert_w_hash(new_t, ent->k, ent->v, h, opts) != 0)
 		{
 			lh_table_free(new_t);
@@ -599,7 +599,7 @@ int lh_table_insert_w_hash(struct lh_table *t, const void *k, const void *v, con
 	}
 
 	t->table[n].k = k;
-	t->table[n].k_is_constant = (opts & JSON_C_OBJECT_KEY_IS_CONSTANT);
+	t->table[n].k_is_constant = (opts & JSON_C_OBJECT_ADD_CONSTANT_KEY);
 	t->table[n].v = v;
 	t->count++;
 
