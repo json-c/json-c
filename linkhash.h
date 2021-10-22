@@ -231,7 +231,7 @@ extern int lh_table_insert(struct lh_table *t, const void *k, const void *v);
  * @param k a pointer to the key to insert.
  * @param v a pointer to the value to insert.
  * @param h hash value of the key to insert
- * @param opts if set to JSON_C_OBJECT_KEY_IS_CONSTANT, sets lh_entry.k_is_constant
+ * @param opts if set to JSON_C_OBJECT_ADD_CONSTANT_KEY, sets lh_entry.k_is_constant
  *             so t's free function knows to avoid freeing the key.
  */
 extern int lh_table_insert_w_hash(struct lh_table *t, const void *k, const void *v,

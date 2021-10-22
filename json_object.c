@@ -607,7 +607,7 @@ int json_object_object_add_ex(struct json_object *jso, const char *const key,
 	if (!existing_entry)
 	{
 		const void *const k =
-		    (opts & JSON_C_OBJECT_KEY_IS_CONSTANT) ? (const void *)key : strdup(key);
+		    (opts & JSON_C_OBJECT_ADD_CONSTANT_KEY) ? (const void *)key : strdup(key);
 		if (k == NULL)
 			return -1;
 		return lh_table_insert_w_hash(JC_OBJECT(jso)->c_object, k, val, hash, opts);

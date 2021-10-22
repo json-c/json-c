@@ -100,9 +100,17 @@ extern "C" {
  * key is given as a real constant value in the function
  * call, e.g. as in
  *   json_object_object_add_ex(obj, "ip", json,
- *       JSON_C_OBJECT_KEY_IS_CONSTANT);
+ *       JSON_C_OBJECT_ADD_CONSTANT_KEY);
  */
-#define JSON_C_OBJECT_KEY_IS_CONSTANT (1 << 2)
+#define JSON_C_OBJECT_ADD_CONSTANT_KEY (1 << 2)
+/**
+ * This flag is an alias to JSON_C_OBJECT_ADD_CONSTANT_KEY.
+ * Historically, this flag was used first and the new name
+ * JSON_C_OBJECT_ADD_CONSTANT_KEY was introduced for version
+ * 0.16.00 in order to have regular naming.
+ * Use of this flag is now legacy.
+ */
+#define JSON_C_OBJECT_KEY_IS_CONSTANT  JSON_C_OBJECT_ADD_CONSTANT_KEY
 
 /**
  * Set the global value of an option, which will apply to all
