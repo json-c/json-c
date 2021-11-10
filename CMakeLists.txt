@@ -472,6 +472,11 @@ if (BUILD_STATIC_LIBS AND BUILD_SHARED_LIBS)
         ${JSON_C_SOURCES}
         ${JSON_C_HEADERS}
     )
+    target_include_directories(${PROJECT_NAME}-static
+        PUBLIC
+            $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+            $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+    )
 
     # rename the static library
     if (NOT MSVC)
