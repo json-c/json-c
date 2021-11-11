@@ -1058,8 +1058,7 @@ static int json_object_double_to_json_string_format(struct json_object *jso, str
 			format_drops_decimals = 1;
 
 		looks_numeric = /* Looks like *some* kind of number */
-		    is_plain_digit(buf[0]) ||
-		    (size > 1 && buf[0] == '-' && is_plain_digit(buf[1]));
+		    is_plain_digit(buf[0]) || (size > 1 && buf[0] == '-' && is_plain_digit(buf[1]));
 
 		if (size < (int)sizeof(buf) - 2 && looks_numeric && !p && /* Has no decimal point */
 		    strchr(buf, 'e') == NULL && /* Not scientific notation */
@@ -1283,7 +1282,8 @@ static struct json_object *_json_object_new_string(const char *s, const size_t l
 		return NULL;
 	jso->len = len;
 	memcpy(jso->c_string.idata, s, len);
-	jso->c_string.idata[len] = '\0';
+	// Cast below needed for Clang UB sanitizer
+	((char *)jso->c_string.idata)[len] = '\0';
 	return &jso->base;
 }
 
@@ -1733,8 +1733,8 @@ static int json_object_deep_copy_recursive(struct json_object *src, struct json_
 			/* This handles the `json_type_null` case */
 			if (!iter.val)
 				jso = NULL;
-			else if (json_object_deep_copy_recursive(iter.val, src, iter.key, UINT_MAX, &jso,
-			                                         shallow_copy) < 0)
+			else if (json_object_deep_copy_recursive(iter.val, src, iter.key, UINT_MAX,
+			                                         &jso, shallow_copy) < 0)
 			{
 				json_object_put(jso);
 				return -1;
