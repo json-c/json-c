@@ -329,21 +329,21 @@ int json_c_get_random_seed(void)
 #else
 #ifdef HAVE_GETRANDOM
 	{
-		int seed;
+		int seed = 0;
 		if (get_getrandom_seed(&seed) == 0)
 			return seed;
 	}
 #endif
 #if defined HAVE_DEV_RANDOM && HAVE_DEV_RANDOM
 	{
-		int seed;
+		int seed = 0;
 		if (get_dev_random_seed(&seed) == 0)
 			return seed;
 	}
 #endif
 #if defined HAVE_CRYPTGENRANDOM && HAVE_CRYPTGENRANDOM
 	{
-		int seed;
+		int seed = 0;
 		if (get_cryptgenrandom_seed(&seed) == 0)
 			return seed;
 	}
