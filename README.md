@@ -186,7 +186,7 @@ If a test fails, check `Testing/Temporary/LastTest.log`,
 `tests/testSubDir/${testname}/${testname}.vg.out`, and other similar files.
 If there is insufficient output try:
 ```sh
-VERBOSE=1 make test
+VERBOSE=1 CTEST_OUTPUT_ON_FAILURE=1 make test
 ```
 or
 ```sh
