@@ -5,42 +5,99 @@ image:
   # aka os: Windows Server 2012 R2
   - Visual Studio 2015
   # aka os: Windows Server 2016
+# b_toolset: v141
   - Visual Studio 2017
   # aka os: Windows Server 2019
+# b_toolset: v142
   - Visual Studio 2019
+# b_toolset: v143
+  - Visual Studio 2022
 
 platform: x64
 
-for:
--
-  matrix:
-    only:
-      - image: Visual Studio 2015
-
-  environment:
-    matrix:
-      - b_toolset: Windows7.1SDK
-        b_config: Debug
-
-      - b_toolset: v120
-        b_config: Debug
-
-      - b_toolset: v140
-        b_config: Debug
-
-  build_script:
-    - cmake -T %b_toolset% -DCMAKE_BUILD_TYPE=%b_config% -DCMAKE_INSTALL_PREFIX=t_install .
-    - cmake --build . --target install
-
 environment:
   matrix:
-    - b_config: Debug
+    - b_toolset: Windows7.1SDK
 
-    - b_config: Release
+    - b_toolset: v120
+
+    - b_toolset: v140
+
+    - b_toolset: v141
+
+    - b_toolset: v142
+
+    - b_toolset: v143
+
+configuration:
+  - Debug
+  - Release
 
 build_script:
-- cmake -DCMAKE_BUILD_TYPE=%b_config% -DCMAKE_INSTALL_PREFIX=t_install .
+- cmake -T %b_toolset% -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DCMAKE_INSTALL_PREFIX=t_install .
 - cmake --build . --target install
+
+matrix:
+  exclude:
+    - image: Visual Studio 2015
+      b_toolset: v141
+
+    - image: Visual Studio 2015
+      b_toolset: v142
+
+    - image: Visual Studio 2015
+      b_toolset: v143
+
+    # ----
+
+    - image: Visual Studio 2017
+      b_toolset: Windows7.1SDK
+
+    - image: Visual Studio 2017
+      b_toolset: v120
+
+    - image: Visual Studio 2017
+      b_toolset: v140
+
+    - image: Visual Studio 2017
+      b_toolset: v142
+
+    - image: Visual Studio 2017
+      b_toolset: v143
+
+    # ----
+
+    - image: Visual Studio 2019
+      b_toolset: Windows7.1SDK
+
+    - image: Visual Studio 2019
+      b_toolset: v120
+
+    - image: Visual Studio 2019
+      b_toolset: v140
+
+    - image: Visual Studio 2019
+      b_toolset: v141
+
+    - image: Visual Studio 2019
+      b_toolset: v143
+
+    # ----
+
+    - image: Visual Studio 2022
+      b_toolset: Windows7.1SDK
+
+    - image: Visual Studio 2022
+      b_toolset: v120
+
+    - image: Visual Studio 2022
+      b_toolset: v140
+
+    - image: Visual Studio 2022
+      b_toolset: v141
+
+    - image: Visual Studio 2022
+      b_toolset: v142
 
 after_build:
 - cd t_install
