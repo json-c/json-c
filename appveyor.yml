@@ -1,31 +1,45 @@
 version: '{branch}.{build}'
-os: Windows Server 2012 R2
+
+image:
+  # VS2015 also used for earlier VS builds
+  # aka os: Windows Server 2012 R2
+  - Visual Studio 2015
+  # aka os: Windows Server 2016
+  - Visual Studio 2017
+  # aka os: Windows Server 2019
+  - Visual Studio 2019
 
 platform: x64
 
-# There should be a better way to set-up a build matrix.
+for:
+-
+  matrix:
+    only:
+      - image: Visual Studio 2015
+
+  environment:
+    matrix:
+      - b_toolset: Windows7.1SDK
+        b_config: Debug
+
+      - b_toolset: v120
+        b_config: Debug
+
+      - b_toolset: v140
+        b_config: Debug
+
+  build_script:
+    - cmake -T %b_toolset% -DCMAKE_BUILD_TYPE=%b_config% -DCMAKE_INSTALL_PREFIX=t_install .
+    - cmake --build . --target install
+
 environment:
   matrix:
-    - b_toolset: Windows7.1SDK
-      b_config: Debug
+    - b_config: Debug
 
-    - b_toolset: Windows7.1SDK
-      b_config: Release
-
-    - b_toolset: v120
-      b_config: Debug
-
-    - b_toolset: v120
-      b_config: Release
-
-    - b_toolset: v140
-      b_config: Debug
-
-    - b_toolset: v140
-      b_config: Release
+    - b_config: Release
 
 build_script:
-- cmake -T %b_toolset% -DCMAKE_BUILD_TYPE=%b_config% -DCMAKE_INSTALL_PREFIX=t_install .
+- cmake -DCMAKE_BUILD_TYPE=%b_config% -DCMAKE_INSTALL_PREFIX=t_install .
 - cmake --build . --target install
 
 after_build:
