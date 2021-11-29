@@ -39,6 +39,11 @@ build_script:
 
 matrix:
   exclude:
+    #  Skip release builds for all except the newest image
+    - image: Visual Studio 2015
+      configuration: Release
+
+    # In the "old" image, new toolsets aren't available:
     - image: Visual Studio 2015
       b_toolset: v141
 
@@ -49,6 +54,12 @@ matrix:
       b_toolset: v143
 
     # ----
+
+    - image: Visual Studio 2017
+      configuration: Release
+
+    # In the "new" images, exclude all toolsets except the relevant
+    #  one for that image:
 
     - image: Visual Studio 2017
       b_toolset: Windows7.1SDK
@@ -66,6 +77,9 @@ matrix:
       b_toolset: v143
 
     # ----
+
+    - image: Visual Studio 2019
+      configuration: Release
 
     - image: Visual Studio 2019
       b_toolset: Windows7.1SDK
@@ -101,8 +115,8 @@ matrix:
 
 after_build:
 - cd t_install
-- 7z a ../json-c.win32.%b_toolset%.%b_config%.zip *
+- 7z a ../json-c.win32.%b_toolset%.%CONFIGURATION%.zip *
 
 artifacts:
-- path: json-c.win32.%b_toolset%.%b_config%.zip
-  name: json-c.win32.%b_toolset%.%b_config%.zip
+- path: json-c.win32.%b_toolset%.%CONFIGURATION%.zip
+  name: json-c.win32.%b_toolset%.%CONFIGURATION%.zip
