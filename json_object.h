@@ -483,14 +483,14 @@ JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key
 #define json_object_object_foreach(obj, key, val)                                \
 	char *key = NULL;                                                        \
 	struct json_object *val __attribute__((__unused__)) = NULL;              \
-	for (struct lh_entry *entry##key = json_object_get_object(obj)->head,    \
+	for (struct lh_entry *entry##key = lh_table_head(json_object_get_object(obj)),    \
 	                     *entry_next##key = NULL;                            \
 	     ({                                                                  \
 		     if (entry##key)                                             \
 		     {                                                           \
 			     key = (char *)lh_entry_k(entry##key);               \
 			     val = (struct json_object *)lh_entry_v(entry##key); \
-			     entry_next##key = entry##key->next;                 \
+			     entry_next##key = lh_entry_next(entry##key);        \
 		     };                                                          \
 		     entry##key;                                                 \
 	     });                                                                 \
@@ -503,10 +503,10 @@ JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key
 	struct json_object *val = NULL;                                        \
 	struct lh_entry *entry##key;                                           \
 	struct lh_entry *entry_next##key = NULL;                               \
-	for (entry##key = json_object_get_object(obj)->head;                   \
+	for (entry##key = lh_table_head(json_object_get_object(obj));          \
 	     (entry##key ? (key = (char *)lh_entry_k(entry##key),              \
 	                   val = (struct json_object *)lh_entry_v(entry##key), \
-	                   entry_next##key = entry##key->next, entry##key)     \
+	                   entry_next##key = lh_entry_next(entry##key), entry##key)     \
 	                 : 0);                                                 \
 	     entry##key = entry_next##key)
 
@@ -517,11 +517,11 @@ JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key
  * @param iter the object iterator, use type json_object_iter
  */
 #define json_object_object_foreachC(obj, iter)                                                  \
-	for (iter.entry = json_object_get_object(obj)->head;                                    \
+	for (iter.entry = lh_table_head(json_object_get_object(obj));                                    \
 	     (iter.entry ? (iter.key = (char *)lh_entry_k(iter.entry),                          \
 	                   iter.val = (struct json_object *)lh_entry_v(iter.entry), iter.entry) \
 	                 : 0);                                                                  \
-	     iter.entry = iter.entry->next)
+	     iter.entry = lh_entry_next(iter.entry))
 
 /* Array type methods */
 

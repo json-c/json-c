@@ -4,9 +4,11 @@ Next Release 0.16
 
 Significant changes and bug fixes
 ---------------------------------
-* Introduction of constant JSON_C_OBJECT_ADD_CONSTANT_KEY
+* Introduce constant JSON_C_OBJECT_ADD_CONSTANT_KEY
    as a replacement of JSON_C_OBJECT_KEY_IS_CONSTANT,
    JSON_C_OBJECT_KEY_IS_CONSTANT becoming legacy.
+* Direct access to lh_table and lh_entry structure members is deprecated.  
+  Use access functions instead, lh_table_head(), lh_entry_next(), etc...
 * Drop REFCOUNT_DEBUG code.
 
 ***

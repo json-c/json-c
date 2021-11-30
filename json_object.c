@@ -498,7 +498,7 @@ static int json_object_object_to_json_string(struct json_object *jso, struct pri
 
 static void json_object_lh_entry_free(struct lh_entry *ent)
 {
-	if (!ent->k_is_constant)
+	if (!lh_entry_k_is_constant(ent))
 		free(lh_entry_k(ent));
 	json_object_put((struct json_object *)lh_entry_v(ent));
 }
@@ -569,7 +569,7 @@ int json_object_object_add_ex(struct json_object *jso, const char *const key,
 	existing_value = (json_object *)lh_entry_v(existing_entry);
 	if (existing_value)
 		json_object_put(existing_value);
-	existing_entry->v = val;
+	lh_entry_set_val(existing_entry, val);
 	return 0;
 }
 
