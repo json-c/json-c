@@ -7,6 +7,7 @@ Significant changes and bug fixes
 * Introduction of constant JSON_C_OBJECT_ADD_CONSTANT_KEY
    as a replacement of JSON_C_OBJECT_KEY_IS_CONSTANT,
    JSON_C_OBJECT_KEY_IS_CONSTANT becoming legacy.
+* Drop REFCOUNT_DEBUG code.
 
 ***
 

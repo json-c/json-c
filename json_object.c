@@ -53,9 +53,6 @@
 #endif
 #endif
 
-// Don't define this.  It's not thread-safe.
-/* #define REFCOUNT_DEBUG 1 */
-
 const char *json_hex_chars = "0123456789abcdefABCDEF";
 
 static void json_object_generic_delete(struct json_object *jso);
@@ -160,41 +157,6 @@ static json_object_to_json_string_fn _json_object_userdata_to_json_string;
  * (in particular for code paths which are never supposed to be run).
  * */
 JSON_NORETURN static void json_abort(const char *message);
-
-/* ref count debugging */
-
-#ifdef REFCOUNT_DEBUG
-
-static struct lh_table *json_object_table;
-
-static void json_object_init(void) __attribute__((constructor));
-static void json_object_init(void)
-{
-	MC_DEBUG("json_object_init: creating object table\n");
-	json_object_table = lh_kptr_table_new(128, NULL);
-}
-
-static void json_object_fini(void) __attribute__((destructor));
-static void json_object_fini(void)
-{
-	struct lh_entry *ent;
-	if (MC_GET_DEBUG())
-	{
-		if (json_object_table->count)
-		{
-			MC_DEBUG("json_object_fini: %d referenced objects at exit\n",
-			         json_object_table->count);
-			lh_foreach(json_object_table, ent)
-			{
-				struct json_object *obj = (struct json_object *)lh_entry_v(ent);
-				MC_DEBUG("\t%s:%p\n", json_type_to_name(obj->o_type), obj);
-			}
-		}
-	}
-	MC_DEBUG("json_object_fini: freeing object table\n");
-	lh_table_free(json_object_table);
-}
-#endif /* REFCOUNT_DEBUG */
 
 /* helper for accessing the optimized string data component in json_object
  */
@@ -339,10 +301,6 @@ int json_object_put(struct json_object *jso)
 
 static void json_object_generic_delete(struct json_object *jso)
 {
-#ifdef REFCOUNT_DEBUG
-	MC_DEBUG("json_object_delete_%s: %p\n", json_type_to_name(jso->o_type), jso);
-	lh_table_delete(json_object_table, jso);
-#endif /* REFCOUNT_DEBUG */
 	printbuf_free(jso->_pb);
 	free(jso);
 }
@@ -364,10 +322,6 @@ static inline struct json_object *json_object_new(enum json_type o_type, size_t 
 	jso->_userdata = NULL;
 	//jso->...   // Type-specific fields must be set by caller
 
-#ifdef REFCOUNT_DEBUG
-	lh_table_insert(json_object_table, jso, jso);
-	MC_DEBUG("json_object_new_%s: %p\n", json_type_to_name(jso->o_type), jso);
-#endif /* REFCOUNT_DEBUG */
 	return jso;
 }
 
