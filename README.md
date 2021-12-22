@@ -16,6 +16,17 @@
 JSON-C - A JSON implementation in C <a name="overview"></a>
 -----------------------------------
 
+JSON-C implements a reference counting object model that allows you to easily
+construct JSON objects in C, output them as JSON formatted strings and parse
+JSON formatted strings back into the C representation of JSON objects.
+It aims to conform to [RFC 7159](https://tools.ietf.org/html/rfc7159).
+
+Skip down to [Using json-c](#using)
+or check out the [API docs](https://json-c.github.io/json-c/),
+if you already have json-c installed and ready to use.
+
+Home page for json-c: https://github.com/json-c/json-c/wiki
+
 Build Status
 * [AppVeyor Build](https://ci.appveyor.com/project/hawicz/json-c) ![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/json-c/json-c?branch=master&svg=true)
 * [Travis Build](https://travis-ci.org/json-c/json-c) ![Travis Build Status](https://travis-ci.org/json-c/json-c.svg?branch=master)
@@ -23,15 +34,11 @@ Build Status
 Test Status
 * [Coveralls](https://coveralls.io/github/json-c/json-c?branch=master) [![Coverage Status](https://coveralls.io/repos/github/json-c/json-c/badge.svg?branch=master)](https://coveralls.io/github/json-c/json-c?branch=master)
 
-JSON-C implements a reference counting object model that allows you to easily
-construct JSON objects in C, output them as JSON formatted strings and parse
-JSON formatted strings back into the C representation of JSON objects.
-It aims to conform to [RFC 7159](https://tools.ietf.org/html/rfc7159).
-
 Building on Unix with `git`, `gcc` and `cmake` <a name="buildunix"></a>
 --------------------------------------------------
 
-Home page for json-c: https://github.com/json-c/json-c/wiki
+If you already have json-c installed, see [Linking to `libjson-c`](#linking)
+for how to build and link your program against it.
 
 ### Prerequisites: <a name="installprereq"></a>
 
@@ -220,14 +227,31 @@ CFLAGS += $(shell pkg-config --cflags json-c)
 LDFLAGS += $(shell pkg-config --libs json-c)
 ```
 
-Without `pkgconfig`, you would do something like this:
+Without `pkgconfig`, you might do something like this:
 
 ```make
 JSON_C_DIR=/path/to/json_c/install
 CFLAGS += -I$(JSON_C_DIR)/include/json-c
+# Or to use lines like: #include <json-c/json_object.h>
+#CFLAGS += -I$(JSON_C_DIR)/include
 LDFLAGS+= -L$(JSON_C_DIR)/lib -ljson-c
 ```
 
+If your project uses cmake:
+
+* Add to your CMakeLists.txt file:
+
+```cmake
+find_package(json-c CONFIG)
+target_link_libraries(${PROJECT_NAME} PRIVATE json-c::json-c)
+```
+
+* Then you might run in your project:
+
+```sh
+cd build
+cmake -DCMAKE_PREFIX_PATH=/path/to/json_c/install/lib64/cmake ..
+```
 
 Using json-c <a name="using">
 ------------
