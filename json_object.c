@@ -200,7 +200,7 @@ static int json_escape_str(struct printbuf *pb, const char *str, size_t len, int
 			}
 
 			if (pos > start_offset)
-				printbuf_memappend(pb, str + start_offset, pos - start_offset);
+				printbuf_memappend(pb, str + start_offset, (int)(pos - start_offset));
 
 			if (c == '\b')
 				printbuf_memappend(pb, "\\b", 2);
@@ -227,7 +227,7 @@ static int json_escape_str(struct printbuf *pb, const char *str, size_t len, int
 				char sbuf[7];
 				if (pos > start_offset)
 					printbuf_memappend(pb, str + start_offset,
-					                   pos - start_offset);
+					                   (int)(pos - start_offset));
 				snprintf(sbuf, sizeof(sbuf), "\\u00%c%c", json_hex_chars[c >> 4],
 				         json_hex_chars[c & 0xf]);
 				printbuf_memappend_fast(pb, sbuf, (int)sizeof(sbuf) - 1);
@@ -238,7 +238,7 @@ static int json_escape_str(struct printbuf *pb, const char *str, size_t len, int
 		}
 	}
 	if (pos > start_offset)
-		printbuf_memappend(pb, str + start_offset, pos - start_offset);
+		printbuf_memappend(pb, str + start_offset, (int)(pos - start_offset));
 	return 0;
 }
 
@@ -681,7 +681,7 @@ static int json_object_int_to_json_string(struct json_object *jso, struct printb
 		snprintf(sbuf, sizeof(sbuf), "%" PRId64, JC_INT(jso)->cint.c_int64);
 	else
 		snprintf(sbuf, sizeof(sbuf), "%" PRIu64, JC_INT(jso)->cint.c_uint64);
-	return printbuf_memappend(pb, sbuf, strlen(sbuf));
+	return printbuf_memappend(pb, sbuf, (int)strlen(sbuf));
 }
 
 struct json_object *json_object_new_int(int32_t i)
@@ -1035,7 +1035,7 @@ static int json_object_double_to_json_string_format(struct json_object *jso, str
 			/* drop trailing zeroes */
 			if (*p != 0)
 				*(++p) = 0;
-			size = p - buf;
+			size = (int)(p - buf);
 		}
 	}
 	// although unlikely, snprintf can fail
@@ -1106,7 +1106,7 @@ static int _json_object_userdata_to_json_string(struct json_object *jso, struct 
 int json_object_userdata_to_json_string(struct json_object *jso, struct printbuf *pb, int level,
                                         int flags)
 {
-	int userdata_len = strlen((const char *)jso->_userdata);
+	int userdata_len = (int)strlen((const char *)jso->_userdata);
 	printbuf_memappend(pb, (const char *)jso->_userdata, userdata_len);
 	return userdata_len;
 }
@@ -1274,7 +1274,7 @@ int json_object_get_string_len(const struct json_object *jso)
 		return 0;
 	switch (jso->o_type)
 	{
-	case json_type_string: return _json_object_get_string_len(JC_STRING_C(jso));
+	case json_type_string: return (int)_json_object_get_string_len(JC_STRING_C(jso));
 	default: return 0;
 	}
 }
@@ -1634,7 +1634,7 @@ int json_c_shallow_copy_default(json_object *src, json_object *parent, const cha
 
 	case json_type_string:
 		*dst = json_object_new_string_len(get_string_component(src),
-		                                  _json_object_get_string_len(JC_STRING(src)));
+		                                  (int)_json_object_get_string_len(JC_STRING(src)));
 		break;
 
 	case json_type_object: *dst = json_object_new_object(); break;

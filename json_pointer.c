@@ -29,8 +29,8 @@
 
 static void string_replace_all_occurrences_with_char(char *s, const char *occur, char repl_char)
 {
-	int slen = strlen(s);
-	int skip = strlen(occur) - 1; /* length of the occurrence, minus the char we're replacing */
+	size_t slen = strlen(s);
+	int skip = (int)strlen(occur) - 1; /* length of the occurrence, minus the char we're replacing */
 	char *p = s;
 	while ((p = strstr(p, occur)))
 	{
@@ -43,7 +43,7 @@ static void string_replace_all_occurrences_with_char(char *s, const char *occur,
 
 static int is_valid_index(struct json_object *jo, const char *path, int32_t *idx)
 {
-	int i, len = strlen(path);
+	int i, len = (int)strlen(path);
 	/* this code-path optimizes a bit, for when we reference the 0-9 index range
 	 * in a JSON array and because leading zeros not allowed
 	 */
@@ -73,14 +73,14 @@ static int is_valid_index(struct json_object *jo, const char *path, int32_t *idx
 		}
 	}
 
-	*idx = strtol(path, NULL, 10);
+	*idx = (int)strtol(path, NULL, 10);
 	if (*idx < 0)
 	{
 		errno = EINVAL;
 		return 0;
 	}
 check_oob:
-	len = json_object_array_length(jo);
+	len = (int)json_object_array_length(jo);
 	if (*idx >= len)
 	{
 		errno = ENOENT;
