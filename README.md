@@ -256,7 +256,7 @@ cmake -DCMAKE_PREFIX_PATH=/path/to/json_c/install/lib64/cmake ..
 Using json-c <a name="using">
 ------------
 
-To use json-c you can either include json.h, or preferrably, one of the
+To use json-c you can either include json.h, or preferably, one of the
 following more specific header files:
 
 * json_object.h  - Core types and methods.
