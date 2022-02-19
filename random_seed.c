@@ -237,13 +237,15 @@ static int get_dev_random_seed(int *seed)
 	}
 
 	ssize_t nread = read(fd, seed, sizeof(*seed));
+
+	close(fd);
+
 	if (nread != sizeof(*seed))
 	{
 		fprintf(stderr, "error short read %s: %s", dev_random_file, strerror(errno));
 		return -1;
 	}
 
-	close(fd);
 	return 0;
 }
 
