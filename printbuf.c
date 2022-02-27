@@ -143,7 +143,7 @@ int sprintbuf(struct printbuf *p, const char *msg, ...)
 	 * if output is truncated whereas some return the number of bytes that
 	 * would have been written - this code handles both cases.
 	 */
-	if (size == -1 || size > 127)
+	if (size < 0 || size > 127)
 	{
 		va_start(ap, msg);
 		if ((size = vasprintf(&t, msg, ap)) < 0)
