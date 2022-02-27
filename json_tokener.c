@@ -746,7 +746,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				 * we can't simply peek ahead here, because the
 				 * characters we need might not be passed to us
 				 * until a subsequent call to json_tokener_parse.
-				 * Instead, transition throug a couple of states.
+				 * Instead, transition through a couple of states.
 				 * (now):
 				 *   _escape_unicode => _unicode_need_escape
 				 * (see a '\\' char):

@@ -353,7 +353,7 @@ static _LH_INLINE struct lh_entry *lh_table_head(const lh_table *t)
 /**
  * Calculate the hash of a key for a given table.
  *
- * This is an exension to support functions that need to calculate
+ * This is an extension to support functions that need to calculate
  * the hash several times and allows them to do it just once and then pass
  * in the hash to all utility functions. Depending on use case, this can be a
  * considerable performance improvement.
