@@ -152,15 +152,14 @@ int sprintbuf(struct printbuf *p, const char *msg, ...)
 			return -1;
 		}
 		va_end(ap);
-		printbuf_memappend(p, t, size);
+		size = printbuf_memappend(p, t, size);
 		free(t);
-		return size;
 	}
 	else
 	{
-		printbuf_memappend(p, buf, size);
-		return size;
+		size = printbuf_memappend(p, buf, size);
 	}
+	return size;
 }
 
 void printbuf_reset(struct printbuf *p)
