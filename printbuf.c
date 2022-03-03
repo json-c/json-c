@@ -91,7 +91,7 @@ static int printbuf_extend(struct printbuf *p, int min_size)
 int printbuf_memappend(struct printbuf *p, const char *buf, int size)
 {
 	/* Prevent signed integer overflows with large buffers. */
-	if (size > INT_MAX - p->bpos - 1)
+	if (size < 0 || size > INT_MAX - p->bpos - 1)
 		return -1;
 	if (p->size <= p->bpos + size + 1)
 	{
@@ -111,7 +111,7 @@ int printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len)
 	if (offset == -1)
 		offset = pb->bpos;
 	/* Prevent signed integer overflows with large buffers. */
-	if (len > INT_MAX - offset)
+	if (len < 0 || offset < -1 || len > INT_MAX - offset)
 		return -1;
 	size_needed = offset + len;
 	if (pb->size < size_needed)
