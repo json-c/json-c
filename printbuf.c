@@ -120,6 +120,8 @@ int printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len)
 			return -1;
 	}
 
+	if (pb->bpos < offset)
+		memset(pb->buf + pb->bpos, '\0', offset - pb->bpos);
 	memset(pb->buf + offset, charvalue, len);
 	if (pb->bpos < size_needed)
 		pb->bpos = size_needed;
