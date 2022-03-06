@@ -156,7 +156,7 @@ check_include_file(xlocale.h        HAVE_XLOCALE_H)
 
 if (HAVE_INTTYPES_H)
 	# Set a json-c specific var to stamp into json_config.h
-	# in a way that hopefull ywon't conflict with other 
+	# in a way that hopefully won't conflict with other
 	# projects that use json-c.
     set(JSON_C_HAVE_INTTYPES_H 1)
 endif()

@@ -124,7 +124,7 @@ static void test_example_get(void)
 	json_object_put(jo1);
 }
 
-/* I'm not too happy with the RFC example to test the recusion of the json_pointer_get() function */
+/* I'm not too happy with the RFC example to test the recursion of the json_pointer_get() function */
 static void test_recursion_get(void)
 {
 	struct json_object *jo2, *jo1 = json_tokener_parse(rec_input_json_str);

@@ -67,7 +67,7 @@ int lh_ptr_equal(const void *k1, const void *k2)
  * hashlittle from lookup3.c, by Bob Jenkins, May 2006, Public Domain.
  * http://burtleburtle.net/bob/c/lookup3.c
  * minor modifications to make functions static so no symbols are exported
- * minor mofifications to compile with -Werror
+ * minor modifications to compile with -Werror
  */
 
 /*
