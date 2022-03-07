@@ -70,7 +70,7 @@ Issues
     Using heaptrack, and analyzing the histogram, only shows ~2.6MB
     ```
     heaptrack ./json_parse -n canada.json
-    heaptrack --analyze heaptrack*gz -H histgram.out
+    heaptrack --analyze heaptrack*gz -H histogram.out
     awk ' { s=$1; count=$2; ru=(int((s+ 15) / 16)) * 16; wasted = ((ru-s)*count); print s, count, ru-s, wasted; total=total+wasted} END { print "Total: ", total }' histogram.out
     ```
 

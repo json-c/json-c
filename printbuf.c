@@ -136,12 +136,12 @@ int sprintbuf(struct printbuf *p, const char *msg, ...)
 	int size;
 	char buf[128];
 
-	/* user stack buffer first */
+	/* use stack buffer first */
 	va_start(ap, msg);
 	size = vsnprintf(buf, 128, msg, ap);
 	va_end(ap);
 	/* if string is greater than stack buffer, then use dynamic string
-	 * with vasprintf.  Note: some implementation of vsnprintf return -1
+	 * with vasprintf.  Note: some implementations of vsnprintf return -1
 	 * if output is truncated whereas some return the number of bytes that
 	 * would have been written - this code handles both cases.
 	 */
