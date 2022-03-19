@@ -81,7 +81,7 @@ if SELF_TEST is defined.  You can use this free for any purpose.  It's in
 the public domain.  It has no warranty.
 
 You probably want to use hashlittle().  hashlittle() and hashbig()
-hash byte arrays.  hashlittle() is is faster than hashbig() on
+hash byte arrays.  hashlittle() is faster than hashbig() on
 little-endian machines.  Intel and AMD are little-endian machines.
 On second thought, you probably want hashlittle2(), which is identical to
 hashlittle() except it returns two 32-bit hashes for the price of one.
@@ -440,7 +440,7 @@ static uint32_t hashlittle(const void *key, size_t length, uint32_t initval)
 /* clang-format on */
 
 /* a simple hash function similar to what perl does for strings.
- * for good results, the string should not be excessivly large.
+ * for good results, the string should not be excessively large.
  */
 static unsigned long lh_perllike_str_hash(const void *k)
 {
@@ -481,7 +481,7 @@ static unsigned long lh_char_hash(const void *k)
 #elif defined _MSC_VER || defined __MINGW32__
 		InterlockedCompareExchange(&random_seed, seed, -1);
 #else
-		//#warning "racy random seed initializtion if used by multiple threads"
+		//#warning "racy random seed initialization if used by multiple threads"
 		random_seed = seed; /* potentially racy */
 #endif
 	}
