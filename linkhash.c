@@ -65,7 +65,7 @@ int lh_ptr_equal(const void *k1, const void *k2)
 
 /*
  * hashlittle from lookup3.c, by Bob Jenkins, May 2006, Public Domain.
- * http://burtleburtle.net/bob/c/lookup3.c
+ * https://burtleburtle.net/bob/c/lookup3.c
  * minor modifications to make functions static so no symbols are exported
  * minor modifications to compile with -Werror
  */
@@ -156,7 +156,7 @@ satisfy this are
    14  9  3  7 17  3
 Well, "9 15 3 18 27 15" didn't quite get 32 bits diffing
 for "differ" defined as + with a one-bit base and a two-bit delta.  I
-used http://burtleburtle.net/bob/hash/avalanche.html to choose
+used https://burtleburtle.net/bob/hash/avalanche.html to choose
 the operations, constants, and arrangements of the variables.
 
 This does not achieve avalanche.  There are input bits of (a,b,c)
@@ -287,7 +287,7 @@ static uint32_t hashlittle(const void *key, size_t length, uint32_t initval)
 		 * still catch it and complain.  The masking trick does make the hash
 		 * noticeably faster for short strings (like English words).
 		 * AddressSanitizer is similarly picky about overrunning
-		 * the buffer. (http://clang.llvm.org/docs/AddressSanitizer.html
+		 * the buffer. (https://clang.llvm.org/docs/AddressSanitizer.html)
 		 */
 #ifdef VALGRIND
 #define PRECISE_MEMORY_ACCESS 1

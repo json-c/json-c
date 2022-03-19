@@ -267,7 +267,7 @@ following more specific header files:
 * json_visit.h   - Methods for walking a tree of json-c objects.
 * json_util.h    - Miscellaneous utility functions.
 
-For a full list of headers see [files.html](http://json-c.github.io/json-c/json-c-current-release/doc/html/files.html)
+For a full list of headers see [files.html](https://json-c.github.io/json-c/json-c-current-release/doc/html/files.html)
 
 The primary type in json-c is json_object.  It describes a reference counted
 tree of json objects which are created by either parsing text with a
