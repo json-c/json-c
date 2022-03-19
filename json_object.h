@@ -52,7 +52,7 @@ extern "C" {
  * json_object_to_file_ext() functions which causes
  * the output to be formatted.
  *
- * See the "Two Space Tab" option at http://jsonformatter.curiousconcept.com/
+ * See the "Two Space Tab" option at https://jsonformatter.curiousconcept.com/
  * for an example of the format.
  */
 #define JSON_C_TO_STRING_PRETTY (1 << 1)
