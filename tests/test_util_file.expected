@@ -4,7 +4,7 @@ OK: correctly unable to parse contents of valid_nested.json with low max depth: 
 
 OK: json_object_from_file(./not_present.json) correctly returned NULL: json_object_from_file: error opening file ./not_present.json: ERRNO=ENOENT
 
-OK: json_object_from_fd(closed_fd), expecting NULL, EBADF, got:NULL, json_object_from_fd: error reading fd 10: ERRNO=EBADF
+OK: json_object_from_fd(closed_fd), expecting NULL, EBADF, got:NULL, json_object_from_fd_ex: error reading fd 10: ERRNO=EBADF
 
 OK: json_object_to_file(json.out, jso)=0
 file[json.out], size=336, contents={"foo":1234,"foo1":"abcdefghijklmnopqrstuvwxyz","foo2":"abcdefghijklmnopqrstuvwxyz","foo3":"abcdefghijklmnopqrstuvwxyz","foo4":"abcdefghijklmnopqrstuvwxyz","foo5":"abcdefghijklmnopqrstuvwxyz","foo6":"abcdefghijklmnopqrstuvwxyz","foo7":"abcdefghijklmnopqrstuvwxyz","foo8":"abcdefghijklmnopqrstuvwxyz","foo9":"abcdefghijklmnopqrstuvwxyz"}

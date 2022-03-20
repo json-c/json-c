@@ -15,6 +15,7 @@
 
 #include "config.h"
 
+#include <errno.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -56,6 +57,8 @@ struct printbuf *printbuf_new(void)
  *
  * If the current size is large enough, nothing is changed.
  *
+ * If extension failed, errno is set to indicate the error.
+ *
  * Note: this does not check the available space!  The caller
  *  is responsible for performing those calculations.
  */
@@ -68,7 +71,10 @@ static int printbuf_extend(struct printbuf *p, int min_size)
 		return 0;
 	/* Prevent signed integer overflows with large buffers. */
 	if (min_size > INT_MAX - 8)
+	{
+		errno = EFBIG;
 		return -1;
+	}
 	if (p->size > INT_MAX / 2)
 		new_size = min_size + 8;
 	else {
@@ -77,7 +83,7 @@ static int printbuf_extend(struct printbuf *p, int min_size)
 			new_size = min_size + 8;
 	}
 #ifdef PRINTBUF_DEBUG
-	MC_DEBUG("printbuf_memappend: realloc "
+	MC_DEBUG("printbuf_extend: realloc "
 	         "bpos=%d min_size=%d old_size=%d new_size=%d\n",
 	         p->bpos, min_size, p->size, new_size);
 #endif /* PRINTBUF_DEBUG */
@@ -92,7 +98,10 @@ int printbuf_memappend(struct printbuf *p, const char *buf, int size)
 {
 	/* Prevent signed integer overflows with large buffers. */
 	if (size < 0 || size > INT_MAX - p->bpos - 1)
+	{
+		errno = EFBIG;
 		return -1;
+	}
 	if (p->size <= p->bpos + size + 1)
 	{
 		if (printbuf_extend(p, p->bpos + size + 1) < 0)
@@ -112,7 +121,10 @@ int printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len)
 		offset = pb->bpos;
 	/* Prevent signed integer overflows with large buffers. */
 	if (len < 0 || offset < -1 || len > INT_MAX - offset)
+	{
+		errno = EFBIG;
 		return -1;
+	}
 	size_needed = offset + len;
 	if (pb->size < size_needed)
 	{
