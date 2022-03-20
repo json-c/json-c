@@ -933,7 +933,21 @@ int json_c_set_serialization_double_format(const char *double_format, int global
 #endif
 		if (global_serialization_float_format)
 			free(global_serialization_float_format);
-		global_serialization_float_format = double_format ? strdup(double_format) : NULL;
+		if (double_format)
+		{
+			char *p = strdup(double_format);
+			if (p == NULL)
+			{
+				_json_c_set_last_err("json_c_set_serialization_double_format: "
+				                     "out of memory\n");
+				return -1;
+			}
+			global_serialization_float_format = p;
+		}
+		else
+		{
+			global_serialization_float_format = NULL;
+		}
 	}
 	else if (global_or_thread == JSON_C_OPTION_THREAD)
 	{
@@ -943,9 +957,23 @@ int json_c_set_serialization_double_format(const char *double_format, int global
 			free(tls_serialization_float_format);
 			tls_serialization_float_format = NULL;
 		}
-		tls_serialization_float_format = double_format ? strdup(double_format) : NULL;
+		if (double_format)
+		{
+			char *p = strdup(double_format);
+			if (p == NULL)
+			{
+				_json_c_set_last_err("json_c_set_serialization_double_format: "
+				                     "out of memory\n");
+				return -1;
+			}
+			tls_serialization_float_format = p;
+		}
+		else
+		{
+			tls_serialization_float_format = NULL;
+		}
 #else
-		_json_c_set_last_err("json_c_set_set_serialization_double_format: not compiled "
+		_json_c_set_last_err("json_c_set_serialization_double_format: not compiled "
 		                     "with __thread support\n");
 		return -1;
 #endif
@@ -1590,15 +1618,22 @@ static int json_object_copy_serializer_data(struct json_object *src, struct json
 	if (dst->_to_json_string == json_object_userdata_to_json_string ||
 	    dst->_to_json_string == _json_object_userdata_to_json_string)
 	{
+		char *p;
 		assert(src->_userdata);
-		dst->_userdata = strdup(src->_userdata);
+		p = strdup(src->_userdata);
+		if (p == NULL)
+		{
+			_json_c_set_last_err("json_object_copy_serializer_data: out of memory\n");
+			return -1;
+		}
+		dst->_userdata = p;
 	}
 	// else if ... other supported serializers ...
 	else
 	{
 		_json_c_set_last_err(
-		    "json_object_deep_copy: unable to copy unknown serializer data: %p\n",
-		    (void *)dst->_to_json_string);
+		    "json_object_copy_serializer_data: unable to copy unknown serializer data: "
+		    "%p\n", (void *)dst->_to_json_string);
 		return -1;
 	}
 	dst->_user_delete = src->_user_delete;
