@@ -28,6 +28,7 @@ enum json_tokener_error
 	json_tokener_success,
 	json_tokener_continue,
 	json_tokener_error_depth,
+	json_tokener_error_memory,
 	json_tokener_error_parse_eof,
 	json_tokener_error_parse_unexpected,
 	json_tokener_error_parse_null,
