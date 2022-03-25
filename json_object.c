@@ -38,7 +38,7 @@
 #define is_plain_digit(c) ((c) >= '0' && (c) <= '9')
 
 #if SIZEOF_LONG_LONG != SIZEOF_INT64_T
-#error The long long type isn't 64-bits
+#error The long long type is not 64-bits
 #endif
 
 #ifndef SSIZE_T_MAX
