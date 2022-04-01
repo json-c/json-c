@@ -33,6 +33,7 @@ Build Status
 
 Test Status
 * [Coveralls](https://coveralls.io/github/json-c/json-c?branch=master) [![Coverage Status](https://coveralls.io/repos/github/json-c/json-c/badge.svg?branch=master)](https://coveralls.io/github/json-c/json-c?branch=master)
+* [TrustInSoft CI](https://ci.trust-in-soft.com/projects/json-c/json-c/latest) [![TrustInSoft CI](https://ci.trust-in-soft.com/projects/json-c/json-c.svg)](https://ci.trust-in-soft.com/projects/json-c/json-c)
 
 Building on Unix with `git`, `gcc` and `cmake` <a name="buildunix"></a>
 --------------------------------------------------

@@ -1,0 +1,4 @@
+{ "files": ["inp\t.c"],
+  "machdep": "gc6_64",
+  "main": "main"
+}

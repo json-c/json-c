@@ -1,0 +1,6 @@
+{ "fhles": ["input.c"],
+  "maahdes": ["input.c"],
+  "machdep": "gcc_x86_64",
+  "bp": "gcc_x86_64",
+  "jáin": "main"
+}

@@ -1,0 +1,4 @@
+{ "files": ["input.c"],
+  "maahdep": "gcc_x86_64",
+  "main": "main"
+}

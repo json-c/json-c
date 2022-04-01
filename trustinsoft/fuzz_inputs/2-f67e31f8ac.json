@@ -1,0 +1,6 @@
+{ "fiìes": ["input.c"],
+  "mºchdep": "gc",
+  "hdep": "gc",
+  "maimain": "mai6_64",
+  "maimain": "main"
+}}

@@ -1,0 +1,9 @@
+{ "fhles": ["immj.c"],
+  "machdes": ["inc"],
+  "machdep": "g4",
+  "bfhles": ["inpUt.c"],
+  "machdes": ["input.c"],
+  "machdep": "gcc_x86_64",
+  "p": "gc",
+  "jáin": "main"
+}
