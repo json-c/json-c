@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 Note: for general questions and comments, please use the forums at:
-https://groups.google.com/forum/#!forum/json-c
+https://groups.google.com/g/json-c
 
 **Describe the bug**
 A clear and concise description of what the bug is, and any information about where you're running into the bug that you feel might be relevant.
