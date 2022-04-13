@@ -24,7 +24,8 @@
 		  the _new_ release version.
     * Update the AUTHORS file
 
-        git log -r 31ab57ca..HEAD | grep Author: | sed -e's/Author: //' ; cat AUTHORS ) | sort -u > A1
+        PREV=$(git tag | tail -1)
+        ( git log -r ${PREV}..HEAD | grep Author: | sed -e's/Author: //' ; cat AUTHORS ) | sort -u > A1
         mv A1 AUTHORS
 
     * Exclude mentioning changes that have already been included in a point 
