@@ -168,3 +168,8 @@ JSONC_0.16 {
 #  global:
 #      ...new symbols here...
 } JSONC_0.15;
+
+JSONC_0.17 {
+#  global:
+#      ...new symbols here...
+} JSONC_0.16;
