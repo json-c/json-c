@@ -1,15 +1,55 @@
 
-Next Release 0.16
-=====================
+0.16 (up to commit 66dcdf5, 2022-04-13)
+========================================
 
-Significant changes and bug fixes
----------------------------------
-* Introduce constant JSON_C_OBJECT_ADD_CONSTANT_KEY
-   as a replacement of JSON_C_OBJECT_KEY_IS_CONSTANT,
-   JSON_C_OBJECT_KEY_IS_CONSTANT becoming legacy.
+Deprecated and removed features:
+--------------------------------
+* JSON_C_OBJECT_KEY_IS_CONSTANT is deprecated in favor of
+  JSON_C_OBJECT_ADD_CONSTANT_KEY
 * Direct access to lh_table and lh_entry structure members is deprecated.  
   Use access functions instead, lh_table_head(), lh_entry_next(), etc...
 * Drop REFCOUNT_DEBUG code.
+
+New features
+------------
+* The 0.16 release introduces no new features
+
+Build changes
+-------------
+* Add a DISABLE_EXTRA_LIBS option to skip using libbsd
+* Add a DISABLE_JSON_POINTER option to skip compiling in json_pointer support.
+
+Significant changes and bug fixes
+---------------------------------
+* Cap string length at INT_MAX to avoid various issues with very long strings.
+* json_object_deep_copy: fix deep copy of strings containing '\0'
+* Fix read past end of buffer in the "json_parse" command
+* Avoid out of memory accesses in the locally provided vasprintf() function
+  (for those platforms that use it)
+* Handle allocation failure in json_tokener_new_ex
+* Fix use-after-free in json_tokener_new_ex() in the event of printbuf_new() returning NULL
+* printbuf_memset(): set gaps to zero - areas within the print buffer which
+  have not been initialized by using printbuf_memset
+* printbuf: return -1 on invalid arguments (len < 0 or total buffer > INT_MAX)
+* sprintbuf(): propagate printbuf_memappend errors back to the caller
+
+Optimizations
+--------------
+* Speed up parsing by replacing ctype functions with simplified, faster 
+  non-locale-sensitive ones in json_tokener and json_object_to_json_string.
+* Neither vertical tab nor formfeed are considered whitespace per the JSON spec
+* json_object: speed up creation of objects, calloc() -> malloc() + set fields
+* Avoid needless extra strlen() call in json_c_shallow_copy_default() and
+  json_object_equal() when the object is known to be a json_type_string.
+
+Other changes
+-------------
+* Validate size arguments in arraylist functions.
+* Use getrandom() if available; with GRND_NONBLOCK to allow use of json-c
+  very early during boot, such as part of cryptsetup.
+* Use arc4random() if it's available.
+* random_seed: on error, continue to next method instead of exiting the process
+* Close file when unable to read from /dev/urandom in get_dev_random_seed()
 
 ***
 
