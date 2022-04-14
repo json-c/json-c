@@ -131,6 +131,8 @@ DISABLE_STATIC_FPIC          | Bool   | The default builds position independent 
 DISABLE_BSYMBOLIC            | Bool   | Disable use of -Bsymbolic-functions.
 DISABLE_THREAD_LOCAL_STORAGE | Bool   | Disable use of Thread-Local Storage (HAVE___THREAD).
 DISABLE_WERROR               | Bool   | Disable use of -Werror.
+DISABLE_EXTRA_LIBS           | Bool   | Disable use of extra libraries, libbsd
+DISABLE_JSON_POINTER         | Bool   | Omit json_pointer support from the build.
 ENABLE_RDRAND                | Bool   | Enable RDRAND Hardware RNG Hash Seed.
 ENABLE_THREADING             | Bool   | Enable partial threading support.
 OVERRIDE_GET_RANDOM_SEED     | String | A block of code to use instead of the default implementation of json_c_get_random_seed(), e.g. on embedded platforms where not even the fallback to time() works.  Must be a single line.
