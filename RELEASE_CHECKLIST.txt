@@ -113,7 +113,8 @@ Go to Amazon S3 service at:
     https://console.aws.amazon.com/s3/
 
 Upload the two tarballs in the json-c_releases/releases folder.
-	When uploading, use "Standard" storage class, and make the uploaded files publicly accessible.
+* Expand "Permissions", pick "Grant public-read access"
+* Expand "Properties", ensure "Standard" storage class is picked.
 
 Logout of Amazon S3, and verify that the files are visible.
     https://s3.amazonaws.com/json-c_releases/releases/index.html
