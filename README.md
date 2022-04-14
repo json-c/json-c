@@ -4,14 +4,15 @@
 ========
 
 1. [Overview and Build Status](#overview)
-2. [Building on Unix](#buildunix)
+2. [Getting Help](#gettinghelp)
+3. [Building on Unix](#buildunix)
     * [Prerequisites](#installprereq)
     * [Build commands](#buildcmds)
-3. [CMake options](#CMake)
-4. [Testing](#testing)
-5. [Building with `vcpkg`](#buildvcpkg)
-6. [Linking to libjson-c](#linking)
-7. [Using json-c](#using)
+4. [CMake options](#CMake)
+5. [Testing](#testing)
+6. [Building with `vcpkg`](#buildvcpkg)
+7. [Linking to libjson-c](#linking)
+8. [Using json-c](#using)
 
 JSON-C - A JSON implementation in C <a name="overview"></a>
 -----------------------------------
@@ -27,18 +28,36 @@ if you already have json-c installed and ready to use.
 
 Home page for json-c: https://github.com/json-c/json-c/wiki
 
-Build Status
-* [AppVeyor Build](https://ci.appveyor.com/project/hawicz/json-c) ![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/json-c/json-c?branch=master&svg=true)
-* [Travis Build](https://travis-ci.org/json-c/json-c) ![Travis Build Status](https://travis-ci.org/json-c/json-c.svg?branch=master)
+Getting Help <a name="gettinghelp"></a>
+------------
 
-Test Status
-* [Coveralls](https://coveralls.io/github/json-c/json-c?branch=master) [![Coverage Status](https://coveralls.io/repos/github/json-c/json-c/badge.svg?branch=master)](https://coveralls.io/github/json-c/json-c?branch=master)
+If you have questions about using json-c, please start a thread on the
+our forums at: https://groups.google.com/forum/#!forum/json-c
+
+If you believe you've discovered a bug, report it at 
+(https://github.com/json-c/json-c/issues).  Please be sure to include
+the version of json-c you're using, the OS you're running on, and any
+other relevant details.  Fully reproducible test cases and/or patches
+to fix problems are greatly appreciated.
+
+Fixes for bugs, or small new features can be directly submitted as a 
+[pull request](https://github.com/json-c/json-c/pulls).  For major new
+features or large changes of any kind, please first start a discussion
+on the [forums](https://groups.google.com/forum/#!forum/json-c).
+
 
 Building on Unix with `git`, `gcc` and `cmake` <a name="buildunix"></a>
 --------------------------------------------------
 
 If you already have json-c installed, see [Linking to `libjson-c`](#linking)
 for how to build and link your program against it.
+
+Build Status
+* [AppVeyor Build](https://ci.appveyor.com/project/hawicz/json-c) ![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/json-c/json-c?branch=master&svg=true)
+* [Travis Build](https://travis-ci.org/json-c/json-c) ![Travis Build Status](https://travis-ci.org/json-c/json-c.svg?branch=master)
+
+Test Status
+* [Coveralls](https://coveralls.io/github/json-c/json-c?branch=master) [![Coverage Status](https://coveralls.io/repos/github/json-c/json-c/badge.svg?branch=master)](https://coveralls.io/github/json-c/json-c?branch=master)
 
 ### Prerequisites: <a name="installprereq"></a>
 
