@@ -14,39 +14,22 @@
 # limitations under the License.
 #
 ################################################################################
+# this is expected to be run only by oss-fuzz. It will run from $SRC (above json-c)
+cp $SRC/json-c/fuzz/*.dict "$OUT/"
 
-# This should be run from the top of the json-c source tree.
+BUILD="$SRC/json-c/build"
 
-mkdir build
-cd build
-cmake -DBUILD_SHARED_LIBS=OFF ..
+zip -j "$SRC/corpus.zip" "$SRC/go-fuzz-corpus/json/corpus"
+
+mkdir "$BUILD"
+cd "$BUILD"
+cmake -DCMAKE_C_FLAGS="$CFLAGS" -DCMAKE_CXX_FLAGS="$CXXFLAGS" -DBUILD_SHARED_LIBS=OFF ..
 make -j$(nproc)
+cp fuzz/*_fuzzer "$OUT/"
 
-LIB=$(pwd)/libjson-c.a
-cd ..
+fuzzerFiles=$(find fuzz/ -name "*_fuzzer")
 
-# These seem to be set externally, but let's assign defaults to
-# make it possible to at least partially test this standalone.
-: ${SRC:=$(dirname "$0")}
-: ${OUT:=$SRC/out}
-: ${CXX:=gcc}
-: ${CXXFLAGS:=}
-
-[ -d "$OUT" ] || mkdir "$OUT"
-cp $SRC/*.dict $OUT/.
-
-# XXX this doesn't seem to make much sense, since $SRC is presumably
-# the "fuzz" directory, which is _inside_ the json-c repo, rather than
-# the other way around, but I'm just preserving existing behavior. -erh
-INCS=$SRC/json-c
-# Compat when testing standalone
-[ -e "${INCS}" ] || ln -s .. "${INCS}"
-
-set -x
-set -v
-for f in $SRC/*_fuzzer.cc; do
-    fuzzer=$(basename "$f" _fuzzer.cc)
-    $CXX $CXXFLAGS -std=c++11 -I$INCS \
-         $SRC/${fuzzer}_fuzzer.cc -o $OUT/${fuzzer}_fuzzer \
-         -lFuzzingEngine $LIB
+for F in $fuzzerFiles; do
+	FN=$(basename -- $F)
+	cp "$SRC/corpus.zip" "$OUT/${FN}_seed_corpus.zip"
 done
