@@ -65,8 +65,14 @@ while [ $# -gt 0 ] ; do
 	--enable-shared)
 		FLAGS+=(-DBUILD_SHARED_LIBS=ON)
 		;;
+	--disable-shared)
+		FLAGS+=(-DBUILD_SHARED_LIBS=OFF)
+		;;
 	--enable-static)
 		FLAGS+=(-DBUILD_STATIC_LIBS=ON)
+		;;
+	--disable-static)
+		FLAGS+=(-DBUILD_STATIC_LIBS=OFF)
 		;;
 	--disable-Bsymbolic)
 		FLAGS+=(-DDISABLE_BSYMBOLIC=ON)
