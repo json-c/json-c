@@ -1,5 +1,8 @@
 /* Copyright (C) 2016 by Rainer Gerhards
  * Released under ASL 2.0 */
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
 #include "config.h"
 #include "json_object.h"
 #include "json_tokener.h"

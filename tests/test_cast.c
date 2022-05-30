@@ -3,6 +3,9 @@
  * Also checks the json_object_get_type and json_object_is_type functions.
  */
 
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>

@@ -2,6 +2,9 @@
  * gcc -o utf8 utf8.c -I/home/y/include -L./.libs -ljson
  */
 
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
 #include "config.h"
 #include <assert.h>
 #include <stdio.h>

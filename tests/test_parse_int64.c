@@ -1,4 +1,7 @@
 
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
 #include <stdio.h>
 #include <string.h>
 
