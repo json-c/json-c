@@ -11,7 +11,7 @@
 /* Avoid compiler warnings about diving by constant zero */
 double zero_dot_zero = 0.0;
 
-int main()
+int main(int argc, char **argv)
 {
 	struct json_object *obj = json_object_new_double(0.5);
 	char udata[] = "test";

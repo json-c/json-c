@@ -9,7 +9,7 @@
 #include "json_inttypes.h"
 #include "json_object.h"
 
-int main()
+int main(int argc, char **argv)
 {
 	/* integer tests */
 	struct json_object *int1 = json_object_new_int(0);

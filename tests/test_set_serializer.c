@@ -73,7 +73,8 @@ int main(int argc, char **argv)
 	my_sub_object = json_object_new_double(1.0);
 	json_object_object_add(my_object, "double", my_sub_object);
 	printf("Check that the custom serializer does not include nul byte:\n");
-	json_object_set_serializer(my_sub_object, json_object_double_to_json_string, "%125.0f,", NULL);
+#define UNCONST(a) ((void *)(uintptr_t)(const void *)(a))
+	json_object_set_serializer(my_sub_object, json_object_double_to_json_string, UNCONST("%125.0f"), NULL);
 	printf("my_object.to_string(custom serializer)=%s\n",
 	       json_object_to_json_string_ext(my_object, JSON_C_TO_STRING_NOZERO));
 

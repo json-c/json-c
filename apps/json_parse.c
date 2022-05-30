@@ -82,7 +82,7 @@ static int parseit(int fd, int (*callback)(struct json_object *))
 			int parse_end = json_tokener_get_parse_end(tok);
 			if (obj == NULL && jerr != json_tokener_continue)
 			{
-				char *aterr = (start_pos + parse_end < sizeof(buf)) ?
+				const char *aterr = (start_pos + parse_end < (int)sizeof(buf)) ?
 					&buf[start_pos + parse_end] : "";
 				fflush(stdout);
 				int fail_offset = total_read - ret + start_pos + parse_end;
@@ -158,7 +158,6 @@ static void usage(const char *argv0, int exitval, const char *errmsg)
 
 int main(int argc, char **argv)
 {
-	json_object *new_obj;
 	int opt;
 
 	while ((opt = getopt(argc, argv, "fhns")) != -1)

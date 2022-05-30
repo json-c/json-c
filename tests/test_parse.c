@@ -200,8 +200,8 @@ static void test_utf8_parse()
 	// json_tokener_parse doesn't support checking for byte order marks.
 	// It's the responsibility of the caller to detect and skip a BOM.
 	// Both of these checks return null.
-	char *utf8_bom = "\xEF\xBB\xBF";
-	char *utf8_bom_and_chars = "\xEF\xBB\xBF{}";
+	const char *utf8_bom = "\xEF\xBB\xBF";
+	const char *utf8_bom_and_chars = "\xEF\xBB\xBF{}";
 	single_basic_parse(utf8_bom, 0);
 	single_basic_parse(utf8_bom_and_chars, 0);
 }
@@ -256,24 +256,24 @@ struct incremental_step
 } incremental_steps[] = {
 
     /* Check that full json messages can be parsed, both w/ and w/o a reset */
-    {"{ \"foo\": 123 }", -1, -1, json_tokener_success, 0},
-    {"{ \"foo\": 456 }", -1, -1, json_tokener_success, 1},
-    {"{ \"foo\": 789 }", -1, -1, json_tokener_success, 1},
+    {"{ \"foo\": 123 }", -1, -1, json_tokener_success, 0, 0},
+    {"{ \"foo\": 456 }", -1, -1, json_tokener_success, 1, 0},
+    {"{ \"foo\": 789 }", -1, -1, json_tokener_success, 1, 0},
 
     /* Check the comment parse*/
-    {"/* hello */{ \"foo\"", -1, -1, json_tokener_continue, 0},
-    {"/* hello */:/* hello */", -1, -1, json_tokener_continue, 0},
-    {"\"bar\"/* hello */", -1, -1, json_tokener_continue, 0},
-    {"}/* hello */", -1, -1, json_tokener_success, 1},
-    {"/ hello ", -1, 1, json_tokener_error_parse_comment, 1},
-    {"/* hello\"foo\"", -1, -1, json_tokener_continue, 1},
-    {"/* hello*\"foo\"", -1, -1, json_tokener_continue, 1},
-    {"// hello\"foo\"", -1, -1, json_tokener_continue, 1},
+    {"/* hello */{ \"foo\"", -1, -1, json_tokener_continue, 0, 0},
+    {"/* hello */:/* hello */", -1, -1, json_tokener_continue, 0, 0},
+    {"\"bar\"/* hello */", -1, -1, json_tokener_continue, 0, 0},
+    {"}/* hello */", -1, -1, json_tokener_success, 1, 0},
+    {"/ hello ", -1, 1, json_tokener_error_parse_comment, 1, 0},
+    {"/* hello\"foo\"", -1, -1, json_tokener_continue, 1, 0},
+    {"/* hello*\"foo\"", -1, -1, json_tokener_continue, 1, 0},
+    {"// hello\"foo\"", -1, -1, json_tokener_continue, 1, 0},
 
     /*  Check a basic incremental parse */
-    {"{ \"foo", -1, -1, json_tokener_continue, 0},
-    {"\": {\"bar", -1, -1, json_tokener_continue, 0},
-    {"\":13}}", -1, -1, json_tokener_success, 1},
+    {"{ \"foo", -1, -1, json_tokener_continue, 0, 0},
+    {"\": {\"bar", -1, -1, json_tokener_continue, 0, 0},
+    {"\":13}}", -1, -1, json_tokener_success, 1, 0},
 
     /* Check the UTF-16 surrogate pair handling in various ways.
 	 * Note: \ud843\udd1e is u+1D11E, Musical Symbol G Clef
@@ -281,56 +281,56 @@ struct incremental_step
 	 *  PuTTY doesn't currently show this character.
 	 */
     /* parse one char at every time */
-    {"\"\\", -1, -1, json_tokener_continue, 0},
-    {"u", -1, -1, json_tokener_continue, 0},
-    {"d", -1, -1, json_tokener_continue, 0},
-    {"8", -1, -1, json_tokener_continue, 0},
-    {"3", -1, -1, json_tokener_continue, 0},
-    {"4", -1, -1, json_tokener_continue, 0},
-    {"\\", -1, -1, json_tokener_continue, 0},
-    {"u", -1, -1, json_tokener_continue, 0},
-    {"d", -1, -1, json_tokener_continue, 0},
-    {"d", -1, -1, json_tokener_continue, 0},
-    {"1", -1, -1, json_tokener_continue, 0},
-    {"e\"", -1, -1, json_tokener_success, 1},
+    {"\"\\", -1, -1, json_tokener_continue, 0, 0},
+    {"u", -1, -1, json_tokener_continue, 0, 0},
+    {"d", -1, -1, json_tokener_continue, 0, 0},
+    {"8", -1, -1, json_tokener_continue, 0, 0},
+    {"3", -1, -1, json_tokener_continue, 0, 0},
+    {"4", -1, -1, json_tokener_continue, 0, 0},
+    {"\\", -1, -1, json_tokener_continue, 0, 0},
+    {"u", -1, -1, json_tokener_continue, 0, 0},
+    {"d", -1, -1, json_tokener_continue, 0, 0},
+    {"d", -1, -1, json_tokener_continue, 0, 0},
+    {"1", -1, -1, json_tokener_continue, 0, 0},
+    {"e\"", -1, -1, json_tokener_success, 1, 0},
     /* parse two char at every time */
-    {"\"\\u", -1, -1, json_tokener_continue, 0},
-    {"d8", -1, -1, json_tokener_continue, 0},
-    {"34", -1, -1, json_tokener_continue, 0},
-    {"\\u", -1, -1, json_tokener_continue, 0},
-    {"dd", -1, -1, json_tokener_continue, 0},
-    {"1e\"", -1, -1, json_tokener_success, 1},
+    {"\"\\u", -1, -1, json_tokener_continue, 0, 0},
+    {"d8", -1, -1, json_tokener_continue, 0, 0},
+    {"34", -1, -1, json_tokener_continue, 0, 0},
+    {"\\u", -1, -1, json_tokener_continue, 0, 0},
+    {"dd", -1, -1, json_tokener_continue, 0, 0},
+    {"1e\"", -1, -1, json_tokener_success, 1, 0},
     /* check the low surrogate pair */
-    {"\"\\ud834", -1, -1, json_tokener_continue, 0},
-    {"\\udd1e\"", -1, -1, json_tokener_success, 1},
-    {"\"\\ud834\\", -1, -1, json_tokener_continue, 0},
-    {"udd1e\"", -1, -1, json_tokener_success, 1},
-    {"\"\\ud834\\u", -1, -1, json_tokener_continue, 0},
-    {"dd1e\"", -1, -1, json_tokener_success, 1},
-    {"\"fff \\ud834\\ud", -1, -1, json_tokener_continue, 0},
-    {"d1e bar\"", -1, -1, json_tokener_success, 1},
-    {"\"fff \\ud834\\udd", -1, -1, json_tokener_continue, 0},
-    {"1e bar\"", -1, -1, json_tokener_success, 1},
+    {"\"\\ud834", -1, -1, json_tokener_continue, 0, 0},
+    {"\\udd1e\"", -1, -1, json_tokener_success, 1, 0},
+    {"\"\\ud834\\", -1, -1, json_tokener_continue, 0, 0},
+    {"udd1e\"", -1, -1, json_tokener_success, 1, 0},
+    {"\"\\ud834\\u", -1, -1, json_tokener_continue, 0, 0},
+    {"dd1e\"", -1, -1, json_tokener_success, 1, 0},
+    {"\"fff \\ud834\\ud", -1, -1, json_tokener_continue, 0, 0},
+    {"d1e bar\"", -1, -1, json_tokener_success, 1, 0},
+    {"\"fff \\ud834\\udd", -1, -1, json_tokener_continue, 0, 0},
+    {"1e bar\"", -1, -1, json_tokener_success, 1, 0},
 
     /* \ud83d\ude00 is U+1F600, Grinning Face
 	 * Displays fine in PuTTY, though you may need "less -r"
 	 */
-    {"\"fff \\ud83d\\ude", -1, -1, json_tokener_continue, 0},
-    {"00 bar\"", -1, -1, json_tokener_success, 1},
+    {"\"fff \\ud83d\\ude", -1, -1, json_tokener_continue, 0, 0},
+    {"00 bar\"", -1, -1, json_tokener_success, 1, 0},
 
     /* Check that json_tokener_reset actually resets */
-    {"{ \"foo", -1, -1, json_tokener_continue, 1},
-    {": \"bar\"}", -1, 0, json_tokener_error_parse_unexpected, 1},
+    {"{ \"foo", -1, -1, json_tokener_continue, 1, 0},
+    {": \"bar\"}", -1, 0, json_tokener_error_parse_unexpected, 1, 0},
 
     /* Check incremental parsing with trailing characters */
-    {"{ \"foo", -1, -1, json_tokener_continue, 0},
-    {"\": {\"bar", -1, -1, json_tokener_continue, 0},
-    {"\":13}}XXXX", 10, 6, json_tokener_success, 0},
-    {"XXXX", 4, 0, json_tokener_error_parse_unexpected, 1},
+    {"{ \"foo", -1, -1, json_tokener_continue, 0, 0},
+    {"\": {\"bar", -1, -1, json_tokener_continue, 0, 0},
+    {"\":13}}XXXX", 10, 6, json_tokener_success, 0, 0},
+    {"XXXX", 4, 0, json_tokener_error_parse_unexpected, 1, 0},
 
     /* Check that trailing characters can change w/o a reset */
-    {"{\"x\": 123 }\"X\"", -1, 11, json_tokener_success, 0},
-    {"\"Y\"", -1, -1, json_tokener_success, 1},
+    {"{\"x\": 123 }\"X\"", -1, 11, json_tokener_success, 0, 0},
+    {"\"Y\"", -1, -1, json_tokener_success, 1, 0},
 
     /* Trailing characters should cause a failure in strict mode */
     {"{\"foo\":9}{\"bar\":8}", -1, 9, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
@@ -342,116 +342,116 @@ struct incremental_step
      JSON_TOKENER_STRICT | JSON_TOKENER_ALLOW_TRAILING_CHARS},
 
     /* To stop parsing a number we need to reach a non-digit, e.g. a \0 */
-    {"1", 1, 1, json_tokener_continue, 0},
+    {"1", 1, 1, json_tokener_continue, 0, 0},
     /* This should parse as the number 12, since it continues the "1" */
-    {"2", 2, 1, json_tokener_success, 0},
-    {"12{", 3, 2, json_tokener_success, 1},
+    {"2", 2, 1, json_tokener_success, 0, 0},
+    {"12{", 3, 2, json_tokener_success, 1, 0},
     /* Parse number in strict mode */
     {"[02]", -1, 3, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
 
-    {"0e+0", 5, 4, json_tokener_success, 1},
-    {"[0e+0]", -1, -1, json_tokener_success, 1},
+    {"0e+0", 5, 4, json_tokener_success, 1, 0},
+    {"[0e+0]", -1, -1, json_tokener_success, 1, 0},
 
     /* The behavior when missing the exponent varies slightly */
-    {"0e", 2, 2, json_tokener_continue, 1},
-    {"0e", 3, 2, json_tokener_success, 1},
+    {"0e", 2, 2, json_tokener_continue, 1, 0},
+    {"0e", 3, 2, json_tokener_success, 1, 0},
     {"0e", 3, 2, json_tokener_error_parse_eof, 1, JSON_TOKENER_STRICT},
-    {"[0e]", -1, -1, json_tokener_success, 1},
+    {"[0e]", -1, -1, json_tokener_success, 1, 0},
     {"[0e]", -1, 3, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
 
-    {"0e+", 3, 3, json_tokener_continue, 1},
-    {"0e+", 4, 3, json_tokener_success, 1},
+    {"0e+", 3, 3, json_tokener_continue, 1, 0},
+    {"0e+", 4, 3, json_tokener_success, 1, 0},
     {"0e+", 4, 3, json_tokener_error_parse_eof, 1, JSON_TOKENER_STRICT},
-    {"[0e+]", -1, -1, json_tokener_success, 1},
+    {"[0e+]", -1, -1, json_tokener_success, 1, 0},
     {"[0e+]", -1, 4, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
 
-    {"0e-", 3, 3, json_tokener_continue, 1},
-    {"0e-", 4, 3, json_tokener_success, 1},
+    {"0e-", 3, 3, json_tokener_continue, 1, 0},
+    {"0e-", 4, 3, json_tokener_success, 1, 0},
     {"0e-", 4, 3, json_tokener_error_parse_eof, 1, JSON_TOKENER_STRICT},
-    {"[0e-]", -1, -1, json_tokener_success, 1},
+    {"[0e-]", -1, -1, json_tokener_success, 1, 0},
     {"[0e-]", -1, 4, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
 
     /* You might expect this to fail, but it won't because
 	   it's a valid partial parse; note the char_offset: */
-    {"0e+-", 5, 3, json_tokener_success, 1},
+    {"0e+-", 5, 3, json_tokener_success, 1, 0},
     {"0e+-", 5, 3, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
-    {"[0e+-]", -1, 4, json_tokener_error_parse_number, 1},
+    {"[0e+-]", -1, 4, json_tokener_error_parse_number, 1, 0},
 
     /* Similar tests for other kinds of objects: */
     /* These could all return success immediately, since regardless of
 	   what follows the false/true/null token we *will* return a json object,
        but it currently doesn't work that way.  hmm... */
-    {"false", 5, 5, json_tokener_continue, 1},
-    {"false", 6, 5, json_tokener_success, 1},
-    {"true", 4, 4, json_tokener_continue, 1},
-    {"true", 5, 4, json_tokener_success, 1},
-    {"null", 4, 4, json_tokener_continue, 1},
-    {"null", 5, 4, json_tokener_success, 1},
+    {"false", 5, 5, json_tokener_continue, 1, 0},
+    {"false", 6, 5, json_tokener_success, 1, 0},
+    {"true", 4, 4, json_tokener_continue, 1, 0},
+    {"true", 5, 4, json_tokener_success, 1, 0},
+    {"null", 4, 4, json_tokener_continue, 1, 0},
+    {"null", 5, 4, json_tokener_success, 1, 0},
 
-    {"Infinity", 9, 8, json_tokener_success, 1},
-    {"infinity", 9, 8, json_tokener_success, 1},
-    {"-infinity", 10, 9, json_tokener_success, 1},
+    {"Infinity", 9, 8, json_tokener_success, 1, 0},
+    {"infinity", 9, 8, json_tokener_success, 1, 0},
+    {"-infinity", 10, 9, json_tokener_success, 1, 0},
     {"infinity", 9, 0, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
     {"-infinity", 10, 1, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
 
-    {"inf", 3, 3, json_tokener_continue, 0},
-    {"inity", 6, 5, json_tokener_success, 1},
-    {"-inf", 4, 4, json_tokener_continue, 0},
-    {"inity", 6, 5, json_tokener_success, 1},
+    {"inf", 3, 3, json_tokener_continue, 0, 0},
+    {"inity", 6, 5, json_tokener_success, 1, 0},
+    {"-inf", 4, 4, json_tokener_continue, 0, 0},
+    {"inity", 6, 5, json_tokener_success, 1, 0},
 
-    {"i", 1, 1, json_tokener_continue, 0},
-    {"n", 1, 1, json_tokener_continue, 0},
-    {"f", 1, 1, json_tokener_continue, 0},
-    {"i", 1, 1, json_tokener_continue, 0},
-    {"n", 1, 1, json_tokener_continue, 0},
-    {"i", 1, 1, json_tokener_continue, 0},
-    {"t", 1, 1, json_tokener_continue, 0},
-    {"y", 1, 1, json_tokener_continue, 0},
-    {"", 1, 0, json_tokener_success, 1},
+    {"i", 1, 1, json_tokener_continue, 0, 0},
+    {"n", 1, 1, json_tokener_continue, 0, 0},
+    {"f", 1, 1, json_tokener_continue, 0, 0},
+    {"i", 1, 1, json_tokener_continue, 0, 0},
+    {"n", 1, 1, json_tokener_continue, 0, 0},
+    {"i", 1, 1, json_tokener_continue, 0, 0},
+    {"t", 1, 1, json_tokener_continue, 0, 0},
+    {"y", 1, 1, json_tokener_continue, 0, 0},
+    {"", 1, 0, json_tokener_success, 1, 0},
 
-    {"-", 1, 1, json_tokener_continue, 0},
-    {"inf", 3, 3, json_tokener_continue, 0},
-    {"ini", 3, 3, json_tokener_continue, 0},
-    {"ty", 3, 2, json_tokener_success, 1},
+    {"-", 1, 1, json_tokener_continue, 0, 0},
+    {"inf", 3, 3, json_tokener_continue, 0, 0},
+    {"ini", 3, 3, json_tokener_continue, 0, 0},
+    {"ty", 3, 2, json_tokener_success, 1, 0},
 
-    {"-", 1, 1, json_tokener_continue, 0},
-    {"i", 1, 1, json_tokener_continue, 0},
-    {"nfini", 5, 5, json_tokener_continue, 0},
-    {"ty", 3, 2, json_tokener_success, 1},
+    {"-", 1, 1, json_tokener_continue, 0, 0},
+    {"i", 1, 1, json_tokener_continue, 0, 0},
+    {"nfini", 5, 5, json_tokener_continue, 0, 0},
+    {"ty", 3, 2, json_tokener_success, 1, 0},
 
-    {"-i", 2, 2, json_tokener_continue, 0},
-    {"nfinity", 8, 7, json_tokener_success, 1},
+    {"-i", 2, 2, json_tokener_continue, 0, 0},
+    {"nfinity", 8, 7, json_tokener_success, 1, 0},
 
-    {"InfinityX", 10, 8, json_tokener_success, 0},
-    {"X", 1, 0, json_tokener_error_parse_unexpected, 1},
+    {"InfinityX", 10, 8, json_tokener_success, 0, 0},
+    {"X", 1, 0, json_tokener_error_parse_unexpected, 1, 0},
 
-    {"Infinity1234", 13, 8, json_tokener_success, 0},
-    {"1234", 5, 4, json_tokener_success, 1},
+    {"Infinity1234", 13, 8, json_tokener_success, 0, 0},
+    {"1234", 5, 4, json_tokener_success, 1, 0},
 
-    {"Infinity9999", 8, 8, json_tokener_continue, 0},
+    {"Infinity9999", 8, 8, json_tokener_continue, 0, 0},
 
     /* returns the Infinity loaded up by the previous call: */
-    {"1234", 5, 0, json_tokener_success, 0},
-    {"1234", 5, 4, json_tokener_success, 1},
+    {"1234", 5, 0, json_tokener_success, 0, 0},
+    {"1234", 5, 4, json_tokener_success, 1, 0},
 
     /* offset=1 because "n" is the start of "null".  hmm... */
-    {"noodle", 7, 1, json_tokener_error_parse_null, 1},
+    {"noodle", 7, 1, json_tokener_error_parse_null, 1, 0},
     /* offset=2 because "na" is the start of "nan".  hmm... */
-    {"naodle", 7, 2, json_tokener_error_parse_null, 1},
+    {"naodle", 7, 2, json_tokener_error_parse_null, 1, 0},
     /* offset=2 because "tr" is the start of "true".  hmm... */
-    {"track", 6, 2, json_tokener_error_parse_boolean, 1},
-    {"fail", 5, 2, json_tokener_error_parse_boolean, 1},
+    {"track", 6, 2, json_tokener_error_parse_boolean, 1, 0},
+    {"fail", 5, 2, json_tokener_error_parse_boolean, 1, 0},
 
     /* Although they may initially look like they should fail,
 	 * the next few tests check that parsing multiple sequential
 	 * json objects in the input works as expected
 	 */
-    {"null123", 8, 4, json_tokener_success, 0},
-    {&"null123"[4], 4, 3, json_tokener_success, 1},
-    {"nullx", 6, 4, json_tokener_success, 0},
-    {&"nullx"[4], 2, 0, json_tokener_error_parse_unexpected, 1},
-    {"{\"a\":1}{\"b\":2}", 15, 7, json_tokener_success, 0},
-    {&"{\"a\":1}{\"b\":2}"[7], 8, 7, json_tokener_success, 1},
+    {"null123", 8, 4, json_tokener_success, 0, 0},
+    {&"null123"[4], 4, 3, json_tokener_success, 1, 0},
+    {"nullx", 6, 4, json_tokener_success, 0, 0},
+    {&"nullx"[4], 2, 0, json_tokener_error_parse_unexpected, 1, 0},
+    {"{\"a\":1}{\"b\":2}", 15, 7, json_tokener_success, 0, 0},
+    {&"{\"a\":1}{\"b\":2}"[7], 8, 7, json_tokener_success, 1, 0},
 
     /*
 	 * Though this may seem invalid at first glance, it
@@ -463,52 +463,52 @@ struct incremental_step
 	 * or json_type_double objects without some other delimiter.
 	 * e.g. whitespace
 	 */
-    {&"2015-01-15"[0], 11, 4, json_tokener_success, 1},
-    {&"2015-01-15"[4], 7, 3, json_tokener_success, 1},
-    {&"2015-01-15"[7], 4, 3, json_tokener_success, 1},
-    {&"2015 01 15"[0], 11, 5, json_tokener_success, 1},
-    {&"2015 01 15"[4], 7, 4, json_tokener_success, 1},
-    {&"2015 01 15"[7], 4, 3, json_tokener_success, 1},
+    {&"2015-01-15"[0], 11, 4, json_tokener_success, 1, 0},
+    {&"2015-01-15"[4], 7, 3, json_tokener_success, 1, 0},
+    {&"2015-01-15"[7], 4, 3, json_tokener_success, 1, 0},
+    {&"2015 01 15"[0], 11, 5, json_tokener_success, 1, 0},
+    {&"2015 01 15"[4], 7, 4, json_tokener_success, 1, 0},
+    {&"2015 01 15"[7], 4, 3, json_tokener_success, 1, 0},
 
     /* Strings have a well defined end point, so we can stop at the quote */
-    {"\"blue\"", -1, -1, json_tokener_success, 0},
+    {"\"blue\"", -1, -1, json_tokener_success, 0, 0},
 
     /* Check each of the escape sequences defined by the spec */
-    {"\"\\\"\"", -1, -1, json_tokener_success, 0},
-    {"\"\\\\\"", -1, -1, json_tokener_success, 0},
-    {"\"\\b\"", -1, -1, json_tokener_success, 0},
-    {"\"\\f\"", -1, -1, json_tokener_success, 0},
-    {"\"\\n\"", -1, -1, json_tokener_success, 0},
-    {"\"\\r\"", -1, -1, json_tokener_success, 0},
-    {"\"\\t\"", -1, -1, json_tokener_success, 0},
-    {"\"\\/\"", -1, -1, json_tokener_success, 0},
+    {"\"\\\"\"", -1, -1, json_tokener_success, 0, 0},
+    {"\"\\\\\"", -1, -1, json_tokener_success, 0, 0},
+    {"\"\\b\"", -1, -1, json_tokener_success, 0, 0},
+    {"\"\\f\"", -1, -1, json_tokener_success, 0, 0},
+    {"\"\\n\"", -1, -1, json_tokener_success, 0, 0},
+    {"\"\\r\"", -1, -1, json_tokener_success, 0, 0},
+    {"\"\\t\"", -1, -1, json_tokener_success, 0, 0},
+    {"\"\\/\"", -1, -1, json_tokener_success, 0, 0},
     // Escaping a forward slash is optional
-    {"\"/\"", -1, -1, json_tokener_success, 0},
+    {"\"/\"", -1, -1, json_tokener_success, 0, 0},
     /* Check wrong escape sequences */
-    {"\"\\a\"", -1, 2, json_tokener_error_parse_string, 1},
+    {"\"\\a\"", -1, 2, json_tokener_error_parse_string, 1, 0},
 
     /* Check '\'' in strict model */
     {"\'foo\'", -1, 0, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
 
     /* Parse array/object */
-    {"[1,2,3]", -1, -1, json_tokener_success, 0},
-    {"[1,2,3}", -1, 6, json_tokener_error_parse_array, 1},
-    {"{\"a\"}", -1, 4, json_tokener_error_parse_object_key_sep, 1},
-    {"{\"a\":1]", -1, 6, json_tokener_error_parse_object_value_sep, 1},
-    {"{\"a\"::1}", -1, 5, json_tokener_error_parse_unexpected, 1},
-    {"{\"a\":}", -1, 5, json_tokener_error_parse_unexpected, 1},
-    {"{\"a\":1,\"a\":2}", -1, -1, json_tokener_success, 1},
-    {"\"a\":1}", -1, 3, json_tokener_success, 1},
-    {"{\"a\":1", -1, -1, json_tokener_continue, 1},
-    {"[,]", -1, 1, json_tokener_error_parse_unexpected, 1},
-    {"[,1]", -1, 1, json_tokener_error_parse_unexpected, 1},
+    {"[1,2,3]", -1, -1, json_tokener_success, 0, 0},
+    {"[1,2,3}", -1, 6, json_tokener_error_parse_array, 1, 0},
+    {"{\"a\"}", -1, 4, json_tokener_error_parse_object_key_sep, 1, 0},
+    {"{\"a\":1]", -1, 6, json_tokener_error_parse_object_value_sep, 1, 0},
+    {"{\"a\"::1}", -1, 5, json_tokener_error_parse_unexpected, 1, 0},
+    {"{\"a\":}", -1, 5, json_tokener_error_parse_unexpected, 1, 0},
+    {"{\"a\":1,\"a\":2}", -1, -1, json_tokener_success, 1, 0},
+    {"\"a\":1}", -1, 3, json_tokener_success, 1, 0},
+    {"{\"a\":1", -1, -1, json_tokener_continue, 1, 0},
+    {"[,]", -1, 1, json_tokener_error_parse_unexpected, 1, 0},
+    {"[,1]", -1, 1, json_tokener_error_parse_unexpected, 1, 0},
 
     /* This behaviour doesn't entirely follow the json spec, but until we have
 	 * a way to specify how strict to be we follow Postel's Law and be liberal
 	 * in what we accept (up to a point).
 	 */
-    {"[1,2,3,]", -1, -1, json_tokener_success, 0},
-    {"[1,2,,3,]", -1, 5, json_tokener_error_parse_unexpected, 0},
+    {"[1,2,3,]", -1, -1, json_tokener_success, 0, 0},
+    {"[1,2,,3,]", -1, 5, json_tokener_error_parse_unexpected, 0, 0},
 
     {"[1,2,3,]", -1, 7, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
     {"{\"a\":1,}", -1, 7, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
@@ -517,24 +517,24 @@ struct incremental_step
     // acsll encoding
     {"\x22\x31\x32\x33\x61\x73\x63\x24\x25\x26\x22", -1, -1, json_tokener_success, 1,
      JSON_TOKENER_VALIDATE_UTF8},
-    {"\x22\x31\x32\x33\x61\x73\x63\x24\x25\x26\x22", -1, -1, json_tokener_success, 1},
+    {"\x22\x31\x32\x33\x61\x73\x63\x24\x25\x26\x22", -1, -1, json_tokener_success, 1, 0},
     // utf-8 encoding
     {"\x22\xe4\xb8\x96\xe7\x95\x8c\x22", -1, -1, json_tokener_success, 1,
      JSON_TOKENER_VALIDATE_UTF8},
     {"\x22\xe4\xb8", -1, 3, json_tokener_error_parse_utf8_string, 0, JSON_TOKENER_VALIDATE_UTF8},
     {"\x96\xe7\x95\x8c\x22", -1, 0, json_tokener_error_parse_utf8_string, 1,
      JSON_TOKENER_VALIDATE_UTF8},
-    {"\x22\xe4\xb8\x96\xe7\x95\x8c\x22", -1, -1, json_tokener_success, 1},
+    {"\x22\xe4\xb8\x96\xe7\x95\x8c\x22", -1, -1, json_tokener_success, 1, 0},
     {"\x22\xcf\x80\xcf\x86\x22", -1, -1, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8},
     {"\x22\xf0\xa5\x91\x95\x22", -1, -1, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8},
     // wrong utf-8 encoding
     {"\x22\xe6\x9d\x4e\x22", -1, 3, json_tokener_error_parse_utf8_string, 1,
      JSON_TOKENER_VALIDATE_UTF8},
-    {"\x22\xe6\x9d\x4e\x22", -1, 5, json_tokener_success, 1},
+    {"\x22\xe6\x9d\x4e\x22", -1, 5, json_tokener_success, 1, 0},
     // GBK encoding
     {"\x22\xc0\xee\xc5\xf4\x22", -1, 2, json_tokener_error_parse_utf8_string, 1,
      JSON_TOKENER_VALIDATE_UTF8},
-    {"\x22\xc0\xee\xc5\xf4\x22", -1, 6, json_tokener_success, 1},
+    {"\x22\xc0\xee\xc5\xf4\x22", -1, 6, json_tokener_success, 1, 0},
     // char after space
     {"\x20\x20\x22\xe4\xb8\x96\x22", -1, -1, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8},
     {"\x20\x20\x81\x22\xe4\xb8\x96\x22", -1, 2, json_tokener_error_parse_utf8_string, 1,
@@ -542,7 +542,7 @@ struct incremental_step
     {"\x5b\x20\x81\x31\x5d", -1, 2, json_tokener_error_parse_utf8_string, 1,
      JSON_TOKENER_VALIDATE_UTF8},
     // char in state inf
-    {"\x49\x6e\x66\x69\x6e\x69\x74\x79", 9, 8, json_tokener_success, 1},
+    {"\x49\x6e\x66\x69\x6e\x69\x74\x79", 9, 8, json_tokener_success, 1, 0},
     {"\x49\x6e\x66\x81\x6e\x69\x74\x79", -1, 3, json_tokener_error_parse_utf8_string, 1,
      JSON_TOKENER_VALIDATE_UTF8},
     // char in escape unicode
@@ -559,7 +559,7 @@ struct incremental_step
     {"\x7b\x22\x31\x81\x22\x3a\x31\x7d", -1, 3, json_tokener_error_parse_utf8_string, 1,
      JSON_TOKENER_VALIDATE_UTF8},
 
-    {NULL, -1, -1, json_tokener_success, 0},
+    {NULL, -1, -1, json_tokener_success, 0, 0},
 };
 
 static void test_incremental_parse()

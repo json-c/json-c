@@ -31,7 +31,7 @@ void checkit_uint(const char *buf)
  * This always exits with a 0 exit value.  The output should be compared
  * against previously saved expected output.
  */
-int main()
+int main(int argc, char **argv)
 {
 	char buf[100];
 
