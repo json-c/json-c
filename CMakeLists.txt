@@ -173,10 +173,12 @@ check_symbol_exists(arc4random      "stdlib.h" HAVE_ARC4RANDOM)
 if (NOT HAVE_ARC4RANDOM AND DISABLE_EXTRA_LIBS STREQUAL "OFF")
     check_include_file(bsd/stdlib.h HAVE_BSD_STDLIB_H)
     if (HAVE_BSD_STDLIB_H)
-		list(APPEND CMAKE_REQUIRED_LIBRARIES "-lbsd")
-		link_libraries(bsd)
+		list(APPEND CMAKE_REQUIRED_LIBRARIES "bsd")
 		unset(HAVE_ARC4RANDOM CACHE)
         check_symbol_exists(arc4random   "bsd/stdlib.h" HAVE_ARC4RANDOM)
+        if (NOT HAVE_ARC4RANDOM)
+			list(REMOVE_ITEM CMAKE_REQUIRED_LIBRARIES "bsd")
+        endif()
     endif()
 endif()
 
@@ -455,6 +457,8 @@ target_include_directories(${PROJECT_NAME}
         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
 )
 
+target_link_libraries(${PROJECT_NAME} PUBLIC ${CMAKE_REQUIRED_LIBRARIES})
+
 # Allow to build static and shared libraries at the same time
 if (BUILD_STATIC_LIBS AND BUILD_SHARED_LIBS)
     set(STATIC_LIB ${PROJECT_NAME}-static)
@@ -467,6 +471,8 @@ if (BUILD_STATIC_LIBS AND BUILD_SHARED_LIBS)
             $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
             $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
     )
+
+	target_link_libraries(${PROJECT_NAME}-static PUBLIC ${CMAKE_REQUIRED_LIBRARIES})
 
     # rename the static library
     if (NOT MSVC)
@@ -521,6 +527,13 @@ if (UNIX OR MINGW OR CYGWIN)
     SET(libdir ${CMAKE_INSTALL_FULL_LIBDIR})
     SET(includedir ${CMAKE_INSTALL_FULL_INCLUDEDIR})
     SET(VERSION ${PROJECT_VERSION})
+
+	# Linking against the static json-c requires
+	# dependent packages to include additional libs:
+	SET(LIBS_LIST ${CMAKE_REQUIRED_LIBRARIES})
+	list(TRANSFORM LIBS_LIST PREPEND "-l")
+	string(REPLACE ";" " " LIBS "${LIBS_LIST}")
+
     configure_file(json-c.pc.in json-c.pc @ONLY)
     set(INSTALL_PKGCONFIG_DIR "${CMAKE_INSTALL_LIBDIR}/pkgconfig" CACHE PATH "Installation directory for pkgconfig (.pc) files")
     install(FILES ${PROJECT_BINARY_DIR}/json-c.pc DESTINATION "${INSTALL_PKGCONFIG_DIR}")
