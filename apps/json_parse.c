@@ -167,7 +167,7 @@ int main(int argc, char **argv)
 		case 'f': formatted_output = 1; break;
 		case 'n': show_output = 0; break;
 		case 's': strict_mode = 1; break;
-		case 'h': usage(argv[0], 0, NULL);
+		case 'h': usage(argv[0], 0, NULL); /* FALLTHRU */
 		default: /* '?' */ usage(argv[0], EXIT_FAILURE, "Unknown arguments");
 		}
 	}
