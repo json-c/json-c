@@ -22,6 +22,19 @@
 #include <sys/time.h>
 #endif
 
+#ifndef JSON_NORETURN
+#if defined(_MSC_VER)
+#define JSON_NORETURN __declspec(noreturn)
+#elif defined(__OS400__)
+#define JSON_NORETURN
+#else
+/* 'cold' attribute is for optimization, telling the computer this code
+ * path is unlikely.
+ */
+#define JSON_NORETURN __attribute__((noreturn, cold))
+#endif
+#endif
+
 static int formatted_output = 0;
 static int show_output = 1;
 static int strict_mode = 0;
@@ -31,7 +44,7 @@ static const char *fname = NULL;
 #define json_tokener_get_parse_end(tok) ((tok)->char_offset)
 #endif
 
-static void usage(const char *argv0, int exitval, const char *errmsg);
+JSON_NORETURN static void usage(const char *argv0, int exitval, const char *errmsg);
 static void showmem(void);
 static int parseit(int fd, int (*callback)(struct json_object *));
 static int showobj(struct json_object *new_obj);
@@ -167,7 +180,7 @@ int main(int argc, char **argv)
 		case 'f': formatted_output = 1; break;
 		case 'n': show_output = 0; break;
 		case 's': strict_mode = 1; break;
-		case 'h': usage(argv[0], 0, NULL); /* FALLTHRU */
+		case 'h': usage(argv[0], 0, NULL);
 		default: /* '?' */ usage(argv[0], EXIT_FAILURE, "Unknown arguments");
 		}
 	}
