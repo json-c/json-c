@@ -31,7 +31,7 @@ Home page for json-c: https://github.com/json-c/json-c/wiki
 Getting Help <a name="gettinghelp"></a>
 ------------
 
-If you have questions about using json-c, please start a thread on the
+If you have questions about using json-c, please start a thread on
 our forums at: https://groups.google.com/forum/#!forum/json-c
 
 If you believe you've discovered a bug, report it at 
