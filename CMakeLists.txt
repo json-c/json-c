@@ -531,7 +531,17 @@ if (UNIX OR MINGW OR CYGWIN)
 	# Linking against the static json-c requires
 	# dependent packages to include additional libs:
 	SET(LIBS_LIST ${CMAKE_REQUIRED_LIBRARIES})
-	list(TRANSFORM LIBS_LIST PREPEND "-l")
+
+	# Note: We would need cmake >= 3.12 in order to use list(TRANSFORM ...)
+	function(list_transform_prepend var prefix)
+		set(temp "")
+		foreach(f ${${var}})
+			list(APPEND temp "${prefix}${f}")
+		endforeach()
+		set(${var} "${temp}" PARENT_SCOPE)
+	endfunction()
+	list_transform_prepend(LIBS_LIST "-l")
+
 	string(REPLACE ";" " " LIBS "${LIBS_LIST}")
 
     configure_file(json-c.pc.in json-c.pc @ONLY)
