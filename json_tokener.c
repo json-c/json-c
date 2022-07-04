@@ -298,11 +298,13 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 	unsigned int nBytes = 0;
 	unsigned int *nBytesp = &nBytes;
 
+#ifndef __LOCALE_C_ONLY
 #ifdef HAVE_USELOCALE
 	locale_t oldlocale = uselocale(NULL);
 	locale_t newloc;
 #elif defined(HAVE_SETLOCALE)
 	char *oldlocale = NULL;
+#endif
 #endif
 
 	tok->char_offset = 0;
@@ -320,6 +322,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 		return NULL;
 	}
 
+#ifndef __LOCALE_C_ONLY
 #ifdef HAVE_USELOCALE
 	{
 		locale_t duploc = duplocale(oldlocale);
@@ -339,6 +342,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 			oldlocale = strdup(tmplocale);
 		setlocale(LC_NUMERIC, "C");
 	}
+#endif
 #endif
 
 	while (PEEK_CHAR(c, tok)) // Note: c might be '\0' !
@@ -1229,12 +1233,14 @@ out:
 			tok->err = json_tokener_error_parse_eof;
 	}
 
+#ifndef __LOCALE_C_ONLY
 #ifdef HAVE_USELOCALE
 	uselocale(oldlocale);
 	freelocale(newloc);
 #elif defined(HAVE_SETLOCALE)
 	setlocale(LC_NUMERIC, oldlocale);
 	free(oldlocale);
+#endif
 #endif
 
 	if (tok->err == json_tokener_success)
