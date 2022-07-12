@@ -93,7 +93,7 @@ static void test_write_to_file()
 static void stat_and_cat(const char *file)
 {
 	struct stat sb;
-	int d = open(file, O_RDONLY, 0600);
+	int d = open(file, O_CREAT | O_RDONLY, 0600);
 	if (d < 0)
 	{
 		printf("FAIL: unable to open %s: %s\n", file, strerror(errno));
