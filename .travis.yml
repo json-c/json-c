@@ -1,8 +1,8 @@
 language: cpp
 matrix:
   include:
-# gcc
-#   xenial
+
+#   ubuntu xenial 16.04
 #   gcc 5 is the default on xenial
     - os: linux
       dist: xenial
@@ -15,35 +15,37 @@ matrix:
             - doxygen
             - cmake
       env: CHECK="true"
-#   bionic
-    - os: linux
-      dist: bionic
-      compiler: gcc
-      env: MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
 
-    # gcc 7 is the default on bionic
+#   ubuntu bionic 18.04
+#   gcc 7 is the default on bionic
     - os: linux
       dist: bionic
       compiler: gcc
+      addons:
+        apt:
+          packages:
+            - valgrind
+            - cppcheck
+            - doxygen
+            - cmake
       env: CHECK="true"
+
+#   ubuntu focal fossa 20.04
+#   gcc 9 is the default on bionic
     - os: linux
-      dist: bionic
+      dist: focal
       compiler: gcc
-      env: MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+      addons:
+        apt:
+          packages:
+            - valgrind
+            - cppcheck
+            - doxygen
+            - cmake
+      env: CHECK="true"
 
 # clang
 #   xenial
-    - os: linux
-      dist: xenial
-      compiler: clang
-      addons:
-        apt:
-          sources:
-            - llvm-toolchain-xenial-5.0
-          packages:
-            - clang-5.0
-            - cmake
-      env: MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
     - os: linux
       dist: xenial
       compiler: clang
@@ -56,9 +58,9 @@ matrix:
             - cmake
       env: MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0"
 
-    # clang-7 is the default on xenial and bionic
+    # clang-7 is the default on focal, xenial and bionic
     - os: linux
-      dist: xenial
+      dist: focal
       compiler: clang
       addons:
         apt:
@@ -69,17 +71,9 @@ matrix:
             - cmake
       env: CHECK="true"
 
-# bionic
-    - os: linux
-      dist: bionic
-      compiler: clang
-      env: CHECK="true"
 # osx
     - os: osx
-      osx_image: xcode9.4
-      env: XCODE="true"
-    - os: osx
-      osx_image: xcode12.5
+      osx_image: xcode13.4
       env: XCODE="true" CHECK="true"
 
 # run coveralls
