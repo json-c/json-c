@@ -1323,11 +1323,18 @@ static int _json_object_set_string_len(json_object *jso, const char *s, size_t l
 		// length as int, cap length at INT_MAX.
 		return 0;
 
-	dstbuf = get_string_component_mutable(jso);
 	curlen = JC_STRING(jso)->len;
-	if (curlen < 0)
-		curlen = -curlen;
+	if (curlen < 0) {
+		if (len == 0) {
+			free(JC_STRING(jso)->c_string.pdata);
+			JC_STRING(jso)->len = curlen = 0;
+		} else {
+			curlen = -curlen;
+		}
+	}
+
 	newlen = len;
+	dstbuf = get_string_component_mutable(jso);
 
 	if ((ssize_t)len > curlen)
 	{
