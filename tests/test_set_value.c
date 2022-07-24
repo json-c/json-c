@@ -71,6 +71,14 @@ int main(int argc, char **argv)
 	json_object_set_string(tmp, SHORT);
 	assert(strcmp(json_object_get_string(tmp), SHORT) == 0);
 	assert(strcmp(json_object_to_json_string(tmp), "\"" SHORT "\"") == 0);
+
+	// Set an empty string a couple times to try to trigger
+	// a case that used to leak memory.
+	json_object_set_string(tmp, "");
+	json_object_set_string(tmp, HUGE);
+	json_object_set_string(tmp, "");
+	json_object_set_string(tmp, HUGE);
+
 	json_object_put(tmp);
 	printf("STRING PASSED\n");
 
