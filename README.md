@@ -54,7 +54,7 @@ for how to build and link your program against it.
 
 Build Status
 * [AppVeyor Build](https://ci.appveyor.com/project/hawicz/json-c) ![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/json-c/json-c?branch=master&svg=true)
-* [Travis Build](https://travis-ci.org/json-c/json-c) ![Travis Build Status](https://travis-ci.org/json-c/json-c.svg?branch=master)
+* [Travis Build](https://app.travis-ci.com/github/json-c/json-c) ![Travis Build Status](https://api.travis-ci.com/json-c/json-c.svg?branch=master)
 
 Test Status
 * [Coveralls](https://coveralls.io/github/json-c/json-c?branch=master) [![Coverage Status](https://coveralls.io/repos/github/json-c/json-c/badge.svg?branch=master)](https://coveralls.io/github/json-c/json-c?branch=master)
