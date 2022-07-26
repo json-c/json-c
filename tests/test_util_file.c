@@ -93,7 +93,7 @@ static void test_write_to_file()
 static void stat_and_cat(const char *file)
 {
 	struct stat sb;
-	int d = open(file, O_RDONLY, 0600);
+	int d = open(file, O_RDONLY);
 	if (d < 0)
 	{
 		printf("FAIL: unable to open %s: %s\n", file, strerror(errno));
@@ -171,7 +171,7 @@ static void test_read_valid_with_fd(const char *testdir)
 	char filename[PATH_MAX];
 	(void)snprintf(filename, sizeof(filename), "%s/valid.json", testdir);
 
-	int d = open(filename, O_RDONLY, 0);
+	int d = open(filename, O_RDONLY);
 	if (d < 0)
 	{
 		fprintf(stderr, "FAIL: unable to open %s: %s\n", filename, strerror(errno));
@@ -196,7 +196,7 @@ static void test_read_valid_nested_with_fd(const char *testdir)
 	char filename[PATH_MAX];
 	(void)snprintf(filename, sizeof(filename), "%s/valid_nested.json", testdir);
 
-	int d = open(filename, O_RDONLY, 0);
+	int d = open(filename, O_RDONLY);
 	if (d < 0)
 	{
 		fprintf(stderr, "FAIL: unable to open %s: %s\n", filename, strerror(errno));
@@ -255,7 +255,7 @@ static void test_read_nonexistant()
 static void test_read_closed()
 {
 	// Test reading from a closed fd
-	int d = open("/dev/null", O_RDONLY, 0);
+	int d = open("/dev/null", O_RDONLY);
 	if (d < 0)
 	{
 		puts("FAIL: unable to open");
@@ -290,7 +290,7 @@ static void test_read_fd_equal(const char *testdir)
 
 	json_object *jso = json_object_from_file(filename);
 
-	int d = open(filename, O_RDONLY, 0);
+	int d = open(filename, O_RDONLY);
 	if (d < 0)
 	{
 		fprintf(stderr, "FAIL: unable to open %s: %s\n", filename, strerror(errno));
