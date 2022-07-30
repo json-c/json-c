@@ -460,16 +460,14 @@ static int json_object_object_to_json_string(struct json_object *jso, struct pri
 	struct json_object_iter iter;
 
 	printbuf_strappend(pb, "{" /*}*/);
-	if (flags & JSON_C_TO_STRING_PRETTY)
-		printbuf_strappend(pb, "\n");
 	json_object_object_foreachC(jso, iter)
 	{
 		if (had_children)
 		{
 			printbuf_strappend(pb, ",");
-			if (flags & JSON_C_TO_STRING_PRETTY)
-				printbuf_strappend(pb, "\n");
 		}
+		if (flags & JSON_C_TO_STRING_PRETTY)
+			printbuf_strappend(pb, "\n");
 		had_children = 1;
 		if (flags & JSON_C_TO_STRING_SPACED && !(flags & JSON_C_TO_STRING_PRETTY))
 			printbuf_strappend(pb, " ");
@@ -485,10 +483,9 @@ static int json_object_object_to_json_string(struct json_object *jso, struct pri
 		else if (iter.val->_to_json_string(iter.val, pb, level + 1, flags) < 0)
 			return -1;
 	}
-	if (flags & JSON_C_TO_STRING_PRETTY)
+	if ((flags & JSON_C_TO_STRING_PRETTY) && had_children)
 	{
-		if (had_children)
-			printbuf_strappend(pb, "\n");
+		printbuf_strappend(pb, "\n");
 		indent(pb, level, flags);
 	}
 	if (flags & JSON_C_TO_STRING_SPACED && !(flags & JSON_C_TO_STRING_PRETTY))
@@ -1381,17 +1378,15 @@ static int json_object_array_to_json_string(struct json_object *jso, struct prin
 	size_t ii;
 
 	printbuf_strappend(pb, "[");
-	if (flags & JSON_C_TO_STRING_PRETTY)
-		printbuf_strappend(pb, "\n");
 	for (ii = 0; ii < json_object_array_length(jso); ii++)
 	{
 		struct json_object *val;
 		if (had_children)
 		{
 			printbuf_strappend(pb, ",");
-			if (flags & JSON_C_TO_STRING_PRETTY)
-				printbuf_strappend(pb, "\n");
 		}
+		if (flags & JSON_C_TO_STRING_PRETTY)
+			printbuf_strappend(pb, "\n");
 		had_children = 1;
 		if (flags & JSON_C_TO_STRING_SPACED && !(flags & JSON_C_TO_STRING_PRETTY))
 			printbuf_strappend(pb, " ");
@@ -1402,10 +1397,9 @@ static int json_object_array_to_json_string(struct json_object *jso, struct prin
 		else if (val->_to_json_string(val, pb, level + 1, flags) < 0)
 			return -1;
 	}
-	if (flags & JSON_C_TO_STRING_PRETTY)
+	if ((flags & JSON_C_TO_STRING_PRETTY) && had_children)
 	{
-		if (had_children)
-			printbuf_strappend(pb, "\n");
+		printbuf_strappend(pb, "\n");
 		indent(pb, level, flags);
 	}
 

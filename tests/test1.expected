@@ -75,4 +75,4 @@ my_object=
 	foo: "bar"
 	bool0: false
 	bool1: true
-my_object.to_string()={ "abc": 12, "foo": "bar", "bool0": false, "bool1": true }
+my_object.to_string()={ "abc": 12, "foo": "bar", "bool0": false, "bool1": true, "empty_array": [ ], "empty_obj": { } }

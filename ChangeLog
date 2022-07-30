@@ -1,4 +1,21 @@
 
+0.17 (future release)
+========================================
+
+Deprecated and removed features:
+--------------------------------
+* ...
+
+New features
+------------
+* ...
+
+Significant changes and bug fixes
+---------------------------------
+* When serializing with JSON_C_TO_STRING_PRETTY set, keep the opening and 
+  closing curly or square braces on same line for empty objects or arrays.
+
+
 0.16 (up to commit 66dcdf5, 2022-04-13)
 ========================================
 

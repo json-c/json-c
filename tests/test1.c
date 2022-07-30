@@ -311,6 +311,11 @@ int main(int argc, char **argv)
 	{
 		printf("\t%s: %s\n", key, json_object_to_json_string(val));
 	}
+
+	json_object *empty_array = json_object_new_array();
+	json_object *empty_obj = json_object_new_object();
+	json_object_object_add(my_object, "empty_array", empty_array);
+	json_object_object_add(my_object, "empty_obj", empty_obj);
 	printf("my_object.to_string()=%s\n", json_object_to_json_string(my_object));
 
 	json_object_put(my_array);
