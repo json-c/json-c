@@ -192,6 +192,18 @@ if (HAVE_LOCALE_H)
     check_symbol_exists(setlocale   "locale.h" HAVE_SETLOCALE)
     check_symbol_exists(uselocale   "locale.h" HAVE_USELOCALE)
 endif()
+
+# uClibc *intentionally* crashes in duplocale(), at least as of:
+# https://github.com/ffainelli/uClibc/blob/266bdc1/libc/misc/locale/locale.c#L1322
+# So, if it looks like we're compiling for a system like that just disable 
+# locale handling entirely.
+exec_program(${CMAKE_C_COMPILER} ARGS -dumpmachine OUTPUT_VARIABLE CMAKE_GNU_C_MACHINE)
+if (CMAKE_GNU_C_MACHINE MATCHES "uclibc")
+	message(STATUS "Detected uClibc compiler, disabling locale handling")
+	set(HAVE_SETLOCALE 0)
+	set(HAVE_USELOCALE 0)
+endif()
+
 if (HAVE_STRINGS_H)
     check_symbol_exists(strcasecmp  "strings.h" HAVE_STRCASECMP)
     check_symbol_exists(strncasecmp "strings.h" HAVE_STRNCASECMP)

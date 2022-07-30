@@ -24,8 +24,6 @@ int main(int argc, char **argv)
 	json_object *new_obj;
 #ifdef HAVE_SETLOCALE
 	setlocale(LC_NUMERIC, "de_DE");
-#else
-	printf("No locale\n");
 #endif
 
 	char buf1[10], buf2[10];
