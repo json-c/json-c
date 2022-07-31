@@ -85,7 +85,7 @@ struct json_object *json_object_from_fd_ex(int fd, int in_depth)
 	struct printbuf *pb;
 	struct json_object *obj;
 	char buf[JSON_FILE_BUF_SIZE];
-	int ret;
+	ssize_t ret;
 	int depth = JSON_TOKENER_DEFAULT_DEPTH;
 	json_tokener *tok;
 
@@ -107,12 +107,15 @@ struct json_object *json_object_from_fd_ex(int fd, int in_depth)
 		return NULL;
 	}
 
-	while ((ret = read(fd, buf, JSON_FILE_BUF_SIZE)) > 0)
+	while ((ret = read(fd, buf, sizeof(buf))) > 0)
 	{
 		if (printbuf_memappend(pb, buf, ret) < 0)
 		{
-			_json_c_set_last_err("json_object_from_fd_ex: error reading fd %d: %s\n",
-			                     fd, strerror(errno));
+#if JSON_FILE_BUF_SIZE > INT_MAX
+#error "Can't append more than INT_MAX bytes at a time"
+#endif
+			_json_c_set_last_err(
+		    	"json_object_from_fd_ex: failed to printbuf_memappend after reading %d+%d bytes: %s", printbuf_length(pb), (int)ret, strerror(errno));
 			json_tokener_free(tok);
 			printbuf_free(pb);
 			return NULL;
@@ -191,9 +194,9 @@ int json_object_to_fd(int fd, struct json_object *obj, int flags)
 }
 static int _json_object_to_fd(int fd, struct json_object *obj, int flags, const char *filename)
 {
-	int ret;
+	ssize_t ret;
 	const char *json_str;
-	unsigned int wpos, wsize;
+	size_t wpos, wsize;
 
 	filename = filename ? filename : "(fd)";
 
@@ -202,8 +205,7 @@ static int _json_object_to_fd(int fd, struct json_object *obj, int flags, const 
 		return -1;
 	}
 
-	/* CAW: probably unnecessary, but the most 64bit safe */
-	wsize = (unsigned int)(strlen(json_str) & UINT_MAX);
+	wsize = strlen(json_str);
 	wpos = 0;
 	while (wpos < wsize)
 	{
@@ -215,7 +217,7 @@ static int _json_object_to_fd(int fd, struct json_object *obj, int flags, const 
 		}
 
 		/* because of the above check for ret < 0, we can safely cast and add */
-		wpos += (unsigned int)ret;
+		wpos += (size_t)ret;
 	}
 
 	return 0;
