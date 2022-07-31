@@ -84,7 +84,7 @@ static int parseit(int fd, int (*callback)(struct json_object *))
 	//   everything you can do with a tokener into json_util.c seems
 	//   like the wrong approach.
 	size_t total_read = 0;
-	while ((ret = read(fd, buf, sizeof(buf))) > 0)
+	while ((ret = (int)read(fd, buf, sizeof(buf))) > 0)
 	{
 		total_read += ret;
 		int start_pos = 0;
@@ -98,7 +98,7 @@ static int parseit(int fd, int (*callback)(struct json_object *))
 				const char *aterr = (start_pos + parse_end < (int)sizeof(buf)) ?
 					&buf[start_pos + parse_end] : "";
 				fflush(stdout);
-				int fail_offset = total_read - ret + start_pos + parse_end;
+				int fail_offset = (int)(total_read - ret + start_pos + parse_end);
 				fprintf(stderr, "Failed at offset %d: %s %c\n", fail_offset,
 				        json_tokener_error_desc(jerr), aterr[0]);
 				json_tokener_free(tok);

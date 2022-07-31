@@ -53,7 +53,7 @@ static void single_incremental_parse(const char *test_string, int clear_serializ
 	all_at_once_str = json_object_to_json_string(all_at_once_obj);
 
 	tok = json_tokener_new();
-	int test_string_len = strlen(test_string) + 1; // Including '\0' !
+	int test_string_len = (int)strlen(test_string) + 1; // Including '\0' !
 	for (ii = 0; ii < test_string_len; ii += chunksize)
 	{
 		int len_to_parse = chunksize;

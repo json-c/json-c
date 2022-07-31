@@ -560,11 +560,11 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				if (!ADVANCE_CHAR(str, tok) || !PEEK_CHAR(c, tok))
 				{
 					printbuf_memappend_fast(tok->pb, case_start,
-					                        str - case_start);
+					                        (int)(str - case_start));
 					goto out;
 				}
 			}
-			printbuf_memappend_fast(tok->pb, case_start, 1 + str - case_start);
+			printbuf_memappend_fast(tok->pb, case_start, 1 + (int)(str - case_start));
 			state = json_tokener_state_comment_end;
 		}
 		break;
@@ -578,11 +578,11 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				if (!ADVANCE_CHAR(str, tok) || !PEEK_CHAR(c, tok))
 				{
 					printbuf_memappend_fast(tok->pb, case_start,
-					                        str - case_start);
+					                        (int)(str - case_start));
 					goto out;
 				}
 			}
-			printbuf_memappend_fast(tok->pb, case_start, str - case_start);
+			printbuf_memappend_fast(tok->pb, case_start, (int)(str - case_start));
 			MC_DEBUG("json_tokener_comment: %s\n", tok->pb->buf);
 			state = json_tokener_state_eatws;
 		}
@@ -610,7 +610,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				if (c == tok->quote_char)
 				{
 					printbuf_memappend_fast(tok->pb, case_start,
-					                        str - case_start);
+					                        (int)(str - case_start));
 					current =
 					    json_object_new_string_len(tok->pb->buf, tok->pb->bpos);
 					if (current == NULL)
@@ -622,7 +622,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				else if (c == '\\')
 				{
 					printbuf_memappend_fast(tok->pb, case_start,
-					                        str - case_start);
+					                        (int)(str - case_start));
 					saved_state = json_tokener_state_string;
 					state = json_tokener_state_string_escape;
 					break;
@@ -630,7 +630,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				if (!ADVANCE_CHAR(str, tok) || !PEEK_CHAR(c, tok))
 				{
 					printbuf_memappend_fast(tok->pb, case_start,
-					                        str - case_start);
+					                        (int)(str - case_start));
 					goto out;
 				}
 			}
@@ -1130,7 +1130,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				if (c == tok->quote_char)
 				{
 					printbuf_memappend_fast(tok->pb, case_start,
-					                        str - case_start);
+					                        (int)(str - case_start));
 					obj_field_name = strdup(tok->pb->buf);
 					saved_state = json_tokener_state_object_field_end;
 					state = json_tokener_state_eatws;
@@ -1139,7 +1139,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				else if (c == '\\')
 				{
 					printbuf_memappend_fast(tok->pb, case_start,
-					                        str - case_start);
+					                        (int)(str - case_start));
 					saved_state = json_tokener_state_object_field;
 					state = json_tokener_state_string_escape;
 					break;
@@ -1147,7 +1147,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				if (!ADVANCE_CHAR(str, tok) || !PEEK_CHAR(c, tok))
 				{
 					printbuf_memappend_fast(tok->pb, case_start,
-					                        str - case_start);
+					                        (int)(str - case_start));
 					goto out;
 				}
 			}
