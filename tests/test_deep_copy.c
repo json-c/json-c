@@ -22,7 +22,7 @@ static const char *json_str1 =
     "            \"number\": 16446744073709551615,"
     "            \"title\": \"S\","
     "            \"null_obj\": null, "
-    "            \"exixt\": false,"
+    "            \"exist\": false,"
     "            \"quantity\":20,"
     "            \"univalent\":19.8,"
     "            \"GlossList\": {"
@@ -136,7 +136,7 @@ int main(int argc, char **argv)
 	assert(0 == json_object_deep_copy(src2, &dst2, NULL));
 	assert(0 == json_object_deep_copy(src3, &dst3, NULL));
 
-	printf("PASSED - all json_object_deep_copy() returned succesful\n");
+	printf("PASSED - all json_object_deep_copy() returned successful\n");
 
 	assert(-1 == json_object_deep_copy(src1, &dst1, NULL));
 	assert(errno == EINVAL);
@@ -151,7 +151,7 @@ int main(int argc, char **argv)
 	assert(1 == json_object_equal(src2, dst2));
 	assert(1 == json_object_equal(src3, dst3));
 
-	printf("PASSED - all json_object_equal() tests returned succesful\n");
+	printf("PASSED - all json_object_equal() tests returned successful\n");
 
 	assert(0 == strcmp(json_object_to_json_string_ext(src1, JSON_C_TO_STRING_PRETTY),
 	                   json_object_to_json_string_ext(dst1, JSON_C_TO_STRING_PRETTY)));
