@@ -97,7 +97,7 @@ static void getit(struct json_object *new_obj, const char *field)
 	printf("new_obj.%s json_object_get_double()=%f\n", field, json_object_get_double(o));
 }
 
-static void checktype_header()
+static void checktype_header(void)
 {
 	printf("json_object_is_type: %s,%s,%s,%s,%s,%s,%s\n", json_type_to_name(json_type_null),
 	       json_type_to_name(json_type_boolean), json_type_to_name(json_type_double),

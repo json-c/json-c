@@ -31,7 +31,7 @@ void print_hex(const char *s)
 }
 
 static void test_lot_of_adds(void);
-static void test_lot_of_adds()
+static void test_lot_of_adds(void)
 {
 	int ii;
 	char key[50];
