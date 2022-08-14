@@ -38,7 +38,7 @@ static void test_read_fd_equal(const char *testdir);
 #define PATH_MAX 256
 #endif
 
-static void test_write_to_file()
+static void test_write_to_file(void)
 {
 	json_object *jso;
 
@@ -234,7 +234,7 @@ static void test_read_valid_nested_with_fd(const char *testdir)
 	close(d);
 }
 
-static void test_read_nonexistant()
+static void test_read_nonexistant(void)
 {
 	const char *filename = "./not_present.json";
 
@@ -252,7 +252,7 @@ static void test_read_nonexistant()
 	}
 }
 
-static void test_read_closed()
+static void test_read_closed(void)
 {
 	// Test reading from a closed fd
 	int d = open("/dev/null", O_RDONLY);

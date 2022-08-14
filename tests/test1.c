@@ -61,7 +61,7 @@ static const char *to_json_string(json_object *obj, int flags)
 #endif
 
 json_object *make_array(void);
-json_object *make_array()
+json_object *make_array(void)
 {
 	json_object *my_array;
 
@@ -77,7 +77,7 @@ json_object *make_array()
 }
 
 void test_array_del_idx(void);
-void test_array_del_idx()
+void test_array_del_idx(void)
 {
 	int rc;
 	size_t ii;
@@ -143,7 +143,7 @@ void test_array_del_idx()
 }
 
 void test_array_list_expand_internal(void);
-void test_array_list_expand_internal()
+void test_array_list_expand_internal(void)
 {
 	int rc;
 	size_t ii;

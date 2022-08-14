@@ -96,7 +96,7 @@ static void single_basic_parse(const char *test_string, int clear_serializer)
 	if (getenv("TEST_PARSE_CHUNKSIZE") != NULL)
 		single_incremental_parse(test_string, clear_serializer);
 }
-static void test_basic_parse()
+static void test_basic_parse(void)
 {
 	single_basic_parse("\"\003\"", 0);
 	single_basic_parse("/* hello */\"foo\"", 0);
@@ -199,7 +199,7 @@ static void test_basic_parse()
 	single_basic_parse("[18446744073709551616]", 1);
 }
 
-static void test_utf8_parse()
+static void test_utf8_parse(void)
 {
 	// json_tokener_parse doesn't support checking for byte order marks.
 	// It's the responsibility of the caller to detect and skip a BOM.
@@ -226,7 +226,7 @@ static int clear_serializer(json_object *jso, int flags, json_object *parent_jso
 	return JSON_C_VISIT_RETURN_CONTINUE;
 }
 
-static void test_verbose_parse()
+static void test_verbose_parse(void)
 {
 	json_object *new_obj;
 	enum json_tokener_error error = json_tokener_success;
@@ -566,7 +566,7 @@ struct incremental_step
     {NULL, -1, -1, json_tokener_success, 0, 0},
 };
 
-static void test_incremental_parse()
+static void test_incremental_parse(void)
 {
 	json_object *new_obj;
 	enum json_tokener_error jerr;

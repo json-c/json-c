@@ -60,7 +60,7 @@ static int _json_object_to_fd(int fd, struct json_object *obj, int flags, const 
 
 static char _last_err[256] = "";
 
-const char *json_util_get_last_err()
+const char *json_util_get_last_err(void)
 {
 	if (_last_err[0] == '\0')
 		return NULL;
