@@ -20,7 +20,6 @@
 extern "C" {
 #endif
 
-struct json_object;
 #include "json_inttypes.h"
 #include "json_types.h"
 
