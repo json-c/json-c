@@ -1047,7 +1047,7 @@ static int json_object_double_to_json_string_format(struct json_object *jso, str
 		{
 			// Ensure it looks like a float, even if snprintf didn't,
 			//  unless a custom format is set to omit the decimal.
-			strcat(buf, ".0");
+			strncat(buf, ".0", 2);
 			size += 2;
 		}
 		if (p && (flags & JSON_C_TO_STRING_NOZERO))
