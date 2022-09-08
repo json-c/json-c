@@ -51,7 +51,7 @@ static int vasprintf(char **buf, const char *fmt, va_list ap)
 		return -1;
 	}
 
-	if ((chars = vsprintf(b, fmt, ap)) < 0)
+	if ((chars = vsnprintf(b, ((size_t)chars + 1), fmt, ap)) < 0)
 	{
 		free(b);
 	}
