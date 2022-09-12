@@ -100,7 +100,7 @@ Then:
 $ make
 $ make test
 $ make USE_VALGRIND=0 test   # optionally skip using valgrind
-$ make install
+$ sudo make install          # it could be necessary to execute make install
 ```
 
 
