@@ -247,7 +247,12 @@ int json_parse_int64(const char *buf, int64_t *retval)
 	val = strtoll(buf, &end, 10);
 	if (end != buf)
 		*retval = val;
-	return ((val == 0 && errno != 0) || (end == buf)) ? 1 : 0;
+	if ((val == 0 && errno != 0) || (end == buf))
+	{
+		errno = EINVAL;
+		return 1;
+	}
+	return 0;
 }
 
 int json_parse_uint64(const char *buf, uint64_t *retval)
