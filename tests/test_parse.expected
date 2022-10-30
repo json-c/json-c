@@ -210,6 +210,19 @@ json_tokener_parse_ex(tok, 1234        ,   5) ... OK: got object of type [int]: 
 json_tokener_parse_ex(tok, Infinity9999,   8) ... OK: got correct error: continue
 json_tokener_parse_ex(tok, 1234        ,   5) ... OK: got object of type [double]: Infinity
 json_tokener_parse_ex(tok, 1234        ,   5) ... OK: got object of type [int]: 1234
+json_tokener_parse_ex(tok, [9223372036854775807],  22) ... OK: got object of type [array]: [ 9223372036854775807 ]
+json_tokener_parse_ex(tok, [9223372036854775808],  22) ... OK: got object of type [array]: [ 9223372036854775808 ]
+json_tokener_parse_ex(tok, [-9223372036854775808],  23) ... OK: got object of type [array]: [ -9223372036854775808 ]
+json_tokener_parse_ex(tok, [-9223372036854775809],  23) ... OK: got object of type [array]: [ -9223372036854775808 ]
+json_tokener_parse_ex(tok, [-9223372036854775809],  23) ... OK: got correct error: number expected
+json_tokener_parse_ex(tok, [18446744073709551615],  23) ... OK: got object of type [array]: [ 18446744073709551615 ]
+json_tokener_parse_ex(tok, [18446744073709551616],  23) ... OK: got object of type [array]: [ 18446744073709551615 ]
+json_tokener_parse_ex(tok, [18446744073709551616],  23) ... OK: got correct error: number expected
+json_tokener_parse_ex(tok, 18446744073709551616,  21) ... OK: got correct error: unexpected end of data
+json_tokener_parse_ex(tok, [9223372036854775808.0],  24) ... OK: got object of type [array]: [ 9223372036854775808.0 ]
+json_tokener_parse_ex(tok, [-9223372036854775809.0],  25) ... OK: got object of type [array]: [ -9223372036854775809.0 ]
+json_tokener_parse_ex(tok, [18446744073709551615.0],  25) ... OK: got object of type [array]: [ 18446744073709551615.0 ]
+json_tokener_parse_ex(tok, [18446744073709551616.0],  25) ... OK: got object of type [array]: [ 18446744073709551616.0 ]
 json_tokener_parse_ex(tok, noodle      ,   7) ... OK: got correct error: null expected
 json_tokener_parse_ex(tok, naodle      ,   7) ... OK: got correct error: null expected
 json_tokener_parse_ex(tok, track       ,   6) ... OK: got correct error: boolean expected
@@ -275,5 +288,5 @@ json_tokener_parse_ex(tok, "\ud855¿udc55",  14) ... OK: got correct error: inval
 json_tokener_parse_ex(tok, "\ud0031¿"  ,  10) ... OK: got correct error: invalid utf-8 string
 json_tokener_parse_ex(tok, 11Å11       ,   5) ... OK: got correct error: invalid utf-8 string
 json_tokener_parse_ex(tok, {"1Å":1}    ,   8) ... OK: got correct error: invalid utf-8 string
-End Incremental Tests OK=185 ERROR=0
+End Incremental Tests OK=198 ERROR=0
 ==================================
