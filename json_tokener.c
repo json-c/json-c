@@ -17,6 +17,7 @@
 
 #include "math_compat.h"
 #include <assert.h>
+#include <errno.h>
 #include <limits.h>
 #include <math.h>
 #include <stddef.h>
@@ -991,6 +992,11 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				if (!tok->is_double && tok->pb->buf[0] == '-' &&
 				    json_parse_int64(tok->pb->buf, &num64) == 0)
 				{
+					if (errno == ERANGE && (tok->flags & JSON_TOKENER_STRICT))
+					{
+						tok->err = json_tokener_error_parse_number;
+						goto out;
+					}
 					current = json_object_new_int64(num64);
 					if (current == NULL)
 						goto out;
@@ -998,6 +1004,11 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				else if (!tok->is_double && tok->pb->buf[0] != '-' &&
 				         json_parse_uint64(tok->pb->buf, &numuint64) == 0)
 				{
+					if (errno == ERANGE && (tok->flags & JSON_TOKENER_STRICT))
+					{
+						tok->err = json_tokener_error_parse_number;
+						goto out;
+					}
 					if (numuint64 && tok->pb->buf[0] == '0' &&
 					    (tok->flags & JSON_TOKENER_STRICT))
 					{

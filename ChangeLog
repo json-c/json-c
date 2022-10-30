@@ -16,6 +16,9 @@ Significant changes and bug fixes
   closing curly or square braces on same line for empty objects or arrays.
 * Disable locale handling when targeting a uClibc system due to problems
   with its duplocale() function.
+* When parsing with JSON_TOKENER_STRICT set, integer overflow/underflow
+  now result in a json_tokener_error_parse_number.  Without that flag
+  values are capped at INT64_MIN/UINT64_MAX.
 
 
 0.16 (up to commit 66dcdf5, 2022-04-13)

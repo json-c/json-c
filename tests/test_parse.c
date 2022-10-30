@@ -438,6 +438,38 @@ struct incremental_step
     {"1234", 5, 0, json_tokener_success, 0, 0},
     {"1234", 5, 4, json_tokener_success, 1, 0},
 
+	/* INT64_MAX */
+	{"[9223372036854775807]", 22, 21, json_tokener_success, 1, 0},
+	/* INT64_MAX+1 => parsed as uint64 */
+	{"[9223372036854775808]", 22, 21, json_tokener_success, 1, 0},
+
+	/* INT64_MIN */
+	{"[-9223372036854775808]", 23, 22, json_tokener_success, 1, 0},
+
+	/* INT64_MIN-1 => success, but value ends up capped */
+	{"[-9223372036854775809]", 23, 22, json_tokener_success, 1, 0},
+
+	/* INT64_MIN-1 => failure due to underflow detected */
+	{"[-9223372036854775809]", 23, 21, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+
+	/* UINT64_MAX */
+	{"[18446744073709551615]", 23, 22, json_tokener_success, 1, 0}, 
+
+	/* UINT64_MAX+1 => success, but value ends up capped */
+	{"[18446744073709551616]", 23, 22, json_tokener_success, 1, 0}, 
+
+	/* UINT64_MAX+1 => failure due to overflow detected */
+	{"[18446744073709551616]", 23, 21, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT}, 
+
+	/* XXX this seems like a bug, should fail with _error_parse_number instead */
+	{"18446744073709551616", 21, 20, json_tokener_error_parse_eof, 1, JSON_TOKENER_STRICT}, 
+
+	/* Exceeding integer limits as double parse OK */
+	{"[9223372036854775808.0]", 24, 23, json_tokener_success, 1, 0},
+	{"[-9223372036854775809.0]", 25, 24, json_tokener_success, 1, JSON_TOKENER_STRICT},
+	{"[18446744073709551615.0]", 25, 24, json_tokener_success, 1, 0}, 
+	{"[18446744073709551616.0]", 25, 24, json_tokener_success, 1, JSON_TOKENER_STRICT}, 
+
     /* offset=1 because "n" is the start of "null".  hmm... */
     {"noodle", 7, 1, json_tokener_error_parse_null, 1, 0},
     /* offset=2 because "na" is the start of "nan".  hmm... */
