@@ -22,19 +22,6 @@
 #include <sys/time.h>
 #endif
 
-#ifndef JSON_NORETURN
-#if defined(_MSC_VER)
-#define JSON_NORETURN __declspec(noreturn)
-#elif defined(__OS400__)
-#define JSON_NORETURN
-#else
-/* 'cold' attribute is for optimization, telling the computer this code
- * path is unlikely.
- */
-#define JSON_NORETURN __attribute__((noreturn, cold))
-#endif
-#endif
-
 static int formatted_output = 0;
 static int show_output = 1;
 static int strict_mode = 0;
@@ -44,7 +31,7 @@ static const char *fname = NULL;
 #define json_tokener_get_parse_end(tok) ((tok)->char_offset)
 #endif
 
-JSON_NORETURN static void usage(const char *argv0, int exitval, const char *errmsg);
+static void usage(const char *argv0, int exitval, const char *errmsg);
 static void showmem(void);
 static int parseit(int fd, int (*callback)(struct json_object *));
 static int showobj(struct json_object *new_obj);
@@ -63,7 +50,7 @@ static int parseit(int fd, int (*callback)(struct json_object *))
 {
 	struct json_object *obj;
 	char buf[32768];
-	ssize_t ret;
+	int ret;
 	int depth = JSON_TOKENER_DEFAULT_DEPTH;
 	json_tokener *tok;
 
@@ -86,21 +73,19 @@ static int parseit(int fd, int (*callback)(struct json_object *))
 	size_t total_read = 0;
 	while ((ret = read(fd, buf, sizeof(buf))) > 0)
 	{
-		size_t retu = (size_t)ret;  // We know it's positive
-		total_read += retu;
-		size_t start_pos = 0;
-		while (start_pos != retu)
+		total_read += ret;
+		int start_pos = 0;
+		while (start_pos != ret)
 		{
-			obj = json_tokener_parse_ex(tok, &buf[start_pos], retu - start_pos);
+			obj = json_tokener_parse_ex(tok, &buf[start_pos], ret - start_pos);
 			enum json_tokener_error jerr = json_tokener_get_error(tok);
-			size_t parse_end = json_tokener_get_parse_end(tok);
+			int parse_end = json_tokener_get_parse_end(tok);
 			if (obj == NULL && jerr != json_tokener_continue)
 			{
-				const char *aterr = (start_pos + parse_end < (int)sizeof(buf)) ?
-					&buf[start_pos + parse_end] : "";
+				char *aterr = &buf[start_pos + parse_end];
 				fflush(stdout);
-				size_t fail_offset = total_read - retu + start_pos + parse_end;
-				fprintf(stderr, "Failed at offset %lu: %s %c\n", (unsigned long)fail_offset,
+				int fail_offset = total_read - ret + start_pos + parse_end;
+				fprintf(stderr, "Failed at offset %d: %s %c\n", fail_offset,
 				        json_tokener_error_desc(jerr), aterr[0]);
 				json_tokener_free(tok);
 				return 1;
@@ -116,7 +101,7 @@ static int parseit(int fd, int (*callback)(struct json_object *))
 				}
 			}
 			start_pos += json_tokener_get_parse_end(tok);
-			assert(start_pos <= retu);
+			assert(start_pos <= ret);
 		}
 	}
 	if (ret < 0)
@@ -172,6 +157,7 @@ static void usage(const char *argv0, int exitval, const char *errmsg)
 
 int main(int argc, char **argv)
 {
+	json_object *new_obj;
 	int opt;
 
 	while ((opt = getopt(argc, argv, "fhns")) != -1)

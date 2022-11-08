@@ -1,6 +1,3 @@
-#ifdef NDEBUG
-#undef NDEBUG
-#endif
 #include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -22,7 +19,7 @@ int main(int argc, char **argv)
 }
 
 /* make sure only lowercase forms are parsed in strict mode */
-static void test_case_parse(void)
+static void test_case_parse()
 {
 	struct json_tokener *tok;
 	json_object *new_obj;

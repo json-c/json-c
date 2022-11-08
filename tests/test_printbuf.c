@@ -1,6 +1,3 @@
-#ifdef NDEBUG
-#undef NDEBUG
-#endif
 #include <assert.h>
 #include <limits.h>
 #include <stddef.h>
@@ -19,7 +16,7 @@ static void test_printbuf_memset_length(void);
 #define __func__ __FUNCTION__
 #endif
 
-static void test_basic_printbuf_memset(void)
+static void test_basic_printbuf_memset()
 {
 	struct printbuf *pb;
 
@@ -32,7 +29,7 @@ static void test_basic_printbuf_memset(void)
 	printf("%s: end test\n", __func__);
 }
 
-static void test_printbuf_memset_length(void)
+static void test_printbuf_memset_length()
 {
 	struct printbuf *pb;
 

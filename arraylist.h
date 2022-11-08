@@ -15,8 +15,8 @@
  *        Although this is exposed by the json_object_get_array() method,
  *        it is not recommended for direct use.
  */
-#ifndef _json_c_arraylist_h_
-#define _json_c_arraylist_h_
+#ifndef _arraylist_h_
+#define _arraylist_h_
 
 #ifdef __cplusplus
 extern "C" {
@@ -75,11 +75,13 @@ extern void *array_list_bsearch(const void **key, struct array_list *arr,
 
 extern int array_list_del_idx(struct array_list *arr, size_t idx, size_t count);
 
+
 /**
  * Shrink the array list to just enough to fit the number of elements in it,
  * plus empty_slots.
  */
 extern int array_list_shrink(struct array_list *arr, size_t empty_slots);
+
 
 #ifdef __cplusplus
 }

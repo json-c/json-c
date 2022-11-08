@@ -3,9 +3,6 @@
  * Also checks the json_object_get_type and json_object_is_type functions.
  */
 
-#ifdef NDEBUG
-#undef NDEBUG
-#endif
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,11 +28,6 @@ int main(int argc, char **argv)
 		\"int64_number\": 2147483649,\n\
 		\"negative_number\": -321321321,\n\
 		\"a_null\": null,\n\
-		\"empty_array\": [],\n\
-		\"nonempty_array\": [ 123 ],\n\
-		\"array_with_zero\": [ 0 ],\n\
-		\"empty_object\": {},\n\
-		\"nonempty_object\": { \"a\": 123 },\n\
 	}";
 	/* Note: 2147483649 = INT_MAX + 2 */
 	/* Note: 9223372036854775809 = INT64_MAX + 2 */
@@ -57,11 +49,6 @@ int main(int argc, char **argv)
 	getit(new_obj, "int64_number");
 	getit(new_obj, "negative_number");
 	getit(new_obj, "a_null");
-	getit(new_obj, "empty_array");
-	getit(new_obj, "nonempty_array");
-	getit(new_obj, "array_with_zero");
-	getit(new_obj, "empty_object");
-	getit(new_obj, "nonempty_object");
 
 	// Now check the behaviour of the json_object_is_type() function.
 	printf("\n================================\n");
@@ -97,7 +84,7 @@ static void getit(struct json_object *new_obj, const char *field)
 	printf("new_obj.%s json_object_get_double()=%f\n", field, json_object_get_double(o));
 }
 
-static void checktype_header(void)
+static void checktype_header()
 {
 	printf("json_object_is_type: %s,%s,%s,%s,%s,%s,%s\n", json_type_to_name(json_type_null),
 	       json_type_to_name(json_type_boolean), json_type_to_name(json_type_double),

@@ -2,9 +2,6 @@
 /* Enable RDRAND Hardware RNG Hash Seed */
 #cmakedefine ENABLE_RDRAND "@ENABLE_RDRAND@"
 
-/* Override json_c_get_random_seed() with custom code */
-#cmakedefine OVERRIDE_GET_RANDOM_SEED @OVERRIDE_GET_RANDOM_SEED@
-
 /* Enable partial threading support */
 #cmakedefine ENABLE_THREADING "@@"
 
@@ -56,9 +53,6 @@
 /* Define to 1 if you have the <sys/param.h> header file. */
 #cmakedefine HAVE_SYS_PARAM_H @HAVE_SYS_PARAM_H@
 
-/* Define to 1 if you have the <sys/random.h> header file. */
-#cmakedefine HAVE_SYS_RANDOM_H
-
 /* Define to 1 if you have the <sys/resource.h> header file. */
 #cmakedefine HAVE_SYS_RESOURCE_H
 
@@ -73,12 +67,6 @@
 
 /* Define to 1 if you have the <xlocale.h> header file. */
 #cmakedefine HAVE_XLOCALE_H
-
-/* Define to 1 if you have the <bsd/stdlib.h> header file. */
-#cmakedefine HAVE_BSD_STDLIB_H
-
-/* Define to 1 if you have `arc4random' */
-#cmakedefine HAVE_ARC4RANDOM
 
 /* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
 #cmakedefine HAVE_DOPRNT
@@ -148,9 +136,6 @@
 
 /* Define to 1 if you have the `vsyslog' function. */
 #cmakedefine HAVE_VSYSLOG @HAVE_VSYSLOG@
-
-/* Define if you have the `getrandom' function. */
-#cmakedefine HAVE_GETRANDOM
 
 /* Define if you have the `getrusage' function. */
 #cmakedefine HAVE_GETRUSAGE

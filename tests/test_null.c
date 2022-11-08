@@ -2,9 +2,6 @@
  * Tests if binary strings are supported.
  */
 
-#ifdef NDEBUG
-#undef NDEBUG
-#endif
 #include "config.h"
 #include <stdio.h>
 #include <string.h>

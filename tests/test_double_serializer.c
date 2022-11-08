@@ -2,9 +2,6 @@
 * Tests if the format string for double serialization is handled correctly
 */
 
-#ifdef NDEBUG
-#undef NDEBUG
-#endif
 #include "config.h"
 #include <stdio.h>
 
@@ -14,7 +11,7 @@
 /* Avoid compiler warnings about diving by constant zero */
 double zero_dot_zero = 0.0;
 
-int main(int argc, char **argv)
+int main()
 {
 	struct json_object *obj = json_object_new_double(0.5);
 	char udata[] = "test";

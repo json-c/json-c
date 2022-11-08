@@ -18,6 +18,16 @@
 #define _json_object_h_
 
 #ifdef __GNUC__
+#define THIS_FUNCTION_IS_DEPRECATED(func) func __attribute__((deprecated))
+#elif defined(_MSC_VER)
+#define THIS_FUNCTION_IS_DEPRECATED(func) __declspec(deprecated) func
+#elif defined(__clang__)
+#define THIS_FUNCTION_IS_DEPRECATED(func) func __deprecated
+#else
+#define THIS_FUNCTION_IS_DEPRECATED(func) func
+#endif
+
+#ifdef __GNUC__
 #define JSON_C_CONST_FUNCTION(func) func __attribute__((const))
 #else
 #define JSON_C_CONST_FUNCTION(func) func
@@ -52,7 +62,7 @@ extern "C" {
  * json_object_to_file_ext() functions which causes
  * the output to be formatted.
  *
- * See the "Two Space Tab" option at https://jsonformatter.curiousconcept.com/
+ * See the "Two Space Tab" option at http://jsonformatter.curiousconcept.com/
  * for an example of the format.
  */
 #define JSON_C_TO_STRING_PRETTY (1 << 1)
@@ -100,17 +110,9 @@ extern "C" {
  * key is given as a real constant value in the function
  * call, e.g. as in
  *   json_object_object_add_ex(obj, "ip", json,
- *       JSON_C_OBJECT_ADD_CONSTANT_KEY);
+ *       JSON_C_OBJECT_KEY_IS_CONSTANT);
  */
-#define JSON_C_OBJECT_ADD_CONSTANT_KEY (1 << 2)
-/**
- * This flag is an alias to JSON_C_OBJECT_ADD_CONSTANT_KEY.
- * Historically, this flag was used first and the new name
- * JSON_C_OBJECT_ADD_CONSTANT_KEY was introduced for version
- * 0.16.00 in order to have regular naming.
- * Use of this flag is now legacy.
- */
-#define JSON_C_OBJECT_KEY_IS_CONSTANT  JSON_C_OBJECT_ADD_CONSTANT_KEY
+#define JSON_C_OBJECT_KEY_IS_CONSTANT (1 << 2)
 
 /**
  * Set the global value of an option, which will apply to all
@@ -131,43 +133,21 @@ extern "C" {
 /* reference counting functions */
 
 /**
- * Increment the reference count of json_object, thereby taking ownership of it.
- *
- * Cases where you might need to increase the refcount include:
- * - Using an object field or array index (retrieved through
- *    `json_object_object_get()` or `json_object_array_get_idx()`)
- *    beyond the lifetime of the parent object.
- * - Detaching an object field or array index from its parent object
- *    (using `json_object_object_del()` or `json_object_array_del_idx()`)
- * - Sharing a json_object with multiple (not necessarily parallel) threads
- *    of execution that all expect to free it (with `json_object_put()`) when
- *    they're done.
+ * Increment the reference count of json_object, thereby grabbing shared
+ * ownership of obj.
  *
  * @param obj the json_object instance
- * @see json_object_put()
- * @see json_object_object_get()
- * @see json_object_array_get_idx()
  */
 JSON_EXPORT struct json_object *json_object_get(struct json_object *obj);
 
 /**
  * Decrement the reference count of json_object and free if it reaches zero.
- *
  * You must have ownership of obj prior to doing this or you will cause an
- * imbalance in the reference count, leading to a classic use-after-free bug.
- * In particular, you normally do not need to call `json_object_put()` on the
- * json_object returned by `json_object_object_get()` or `json_object_array_get_idx()`.
- *
- * Just like after calling `free()` on a block of memory, you must not use
- * `obj` after calling `json_object_put()` on it or any object that it
- * is a member of (unless you know you've called `json_object_get(obj)` to
- * explicitly increment the refcount).
- *
- * NULL may be passed, which which case this is a no-op.
+ * imbalance in the reference count.
+ * An obj of NULL may be passed; in that case this call is a no-op.
  *
  * @param obj the json_object instance
  * @returns 1 if the object was freed.
- * @see json_object_get()
  */
 JSON_EXPORT int json_object_put(struct json_object *obj);
 
@@ -367,21 +347,15 @@ JSON_C_CONST_FUNCTION(JSON_EXPORT size_t json_c_object_sizeof(void));
 
 /** Add an object field to a json_object of type json_type_object
  *
- * The reference count of `val` will *not* be incremented, in effect
- * transferring ownership that object to `obj`, and thus `val` will be
- * freed when `obj` is.  (i.e. through `json_object_put(obj)`)
+ * The reference count will *not* be incremented. This is to make adding
+ * fields to objects in code more compact. If you want to retain a reference
+ * to an added object, independent of the lifetime of obj, you must wrap the
+ * passed object with json_object_get.
  *
- * If you want to retain a reference to the added object, independent
- * of the lifetime of obj, you must increment the refcount with
- * `json_object_get(val)` (and later release it with json_object_put()).
- *
- * Since ownership transfers to `obj`, you must make sure
- * that you do in fact have ownership over `val`.  For instance,
- * json_object_new_object() will give you ownership until you transfer it,
- * whereas json_object_object_get() does not.
- *
- * Any previous object stored under `key` in `obj` will have its refcount
- * decremented, and be freed normally if that drops to zero.
+ * Upon calling this, the ownership of val transfers to obj.  Thus you must
+ * make sure that you do in fact have ownership over this object.  For instance,
+ * json_object_new_object will give you ownership until you transfer it,
+ * whereas json_object_object_get does not.
  *
  * @param obj the json_object instance
  * @param key the object field name (a private copy will be duplicated)
@@ -404,7 +378,7 @@ JSON_EXPORT int json_object_object_add(struct json_object *obj, const char *key,
  * @param key the object field name (a private copy will be duplicated)
  * @param val a json_object or NULL member to associate with the given field
  * @param opts process-modifying options. To specify multiple options, use
- *             (OPT1|OPT2)
+ *             arithmetic or (OPT1|OPT2)
  */
 JSON_EXPORT int json_object_object_add_ex(struct json_object *obj, const char *const key,
                                           struct json_object *const val, const unsigned opts);
@@ -478,19 +452,19 @@ JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key
  * @param val the local name for the json_object* object variable defined in
  *            the body
  */
-#if defined(__GNUC__) && !defined(__STRICT_ANSI__) && (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
+#if defined(__GNUC__) && !defined(__STRICT_ANSI__) && __STDC_VERSION__ >= 199901L
 
 #define json_object_object_foreach(obj, key, val)                                \
 	char *key = NULL;                                                        \
 	struct json_object *val __attribute__((__unused__)) = NULL;              \
-	for (struct lh_entry *entry##key = lh_table_head(json_object_get_object(obj)),    \
+	for (struct lh_entry *entry##key = json_object_get_object(obj)->head,    \
 	                     *entry_next##key = NULL;                            \
 	     ({                                                                  \
 		     if (entry##key)                                             \
 		     {                                                           \
 			     key = (char *)lh_entry_k(entry##key);               \
 			     val = (struct json_object *)lh_entry_v(entry##key); \
-			     entry_next##key = lh_entry_next(entry##key);        \
+			     entry_next##key = entry##key->next;                 \
 		     };                                                          \
 		     entry##key;                                                 \
 	     });                                                                 \
@@ -503,30 +477,29 @@ JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key
 	struct json_object *val = NULL;                                        \
 	struct lh_entry *entry##key;                                           \
 	struct lh_entry *entry_next##key = NULL;                               \
-	for (entry##key = lh_table_head(json_object_get_object(obj));          \
+	for (entry##key = json_object_get_object(obj)->head;                   \
 	     (entry##key ? (key = (char *)lh_entry_k(entry##key),              \
 	                   val = (struct json_object *)lh_entry_v(entry##key), \
-	                   entry_next##key = lh_entry_next(entry##key), entry##key)     \
+	                   entry_next##key = entry##key->next, entry##key)     \
 	                 : 0);                                                 \
 	     entry##key = entry_next##key)
 
-#endif /* defined(__GNUC__) && !defined(__STRICT_ANSI__) && (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) */
+#endif /* defined(__GNUC__) && !defined(__STRICT_ANSI__) && __STDC_VERSION__ >= 199901L */
 
 /** Iterate through all keys and values of an object (ANSI C Safe)
  * @param obj the json_object instance
  * @param iter the object iterator, use type json_object_iter
  */
 #define json_object_object_foreachC(obj, iter)                                                  \
-	for (iter.entry = lh_table_head(json_object_get_object(obj));                                    \
+	for (iter.entry = json_object_get_object(obj)->head;                                    \
 	     (iter.entry ? (iter.key = (char *)lh_entry_k(iter.entry),                          \
 	                   iter.val = (struct json_object *)lh_entry_v(iter.entry), iter.entry) \
 	                 : 0);                                                                  \
-	     iter.entry = lh_entry_next(iter.entry))
+	     iter.entry = iter.entry->next)
 
 /* Array type methods */
 
 /** Create a new empty json_object of type json_type_array
- * with 32 slots allocated.
  * If you know the array size you'll need ahead of time, use
  * json_object_new_array_ext() instead.
  * @see json_object_new_array_ext()
@@ -535,12 +508,6 @@ JSON_EXPORT void json_object_object_del(struct json_object *obj, const char *key
  */
 JSON_EXPORT struct json_object *json_object_new_array(void);
 
-/** Create a new empty json_object of type json_type_array
- * with the desired number of slots allocated.
- * @see json_object_array_shrink()
- * @param initial_size the number of slots to allocate
- * @returns a json_object of type json_type_array
- */
 JSON_EXPORT struct json_object *json_object_new_array_ext(int initial_size);
 
 /** Get the arraylist of a json_object of type json_type_array
@@ -613,15 +580,7 @@ JSON_EXPORT int json_object_array_add(struct json_object *obj, struct json_objec
 JSON_EXPORT int json_object_array_put_idx(struct json_object *obj, size_t idx,
                                           struct json_object *val);
 
-/** Get the element at specified index of array `obj` (which must be a json_object of type json_type_array)
- *
- * *No* reference counts will be changed, and ownership of the returned
- * object remains with `obj`.  See json_object_object_get() for additional
- * implications of this behavior.
- *
- * Calling this with anything other than a json_type_array will trigger
- * an assert.
- *
+/** Get the element at specified index of the array (a json_object of type json_type_array)
  * @param obj the json_object instance
  * @param idx the index to get the element at
  * @returns the json_object at the specified index (or NULL)
@@ -664,9 +623,8 @@ JSON_EXPORT struct json_object *json_object_new_boolean(json_bool b);
  * The type is coerced to a json_bool if the passed object is not a json_bool.
  * integer and double objects will return 0 if there value is zero
  * or 1 otherwise. If the passed object is a string it will return
- * 1 if it has a non zero length. 
- * If any other object type is passed 0 will be returned, even non-empty
- *  json_type_array and json_type_object objects.
+ * 1 if it has a non zero length. If any other object type is passed
+ * 1 will be returned if the object is not NULL.
  *
  * @param obj the json_object instance
  * @returns a json_bool
@@ -747,7 +705,7 @@ JSON_EXPORT int json_object_set_int(struct json_object *obj, int new_value);
  *
  * @param obj the json_object instance
  * @param val the value to add
- * @returns 1 if the increment succeeded, 0 otherwise
+ * @returns 1 if the increment succeded, 0 otherwise
  */
 JSON_EXPORT int json_object_int_inc(struct json_object *obj, int64_t val);
 
@@ -1064,7 +1022,7 @@ JSON_EXPORT json_c_shallow_copy_fn json_c_shallow_copy_default;
  *                     when custom serializers are in use.  See also
  *                     json_object set_serializer.
  *
- * @returns 0 if the copy went well, -1 if an error occurred during copy
+ * @returns 0 if the copy went well, -1 if an error occured during copy
  *          or if the destination pointer is non-NULL
  */
 

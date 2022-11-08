@@ -1,7 +1,4 @@
 
-#ifdef NDEBUG
-#undef NDEBUG
-#endif
 #include <stdio.h>
 #include <string.h>
 
@@ -34,7 +31,7 @@ void checkit_uint(const char *buf)
  * This always exits with a 0 exit value.  The output should be compared
  * against previously saved expected output.
  */
-int main(int argc, char **argv)
+int main()
 {
 	char buf[100];
 

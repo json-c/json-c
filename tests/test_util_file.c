@@ -1,6 +1,3 @@
-#ifdef NDEBUG
-#undef NDEBUG
-#endif
 #include "strerror_override.h"
 #include "strerror_override_private.h"
 #ifdef WIN32
@@ -38,7 +35,7 @@ static void test_read_fd_equal(const char *testdir);
 #define PATH_MAX 256
 #endif
 
-static void test_write_to_file(void)
+static void test_write_to_file()
 {
 	json_object *jso;
 
@@ -93,7 +90,7 @@ static void test_write_to_file(void)
 static void stat_and_cat(const char *file)
 {
 	struct stat sb;
-	int d = open(file, O_RDONLY);
+	int d = open(file, O_RDONLY, 0600);
 	if (d < 0)
 	{
 		printf("FAIL: unable to open %s: %s\n", file, strerror(errno));
@@ -129,6 +126,8 @@ int main(int argc, char **argv)
 {
 	//	json_object_to_file(file, obj);
 	//	json_object_to_file_ext(file, obj, flags);
+
+	_json_c_strerror_enable = 1;
 
 	const char *testdir;
 	if (argc < 2)
@@ -171,7 +170,7 @@ static void test_read_valid_with_fd(const char *testdir)
 	char filename[PATH_MAX];
 	(void)snprintf(filename, sizeof(filename), "%s/valid.json", testdir);
 
-	int d = open(filename, O_RDONLY);
+	int d = open(filename, O_RDONLY, 0);
 	if (d < 0)
 	{
 		fprintf(stderr, "FAIL: unable to open %s: %s\n", filename, strerror(errno));
@@ -196,7 +195,7 @@ static void test_read_valid_nested_with_fd(const char *testdir)
 	char filename[PATH_MAX];
 	(void)snprintf(filename, sizeof(filename), "%s/valid_nested.json", testdir);
 
-	int d = open(filename, O_RDONLY);
+	int d = open(filename, O_RDONLY, 0);
 	if (d < 0)
 	{
 		fprintf(stderr, "FAIL: unable to open %s: %s\n", filename, strerror(errno));
@@ -234,7 +233,7 @@ static void test_read_valid_nested_with_fd(const char *testdir)
 	close(d);
 }
 
-static void test_read_nonexistant(void)
+static void test_read_nonexistant()
 {
 	const char *filename = "./not_present.json";
 
@@ -252,10 +251,10 @@ static void test_read_nonexistant(void)
 	}
 }
 
-static void test_read_closed(void)
+static void test_read_closed()
 {
 	// Test reading from a closed fd
-	int d = open("/dev/null", O_RDONLY);
+	int d = open("/dev/null", O_RDONLY, 0);
 	if (d < 0)
 	{
 		puts("FAIL: unable to open");
@@ -290,7 +289,7 @@ static void test_read_fd_equal(const char *testdir)
 
 	json_object *jso = json_object_from_file(filename);
 
-	int d = open(filename, O_RDONLY);
+	int d = open(filename, O_RDONLY, 0);
 	if (d < 0)
 	{
 		fprintf(stderr, "FAIL: unable to open %s: %s\n", filename, strerror(errno));

@@ -10,14 +10,14 @@
  *
  * Copyright (c) 2008-2009 Yahoo! Inc.  All rights reserved.
  * The copyrights to the contents of this file are licensed under the MIT License
- * (https://www.opensource.org/licenses/mit-license.php)
+ * (http://www.opensource.org/licenses/mit-license.php)
  */
 
 #include "config.h"
 
 #include "math_compat.h"
 #include <assert.h>
-#include <errno.h>
+#include <ctype.h>
 #include <limits.h>
 #include <math.h>
 #include <stddef.h>
@@ -53,34 +53,6 @@
 #error You do not have strncasecmp on your system.
 #endif /* HAVE_STRNCASECMP */
 
-#if defined(_MSC_VER) && (_MSC_VER <= 1800)
-/* VS2013 doesn't know about "inline" */
-#define inline __inline
-#elif defined(AIX_CC)
-#define inline
-#endif
-
-/* The following helper functions are used to speed up parsing. They
- * are faster than their ctype counterparts because they assume that
- * the input is in ASCII and that the locale is set to "C". The
- * compiler will also inline these functions, providing an additional
- * speedup by saving on function calls.
- */
-static inline int is_ws_char(char c)
-{
-	return c == ' '
-	    || c == '\t'
-	    || c == '\n'
-	    || c == '\r';
-}
-
-static inline int is_hex_char(char c)
-{
-	return (c >= '0' && c <= '9')
-	    || (c >= 'A' && c <= 'F')
-	    || (c >= 'a' && c <= 'f');
-}
-
 /* Use C99 NAN by default; if not available, nan("") should work too. */
 #ifndef NAN
 #define NAN nan("")
@@ -89,8 +61,7 @@ static inline int is_hex_char(char c)
 static const char json_null_str[] = "null";
 static const int json_null_str_len = sizeof(json_null_str) - 1;
 static const char json_inf_str[] = "Infinity";
-/* Swapped case "Infinity" to avoid need to call tolower() on input chars: */
-static const char json_inf_str_invert[] = "iNFINITY";
+static const char json_inf_str_lower[] = "infinity";
 static const unsigned int json_inf_str_len = sizeof(json_inf_str) - 1;
 static const char json_nan_str[] = "NaN";
 static const int json_nan_str_len = sizeof(json_nan_str) - 1;
@@ -125,8 +96,6 @@ static const char *json_tokener_errors[] = {
  * if not utf-8 format, return err.
  */
 static json_bool json_tokener_validate_utf8(const char c, unsigned int *nBytes);
-
-static int json_tokener_parse_double(const char *buf, int len, double *retval);
 
 const char *json_tokener_error_desc(enum json_tokener_error jerr)
 {
@@ -163,12 +132,6 @@ struct json_tokener *json_tokener_new_ex(int depth)
 		return NULL;
 	}
 	tok->pb = printbuf_new();
-	if (!tok->pb)
-	{
-		free(tok->stack);
-		free(tok);
-		return NULL;
-	}
 	tok->max_depth = depth;
 	json_tokener_reset(tok);
 	return tok;
@@ -228,17 +191,7 @@ struct json_object *json_tokener_parse_verbose(const char *str, enum json_tokene
 		return NULL;
 	obj = json_tokener_parse_ex(tok, str, -1);
 	*error = tok->err;
-	if (tok->err != json_tokener_success
-#if 0
-		/* This would be a more sensible default, and cause parsing
-		 * things like "null123" to fail when the caller can't know
-		 * where the parsing left off, but starting to fail would
-		 * be a notable behaviour change.  Save for a 1.0 release.
-		 */
-	    || json_tokener_get_parse_end(tok) != strlen(str)
-#endif
-	)
-
+	if (tok->err != json_tokener_success)
 	{
 		if (obj != NULL)
 			json_object_put(obj);
@@ -270,7 +223,7 @@ struct json_object *json_tokener_parse_verbose(const char *str, enum json_tokene
 /* PEEK_CHAR(dest, tok) macro:
  *   Peeks at the current char and stores it in dest.
  *   Returns 1 on success, sets tok->err and returns 0 if no more chars.
- *   Implicit inputs:  str, len, nBytesp vars
+ *   Implicit inputs:  str, len vars
  */
 #define PEEK_CHAR(dest, tok)                                                 \
 	(((tok)->char_offset == len)                                         \
@@ -342,7 +295,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 	}
 #endif
 
-	while (PEEK_CHAR(c, tok)) // Note: c might be '\0' !
+	while (PEEK_CHAR(c, tok))
 	{
 
 	redo_char:
@@ -351,7 +304,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 
 		case json_tokener_state_eatws:
 			/* Advance until we change state */
-			while (is_ws_char(c))
+			while (isspace((unsigned char)c))
 			{
 				if ((!ADVANCE_CHAR(str, tok)) || (!PEEK_CHAR(c, tok)))
 					goto out;
@@ -456,15 +409,17 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 			 * complicated with likely little performance benefit.
 			 */
 			int is_negative = 0;
+			const char *_json_inf_str = json_inf_str;
+			if (!(tok->flags & JSON_TOKENER_STRICT))
+				_json_inf_str = json_inf_str_lower;
 
 			/* Note: tok->st_pos must be 0 when state is set to json_tokener_state_inf */
 			while (tok->st_pos < (int)json_inf_str_len)
 			{
 				char inf_char = *str;
-				if (inf_char != json_inf_str[tok->st_pos] &&
-				    ((tok->flags & JSON_TOKENER_STRICT) ||
-				      inf_char != json_inf_str_invert[tok->st_pos])
-				   )
+				if (!(tok->flags & JSON_TOKENER_STRICT))
+					inf_char = tolower((int)*str);
+				if (inf_char != _json_inf_str[tok->st_pos])
 				{
 					tok->err = json_tokener_error_parse_unexpected;
 					goto out;
@@ -673,164 +628,183 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 			}
 			break;
 
-			// ===================================================
-
 		case json_tokener_state_escape_unicode:
 		{
-			/* Handle a 4-byte \uNNNN sequence, or two sequences if a surrogate pair */
+			/* Handle a 4-byte sequence, or two sequences if a surrogate pair */
 			while (1)
 			{
-				if (!c || !is_hex_char(c))
+				if (c && strchr(json_hex_chars, c))
+				{
+					tok->ucs_char += ((unsigned int)jt_hexdigit(c)
+					                  << ((3 - tok->st_pos++) * 4));
+					if (tok->st_pos == 4)
+					{
+						unsigned char unescaped_utf[4];
+
+						if (tok->got_hi_surrogate)
+						{
+							if (IS_LOW_SURROGATE(tok->ucs_char))
+							{
+								/* remove the utf8_replacement_char */
+								/* which may generate during */
+								/* parsing the high surrogate pair. */
+								if (!strcmp(
+								        tok->pb->buf,
+								        (char *)
+								            utf8_replacement_char))
+								{
+									printbuf_reset(tok->pb);
+								}
+								/* Recalculate the ucs_char, then fall thru to process normally */
+								tok->ucs_char =
+								    DECODE_SURROGATE_PAIR(
+								        tok->got_hi_surrogate,
+								        tok->ucs_char);
+							}
+							else
+							{
+								/* Hi surrogate was not followed by a low surrogate */
+								/* Replace the hi and process the rest normally */
+								printbuf_memappend_fast(
+								    tok->pb,
+								    (char *)utf8_replacement_char,
+								    3);
+							}
+							tok->got_hi_surrogate = 0;
+						}
+
+						if (tok->ucs_char < 0x80)
+						{
+							unescaped_utf[0] = tok->ucs_char;
+							printbuf_memappend_fast(
+							    tok->pb, (char *)unescaped_utf, 1);
+						}
+						else if (tok->ucs_char < 0x800)
+						{
+							unescaped_utf[0] =
+							    0xc0 | (tok->ucs_char >> 6);
+							unescaped_utf[1] =
+							    0x80 | (tok->ucs_char & 0x3f);
+							printbuf_memappend_fast(
+							    tok->pb, (char *)unescaped_utf, 2);
+						}
+						else if (IS_HIGH_SURROGATE(tok->ucs_char))
+						{
+							/* Got a high surrogate.  Remember it and look for
+							 * the beginning of another sequence, which
+							 * should be the low surrogate.
+							 */
+							tok->got_hi_surrogate = tok->ucs_char;
+							/* Not at end, and the next two chars should be "\u" */
+							if ((len == -1 ||
+							     len > (tok->char_offset + 2)) &&
+							    // str[0] != '0' &&  // implied by json_hex_chars, above.
+							    (str[1] == '\\') && (str[2] == 'u'))
+							{
+								/* Advance through the 16 bit surrogate, and move
+								 * on to the next sequence. The next step is to
+								 * process the following characters.
+								 */
+								if (!ADVANCE_CHAR(str, tok) ||
+								    !ADVANCE_CHAR(str, tok))
+								{
+									printbuf_memappend_fast(
+									    tok->pb,
+									    (char *)
+									        utf8_replacement_char,
+									    3);
+								}
+								/* Advance to the first char of the next sequence and
+								 * continue processing with the next sequence.
+								 */
+								if (!ADVANCE_CHAR(str, tok) ||
+								    !PEEK_CHAR(c, tok))
+								{
+									printbuf_memappend_fast(
+									    tok->pb,
+									    (char *)
+									        utf8_replacement_char,
+									    3);
+									tok->ucs_char = 0;
+									tok->st_pos = 0;
+									goto out;
+								}
+								tok->ucs_char = 0;
+								tok->st_pos = 0;
+								/* other json_tokener_state_escape_unicode */
+								continue;
+							}
+							else
+							{
+								/* Got a high surrogate without another sequence following
+								 * it.  Put a replacement char in for the hi surrogate
+								 * and pretend we finished.
+								 */
+								printbuf_memappend_fast(
+								    tok->pb,
+								    (char *)utf8_replacement_char,
+								    3);
+							}
+						}
+						else if (IS_LOW_SURROGATE(tok->ucs_char))
+						{
+							/* Got a low surrogate not preceded by a high */
+							printbuf_memappend_fast(
+							    tok->pb, (char *)utf8_replacement_char,
+							    3);
+						}
+						else if (tok->ucs_char < 0x10000)
+						{
+							unescaped_utf[0] =
+							    0xe0 | (tok->ucs_char >> 12);
+							unescaped_utf[1] =
+							    0x80 | ((tok->ucs_char >> 6) & 0x3f);
+							unescaped_utf[2] =
+							    0x80 | (tok->ucs_char & 0x3f);
+							printbuf_memappend_fast(
+							    tok->pb, (char *)unescaped_utf, 3);
+						}
+						else if (tok->ucs_char < 0x110000)
+						{
+							unescaped_utf[0] =
+							    0xf0 | ((tok->ucs_char >> 18) & 0x07);
+							unescaped_utf[1] =
+							    0x80 | ((tok->ucs_char >> 12) & 0x3f);
+							unescaped_utf[2] =
+							    0x80 | ((tok->ucs_char >> 6) & 0x3f);
+							unescaped_utf[3] =
+							    0x80 | (tok->ucs_char & 0x3f);
+							printbuf_memappend_fast(
+							    tok->pb, (char *)unescaped_utf, 4);
+						}
+						else
+						{
+							/* Don't know what we got--insert the replacement char */
+							printbuf_memappend_fast(
+							    tok->pb, (char *)utf8_replacement_char,
+							    3);
+						}
+						state = saved_state;
+						break;
+					}
+				}
+				else
 				{
 					tok->err = json_tokener_error_parse_string;
 					goto out;
 				}
-				tok->ucs_char |=
-				    ((unsigned int)jt_hexdigit(c) << ((3 - tok->st_pos) * 4));
-				tok->st_pos++;
-				if (tok->st_pos >= 4)
-					break;
-
-				(void)ADVANCE_CHAR(str, tok);
-				if (!PEEK_CHAR(c, tok))
+				if (!ADVANCE_CHAR(str, tok) || !PEEK_CHAR(c, tok))
 				{
-					/*
-					 * We're out of characters in the current call to
-					 * json_tokener_parse(), but a subsequent call might
-					 * provide us with more, so leave our current state
-					 * as-is (including tok->high_surrogate) and return.
-					 */
+					/* Clean up any pending chars */
+					if (tok->got_hi_surrogate &&
+					    strcmp(tok->pb->buf, (char *)utf8_replacement_char))
+						printbuf_memappend_fast(
+						    tok->pb, (char *)utf8_replacement_char, 3);
 					goto out;
 				}
 			}
-			tok->st_pos = 0;
-
-			/* Now, we have a full \uNNNN sequence in tok->ucs_char */
-
-			/* If the *previous* sequence was a high surrogate ... */
-			if (tok->high_surrogate)
-			{
-				if (IS_LOW_SURROGATE(tok->ucs_char))
-				{
-					/* Recalculate the ucs_char, then fall thru to process normally */
-					tok->ucs_char = DECODE_SURROGATE_PAIR(tok->high_surrogate,
-					                                      tok->ucs_char);
-				}
-				else
-				{
-					/* High surrogate was not followed by a low surrogate
-					 * Replace the high and process the rest normally
-					 */
-					printbuf_memappend_fast(tok->pb,
-					                        (char *)utf8_replacement_char, 3);
-				}
-				tok->high_surrogate = 0;
-			}
-
-			if (tok->ucs_char < 0x80)
-			{
-				unsigned char unescaped_utf[1];
-				unescaped_utf[0] = tok->ucs_char;
-				printbuf_memappend_fast(tok->pb, (char *)unescaped_utf, 1);
-			}
-			else if (tok->ucs_char < 0x800)
-			{
-				unsigned char unescaped_utf[2];
-				unescaped_utf[0] = 0xc0 | (tok->ucs_char >> 6);
-				unescaped_utf[1] = 0x80 | (tok->ucs_char & 0x3f);
-				printbuf_memappend_fast(tok->pb, (char *)unescaped_utf, 2);
-			}
-			else if (IS_HIGH_SURROGATE(tok->ucs_char))
-			{
-				/*
-				 * The next two characters should be \u, HOWEVER,
-				 * we can't simply peek ahead here, because the
-				 * characters we need might not be passed to us
-				 * until a subsequent call to json_tokener_parse.
-				 * Instead, transition through a couple of states.
-				 * (now):
-				 *   _escape_unicode => _unicode_need_escape
-				 * (see a '\\' char):
-				 *   _unicode_need_escape => _unicode_need_u
-				 * (see a 'u' char):
-				 *   _unicode_need_u => _escape_unicode
-				 *      ...and we'll end up back around here.
-				 */
-				tok->high_surrogate = tok->ucs_char;
-				tok->ucs_char = 0;
-				state = json_tokener_state_escape_unicode_need_escape;
-				break;
-			}
-			else if (IS_LOW_SURROGATE(tok->ucs_char))
-			{
-				/* Got a low surrogate not preceded by a high */
-				printbuf_memappend_fast(tok->pb, (char *)utf8_replacement_char, 3);
-			}
-			else if (tok->ucs_char < 0x10000)
-			{
-				unsigned char unescaped_utf[3];
-				unescaped_utf[0] = 0xe0 | (tok->ucs_char >> 12);
-				unescaped_utf[1] = 0x80 | ((tok->ucs_char >> 6) & 0x3f);
-				unescaped_utf[2] = 0x80 | (tok->ucs_char & 0x3f);
-				printbuf_memappend_fast(tok->pb, (char *)unescaped_utf, 3);
-			}
-			else if (tok->ucs_char < 0x110000)
-			{
-				unsigned char unescaped_utf[4];
-				unescaped_utf[0] = 0xf0 | ((tok->ucs_char >> 18) & 0x07);
-				unescaped_utf[1] = 0x80 | ((tok->ucs_char >> 12) & 0x3f);
-				unescaped_utf[2] = 0x80 | ((tok->ucs_char >> 6) & 0x3f);
-				unescaped_utf[3] = 0x80 | (tok->ucs_char & 0x3f);
-				printbuf_memappend_fast(tok->pb, (char *)unescaped_utf, 4);
-			}
-			else
-			{
-				/* Don't know what we got--insert the replacement char */
-				printbuf_memappend_fast(tok->pb, (char *)utf8_replacement_char, 3);
-			}
-			state = saved_state; // i.e. _state_string or _state_object_field
 		}
 		break;
-
-		case json_tokener_state_escape_unicode_need_escape:
-			// We get here after processing a high_surrogate
-			// require a '\\' char
-			if (!c || c != '\\')
-			{
-				/* Got a high surrogate without another sequence following
-				 * it.  Put a replacement char in for the high surrogate
-				 * and pop back up to _state_string or _state_object_field.
-				 */
-				printbuf_memappend_fast(tok->pb, (char *)utf8_replacement_char, 3);
-				tok->high_surrogate = 0;
-				tok->ucs_char = 0;
-				tok->st_pos = 0;
-				state = saved_state;
-				goto redo_char;
-			}
-			state = json_tokener_state_escape_unicode_need_u;
-			break;
-
-		case json_tokener_state_escape_unicode_need_u:
-			/* We already had a \ char, check that it's \u */
-			if (!c || c != 'u')
-			{
-				/* Got a high surrogate with some non-unicode escape
-				 * sequence following it.
-				 * Put a replacement char in for the high surrogate
-				 * and handle the escape sequence normally.
-				 */
-				printbuf_memappend_fast(tok->pb, (char *)utf8_replacement_char, 3);
-				tok->high_surrogate = 0;
-				tok->ucs_char = 0;
-				tok->st_pos = 0;
-				state = json_tokener_state_string_escape;
-				goto redo_char;
-			}
-			state = json_tokener_state_escape_unicode;
-			break;
-
-			// ===================================================
 
 		case json_tokener_state_boolean:
 		{
@@ -881,38 +855,9 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 			const char *case_start = str;
 			int case_len = 0;
 			int is_exponent = 0;
-			int neg_sign_ok = 1;
-			int pos_sign_ok = 0;
-			if (printbuf_length(tok->pb) > 0)
+			int negativesign_next_possible_location = 1;
+			while (c && strchr(json_number_chars, c))
 			{
-				/* We don't save all state from the previous incremental parse
-				   so we need to re-generate it based on the saved string so far.
-				 */
-				char *e_loc = strchr(tok->pb->buf, 'e');
-				if (!e_loc)
-					e_loc = strchr(tok->pb->buf, 'E');
-				if (e_loc)
-				{
-					char *last_saved_char =
-					    &tok->pb->buf[printbuf_length(tok->pb) - 1];
-					is_exponent = 1;
-					pos_sign_ok = neg_sign_ok = 1;
-					/* If the "e" isn't at the end, we can't start with a '-' */
-					if (e_loc != last_saved_char)
-					{
-						neg_sign_ok = 0;
-						pos_sign_ok = 0;
-					}
-					// else leave it set to 1, i.e. start of the new input
-				}
-			}
-
-			while (c && ((c >= '0' && c <= '9') ||
-			             (!is_exponent && (c == 'e' || c == 'E')) ||
-			             (neg_sign_ok && c == '-') || (pos_sign_ok && c == '+') ||
-			             (!tok->is_double && c == '.')))
-			{
-				pos_sign_ok = neg_sign_ok = 0;
 				++case_len;
 
 				/* non-digit characters checks */
@@ -921,21 +866,40 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				 * protected from input starting with '.' or
 				 * e/E.
 				 */
-				switch (c)
+				if (c == '.')
 				{
-				case '.':
+					if (tok->is_double != 0)
+					{
+						/* '.' can only be found once, and out of the exponent part.
+						 * Thus, if the input is already flagged as double, it
+						 * is invalid.
+						 */
+						tok->err = json_tokener_error_parse_number;
+						goto out;
+					}
 					tok->is_double = 1;
-					pos_sign_ok = 1;
-					neg_sign_ok = 1;
-					break;
-				case 'e': /* FALLTHRU */
-				case 'E':
+				}
+				if (c == 'e' || c == 'E')
+				{
+					if (is_exponent != 0)
+					{
+						/* only one exponent possible */
+						tok->err = json_tokener_error_parse_number;
+						goto out;
+					}
 					is_exponent = 1;
 					tok->is_double = 1;
 					/* the exponent part can begin with a negative sign */
-					pos_sign_ok = neg_sign_ok = 1;
-					break;
-				default: break;
+					negativesign_next_possible_location = case_len + 1;
+				}
+				if (c == '-' && case_len != negativesign_next_possible_location)
+				{
+					/* If the negative sign is not where expected (ie
+					 * start of input or start of exponent part), the
+					 * input is invalid.
+					 */
+					tok->err = json_tokener_error_parse_number;
+					goto out;
 				}
 
 				if (!ADVANCE_CHAR(str, tok) || !PEEK_CHAR(c, tok))
@@ -943,20 +907,6 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 					printbuf_memappend_fast(tok->pb, case_start, case_len);
 					goto out;
 				}
-			}
-			/*
-				Now we know c isn't a valid number char, but check whether
-				it might have been intended to be, and return a potentially
-				more understandable error right away.
-				However, if we're at the top-level, use the number as-is
-			    because c can be part of a new object to parse on the
-				next call to json_tokener_parse().
-			 */
-			if (tok->depth > 0 && c != ',' && c != ']' && c != '}' && c != '/' &&
-			    c != 'I' && c != 'i' && !is_ws_char(c))
-			{
-				tok->err = json_tokener_error_parse_number;
-				goto out;
 			}
 			if (case_len > 0)
 				printbuf_memappend_fast(tok->pb, case_start, case_len);
@@ -968,22 +918,6 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				tok->st_pos = 0;
 				goto redo_char;
 			}
-			if (tok->is_double && !(tok->flags & JSON_TOKENER_STRICT))
-			{
-				/* Trim some chars off the end, to allow things
-				   like "123e+" to parse ok. */
-				while (printbuf_length(tok->pb) > 1)
-				{
-					char last_char = tok->pb->buf[printbuf_length(tok->pb) - 1];
-					if (last_char != 'e' && last_char != 'E' &&
-					    last_char != '-' && last_char != '+')
-					{
-						break;
-					}
-					tok->pb->buf[printbuf_length(tok->pb) - 1] = '\0';
-					printbuf_length(tok->pb)--;
-				}
-			}
 		}
 			{
 				int64_t num64;
@@ -992,11 +926,6 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				if (!tok->is_double && tok->pb->buf[0] == '-' &&
 				    json_parse_int64(tok->pb->buf, &num64) == 0)
 				{
-					if (errno == ERANGE && (tok->flags & JSON_TOKENER_STRICT))
-					{
-						tok->err = json_tokener_error_parse_number;
-						goto out;
-					}
 					current = json_object_new_int64(num64);
 					if (current == NULL)
 						goto out;
@@ -1004,11 +933,6 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				else if (!tok->is_double && tok->pb->buf[0] != '-' &&
 				         json_parse_uint64(tok->pb->buf, &numuint64) == 0)
 				{
-					if (errno == ERANGE && (tok->flags & JSON_TOKENER_STRICT))
-					{
-						tok->err = json_tokener_error_parse_number;
-						goto out;
-					}
 					if (numuint64 && tok->pb->buf[0] == '0' &&
 					    (tok->flags & JSON_TOKENER_STRICT))
 					{
@@ -1030,8 +954,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 					}
 				}
 				else if (tok->is_double &&
-				         json_tokener_parse_double(
-				             tok->pb->buf, printbuf_length(tok->pb), &numd) == 0)
+				         json_parse_double(tok->pb->buf, &numd) == 0)
 				{
 					current = json_object_new_double_s(numd, tok->pb->buf);
 					if (current == NULL)
@@ -1216,9 +1139,8 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 			}
 			break;
 		}
-		(void)ADVANCE_CHAR(str, tok);
-		if (!c) // This is the char *before* advancing
-			break;
+		if (!ADVANCE_CHAR(str, tok))
+			goto out;
 	} /* while(PEEK_CHAR) */
 
 out:
@@ -1227,8 +1149,7 @@ out:
 		tok->err = json_tokener_error_parse_utf8_string;
 	}
 	if (c && (state == json_tokener_state_finish) && (tok->depth == 0) &&
-	    (tok->flags & (JSON_TOKENER_STRICT | JSON_TOKENER_ALLOW_TRAILING_CHARS)) ==
-	        JSON_TOKENER_STRICT)
+	    (tok->flags & (JSON_TOKENER_STRICT|JSON_TOKENER_ALLOW_TRAILING_CHARS)) == JSON_TOKENER_STRICT)
 	{
 		/* unexpected char after JSON data */
 		tok->err = json_tokener_error_parse_unexpected;
@@ -1299,13 +1220,4 @@ size_t json_tokener_get_parse_end(struct json_tokener *tok)
 {
 	assert(tok->char_offset >= 0); /* Drop this line when char_offset becomes a size_t */
 	return (size_t)tok->char_offset;
-}
-
-static int json_tokener_parse_double(const char *buf, int len, double *retval)
-{
-	char *end;
-	*retval = strtod(buf, &end);
-	if (buf + len == end)
-		return 0; // It worked
-	return 1;
 }

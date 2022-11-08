@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+
 add_executable(test1Formatted test1.c parse_flags.c parse_flags.h)
 target_compile_definitions(test1Formatted PRIVATE TEST_FORMATTED=1)
 target_link_libraries(test1Formatted PRIVATE ${PROJECT_NAME})
@@ -12,41 +12,31 @@ target_link_libraries(test2Formatted PRIVATE ${PROJECT_NAME})
 
 include_directories(PUBLIC ${CMAKE_SOURCE_DIR})
 
-set(ALL_TEST_NAMES
-    test1
-    test2
-    test4
-    testReplaceExisting
-    test_cast
-    test_charcase
-    test_compare
-    test_deep_copy
-    test_double_serializer
-    test_float
-    test_int_add
-    test_locale
-    test_null
-    test_parse
-    test_parse_int64
-    test_printbuf
-    test_set_serializer
-    test_set_value
-    test_strerror
-    test_util_file
-    test_visit
-    test_object_iterator)
-
-if (NOT DISABLE_JSON_POINTER)
-    set(ALL_TEST_NAMES ${ALL_TEST_NAMES} test_json_pointer)
-endif()
-
-foreach(TESTNAME ${ALL_TEST_NAMES})
+foreach(TESTNAME
+	test1
+	test2
+	test4
+	testReplaceExisting
+	test_cast
+	test_charcase
+	test_compare
+	test_deep_copy
+	test_double_serializer
+	test_float
+	test_int_add
+	test_json_pointer
+	test_locale
+	test_null
+	test_parse
+	test_parse_int64
+	test_printbuf
+	test_set_serializer
+	test_set_value
+	test_util_file
+	test_visit
+	test_object_iterator)
 
 add_executable(${TESTNAME} ${TESTNAME}.c)
-if(${TESTNAME} STREQUAL test_strerror OR ${TESTNAME} STREQUAL test_util_file)
-# For output consistency, we need _json_c_strerror() in some tests:
-target_sources(${TESTNAME} PRIVATE ../strerror_override.c)
-endif()
 add_test(NAME ${TESTNAME} COMMAND ${PROJECT_SOURCE_DIR}/tests/${TESTNAME}.test)
 
 # XXX using the non-target_ versions of these doesn't work :(

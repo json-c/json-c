@@ -2,9 +2,6 @@
  * gcc -o utf8 utf8.c -I/home/y/include -L./.libs -ljson
  */
 
-#ifdef NDEBUG
-#undef NDEBUG
-#endif
 #include "config.h"
 #include <assert.h>
 #include <stdio.h>
@@ -31,7 +28,7 @@ void print_hex(const char *s)
 }
 
 static void test_lot_of_adds(void);
-static void test_lot_of_adds(void)
+static void test_lot_of_adds()
 {
 	int ii;
 	char key[50];
