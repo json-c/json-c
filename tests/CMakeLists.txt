@@ -24,6 +24,7 @@ set(ALL_TEST_NAMES
     test_double_serializer
     test_float
     test_int_add
+    test_int_get
     test_locale
     test_null
     test_parse

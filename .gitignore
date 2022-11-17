@@ -27,6 +27,7 @@
 /tests/test_double_serializer
 /tests/test_float
 /tests/test_int_add
+/tests/test_int_get
 /tests/test_json_pointer
 /tests/test_locale
 /tests/test_null
