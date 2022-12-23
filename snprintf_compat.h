@@ -35,7 +35,7 @@ static int json_c_snprintf(char *str, size_t size, const char *format, ...)
 #define snprintf json_c_snprintf
 
 #elif !defined(HAVE_SNPRINTF) /* !HAVE_SNPRINTF */
-#error Need vsnprintf!
+#error snprintf is required but was not found
 #endif /* !HAVE_SNPRINTF && defined(WIN32) */
 
 #endif /* __snprintf_compat_h */
