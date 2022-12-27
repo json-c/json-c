@@ -1,6 +1,9 @@
-# Many projects still are stuck using CMake 2.8 is several places so it's good to provide backward support too. This is
+# Many projects still are stuck using CMake 2.8 in several places so it's good to provide backward support too. This is
 # specially true in old embedded systems (OpenWRT and friends) where CMake isn't necessarily upgraded.
-cmake_minimum_required(VERSION 2.8)
+# We set it to 2.8.12 as CMake currently indicates that support for versions below it will be removed
+# from a future version ("Compatibility with CMake < 2.8.12 will be removed from a future version of CMake.")
+# 2.8.12 was released in 2013.
+cmake_minimum_required(VERSION 2.8.12)
 
 if(POLICY CMP0048)
 	cmake_policy(SET CMP0048 NEW)
