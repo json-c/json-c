@@ -22,8 +22,15 @@ endif()
 
 # If we've got 3.0 then it's good, let's provide support. Otherwise, leave it be.
 if(POLICY CMP0038)
-  # Policy CMP0038 introduced was in CMake 3.0
+  # Policy CMP0038 was introduced in CMake 3.0
   cmake_policy(SET CMP0038 NEW)
+endif()
+
+if(POLICY CMP0042)
+    # Policy CMP0042 was introduced in CMake 3.0
+    # CMake version 3.25.1 warns when the policy is not set and uses OLD behavior
+    # We set it explicitly to avoid the warning
+    cmake_policy(SET CMP0042 OLD)
 endif()
 
 if(POLICY CMP0054)
