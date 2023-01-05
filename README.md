@@ -11,6 +11,7 @@
 4. [CMake options](#CMake)
 5. [Testing](#testing)
 6. [Building with `vcpkg`](#buildvcpkg)
+7. [Building for Android](#android)
 7. [Linking to libjson-c](#linking)
 8. [Using json-c](#using)
 
@@ -236,6 +237,29 @@ You can download and install JSON-C using the [vcpkg](https://github.com/Microso
 
 The JSON-C port in vcpkg is kept up to date by Microsoft team members and community contributors. If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg) on the vcpkg repository.
 
+Building for Android <a name="android">
+----------------------
+
+Building on Android is now particularly well supported, but there
+have been some reports of success using
+https://developer.android.com/ndk/guides/cmake
+
+```
+mkdir json-c-build
+cd json-c-build/
+export NDK_HOME=~/Library/Android/sdk/ndk/22.1.7171670/
+cmake \
+    --toolchain=$NDK_HOME/build/cmake/android.toolchain.cmake \
+    -DANDROID_STL=none \
+    -DANDROID_ABI=arm64-v8a \
+    -DANDROID_PLATFORM=android-29 \
+    -DANDROID_LD=lld \
+    -DCMAKE_BUILD_TYPE=MinSizeRel \
+    -DCMAKE_INSTALL_PREFIX=<install prefix> \
+    -DENABLE_THREADING=true \
+    ..
+make install
+```
 
 Linking to `libjson-c` <a name="linking">
 ----------------------
