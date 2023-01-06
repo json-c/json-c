@@ -75,6 +75,19 @@ extern "C" {
 #define JSON_C_TO_STRING_NOSLASHESCAPE (1 << 4)
 
 /**
+ * A flag for the json_object_to_json_string_ext() and
+ * json_object_to_file_ext() functions which causes
+ * the output to be formatted.
+ * The format is the same as JSON_C_TO_STRING_PRETTY except
+ * that arrays with elements with the following types:
+ *	json_type_null,
+ *	json_type_boolean,
+ *	json_type_double,
+ *	json_type_int
+ * are formatted compactly with 16 elements (instead of 1) per line.
+ */
+#define JSON_C_TO_STRING_PRETTY_COMPACT_ARRAY (1 << 5)
+/**
  * A flag for the json_object_object_add_ex function which
  * causes the value to be added without a check if it already exists.
  * Note: it is the responsibility of the caller to ensure that no

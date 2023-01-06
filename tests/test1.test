@@ -11,7 +11,7 @@ fi
 run_output_test test1
 _err=$?
 
-for flag in plain spaced pretty ; do
+for flag in plain spaced pretty compact_array ; do
 	run_output_test -o test1Formatted_${flag} test1Formatted ${flag}
 	_err2=$?
 	if [ $_err -eq 0 ] ; then

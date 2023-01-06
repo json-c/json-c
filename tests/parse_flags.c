@@ -24,6 +24,7 @@ static struct
     {"spaced", JSON_C_TO_STRING_SPACED},
     {"pretty", JSON_C_TO_STRING_PRETTY},
     {"pretty_tab", JSON_C_TO_STRING_PRETTY_TAB},
+    {"compact_array", JSON_C_TO_STRING_PRETTY_COMPACT_ARRAY},
 };
 
 #ifndef NELEM
