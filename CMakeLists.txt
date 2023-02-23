@@ -1,41 +1,26 @@
-# Many projects still are stuck using CMake 2.8 in several places so it's good to provide backward support too. This is
-# specially true in old embedded systems (OpenWRT and friends) where CMake isn't necessarily upgraded.
-# We set it to 2.8.12 as CMake currently indicates that support for versions below it will be removed
-# from a future version ("Compatibility with CMake < 2.8.12 will be removed from a future version of CMake.")
-# 2.8.12 was released in 2013.
-cmake_minimum_required(VERSION 2.8.12)
+# CMake 3.9 was released in 2017/07
+#  As of 2023, many versions of Linux, NetBSD and FreeBSD provide,
+#   and many OpenWRT packages require, much newer CMake packages.
+#  We're stopping before 3.10 because that version starts requiring
+#   c++11, which isn't available on e.g HPUX.
+cmake_minimum_required(VERSION 3.9)
 
-if(POLICY CMP0048)
-	cmake_policy(SET CMP0048 NEW)
-endif()
+# The project() command manages VERSION variables.
+cmake_policy(SET CMP0048 NEW)
 
 # JSON-C library is C only project.
-if (CMAKE_VERSION VERSION_LESS 3.0)
-	project(json-c)
-	set(PROJECT_VERSION_MAJOR "0")
-	set(PROJECT_VERSION_MINOR "16")
-	set(PROJECT_VERSION_PATCH "99")
-	set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
-else()
-	project(json-c LANGUAGES C VERSION 0.16.99)
-endif()
+# PROJECT_VERSION{,_MAJOR,_MINOR,_PATCH} set by project():
+project(json-c LANGUAGES C VERSION 0.16.99)
 
-# If we've got 3.0 then it's good, let's provide support. Otherwise, leave it be.
-if(POLICY CMP0038)
-  # Policy CMP0038 was introduced in CMake 3.0
-  cmake_policy(SET CMP0038 NEW)
-endif()
+# Targets may not link directly to themselves.
+cmake_policy(SET CMP0038 NEW)
 
-if(POLICY CMP0042)
-    # Policy CMP0042 was introduced in CMake 3.0
-    # CMake version 3.25.1 warns when the policy is not set and uses OLD behavior
-    # We set it explicitly to avoid the warning
-    cmake_policy(SET CMP0042 OLD)
-endif()
+# MACOSX_RPATH is enabled by default.
+# We set it explicitly to avoid the warning
+cmake_policy(SET CMP0042 NEW)
 
-if(POLICY CMP0054)
-    cmake_policy(SET CMP0054 NEW)
-endif()
+# Only interpret if() arguments as variables or keywords when unquoted.
+cmake_policy(SET CMP0054 NEW)
 
 # set default build type if not specified by user
 if(NOT CMAKE_BUILD_TYPE)
@@ -46,6 +31,7 @@ set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE} -O2")
 
 # Include file check macros honor CMAKE_REQUIRED_LIBRARIES
 # i.e. the check_include_file() calls will include -lm when checking.
+# New in version 3.12.
 if(POLICY CMP0075)
 	cmake_policy(SET CMP0075 NEW)
 endif()
