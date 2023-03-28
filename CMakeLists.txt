@@ -398,7 +398,6 @@ set(JSON_C_HEADERS
     ${PROJECT_SOURCE_DIR}/json_object_private.h
     ${PROJECT_SOURCE_DIR}/random_seed.h
     ${PROJECT_SOURCE_DIR}/strerror_override.h
-    ${PROJECT_SOURCE_DIR}/strerror_override_private.h
     ${PROJECT_SOURCE_DIR}/math_compat.h
     ${PROJECT_SOURCE_DIR}/snprintf_compat.h
     ${PROJECT_SOURCE_DIR}/strdup_compat.h

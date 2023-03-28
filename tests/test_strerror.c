@@ -2,7 +2,6 @@
 #undef NDEBUG
 #endif
 #include "strerror_override.h"
-#include "strerror_override_private.h"
 
 #include <stdio.h>
 

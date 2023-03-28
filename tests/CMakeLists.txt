@@ -44,10 +44,6 @@ endif()
 foreach(TESTNAME ${ALL_TEST_NAMES})
 
 add_executable(${TESTNAME} ${TESTNAME}.c)
-if(${TESTNAME} STREQUAL test_strerror OR ${TESTNAME} STREQUAL test_util_file)
-# For output consistency, we need _json_c_strerror() in some tests:
-target_sources(${TESTNAME} PRIVATE ../strerror_override.c)
-endif()
 add_test(NAME ${TESTNAME} COMMAND ${PROJECT_SOURCE_DIR}/tests/${TESTNAME}.test)
 
 # XXX using the non-target_ versions of these doesn't work :(

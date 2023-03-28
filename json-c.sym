@@ -41,6 +41,8 @@ JSONC_PRIVATE {
     printbuf_new;
     printbuf_reset;
     sprintbuf;
+    # Used by tests:
+    _json_c_strerror;
 };
 
 JSONC_0.14 {
