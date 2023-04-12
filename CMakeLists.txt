@@ -564,7 +564,9 @@ if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING AND
 add_subdirectory(tests)
 endif()
 
+if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 if (NOT MSVC)  # cmd line apps don't built on Windows currently.
 add_subdirectory(apps)
+endif()
 endif()
 
