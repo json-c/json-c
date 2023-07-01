@@ -94,7 +94,11 @@ Create the release tarballs:
     echo .git > excludes
     tar -czf json-c-${release}.tar.gz -X excludes json-c-${release}
 
-    echo 'doc/*' >> excludes
+    echo 'doc/*.cmake' >> excludes
+    echo 'doc/CMakeFiles' >> excludes
+    echo 'doc/Makefile' >> excludes
+    echo 'doc/Doxyfile' >> excludes
+    echo 'doc/html' >> excludes
     tar -czf json-c-${release}-nodoc.tar.gz -X excludes json-c-${release}
 
 ------------
