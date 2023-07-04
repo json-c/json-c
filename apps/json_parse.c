@@ -35,7 +35,7 @@
 #endif
 #endif
 
-static int formatted_output = 0;
+static int formatted_output = JSON_C_TO_STRING_SPACED;
 static int show_output = 1;
 static int strict_mode = 0;
 static const char *fname = NULL;
@@ -55,7 +55,7 @@ static void showmem(void)
 	struct rusage rusage;
 	memset(&rusage, 0, sizeof(rusage));
 	getrusage(RUSAGE_SELF, &rusage);
-	printf("maxrss: %ld KB\n", rusage.ru_maxrss);
+	fprintf(stderr, "maxrss: %ld KB\n", rusage.ru_maxrss);
 #endif
 }
 
@@ -136,15 +136,12 @@ static int showobj(struct json_object *new_obj)
 		return 1;
 	}
 
-	printf("Successfully parsed object from %s\n", fname);
+	fprintf(stderr, "Successfully parsed object from %s\n", fname);
 
 	if (show_output)
 	{
 		const char *output;
-		if (formatted_output)
-			output = json_object_to_json_string(new_obj);
-		else
-			output = json_object_to_json_string_ext(new_obj, JSON_C_TO_STRING_PRETTY);
+		output = json_object_to_json_string_ext(new_obj, formatted_output);
 		printf("%s\n", output);
 	}
 
@@ -159,11 +156,13 @@ static void usage(const char *argv0, int exitval, const char *errmsg)
 		fp = stderr;
 	if (errmsg != NULL)
 		fprintf(fp, "ERROR: %s\n\n", errmsg);
-	fprintf(fp, "Usage: %s [-f] [-n] [-s]\n", argv0);
-	fprintf(fp, "  -f - Format the output with JSON_C_TO_STRING_PRETTY\n");
+	fprintf(fp, "Usage: %s [-f|-F <arg>] [-n] [-s]\n", argv0);
+	fprintf(fp, "  -f - Format the output to stdout with JSON_C_TO_STRING_PRETTY (default is JSON_C_TO_STRING_SPACED)\n");
+	fprintf(fp, "  -F - Format the output to stdout with <arg>, e.g. 0 for JSON_C_TO_STRING_PLAIN\n");
 	fprintf(fp, "  -n - No output\n");
 	fprintf(fp, "  -s - Parse in strict mode, flags:\n");
 	fprintf(fp, "       JSON_TOKENER_STRICT|JSON_TOKENER_ALLOW_TRAILING_CHARS\n");
+	fprintf(fp, " Diagnostic information will be emitted to stderr\n");
 
 	fprintf(fp, "\nWARNING WARNING WARNING\n");
 	fprintf(fp, "This is a prototype, it may change or be removed at any time!\n");
@@ -174,11 +173,12 @@ int main(int argc, char **argv)
 {
 	int opt;
 
-	while ((opt = getopt(argc, argv, "fhns")) != -1)
+	while ((opt = getopt(argc, argv, "fF:hns")) != -1)
 	{
 		switch (opt)
 		{
-		case 'f': formatted_output = 1; break;
+		case 'f': formatted_output = JSON_C_TO_STRING_PRETTY; break;
+		case 'F': formatted_output = atoi(optarg); break;
 		case 'n': show_output = 0; break;
 		case 's': strict_mode = 1; break;
 		case 'h': usage(argv[0], 0, NULL);
