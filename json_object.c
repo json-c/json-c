@@ -438,7 +438,7 @@ const char *json_object_to_json_string(struct json_object *jso)
 
 static void indent(struct printbuf *pb, int level, int flags)
 {
-	if (flags & JSON_C_TO_STRING_PRETTY)
+	if (flags & (JSON_C_TO_STRING_PRETTY | JSON_C_TO_STRING_PRETTY_COMPACT_ARRAY))
 	{
 		if (flags & JSON_C_TO_STRING_PRETTY_TAB)
 		{
@@ -458,10 +458,17 @@ static int json_object_object_to_json_string(struct json_object *jso, struct pri
 {
 	int had_children = 0;
 	struct json_object_iter iter;
+	int compact_array_reset_flag = 0;
 
 	printbuf_strappend(pb, "{" /*}*/);
 	json_object_object_foreachC(jso, iter)
 	{
+		/* For objects that are not arrays, these flags are equivalent. */
+		if (flags & JSON_C_TO_STRING_PRETTY_COMPACT_ARRAY)
+		{
+			flags = JSON_C_TO_STRING_PRETTY;
+			compact_array_reset_flag = 1;
+		}
 		if (had_children)
 		{
 			printbuf_strappend(pb, ",");
@@ -480,10 +487,19 @@ static int json_object_object_to_json_string(struct json_object *jso, struct pri
 			printbuf_strappend(pb, "\":");
 		if (iter.val == NULL)
 			printbuf_strappend(pb, "null");
-		else if (iter.val->_to_json_string(iter.val, pb, level + 1, flags) < 0)
-			return -1;
+		else
+		{
+			if (compact_array_reset_flag)
+			{
+				flags = JSON_C_TO_STRING_PRETTY_COMPACT_ARRAY;
+				compact_array_reset_flag = 0;
+			}
+			int ret = iter.val->_to_json_string(iter.val, pb, level + 1, flags);
+			if (ret < 0)
+				return -1;
+		}
 	}
-	if ((flags & JSON_C_TO_STRING_PRETTY) && had_children)
+	if ((flags & (JSON_C_TO_STRING_PRETTY | JSON_C_TO_STRING_PRETTY_COMPACT_ARRAY)) && had_children)
 	{
 		printbuf_strappend(pb, "\n");
 		indent(pb, level, flags);
@@ -1376,28 +1392,66 @@ static int json_object_array_to_json_string(struct json_object *jso, struct prin
 {
 	int had_children = 0;
 	size_t ii;
+	int compact_array_reset_flag = 0;
+	int compact_array_elements_on_line = 0;
+	const int COMPACT_ARRAY_ELEMENTS_PER_LINE_MAX = 15;
 
 	printbuf_strappend(pb, "[");
 	for (ii = 0; ii < json_object_array_length(jso); ii++)
 	{
 		struct json_object *val;
+		val = json_object_array_get_idx(jso, ii);
+		json_type val_type = json_object_get_type(val);
+
 		if (had_children)
 		{
 			printbuf_strappend(pb, ",");
 		}
+
+		/* Do not compactly print arrays with elements that are arrays, strings or objects. */
+		if ((flags & JSON_C_TO_STRING_PRETTY_COMPACT_ARRAY) || compact_array_reset_flag)
+		{
+			if (compact_array_reset_flag)
+			{
+				flags = JSON_C_TO_STRING_PRETTY_COMPACT_ARRAY;
+				compact_array_reset_flag = 0;
+			}
+			if ((val_type == json_type_array) || (val_type == json_type_string) || (val_type == json_type_object))
+			{
+				flags = JSON_C_TO_STRING_PRETTY;
+				compact_array_reset_flag = 1;
+			}
+		}
+
 		if (flags & JSON_C_TO_STRING_PRETTY)
 			printbuf_strappend(pb, "\n");
+
+		if (flags & JSON_C_TO_STRING_PRETTY_COMPACT_ARRAY)
+		{
+			if (ii == 0 || compact_array_elements_on_line >= COMPACT_ARRAY_ELEMENTS_PER_LINE_MAX)
+			{
+				printbuf_strappend(pb, "\n");
+				indent(pb, level + 1, flags);
+				compact_array_elements_on_line = 0;
+			}
+			else
+			{
+				printbuf_strappend(pb, " ");
+				compact_array_elements_on_line++;
+			}
+		}
 		had_children = 1;
 		if (flags & JSON_C_TO_STRING_SPACED && !(flags & JSON_C_TO_STRING_PRETTY))
 			printbuf_strappend(pb, " ");
-		indent(pb, level + 1, flags);
-		val = json_object_array_get_idx(jso, ii);
+		if (!(flags & JSON_C_TO_STRING_PRETTY_COMPACT_ARRAY))
+			indent(pb, level + 1, flags);
 		if (val == NULL)
 			printbuf_strappend(pb, "null");
 		else if (val->_to_json_string(val, pb, level + 1, flags) < 0)
 			return -1;
+
 	}
-	if ((flags & JSON_C_TO_STRING_PRETTY) && had_children)
+	if ((flags & (JSON_C_TO_STRING_PRETTY | JSON_C_TO_STRING_PRETTY_COMPACT_ARRAY)) && had_children)
 	{
 		printbuf_strappend(pb, "\n");
 		indent(pb, level, flags);

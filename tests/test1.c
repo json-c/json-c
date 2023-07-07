@@ -338,6 +338,57 @@ int main(int argc, char **argv)
 		my_array = NULL;
 	}
 #endif
+	const int TEST_ARRAY_LENGTH = 50;
+
+	/* Arrays with string elements should not be printed compactly. */
+	json_object *my_long_array_of_strings = json_object_new_array();
+	char str[TEST_ARRAY_LENGTH];
+	for (int i = 0; i < TEST_ARRAY_LENGTH; i++) {
+		sprintf(&str[i], "%d", i);
+		json_object_array_add(my_long_array_of_strings, json_object_new_string(str));
+	}
+	printf("my_long_array_of_strings.to_string()=%s\n", json_object_to_json_string(my_long_array_of_strings));
+	json_object_put(my_long_array_of_strings);
+
+	/* Arrays with elements which are themselves arrays should not be printed compactly. */
+	json_object *my_long_array_of_arrays = json_object_new_array();
+	for (int i = 0; i < TEST_ARRAY_LENGTH; i++)
+		json_object_array_add(my_long_array_of_arrays, json_object_new_array());
+	printf("my_long_array_of_arrays.to_string()=%s\n", json_object_to_json_string(my_long_array_of_arrays));
+	json_object_put(my_long_array_of_arrays);
+
+	/* Arrays with int elements are printed compactly. */
+	json_object *my_long_array_of_int = json_object_new_array();
+	for (int i = 0; i < TEST_ARRAY_LENGTH; i++)
+		json_object_array_add(my_long_array_of_int, json_object_new_int(i * 100000000));
+	printf("my_long_array_of_int.to_string()=%s\n", json_object_to_json_string(my_long_array_of_int));
+	json_object_put(my_long_array_of_int);
+
+	/* Arrays with int elements that are null are printed compactly. */
+	json_object *my_long_array_of_null = json_object_new_array();
+	for (int i = 0; i < TEST_ARRAY_LENGTH; i++)
+		json_object_array_add(my_long_array_of_null, NULL);
+	printf("my_long_array_of_null.to_string()=%s\n", json_object_to_json_string(my_long_array_of_null));
+	json_object_put(my_long_array_of_null);
+
+	/* Arrays nested within objects should still be printed compactly. */
+	json_object *my_long_array_parent = json_object_new_object();
+	struct json_object *a_object = json_object_new_int(3);
+	json_object_object_add(my_long_array_parent, "a_object", a_object);
+	struct json_object *b_object = json_object_new_string("b_object");
+	json_object_object_add(my_long_array_parent, "b_object", b_object);
+	struct json_object *c_object = json_object_new_object();
+	struct json_object *d_object = json_object_new_object();
+	struct json_object *e_object = json_object_new_string("e_object");
+	json_object *my_long_array_of_ints = json_object_new_array();
+	for (int i = 0; i < TEST_ARRAY_LENGTH; i++)
+		json_object_array_add(my_long_array_of_ints, json_object_new_int(i));
+	json_object_object_add(d_object, "e_object", e_object);
+	json_object_object_add(d_object, "my_long_array_of_ints", my_long_array_of_ints);
+	json_object_object_add(c_object, "d_object", d_object);
+	json_object_object_add(my_long_array_parent, "c_object", c_object);
+	printf("my_long_array_parent.to_string()=%s\n", json_object_to_json_string(my_long_array_parent));
+	json_object_put(my_long_array_parent);
 
 	json_object_put(my_string);
 	json_object_put(my_int);
