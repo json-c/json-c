@@ -75,6 +75,15 @@ extern "C" {
 #define JSON_C_TO_STRING_NOSLASHESCAPE (1 << 4)
 
 /**
+ * A flag for the json_object_to_json_string_ext() and
+ * json_object_to_file_ext() functions which causes
+ * the output to be formatted.
+ *
+ * Use color for printing json.
+ */
+#define JSON_C_TO_STRING_COLOR (1 << 5)
+
+/**
  * A flag for the json_object_object_add_ex function which
  * causes the value to be added without a check if it already exists.
  * Note: it is the responsibility of the caller to ensure that no

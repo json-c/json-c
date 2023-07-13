@@ -38,6 +38,7 @@
 static int formatted_output = JSON_C_TO_STRING_SPACED;
 static int show_output = 1;
 static int strict_mode = 0;
+static int color = 0;
 static const char *fname = NULL;
 
 #ifndef HAVE_JSON_TOKENER_GET_PARSE_END
@@ -141,7 +142,7 @@ static int showobj(struct json_object *new_obj)
 	if (show_output)
 	{
 		const char *output;
-		output = json_object_to_json_string_ext(new_obj, formatted_output);
+		output = json_object_to_json_string_ext(new_obj, formatted_output | color);
 		printf("%s\n", output);
 	}
 
@@ -160,6 +161,7 @@ static void usage(const char *argv0, int exitval, const char *errmsg)
 	fprintf(fp, "  -f - Format the output to stdout with JSON_C_TO_STRING_PRETTY (default is JSON_C_TO_STRING_SPACED)\n");
 	fprintf(fp, "  -F - Format the output to stdout with <arg>, e.g. 0 for JSON_C_TO_STRING_PLAIN\n");
 	fprintf(fp, "  -n - No output\n");
+	fprintf(fp, "  -c - color\n");
 	fprintf(fp, "  -s - Parse in strict mode, flags:\n");
 	fprintf(fp, "       JSON_TOKENER_STRICT|JSON_TOKENER_ALLOW_TRAILING_CHARS\n");
 	fprintf(fp, " Diagnostic information will be emitted to stderr\n");
@@ -173,7 +175,7 @@ int main(int argc, char **argv)
 {
 	int opt;
 
-	while ((opt = getopt(argc, argv, "fF:hns")) != -1)
+	while ((opt = getopt(argc, argv, "fF:hnsc")) != -1)
 	{
 		switch (opt)
 		{
@@ -181,6 +183,7 @@ int main(int argc, char **argv)
 		case 'F': formatted_output = atoi(optarg); break;
 		case 'n': show_output = 0; break;
 		case 's': strict_mode = 1; break;
+		case 'c': color = JSON_C_TO_STRING_COLOR; break;
 		case 'h': usage(argv[0], 0, NULL);
 		default: /* '?' */ usage(argv[0], EXIT_FAILURE, "Unknown arguments");
 		}

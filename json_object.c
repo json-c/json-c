@@ -64,6 +64,12 @@ static void json_object_generic_delete(struct json_object *jso);
 #define inline
 #endif
 
+/* define colors */
+#define ANSI_COLOR_RESET "\033[0m"
+#define ANSI_COLOR_FG_GREEN "\033[0;32m"
+#define ANSI_COLOR_FG_BLUE "\033[0;34m"
+#define ANSI_COLOR_FG_MAGENTA "\033[0;35m"
+
 /*
  * Helper functions to more safely cast to a particular type of json_object
  */
@@ -472,15 +478,28 @@ static int json_object_object_to_json_string(struct json_object *jso, struct pri
 		if (flags & JSON_C_TO_STRING_SPACED && !(flags & JSON_C_TO_STRING_PRETTY))
 			printbuf_strappend(pb, " ");
 		indent(pb, level + 1, flags);
+		if (flags & JSON_C_TO_STRING_COLOR)
+			printbuf_strappend(pb, ANSI_COLOR_FG_BLUE);
+
 		printbuf_strappend(pb, "\"");
 		json_escape_str(pb, iter.key, strlen(iter.key), flags);
+		printbuf_strappend(pb, "\"");
+
+		if (flags & JSON_C_TO_STRING_COLOR)
+			printbuf_strappend(pb, ANSI_COLOR_RESET);
+
 		if (flags & JSON_C_TO_STRING_SPACED)
-			printbuf_strappend(pb, "\": ");
+			printbuf_strappend(pb, ": ");
 		else
-			printbuf_strappend(pb, "\":");
-		if (iter.val == NULL)
+			printbuf_strappend(pb, ":");
+
+		if (iter.val == NULL) {
+			if (flags & JSON_C_TO_STRING_COLOR)
+				printbuf_strappend(pb, ANSI_COLOR_FG_MAGENTA);
 			printbuf_strappend(pb, "null");
-		else if (iter.val->_to_json_string(iter.val, pb, level + 1, flags) < 0)
+			if (flags & JSON_C_TO_STRING_COLOR)
+				printbuf_strappend(pb, ANSI_COLOR_RESET);
+		} else if (iter.val->_to_json_string(iter.val, pb, level + 1, flags) < 0)
 			return -1;
 	}
 	if ((flags & JSON_C_TO_STRING_PRETTY) && had_children)
@@ -626,9 +645,18 @@ void json_object_object_del(struct json_object *jso, const char *key)
 static int json_object_boolean_to_json_string(struct json_object *jso, struct printbuf *pb,
                                               int level, int flags)
 {
+	int ret;
+
+	if (flags & JSON_C_TO_STRING_COLOR)
+		printbuf_strappend(pb, ANSI_COLOR_FG_MAGENTA);
+
 	if (JC_BOOL(jso)->c_boolean)
-		return printbuf_strappend(pb, "true");
-	return printbuf_strappend(pb, "false");
+		ret = printbuf_strappend(pb, "true");
+	else
+		ret = printbuf_strappend(pb, "false");
+	if (ret > -1 && flags & JSON_C_TO_STRING_COLOR)
+		return printbuf_strappend(pb, ANSI_COLOR_RESET);
+	return ret;
 }
 
 struct json_object *json_object_new_boolean(json_bool b)
@@ -1217,9 +1245,13 @@ static int json_object_string_to_json_string(struct json_object *jso, struct pri
                                              int level, int flags)
 {
 	ssize_t len = JC_STRING(jso)->len;
+	if (flags & JSON_C_TO_STRING_COLOR)
+		printbuf_strappend(pb, ANSI_COLOR_FG_GREEN);
 	printbuf_strappend(pb, "\"");
 	json_escape_str(pb, get_string_component(jso), len < 0 ? -(ssize_t)len : len, flags);
 	printbuf_strappend(pb, "\"");
+	if (flags & JSON_C_TO_STRING_COLOR)
+		printbuf_strappend(pb, ANSI_COLOR_RESET);
 	return 0;
 }
 
@@ -1392,9 +1424,15 @@ static int json_object_array_to_json_string(struct json_object *jso, struct prin
 			printbuf_strappend(pb, " ");
 		indent(pb, level + 1, flags);
 		val = json_object_array_get_idx(jso, ii);
-		if (val == NULL)
+		if (val == NULL) {
+
+			if (flags & JSON_C_TO_STRING_COLOR)
+				printbuf_strappend(pb, ANSI_COLOR_FG_MAGENTA);
 			printbuf_strappend(pb, "null");
-		else if (val->_to_json_string(val, pb, level + 1, flags) < 0)
+			if (flags & JSON_C_TO_STRING_COLOR)
+				printbuf_strappend(pb, ANSI_COLOR_RESET);
+
+		} else if (val->_to_json_string(val, pb, level + 1, flags) < 0)
 			return -1;
 	}
 	if ((flags & JSON_C_TO_STRING_PRETTY) && had_children)
