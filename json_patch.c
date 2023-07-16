@@ -14,6 +14,7 @@
 
 #include "json_patch.h"
 #include "json_object_private.h"
+#include "json_pointer_private.h"
 
 /**
  * JavaScript Object Notation (JSON) Patch
@@ -193,7 +194,7 @@ static int json_patch_apply_move_copy(struct json_object **res,
 int json_patch_apply(struct json_object *base, struct json_object *patch,
                      struct json_object **res)
 {
-	size_t i;
+	size_t ii;
 	int rc = 0;
 
 	if (!base || !json_object_is_type(patch, json_type_array)) {
@@ -206,9 +207,9 @@ int json_patch_apply(struct json_object *base, struct json_object *patch,
 		return -1;
 
 	/* Go through all operations ; apply them on res */
-	for (i = 0; i < json_object_array_length(patch); i++) {
+	for (ii = 0; ii < json_object_array_length(patch); ii++) {
 		struct json_object *jop, *jpath;
-		struct json_object *patch_elem = json_object_array_get_idx(patch, i);
+		struct json_object *patch_elem = json_object_array_get_idx(patch, ii);
 		const char *op, *path;
 		if (!json_object_object_get_ex(patch_elem, "op", &jop)) {
 			errno = EINVAL;

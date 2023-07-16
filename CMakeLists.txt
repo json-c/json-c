@@ -403,6 +403,7 @@ set(JSON_C_PUBLIC_HEADERS
 set(JSON_C_HEADERS
     ${JSON_C_PUBLIC_HEADERS}
     ${PROJECT_SOURCE_DIR}/json_object_private.h
+    ${PROJECT_SOURCE_DIR}/json_pointer_private.h
     ${PROJECT_SOURCE_DIR}/random_seed.h
     ${PROJECT_SOURCE_DIR}/strerror_override.h
     ${PROJECT_SOURCE_DIR}/math_compat.h

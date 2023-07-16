@@ -189,9 +189,10 @@ void test_array_list_expand_internal(void)
 	json_object_put(my_array);
 }
 
+void test_array_insert_idx(void);
 void test_array_insert_idx()
 {
-	json_object *my_string, *my_int, *my_null, *my_object, *my_array;
+	json_object *my_array;
 	struct json_object *jo1;
 
 	my_array = json_object_new_array();

@@ -7,7 +7,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "config.h"
 #include "json.h"
+#include "snprintf_compat.h"
 
 #ifndef PATH_MAX
 #define PATH_MAX 256
@@ -70,7 +72,7 @@ void test_json_patch_using_file(const char *testdir, const char *filename)
 {
 	char full_filename[PATH_MAX];
 	(void)snprintf(full_filename, sizeof(full_filename), "%s/%s", testdir, filename);
-	int i;
+	size_t ii;
 
 	json_object *jo = json_object_from_file(full_filename);
 	if (!jo) {
@@ -78,8 +80,8 @@ void test_json_patch_using_file(const char *testdir, const char *filename)
 		exit(EXIT_FAILURE);
 	}
 
-	for (i = 0; i < json_object_array_length(jo); i++) {
-		struct json_object *jo1 = json_object_array_get_idx(jo, i);
+	for (ii = 0; ii < json_object_array_length(jo); ii++) {
+		struct json_object *jo1 = json_object_array_get_idx(jo, ii);
 		test_json_patch_op(jo1);
 	}
 

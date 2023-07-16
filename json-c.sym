@@ -176,4 +176,5 @@ JSONC_0.16 {
 JSONC_0.17 {
 #  global:
 #      ...new symbols here...
+#    array_list_insert_idx is intentionally not exported
 } JSONC_0.16;

@@ -17,6 +17,7 @@
 
 #include "json_object_private.h"
 #include "json_pointer.h"
+#include "json_pointer_private.h"
 #include "strdup_compat.h"
 #include "vasprintf_compat.h"
 
