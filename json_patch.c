@@ -49,9 +49,9 @@ static int json_patch_apply_test(struct json_object **res,
 static int __json_patch_apply_remove(struct json_pointer_get_result *jpres)
 {
 	if (json_object_is_type(jpres->parent, json_type_array)) {
-		return json_object_array_del_idx(jpres->parent, jpres->id.index, 1);
-	} else if (jpres->parent && jpres->id.key) {
-		json_object_object_del(jpres->parent, jpres->id.key);
+		return json_object_array_del_idx(jpres->parent, jpres->index_in_parent, 1);
+	} else if (jpres->parent && jpres->key_in_parent) {
+		json_object_object_del(jpres->parent, jpres->key_in_parent);
 		return 0;
 	} else {
 		return json_object_put(jpres->obj);

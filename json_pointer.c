@@ -190,9 +190,9 @@ static int json_pointer_result_get_recursive(struct json_object *obj, char *path
 		res->parent = parent_obj;
 		res->obj = obj;
 		if (json_object_is_type(res->parent, json_type_array))
-			res->id.index = idx;
+			res->index_in_parent = idx;
 		else
-			res->id.key = path;
+			res->key_in_parent = path;
 	}
 
 	return 0;
@@ -228,11 +228,10 @@ int json_pointer_get_internal(struct json_object *obj, const char *path,
 
 	if (path[0] == '\0')
 	{
-		if (res) {
-			res->parent = NULL;
-			res->obj = obj;
-		}
-		res->id.key = NULL;
+		res->parent = NULL;
+		res->obj = obj;
+		res->key_in_parent = NULL;
+		res->index_in_parent = -1;
 		return 0;
 	}
 
@@ -244,8 +243,8 @@ int json_pointer_get_internal(struct json_object *obj, const char *path,
 	}
 	rc = json_pointer_result_get_recursive(obj, path_copy, res);
 	/* re-map the path string to the const-path string */
-	if (rc == 0 && res->id.key && !json_object_is_type(res->parent, json_type_array))
-		res->id.key = path + (res->id.key - path_copy);
+	if (rc == 0 && json_object_is_type(res->parent, json_type_object) && res->key_in_parent)
+		res->key_in_parent = path + (res->key_in_parent - path_copy);
 	free(path_copy);
 
 	return rc;
