@@ -1,6 +1,7 @@
 #ifdef NDEBUG
 #undef NDEBUG
 #endif
+#include "strerror_override.h"
 #include <assert.h>
 #include <errno.h>
 #include <limits.h>
@@ -40,19 +41,27 @@ void test_json_patch_op(struct json_object *jo)
 		return;
 	}
 	fflush(stdout);
+	struct json_patch_error jperr;
 	if (error) {
-		assert(-1 == json_patch_apply(doc, patch, &res));
-		assert(res == NULL);
+		assert(-1 == json_patch_apply(doc, patch, &res, &jperr));
+		assert(jperr.errno_code != 0);
+		printf("OK\n");
+		printf(" => json_patch_apply failed as expected: %s at patch idx %zu: %s\n",
+			strerror(jperr.errno_code), jperr.patch_failure_idx, jperr.errmsg);
+		json_object_put(res);
 	} else {
-		ret = json_patch_apply(doc, patch, &res);
+		ret = json_patch_apply(doc, patch, &res, &jperr);
 		if (ret) {
 			fprintf(stderr, "json_patch_apply() returned '%d'\n", ret);
 			fprintf(stderr, "Expected: %s\n", json_object_get_string(expected));
 			fprintf(stderr, "Got: %s\n", json_object_get_string(res));
+			fprintf(stderr, "json_patch_apply failed: %s at patch idx %zu: %s\n",
+				strerror(jperr.errno_code), jperr.patch_failure_idx, jperr.errmsg);
 			fflush(stderr);
 			assert(0);
 		}
 		assert(res != NULL);
+		assert(jperr.errno_code == 0);
 		ret = json_object_equal(expected, res);
 		if (ret == 0) {
 			fprintf(stderr, "json_object_equal() returned '%d'\n", ret);
@@ -63,9 +72,9 @@ void test_json_patch_op(struct json_object *jo)
 		}
 		json_object_put(res);
 		res = NULL;
+		printf("OK\n");
 	}
 
-	printf("OK\n");
 }
 
 void test_json_patch_using_file(const char *testdir, const char *filename)
