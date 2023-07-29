@@ -190,7 +190,7 @@ void test_array_list_expand_internal(void)
 }
 
 void test_array_insert_idx(void);
-void test_array_insert_idx()
+void test_array_insert_idx(void)
 {
 	json_object *my_array;
 	struct json_object *jo1;
