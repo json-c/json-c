@@ -21,9 +21,9 @@ void test_json_patch_op(struct json_object *jo)
 	const char *comment = json_object_get_string(json_object_object_get(jo, "comment"));
 	struct json_object *doc = json_object_object_get(jo, "doc");
 	struct json_object *patch = json_object_object_get(jo, "patch");
-	struct json_object *expected = json_object_object_get(jo, "expected");
+	struct json_object *expected = NULL;
+	json_bool have_expected = json_object_object_get_ex(jo, "expected", &expected);
 	struct json_object *error = json_object_object_get(jo, "error");
-	int disabled_test = json_object_get_boolean(json_object_object_get(jo, "disabled_in_json_c"));
 	const char *error_s = json_object_get_string(error);
 	struct json_object *res = NULL;
 	int ret;
@@ -32,13 +32,9 @@ void test_json_patch_op(struct json_object *jo)
 		comment ? comment : error_s,
 		json_object_get_string(doc),
 		json_object_get_string(patch));
-	if (disabled_test) {
-		printf("SKIPPING - disabled in the test spec\n");
-		return;
-	}
-	if (!error && !expected) {
-		printf("SKIPPING - no expected or error conditions in test\n");
-		return;
+	if (!error && !have_expected) {
+		printf("BAD TEST - no expected or error conditions in test: %s\n", json_object_to_json_string(jo));
+		assert(0);
 	}
 	fflush(stdout);
 	struct json_patch_error jperr;
@@ -54,13 +50,13 @@ void test_json_patch_op(struct json_object *jo)
 		if (ret) {
 			fprintf(stderr, "json_patch_apply() returned '%d'\n", ret);
 			fprintf(stderr, "Expected: %s\n", json_object_get_string(expected));
-			fprintf(stderr, "Got: %s\n", json_object_get_string(res));
+			fprintf(stderr, "Got: %s\n", res ? json_object_get_string(res) : "(null)");
 			fprintf(stderr, "json_patch_apply failed: %s at patch idx %zu: %s\n",
 				strerror(jperr.errno_code), jperr.patch_failure_idx, jperr.errmsg);
 			fflush(stderr);
 			assert(0);
 		}
-		assert(res != NULL);
+		// Note: res might be NULL if the whole document was removed
 		assert(jperr.errno_code == 0);
 		ret = json_object_equal(expected, res);
 		if (ret == 0) {
@@ -83,6 +79,7 @@ void test_json_patch_using_file(const char *testdir, const char *filename)
 	(void)snprintf(full_filename, sizeof(full_filename), "%s/%s", testdir, filename);
 	size_t ii;
 
+	printf("Testing using file %s\n", filename);
 	json_object *jo = json_object_from_file(full_filename);
 	if (!jo) {
 		fprintf(stderr, "FAIL: unable to open %s: %s\n", full_filename, strerror(errno));

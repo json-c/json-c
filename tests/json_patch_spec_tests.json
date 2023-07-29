@@ -192,8 +192,8 @@
     "patch": [
   { "op": "add", "path": "/baz", "value": "qux", "op": "remove" }
 ],
-    "error": "operation has two 'op' members",
-    "disabled": true
+    "error_wont_happen_in_jsonc": "operation has two 'op' members",
+    "error": "Did not find element referenced by path field"
   },
 
   {

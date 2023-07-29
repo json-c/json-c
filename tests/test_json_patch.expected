@@ -1,3 +1,4 @@
+Testing using file json_patch_spec_tests.json
 Testing '4.1. add with missing object', doc '{ "q": { "bar": 2 } }' patch '[ { "op": "add", "path": "\/a\/b", "value": 1 } ]' : OK
  => json_patch_apply failed as expected: ERRNO=ENOENT at patch idx 0: Failed to set value at path referenced by 'path' field
 Testing 'A.1.  Adding an Object Member', doc '{ "foo": "bar" }' patch '[ { "op": "add", "path": "\/baz", "value": "qux" } ]' : OK
@@ -20,6 +21,7 @@ Testing 'A.14. ~ Escape Ordering', doc '{ "\/": 9, "~1": 10 }' patch '[ { "op": 
 Testing 'A.15. Comparing Strings and Numbers', doc '{ "\/": 9, "~1": 10 }' patch '[ { "op": "test", "path": "\/~01", "value": "10" } ]' : OK
  => json_patch_apply failed as expected: ERRNO=ENOENT at patch idx 0: Value of element referenced by 'path' field did not match 'value' field
 Testing 'A.16. Adding an Array Value', doc '{ "foo": [ "bar" ] }' patch '[ { "op": "add", "path": "\/foo\/-", "value": [ "abc", "def" ] } ]' : OK
+Testing using file json_patch_tests.json
 Testing 'empty list, empty docs', doc '{ }' patch '[ ]' : OK
 Testing 'empty patch list', doc '{ "foo": 1 }' patch '[ ]' : OK
 Testing 'rearrangements OK?', doc '{ "foo": 1, "bar": 2 }' patch '[ ]' : OK
@@ -69,6 +71,15 @@ Testing '(null)', doc '[ "" ]' patch '[ { "op": "replace", "path": "\/0", "value
 Testing '(null)', doc '[ "" ]' patch '[ { "op": "replace", "path": "\/0", "value": null } ]' : OK
 Testing 'value in array replace not flattened', doc '[ "foo", "sil" ]' patch '[ { "op": "replace", "path": "\/1", "value": [ "bar", "baz" ] } ]' : OK
 Testing 'replace whole document', doc '{ "foo": "bar" }' patch '[ { "op": "replace", "path": "", "value": { "baz": "qux" } } ]' : OK
+Testing 'add whole document, null', doc '{ }' patch '[ { "op": "remove", "path": "" }, { "op": "add", "path": "", "value": { "baz": "qux" } } ]' : OK
+Testing 'replace whole document, null', doc '{ }' patch '[ { "op": "remove", "path": "" }, { "op": "replace", "path": "", "value": { "baz": "qux" } } ]' : OK
+ => json_patch_apply failed as expected: ERRNO=EINVAL at patch idx 1: Invalid path field
+Testing 'remove whole document', doc '{ "foo": "bar" }' patch '[ { "op": "remove", "path": "" } ]' : OK
+Testing 'remove whole document', doc '{ "foo": "bar" }' patch '[ { "op": "remove", "path": "" } ]' : OK
+Testing 'remove whole document, array', doc '[ "foo", "bar" ]' patch '[ { "op": "remove", "path": "" } ]' : OK
+Testing 'remove whole document, string', doc 'foo' patch '[ { "op": "remove", "path": "" } ]' : OK
+Testing 'remove whole document, null', doc '{ }' patch '[ { "op": "remove", "path": "" }, { "op": "remove", "path": "" } ]' : OK
+ => json_patch_apply failed as expected: ERRNO=EINVAL at patch idx 1: Invalid path field
 Testing 'test replace with missing parent key should fail', doc '{ "bar": "baz" }' patch '[ { "op": "replace", "path": "\/foo\/bar", "value": false } ]' : OK
  => json_patch_apply failed as expected: ERRNO=ENOENT at patch idx 0: Did not find element referenced by path field
 Testing 'spurious patch properties', doc '{ "foo": 1 }' patch '[ { "op": "test", "path": "\/foo", "value": 1, "spurious": 1 } ]' : OK
@@ -83,7 +94,9 @@ Testing 'test should pass despite (nested) rearrangement', doc '{ "foo": [ { "fo
 Testing 'test should pass - no error', doc '{ "foo": { "bar": [ 1, 2, 5, 4 ] } }' patch '[ { "op": "test", "path": "\/foo", "value": { "bar": [ 1, 2, 5, 4 ] } } ]' : OK
 Testing 'test op should fail', doc '{ "foo": { "bar": [ 1, 2, 5, 4 ] } }' patch '[ { "op": "test", "path": "\/foo", "value": [ 1, 2 ] } ]' : OK
  => json_patch_apply failed as expected: ERRNO=ENOENT at patch idx 0: Value of element referenced by 'path' field did not match 'value' field
-Testing 'Whole document', doc '{ "foo": 1 }' patch '[ { "op": "test", "path": "", "value": { "foo": 1 } } ]' : SKIPPING - no expected or error conditions in test
+Testing 'Test the whole document', doc '{ "foo": 1 }' patch '[ { "op": "test", "path": "", "value": { "foo": 1 } } ]' : OK
+Testing 'Test the whole document, no match', doc '{ "foo": 1 }' patch '[ { "op": "test", "path": "", "value": { "foo": 2 } } ]' : OK
+ => json_patch_apply failed as expected: ERRNO=ENOENT at patch idx 0: Value of element referenced by 'path' field did not match 'value' field
 Testing 'Empty-string element', doc '{ "": 1 }' patch '[ { "op": "test", "path": "\/", "value": 1 } ]' : OK
 Testing '(null)', doc '{ "foo": [ "bar", "baz" ], "": 0, "a\/b": 1, "c%d": 2, "e^f": 3, "g|h": 4, "i\\j": 5, "k\"l": 6, " ": 7, "m~n": 8 }' patch '[ { "op": "test", "path": "\/foo", "value": [ "bar", "baz" ] }, { "op": "test", "path": "\/foo\/0", "value": "bar" }, { "op": "test", "path": "\/", "value": 0 }, { "op": "test", "path": "\/a~1b", "value": 1 }, { "op": "test", "path": "\/c%d", "value": 2 }, { "op": "test", "path": "\/e^f", "value": 3 }, { "op": "test", "path": "\/g|h", "value": 4 }, { "op": "test", "path": "\/i\\j", "value": 5 }, { "op": "test", "path": "\/k\"l", "value": 6 }, { "op": "test", "path": "\/ ", "value": 7 }, { "op": "test", "path": "\/m~0n", "value": 8 } ]' : OK
 Testing 'Move to same location has no effect', doc '{ "foo": 1 }' patch '[ { "op": "move", "from": "\/foo", "path": "\/foo" } ]' : OK
@@ -129,7 +142,7 @@ Testing 'missing from parameter to move', doc '{ "foo": 1 }' patch '[ { "op": "m
  => json_patch_apply failed as expected: ERRNO=EINVAL at patch idx 0: Patch does not contain a 'from' field
 Testing 'missing from location to move', doc '{ "foo": 1 }' patch '[ { "op": "move", "from": "\/bar", "path": "\/foo" } ]' : OK
  => json_patch_apply failed as expected: ERRNO=ENOENT at patch idx 0: Did not find element referenced by from field
-Testing 'duplicate ops', doc '{ "foo": "bar" }' patch '[ { "op": "move", "path": "\/baz", "value": "qux", "from": "\/foo" } ]' : SKIPPING - disabled in the test spec
+Testing 'duplicate ops, json-c parses this as op:move', doc '{ "foo": "bar" }' patch '[ { "op": "move", "path": "\/baz", "value": "qux", "from": "\/foo" } ]' : OK
 Testing 'unrecognized op should fail', doc '{ "foo": 1 }' patch '[ { "op": "spam", "path": "\/foo", "value": 1 } ]' : OK
  => json_patch_apply failed as expected: ERRNO=EINVAL at patch idx 0: Patch object has invalid 'op' field
 Testing 'test with bad array number that has leading zeros', doc '[ "foo", "bar" ]' patch '[ { "op": "test", "path": "\/00", "value": "foo" } ]' : OK

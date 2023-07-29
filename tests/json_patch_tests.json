@@ -52,8 +52,8 @@
     { "comment": "Toplevel scalar values OK?",
       "doc": "foo",
       "patch": [{"op": "replace", "path": "", "value": "bar"}],
-      "expected": "bar",
-      "disabled": true },
+      "expected": "bar"
+      },
 
     { "comment": "replace object document with array document?",
       "doc": {},
@@ -202,6 +202,55 @@
       "patch": [{"op": "replace", "path": "", "value": {"baz": "qux"}}],
       "expected": {"baz": "qux"} },
 
+    { "comment": "add whole document, null",
+      "doc": {},
+      "Note1": "We can't pass null in to json_patch_apply, so start with _something_ and remove it",
+      "patch": [
+        {"op": "remove", "path": ""},
+        {"op": "add", "path": "", "value": {"baz": "qux"}}
+      ],
+      "expected": {"baz": "qux"} },
+
+    { "comment": "replace whole document, null",
+      "doc": {},
+      "Note1": "We can't pass null in to json_patch_apply, so start with _something_ and remove it",
+      "patch": [
+        {"op": "remove", "path": ""},
+        {"op": "replace", "path": "", "value": {"baz": "qux"}}
+      ],
+      "error": "The spec says the target location must exist, so replacing a null document fails"
+    },
+
+    { "comment": "remove whole document",
+      "doc": {"foo": "bar"},
+      "patch": [{"op": "remove", "path": ""}],
+      "expected": null },
+
+    { "comment": "remove whole document",
+      "doc": {"foo": "bar"},
+      "patch": [{"op": "remove", "path": ""}],
+      "expected": null },
+
+    { "comment": "remove whole document, array",
+      "doc": ["foo", "bar"],
+      "patch": [{"op": "remove", "path": ""}],
+      "expected": null },
+
+    { "comment": "remove whole document, string",
+      "doc": "foo",
+      "patch": [{"op": "remove", "path": ""}],
+      "expected": null },
+
+    { "comment": "remove whole document, null",
+      "doc": {},
+      "Note1": "We can't pass null in to json_patch_apply, so start with _something_ and remove it",
+      "patch": [
+          {"op": "remove", "path": ""},
+          {"op": "remove", "path": ""},
+      ],
+      "error": "The spec says the target location must exist, so removing a null document fails"
+    },
+
     { "comment": "test replace with missing parent key should fail",
       "doc": {"bar": "baz"},
       "patch": [{"op": "replace", "path": "/foo/bar", "value": false}],
@@ -261,10 +310,16 @@
       "patch": [{"op": "test", "path": "/foo", "value": [1, 2]}],
       "error": "test op should fail" },
 
-    { "comment": "Whole document",
+    { "comment": "Test the whole document",
       "doc": { "foo": 1 },
       "patch": [{"op": "test", "path": "", "value": {"foo": 1}}],
-      "disabled": true },
+      "expected": { "foo": 1 } },
+
+    { "comment": "Test the whole document, no match",
+      "doc": { "foo": 1 },
+      "patch": [{"op": "test", "path": "", "value": {"foo": 2}}],
+      "expected": { "foo": 1 },
+      "error": "Tested value does not match original doc" },
 
     { "comment": "Empty-string element",
       "doc": { "": 1 },
@@ -438,13 +493,13 @@
       "patch": [ { "op": "move", "from": "/bar", "path": "/foo" } ],
       "error": "missing 'from' location" },
 
-    { "comment": "duplicate ops",
+    { "comment": "duplicate ops, json-c parses this as op:move",
       "doc": { "foo": "bar" },
       "patch": [ { "op": "add", "path": "/baz", "value": "qux",
                    "op": "move", "from":"/foo" } ],
-      "error": "patch has two 'op' members",
-      "disabled_in_json_c": true,
-      "disabled": true },
+      "error_wont_happen_in_jsonc": "patch has two 'op' members",
+      "expected": { "baz": "bar" }
+      },
 
     { "comment": "unrecognized op should fail",
       "doc": {"foo": 1},

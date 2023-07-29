@@ -81,7 +81,10 @@ static int __json_patch_apply_remove(struct json_pointer_get_result *jpres)
 		json_object_object_del(jpres->parent, jpres->key_in_parent);
 		return 0;
 	} else {
-		return json_object_put(jpres->obj);
+		// We're removing the root object
+		(void)json_object_put(jpres->obj);
+		jpres->obj = NULL;
+		return 0;
 	}
 }
 
@@ -99,6 +102,9 @@ static int json_patch_apply_remove(struct json_object **res, const char *path, s
 	rc = __json_patch_apply_remove(&jpres);
 	if (rc < 0)
 		_set_err(EINVAL, "Unable to remove path referenced by 'path' field");
+	// This means we removed and freed the root object, i.e. *res
+	if (jpres.parent == NULL)
+		*res = NULL;
 	return rc;
 }
 
@@ -223,6 +229,8 @@ static int json_patch_apply_move_copy(struct json_object **res,
 		return rc;
 	}
 
+	// Note: it's impossible for json_pointer to find the root obj, due
+	// to the path check above, so from.parent is guaranteed non-NULL
 	json_object_get(from.obj);
 
 	if (!move) {
