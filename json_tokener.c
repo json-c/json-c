@@ -344,6 +344,11 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 			freelocale(duploc);
 			return NULL;
 		}
+#ifdef NEWLOCALE_NEEDS_FREELOCALE
+		// Older versions of FreeBSD (<12.4) don't free the locale
+		// passed to newlocale(), so do it here
+		freelocale(duploc);
+#endif
 		uselocale(newloc);
 	}
 #elif defined(HAVE_SETLOCALE)
