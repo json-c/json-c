@@ -305,6 +305,11 @@ if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_C_COMPILER_ID}" STREQUAL
     endif()
 
     add_definitions(-D_GNU_SOURCE)
+
+    if ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
+        # Remove this for 1.0 when we can bump the ABI and actually fix these warnings.
+        set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -Wno-shorten-64-to-32")
+    endif()
 elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /DEBUG")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /wd4100")
