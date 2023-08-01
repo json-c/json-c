@@ -1519,6 +1519,12 @@ int json_object_array_add(struct json_object *jso, struct json_object *val)
 	return array_list_add(JC_ARRAY(jso)->c_array, val);
 }
 
+int json_object_array_insert_idx(struct json_object *jso, size_t idx, struct json_object *val)
+{
+	assert(json_object_get_type(jso) == json_type_array);
+	return array_list_insert_idx(JC_ARRAY(jso)->c_array, idx, val);
+}
+
 int json_object_array_put_idx(struct json_object *jso, size_t idx, struct json_object *val)
 {
 	assert(json_object_get_type(jso) == json_type_array);

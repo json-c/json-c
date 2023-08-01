@@ -88,7 +88,8 @@ option(ENABLE_RDRAND                  "Enable RDRAND Hardware RNG Hash Seed."   
 option(ENABLE_THREADING               "Enable partial threading support."                     OFF)
 option(OVERRIDE_GET_RANDOM_SEED       "Override json_c_get_random_seed() with custom code."   OFF)
 option(DISABLE_EXTRA_LIBS             "Avoid linking against extra libraries, such as libbsd." OFF)
-option(DISABLE_JSON_POINTER           "Disable JSON pointer (RFC6901) support."               OFF)
+option(DISABLE_JSON_POINTER           "Disable JSON pointer (RFC6901) and JSON patch support." OFF)
+option(DISABLE_JSON_PATCH             "Disable JSON patch (RFC6902) support."                 OFF)
 option(NEWLOCALE_NEEDS_FREELOCALE     "Work around newlocale bugs in old FreeBSD by calling freelocale"  OFF)
 
 
@@ -402,6 +403,7 @@ set(JSON_C_PUBLIC_HEADERS
 set(JSON_C_HEADERS
     ${JSON_C_PUBLIC_HEADERS}
     ${PROJECT_SOURCE_DIR}/json_object_private.h
+    ${PROJECT_SOURCE_DIR}/json_pointer_private.h
     ${PROJECT_SOURCE_DIR}/random_seed.h
     ${PROJECT_SOURCE_DIR}/strerror_override.h
     ${PROJECT_SOURCE_DIR}/math_compat.h
@@ -429,8 +431,15 @@ if (NOT DISABLE_JSON_POINTER)
     set(JSON_C_PUBLIC_HEADERS   ${JSON_C_PUBLIC_HEADERS}  ${PROJECT_SOURCE_DIR}/json_pointer.h)
     set(JSON_C_SOURCES          ${JSON_C_SOURCES}         ${PROJECT_SOURCE_DIR}/json_pointer.c)
     set(JSON_H_JSON_POINTER "#include \"json_pointer.h\"")
+
+    if (NOT DISABLE_JSON_PATCH)
+        set(JSON_C_PUBLIC_HEADERS   ${JSON_C_PUBLIC_HEADERS}  ${PROJECT_SOURCE_DIR}/json_patch.h)
+        set(JSON_C_SOURCES          ${JSON_C_SOURCES}         ${PROJECT_SOURCE_DIR}/json_patch.c)
+	set(JSON_H_JSON_PATCH "#include \"json_patch.h\"")
+    endif()
 else()
     set(JSON_H_JSON_POINTER "")
+    set(JSON_H_JSON_PATCH "")
 endif()
 
 configure_file(json.h.cmakein ${PROJECT_BINARY_DIR}/json.h @ONLY)

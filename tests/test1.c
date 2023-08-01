@@ -189,6 +189,42 @@ void test_array_list_expand_internal(void)
 	json_object_put(my_array);
 }
 
+void test_array_insert_idx(void);
+void test_array_insert_idx(void)
+{
+	json_object *my_array;
+	struct json_object *jo1;
+
+	my_array = json_object_new_array();
+	json_object_array_add(my_array, json_object_new_int(1));
+	json_object_array_add(my_array, json_object_new_int(2));
+	json_object_array_add(my_array, json_object_new_int(5));
+
+	json_object_array_insert_idx(my_array, 2, json_object_new_int(4));
+	jo1 = json_tokener_parse("[1, 2, 4, 5]");
+	assert(1 == json_object_equal(my_array, jo1));
+	json_object_put(jo1);
+
+	json_object_array_insert_idx(my_array, 2, json_object_new_int(3));
+
+	jo1 = json_tokener_parse("[1, 2, 3, 4, 5]");
+	assert(1 == json_object_equal(my_array, jo1));
+	json_object_put(jo1);
+
+	json_object_array_insert_idx(my_array, 5, json_object_new_int(6));
+
+	jo1 = json_tokener_parse("[1, 2, 3, 4, 5, 6]");
+	assert(1 == json_object_equal(my_array, jo1));
+	json_object_put(jo1);
+
+	json_object_array_insert_idx(my_array, 7, json_object_new_int(8));
+	jo1 = json_tokener_parse("[1, 2, 3, 4, 5, 6, null, 8]");
+	assert(1 == json_object_equal(my_array, jo1));
+	json_object_put(jo1);
+
+	json_object_put(my_array);
+}
+
 int main(int argc, char **argv)
 {
 	json_object *my_string, *my_int, *my_null, *my_object, *my_array;
@@ -252,6 +288,8 @@ int main(int argc, char **argv)
 	printf("my_array.to_string()=%s\n", json_object_to_json_string(my_array));
 
 	json_object_put(my_array);
+
+	test_array_insert_idx();
 
 	test_array_del_idx();
 	test_array_list_expand_internal();

@@ -167,11 +167,12 @@ JSONC_0.15 {
 } JSONC_0.14;
 
 JSONC_0.16 {
-#  global:
-#      ...new symbols here...
+# No new symbols in 0.16
 } JSONC_0.15;
 
 JSONC_0.17 {
-#  global:
-#      ...new symbols here...
+  global:
+    json_object_array_insert_idx;
+    json_patch_apply;
+#    array_list_insert_idx is intentionally not exported
 } JSONC_0.16;
