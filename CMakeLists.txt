@@ -91,6 +91,7 @@ option(DISABLE_EXTRA_LIBS             "Avoid linking against extra libraries, su
 option(DISABLE_JSON_POINTER           "Disable JSON pointer (RFC6901) and JSON patch support." OFF)
 option(DISABLE_JSON_PATCH             "Disable JSON patch (RFC6902) support."                 OFF)
 option(NEWLOCALE_NEEDS_FREELOCALE     "Work around newlocale bugs in old FreeBSD by calling freelocale"  OFF)
+option(BUILD_APPS                     "Default to building apps" ON)
 
 
 if (UNIX OR MINGW OR CYGWIN)
@@ -579,7 +580,7 @@ if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING AND
 add_subdirectory(tests)
 endif()
 
-if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_APPS)
 # skip apps when we're included in someone else's build
 if (NOT MSVC)  # cmd line apps don't built on Windows currently.
 add_subdirectory(apps)
