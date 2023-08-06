@@ -143,11 +143,14 @@ check_include_file(sys/random.h     HAVE_SYS_RANDOM_H)
 check_include_file(sys/stat.h       HAVE_SYS_STAT_H)
 check_include_file(xlocale.h        HAVE_XLOCALE_H)
 
+# Set json-c specific vars to stamp into json_config.h
+# in a way that hopefully won't conflict with other
+# projects that use json-c.
 if (HAVE_INTTYPES_H)
-	# Set a json-c specific var to stamp into json_config.h
-	# in a way that hopefully won't conflict with other
-	# projects that use json-c.
-    set(JSON_C_HAVE_INTTYPES_H 1)
+	set(JSON_C_HAVE_INTTYPES_H 1)
+endif()
+if (HAVE_STDINT_H)
+	set(JSON_C_HAVE_STDINT_H 1)
 endif()
 
 check_symbol_exists(_isnan          "float.h" HAVE_DECL__ISNAN)

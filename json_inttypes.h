@@ -13,7 +13,15 @@
 #include <inttypes.h>
 
 #else
+#ifdef JSON_C_HAVE_STDINT_H
 #include <stdint.h>
+#else
+/* Really only valid for old MS compilers, VS2008 and earlier: */
+typedef __int32 int32_t;
+typedef unsigned __int32 uint32_t;
+typedef __int64 int64_t;
+typedef unsigned __int64 uint64_t;
+#endif
 
 #define PRId64 "I64d"
 #define SCNd64 "I64d"
