@@ -53,6 +53,7 @@
 #endif
 #endif
 
+const char *json_number_chars = "0123456789.+-eE"; /* Unused, but part of public API, drop for 1.0 */
 const char *json_hex_chars = "0123456789abcdefABCDEF";
 
 static void json_object_generic_delete(struct json_object *jso);
