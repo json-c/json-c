@@ -104,7 +104,6 @@ static const char *json_tokener_errors[] = {
 	"success",
 	"continue",
 	"nesting too deep",
-	"out of memory",
 	"unexpected end of data",
 	"unexpected character",
 	"null expected",
@@ -117,7 +116,8 @@ static const char *json_tokener_errors[] = {
 	"invalid string sequence",
 	"expected comment",
 	"invalid utf-8 string",
-	"buffer size overflow"
+	"buffer size overflow",
+	"out of memory"
 };
 /* clang-format on */
 
