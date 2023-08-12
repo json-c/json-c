@@ -10,7 +10,7 @@ cmake_policy(SET CMP0048 NEW)
 
 # JSON-C library is C only project.
 # PROJECT_VERSION{,_MAJOR,_MINOR,_PATCH} set by project():
-project(json-c LANGUAGES C VERSION 0.16.99)
+project(json-c LANGUAGES C VERSION 0.17.99)
 
 # Targets may not link directly to themselves.
 cmake_policy(SET CMP0038 NEW)
@@ -472,7 +472,7 @@ add_library(${PROJECT_NAME}
     ${JSON_C_HEADERS}
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    VERSION 5.2.0
+    VERSION 5.3.0
     SOVERSION 5)
 list(APPEND CMAKE_TARGETS ${PROJECT_NAME})
 # If json-c is used as subroject it set to target correct interface -I flags and allow

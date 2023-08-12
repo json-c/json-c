@@ -141,11 +141,9 @@ Use ${release}.99 to indicate a version "newer" than anything on the branch:
 	Update the version in json_c_version.h
 	Update the version in CMakeLists.txt
 
-Update RELEASE_CHECKLIST.txt, set release=${release}+1
+Update the set_target_properties() line in CmakeLists.txt to match the release branch.
 
 Add a new empty section to the json-c.sym file, for ${release}+1
-
-Update the set_target_properties() line in CmakeLists.txt to match the release branch.
 
     git commit -a -m "Update the master branch to version ${release}.99"
     git push

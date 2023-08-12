@@ -176,3 +176,7 @@ JSONC_0.17 {
     json_patch_apply;
 #    array_list_insert_idx is intentionally not exported
 } JSONC_0.16;
+
+JSONC_0.18 {
+#  global:
+} JSONC_0.17;
