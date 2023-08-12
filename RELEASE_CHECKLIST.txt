@@ -16,6 +16,7 @@
       changes (added/removed/updated funcs, etc...), and detect backwards compat
       issues.
         * https://github.com/lvc/abi-compliance-checker
+        * See also `abi-check.sh`
         * If the new release is not backwards compatible, then this is a MAJOR release.
         * Mention removed features in ChangeLog
 		* Consider re-adding backwards compatible support, through symbol
@@ -40,9 +41,15 @@
 ## Release creation
 
 Start creating the new release:
-    release=0.16
+
+    PREV=$(git tag | tail -1)
+    PREV=${PREV#json-c-}
+    PREV=${PREV%-*}
+    release=0.$((${PREV#*.} + 1))
+    cd ~
     git clone https://github.com/json-c/json-c json-c-${release}
 
+    rm -rf distcheck
     mkdir distcheck
     cd distcheck
     # Note, the build directory *must* be entirely separate from
@@ -54,8 +61,7 @@ Start creating the new release:
 Make any fixes/changes *before* branching.
 
     cd json-c-${release}
-    git branch json-c-${release}
-    git checkout json-c-${release}
+    git checkout -b json-c-${release}
 
 ------------
 
@@ -177,7 +183,8 @@ Update checksums on wiki page.
     openssl md5 json-c*gz
 
 Copy and paste this output into the wiki page at:
-	https://github.com/json-c/json-c/wiki
+* https://github.com/json-c/json-c/wiki
+* https://github.com/json-c/json-c/wiki/Old-Releases
 
 ------------
 
