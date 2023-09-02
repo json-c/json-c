@@ -65,6 +65,10 @@ include(CMakePackageConfigHelpers)
 option(BUILD_SHARED_LIBS  "Default to building shared libraries" ON)
 option(BUILD_STATIC_LIBS  "Default to building static libraries" ON)
 
+if (CMAKE_SYSTEM_NAME STREQUAL "WASI")
+    set(BUILD_SHARED_LIBS OFF)
+endif()
+
 if (BUILD_SHARED_LIBS)
     add_definitions(-D JSON_C_DLL)
 endif()
@@ -560,6 +564,7 @@ install(FILES ${JSON_C_PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_FULL_INCLUDED
 
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING AND
    (NOT MSVC OR NOT (MSVC_VERSION LESS 1800)) # Tests need at least VS2013
+   AND NOT (CMAKE_SYSTEM_NAME STREQUAL "WASI")
    )
 add_subdirectory(tests)
 endif()
