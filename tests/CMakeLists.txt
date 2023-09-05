@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.9)
 add_executable(test1Formatted test1.c parse_flags.c parse_flags.h)
 target_compile_definitions(test1Formatted PRIVATE TEST_FORMATTED=1)
 target_link_libraries(test1Formatted PRIVATE ${PROJECT_NAME})
