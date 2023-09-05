@@ -5,22 +5,9 @@
 #   c++11, which isn't available on e.g HPUX.
 cmake_minimum_required(VERSION 3.9)
 
-# The project() command manages VERSION variables.
-cmake_policy(SET CMP0048 NEW)
-
 # JSON-C library is C only project.
 # PROJECT_VERSION{,_MAJOR,_MINOR,_PATCH} set by project():
 project(json-c LANGUAGES C VERSION 0.17.99)
-
-# Targets may not link directly to themselves.
-cmake_policy(SET CMP0038 NEW)
-
-# MACOSX_RPATH is enabled by default.
-# We set it explicitly to avoid the warning
-cmake_policy(SET CMP0042 NEW)
-
-# Only interpret if() arguments as variables or keywords when unquoted.
-cmake_policy(SET CMP0054 NEW)
 
 # set default build type if not specified by user
 if(NOT CMAKE_BUILD_TYPE)
