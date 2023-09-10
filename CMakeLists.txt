@@ -3,24 +3,11 @@
 #   and many OpenWRT packages require, much newer CMake packages.
 #  We're stopping before 3.10 because that version starts requiring
 #   c++11, which isn't available on e.g HPUX.
-cmake_minimum_required(VERSION 3.9)
-
-# The project() command manages VERSION variables.
-cmake_policy(SET CMP0048 NEW)
+cmake_minimum_required(VERSION 3.9...3.12)
 
 # JSON-C library is C only project.
 # PROJECT_VERSION{,_MAJOR,_MINOR,_PATCH} set by project():
 project(json-c LANGUAGES C VERSION 0.17.99)
-
-# Targets may not link directly to themselves.
-cmake_policy(SET CMP0038 NEW)
-
-# MACOSX_RPATH is enabled by default.
-# We set it explicitly to avoid the warning
-cmake_policy(SET CMP0042 NEW)
-
-# Only interpret if() arguments as variables or keywords when unquoted.
-cmake_policy(SET CMP0054 NEW)
 
 # set default build type if not specified by user
 if(NOT CMAKE_BUILD_TYPE)
@@ -28,13 +15,6 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE} -O2")
-
-# Include file check macros honor CMAKE_REQUIRED_LIBRARIES
-# i.e. the check_include_file() calls will include -lm when checking.
-# New in version 3.12.
-if(POLICY CMP0075)
-	cmake_policy(SET CMP0075 NEW)
-endif()
 
 include(CTest)
 
