@@ -116,8 +116,8 @@ static const char *json_tokener_errors[] = {
 	"invalid string sequence",
 	"expected comment",
 	"invalid utf-8 string",
-	"buffer size overflow",
-	"out of memory"
+	"out of memory",
+	"buffer size overflow"
 };
 /* clang-format on */
 
