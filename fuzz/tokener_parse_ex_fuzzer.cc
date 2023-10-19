@@ -8,9 +8,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	json_tokener *tok = json_tokener_new();
 	json_object *obj = json_tokener_parse_ex(tok, data1, size);
 	
-	json_object_object_foreach(obj, key, val) {
-		(void)json_object_get_type(val);
-		(void)json_object_get_string(val);
+	if (json_object_is_type(obj, json_type_object)) {
+		json_object_object_foreach(obj, key, val) {
+			(void)json_object_get_type(val);
+			(void)json_object_get_string(val);
+		}
 	}
 	(void)json_object_to_json_string_ext(obj, JSON_C_TO_STRING_PRETTY | JSON_C_TO_STRING_SPACED);
 	
