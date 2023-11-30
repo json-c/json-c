@@ -231,7 +231,7 @@ int json_pointer_get_internal(struct json_object *obj, const char *path,
 		res->parent = NULL;
 		res->obj = obj;
 		res->key_in_parent = NULL;
-		res->index_in_parent = -1;
+		res->index_in_parent = UINT32_MAX;
 		return 0;
 	}
 
