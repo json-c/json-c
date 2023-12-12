@@ -177,9 +177,13 @@ endif()
 
 # uClibc *intentionally* crashes in duplocale(), at least as of:
 # https://github.com/ffainelli/uClibc/blob/266bdc1/libc/misc/locale/locale.c#L1322
-# So, if it looks like we're compiling for a system like that just disable 
+# So, if it looks like we're compiling for a system like that just disable
 # locale handling entirely.
-exec_program(${CMAKE_C_COMPILER} ARGS -dumpmachine OUTPUT_VARIABLE CMAKE_GNU_C_MACHINE)
+if (CMAKE_VERSION GREATER_EQUAL "3.28")
+  execute_process (COMMAND ${CMAKE_C_COMPILER} -dumpmachine OUTPUT_QUIET ERROR_QUIET OUTPUT_VARIABLE CMAKE_GNU_C_MACHINE)
+else ()
+  exec_program(${CMAKE_C_COMPILER} ARGS -dumpmachine OUTPUT_VARIABLE CMAKE_GNU_C_MACHINE)
+endif ()
 if (CMAKE_GNU_C_MACHINE MATCHES "uclibc")
 	message(STATUS "Detected uClibc compiler, disabling locale handling")
 	set(HAVE_SETLOCALE 0)
@@ -569,4 +573,3 @@ if (NOT MSVC)  # cmd line apps don't built on Windows currently.
 add_subdirectory(apps)
 endif()
 endif()
-
