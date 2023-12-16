@@ -180,7 +180,7 @@ endif()
 # So, if it looks like we're compiling for a system like that just disable
 # locale handling entirely.
 if (CMAKE_VERSION GREATER_EQUAL "3.28")
-  execute_process (COMMAND ${CMAKE_C_COMPILER} -dumpmachine OUTPUT_QUIET ERROR_QUIET ECHO_OUTPUT_VARIABLE CMAKE_GNU_C_MACHINE)
+  execute_process (COMMAND ${CMAKE_C_COMPILER} -dumpmachine ERROR_QUIET OUTPUT_VARIABLE CMAKE_GNU_C_MACHINE)
 else ()
   exec_program(${CMAKE_C_COMPILER} ARGS -dumpmachine OUTPUT_VARIABLE CMAKE_GNU_C_MACHINE)
 endif ()
