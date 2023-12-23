@@ -12,8 +12,9 @@ json-c
 5. [Testing](#testing)
 6. [Building with `vcpkg`](#buildvcpkg)
 7. [Building for Android](#android)
-7. [Linking to libjson-c](#linking)
-8. [Using json-c](#using)
+8. [Building for Commodore Amiga](#amiga)
+9. [Linking to libjson-c](#linking)
+10. [Using json-c](#using)
 
 <a name="overview"></a>
 JSON-C - A JSON implementation in C
@@ -269,6 +270,44 @@ cmake \
     ..
 make install
 ```
+
+<a name="amiga"></a>
+Building for Commodore Amiga 
+----------------------
+
+Building for Commodore Amiga is supported for both Motorola 68k (AmigaOS 3) and PowerPC (AmigaOS 4) architectures. You can set up a cross compiler locally, however it is much easier to use the already preconfigured Amiga development environment wtthin a Docker container.
+
+Install Docker on your machine if you don't already have it. You can download Docker Desktop for Windows/macOS/Linux [here](https://www.docker.com/products/docker-desktop/).
+
+To build for Motorola 68k Amiga:
+
+```
+mkdir json-c-build
+docker run --rm \
+    -v ${PWD}:/work \
+    -e USER=$( id -u ) -e GROUP=$( id -g ) \
+    -it  sacredbanana/amiga-compiler:m68k-amigaos bash
+cd json-c-build
+cmake ..
+make
+```
+
+libjson-c.a will get created in the json-c-build directory.
+
+To build for PowerPC Amiga:
+
+```
+mkdir json-c-build
+docker run --rm \
+    -v ${PWD}:/work \
+    -e USER=$( id -u ) -e GROUP=$( id -g ) \
+    -it  sacredbanana/amiga-compiler:ppc-amigaos bash
+cd json-c-build
+cmake ..
+make
+```
+
+libjson-c.a will get created in the json-c-build directory.
 
 <a name="linking"></a>
 Linking to `libjson-c`
