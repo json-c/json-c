@@ -95,7 +95,7 @@ endif() # end "standalone mode" block
 # ---------------------------------
 
 check_include_file(sys/resource.h   HAVE_SYS_RESOURCE_H) # for getrusage
-if (HAVE_SYS_RESOURCE_H AND NOT AMIGA)
+if (HAVE_SYS_RESOURCE_H)
     check_symbol_exists(getrusage   "sys/resource.h" HAVE_GETRUSAGE)
 endif()
 
