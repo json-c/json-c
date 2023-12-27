@@ -288,11 +288,13 @@ docker run --rm \
     -e USER=$( id -u ) -e GROUP=$( id -g ) \
     -it  sacredbanana/amiga-compiler:m68k-amigaos bash
 cd json-c-build
-cmake ..
+cmake -DM68K_CRT=newlib ..
 make
 ```
 
 libjson-c.a will get created in the json-c-build directory.
+
+You can change newlib to nix20, nix13 or clib2 if you would like to build the library suited for libnix or clib2 instead. Newlib is default.
 
 To build for PowerPC Amiga:
 
