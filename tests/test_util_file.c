@@ -2,11 +2,11 @@
 #undef NDEBUG
 #endif
 #include "strerror_override.h"
-#ifdef WIN32
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <io.h>
 #include <windows.h>
-#endif /* defined(WIN32) */
+#endif /* defined(_WIN32) */
 #include <fcntl.h>
 #include <limits.h>
 #include <stddef.h>

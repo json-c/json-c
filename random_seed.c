@@ -254,7 +254,7 @@ static int get_dev_random_seed(int *seed)
 
 /* get_cryptgenrandom_seed */
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #define HAVE_CRYPTGENRANDOM 1
 
