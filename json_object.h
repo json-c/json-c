@@ -172,7 +172,7 @@ JSON_EXPORT struct json_object *json_object_get(struct json_object *obj);
  * is a member of (unless you know you've called `json_object_get(obj)` to
  * explicitly increment the refcount).
  *
- * NULL may be passed, which which case this is a no-op.
+ * NULL may be passed, in which case this is a no-op.
  *
  * @param obj the json_object instance
  * @returns 1 if the object was freed.
