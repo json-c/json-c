@@ -12,8 +12,9 @@
 5. [Testing](#testing)
 6. [Building with `vcpkg`](#buildvcpkg)
 7. [Building for Android](#android)
-7. [Linking to libjson-c](#linking)
-8. [Using json-c](#using)
+8. [Building for Commodore Amiga](#amiga)
+9. [Linking to libjson-c](#linking)
+10. [Using json-c](#using)
 
 JSON-C - A JSON implementation in C <a name="overview"></a>
 -----------------------------------
@@ -237,7 +238,7 @@ You can download and install JSON-C using the [vcpkg](https://github.com/Microso
 
 The JSON-C port in vcpkg is kept up to date by Microsoft team members and community contributors. If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg) on the vcpkg repository.
 
-Building for Android <a name="android">
+Building for Android <a name="android"></a>
 ----------------------
 
 Building on Android is now particularly well supported, but there
@@ -261,7 +262,46 @@ cmake \
 make install
 ```
 
-Linking to `libjson-c` <a name="linking">
+Building for Commodore Amiga <a name="amiga"></a>
+----------------------
+
+Building for Commodore Amiga is supported for both Motorola 68k (AmigaOS 3) and PowerPC (AmigaOS 4) architectures. You can set up a cross compiler locally, however it is much easier to use the already preconfigured Amiga development environment wtthin a Docker container.
+
+Install Docker on your machine if you don't already have it. You can download Docker Desktop for Windows/macOS/Linux [here](https://www.docker.com/products/docker-desktop/).
+
+To build for Motorola 68k Amiga:
+
+```
+mkdir json-c-build
+docker run --rm \
+    -v ${PWD}:/work \
+    -e USER=$( id -u ) -e GROUP=$( id -g ) \
+    -it  sacredbanana/amiga-compiler:m68k-amigaos bash
+cd json-c-build
+cmake -DM68K_CRT=newlib ..
+make
+```
+
+libjson-c.a will get created in the json-c-build directory.
+
+You can change newlib to nix20, nix13 or clib2 if you would like to build the library suited for libnix or clib2 instead. Newlib is default.
+
+To build for PowerPC Amiga:
+
+```
+mkdir json-c-build
+docker run --rm \
+    -v ${PWD}:/work \
+    -e USER=$( id -u ) -e GROUP=$( id -g ) \
+    -it  sacredbanana/amiga-compiler:ppc-amigaos bash
+cd json-c-build
+cmake ..
+make
+```
+
+libjson-c.a will get created in the json-c-build directory.
+
+Linking to `libjson-c` <a name="linking"></a>
 ----------------------
 
 If your system has `pkgconfig`,
@@ -298,7 +338,7 @@ cd build
 cmake -DCMAKE_PREFIX_PATH=/path/to/json_c/install/lib64/cmake ..
 ```
 
-Using json-c <a name="using">
+Using json-c <a name="using"></a>
 ------------
 
 To use json-c you can either include json.h, or preferably, one of the
