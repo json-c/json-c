@@ -1,6 +1,6 @@
 \mainpage
 
-`json-c`
+json-c
 ========
 
 1. [Overview and Build Status](#overview)
@@ -15,7 +15,8 @@
 7. [Linking to libjson-c](#linking)
 8. [Using json-c](#using)
 
-JSON-C - A JSON implementation in C <a name="overview"></a>
+<a name="overview"></a>
+JSON-C - A JSON implementation in C
 -----------------------------------
 
 JSON-C implements a reference counting object model that allows you to easily
@@ -29,7 +30,8 @@ if you already have json-c installed and ready to use.
 
 Home page for json-c: https://github.com/json-c/json-c/wiki
 
-Getting Help <a name="gettinghelp"></a>
+<a name="gettinghelp"></a>
+Getting Help
 ------------
 
 If you have questions about using json-c, please start a thread on
@@ -47,7 +49,8 @@ features or large changes of any kind, please first start a discussion
 on the [forums](https://groups.google.com/forum/#!forum/json-c).
 
 
-Building on Unix with `git`, `gcc` and `cmake` <a name="buildunix"></a>
+<a name="buildunix"></a>
+Building on Unix with `git`, `gcc` and `cmake`
 --------------------------------------------------
 
 If you already have json-c installed, see [Linking to `libjson-c`](#linking)
@@ -60,7 +63,8 @@ Build Status
 Test Status
 * [Coveralls](https://coveralls.io/github/json-c/json-c?branch=master) [![Coverage Status](https://coveralls.io/repos/github/json-c/json-c/badge.svg?branch=master)](https://coveralls.io/github/json-c/json-c?branch=master)
 
-### Prerequisites: <a name="installprereq"></a>
+<a name="installprereq"></a>
+### Prerequisites:
 
  - `gcc`, `clang`, or another C compiler
 
@@ -80,7 +84,8 @@ sudo apt install doxygen  # optional
 sudo apt install valgrind # optional
 ```
 
-### Build instructions:  <a name="buildcmds"></a>
+<a name="buildcmds"></a>
+### Build instructions:
 
 `json-c` GitHub repo: https://github.com/json-c/json-c
 
@@ -116,7 +121,8 @@ google-chrome doc/html/index.html
 ```
 
 
-CMake Options <a name="CMake"></a>
+<a name="CMake"></a>
+CMake Options
 --------------------
 
 The json-c library is built with [CMake](https://cmake.org/cmake-tutorial/),
@@ -188,7 +194,8 @@ cmake-configure can take a few options.
 | disable-werror |  Avoid treating compiler warnings as fatal errors |
 
 
-Testing:  <a name="testing"></a>
+<a name="testing"></a>
+Testing:
 ----------
 
 By default, if valgrind is available running tests uses it.
@@ -224,7 +231,8 @@ JSONC_TEST_TRACE=1 make test
 and check the log files again.
 
 
-Building on Unix and Windows with `vcpkg` <a name="buildvcpkg"></a>
+<a name="buildvcpkg"></a>
+Building on Unix and Windows with `vcpkg`
 --------------------------------------------------
 
 You can download and install JSON-C using the [vcpkg](https://github.com/Microsoft/vcpkg/) dependency manager:
@@ -237,7 +245,8 @@ You can download and install JSON-C using the [vcpkg](https://github.com/Microso
 
 The JSON-C port in vcpkg is kept up to date by Microsoft team members and community contributors. If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg) on the vcpkg repository.
 
-Building for Android <a name="android">
+<a name="android">
+Building for Android
 ----------------------
 
 Building on Android is now particularly well supported, but there
@@ -261,7 +270,8 @@ cmake \
 make install
 ```
 
-Linking to `libjson-c` <a name="linking">
+<a name="linking">
+Linking to `libjson-c`
 ----------------------
 
 If your system has `pkgconfig`,
@@ -298,7 +308,8 @@ cd build
 cmake -DCMAKE_PREFIX_PATH=/path/to/json_c/install/lib64/cmake ..
 ```
 
-Using json-c <a name="using">
+<a name="using">
+Using json-c
 ------------
 
 To use json-c you can either include json.h, or preferably, one of the
