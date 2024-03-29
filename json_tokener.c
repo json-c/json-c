@@ -226,7 +226,10 @@ struct json_object *json_tokener_parse_verbose(const char *str, enum json_tokene
 
 	tok = json_tokener_new();
 	if (!tok)
+	{
+		*error = json_tokener_error_memory;
 		return NULL;
+	}
 	obj = json_tokener_parse_ex(tok, str, -1);
 	*error = tok->err;
 	if (tok->err != json_tokener_success
