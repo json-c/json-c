@@ -276,7 +276,24 @@ message(STATUS "Wrote ${PROJECT_BINARY_DIR}/config.h")
 configure_file(${PROJECT_SOURCE_DIR}/cmake/json_config.h.in   ${PROJECT_BINARY_DIR}/json_config.h)
 message(STATUS "Wrote ${PROJECT_BINARY_DIR}/json_config.h")
 
-if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
+if (NOT DEFINED CMAKE_C_COMPILER_FRONTEND_VARIANT)  # only available in cmake 3.14+
+	if ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
+		set(CMAKE_C_COMPILER_FRONTEND_VARIANT "MSVC")
+	elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
+		set(CMAKE_C_COMPILER_FRONTEND_VARIANT "GNU")
+	elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
+		# Detect clang-cl.exe, it is Clang but with MSVC compatible command line arguments
+		execute_process (COMMAND ${CMAKE_C_COMPILER} -? ERROR_QUIET OUTPUT_QUIET RESULT_VARIABLE _clang_result)
+		if (_clang_result EQUAL 0)
+			set(CMAKE_C_COMPILER_FRONTEND_VARIANT "MSVC")
+		else()
+			set(CMAKE_C_COMPILER_FRONTEND_VARIANT "GNU")
+			message(STATUS, "clang result is NOT 0")
+		endif()
+	endif()
+endif()
+
+if ("${CMAKE_C_COMPILER_FRONTEND_VARIANT}" STREQUAL "GNU" OR "${CMAKE_C_COMPILER_FRONTEND_VARIANT}" STREQUAL "Clang")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections")
 	if ("${DISABLE_WERROR}" STREQUAL "OFF")
 	    set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -Werror")
@@ -293,11 +310,11 @@ if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_C_COMPILER_ID}" STREQUAL
 
     add_definitions(-D_GNU_SOURCE)
 
-    if ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
+    if ("${CMAKE_C_COMPILER_FRONTEND_VARIANT}" STREQUAL "Clang")
         # Remove this for 1.0 when we can bump the ABI and actually fix these warnings.
         set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -Wno-shorten-64-to-32")
     endif()
-elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
+elseif ("${CMAKE_C_COMPILER_FRONTEND_VARIANT}" STREQUAL "MSVC")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /DEBUG")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /wd4100")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /wd4996")
@@ -308,7 +325,7 @@ elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
     set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} /wd4701")
 endif()
 
-if (NOT ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC"))
+if (NOT ("${CMAKE_C_COMPILER_FRONTEND_VARIANT}" STREQUAL "MSVC"))
 	check_c_source_compiles(
 	"
 	/* uClibc toolchains without threading barf when _REENTRANT is defined */
