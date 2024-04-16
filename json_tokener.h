@@ -230,7 +230,7 @@ JSON_EXPORT void json_tokener_reset(struct json_tokener *tok);
 JSON_EXPORT struct json_object *json_tokener_parse(const char *str);
 
 /**
- * Parser a json_object out of the string `str`, but if it fails
+ * Parse a json_object out of the string `str`, but if it fails
  * return the error in `*error`.
  * @see json_tokener_parse()
  * @see json_tokener_parse_ex()
