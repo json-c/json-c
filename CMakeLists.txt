@@ -276,7 +276,7 @@ message(STATUS "Wrote ${PROJECT_BINARY_DIR}/config.h")
 configure_file(${PROJECT_SOURCE_DIR}/cmake/json_config.h.in   ${PROJECT_BINARY_DIR}/json_config.h)
 message(STATUS "Wrote ${PROJECT_BINARY_DIR}/json_config.h")
 
-if (NOT DEFINED CMAKE_C_COMPILER_FRONTEND_VARIANT)  # only available in cmake 3.14+
+if (NOT DEFINED CMAKE_C_COMPILER_FRONTEND_VARIANT OR "${CMAKE_C_COMPILER_FRONTEND_VARIANT}" STREQUAL "")  # only available in cmake 3.14+
 	if ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
 		set(CMAKE_C_COMPILER_FRONTEND_VARIANT "MSVC")
 	elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
