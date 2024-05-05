@@ -341,6 +341,11 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 #ifdef HAVE_USELOCALE
 	{
 		locale_t duploc = duplocale(oldlocale);
+		if (duploc == NULL && errno == ENOMEM)
+		{
+			tok->err = json_tokener_error_memory;
+			return NULL;
+		}
 		newloc = newlocale(LC_NUMERIC_MASK, "C", duploc);
 		if (newloc == NULL)
 		{
