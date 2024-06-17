@@ -543,35 +543,29 @@ install(
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
-if (UNIX OR MINGW OR CYGWIN)
-    SET(prefix ${CMAKE_INSTALL_PREFIX})
-    # exec_prefix is prefix by default and CMake does not have the
-    # concept.
-    SET(exec_prefix ${CMAKE_INSTALL_PREFIX})
-    SET(libdir ${CMAKE_INSTALL_FULL_LIBDIR})
-    SET(includedir ${CMAKE_INSTALL_FULL_INCLUDEDIR})
-    SET(VERSION ${PROJECT_VERSION})
-
-	# Linking against the static json-c requires
-	# dependent packages to include additional libs:
-	SET(LIBS_LIST ${CMAKE_REQUIRED_LIBRARIES})
-
-	# Note: We would need cmake >= 3.12 in order to use list(TRANSFORM ...)
-	function(list_transform_prepend var prefix)
-		set(temp "")
-		foreach(f ${${var}})
-			list(APPEND temp "${prefix}${f}")
-		endforeach()
-		set(${var} "${temp}" PARENT_SCOPE)
-	endfunction()
-	list_transform_prepend(LIBS_LIST "-l")
-
-	string(REPLACE ";" " " LIBS "${LIBS_LIST}")
-
-    configure_file(json-c.pc.in json-c.pc @ONLY)
-    set(INSTALL_PKGCONFIG_DIR "${CMAKE_INSTALL_LIBDIR}/pkgconfig" CACHE PATH "Installation directory for pkgconfig (.pc) files")
-    install(FILES ${PROJECT_BINARY_DIR}/json-c.pc DESTINATION "${INSTALL_PKGCONFIG_DIR}")
-endif ()
+SET(prefix ${CMAKE_INSTALL_PREFIX})
+# exec_prefix is prefix by default and CMake does not have the
+# concept.
+SET(exec_prefix ${CMAKE_INSTALL_PREFIX})
+SET(libdir ${CMAKE_INSTALL_FULL_LIBDIR})
+SET(includedir ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+SET(VERSION ${PROJECT_VERSION})
+# Linking against the static json-c requires
+# dependent packages to include additional libs:
+SET(LIBS_LIST ${CMAKE_REQUIRED_LIBRARIES})
+# Note: We would need cmake >= 3.12 in order to use list(TRANSFORM ...)
+function(list_transform_prepend var prefix)
+	set(temp "")
+	foreach(f ${${var}})
+		list(APPEND temp "${prefix}${f}")
+	endforeach()
+	set(${var} "${temp}" PARENT_SCOPE)
+endfunction()
+list_transform_prepend(LIBS_LIST "-l")
+string(REPLACE ";" " " LIBS "${LIBS_LIST}")
+configure_file(json-c.pc.in json-c.pc @ONLY)
+set(INSTALL_PKGCONFIG_DIR "${CMAKE_INSTALL_LIBDIR}/pkgconfig" CACHE PATH "Installation directory for pkgconfig (.pc) files")
+install(FILES ${PROJECT_BINARY_DIR}/json-c.pc DESTINATION "${INSTALL_PKGCONFIG_DIR}")
 
 install(FILES ${JSON_C_PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/json-c)
 
