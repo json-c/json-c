@@ -282,34 +282,34 @@ Install Docker on your machine if you don't already have it. You can download Do
 ### To build for Motorola 68k Amiga:
 
 ```
-mkdir json-c-build
+mkdir build
 docker run --rm \
     -v ${PWD}:/work \
     -e USER=$( id -u ) -e GROUP=$( id -g ) \
     -it  sacredbanana/amiga-compiler:m68k-amigaos bash
-cd json-c-build
+cd build
 cmake -DM68K_CRT=newlib ..
 make
 ```
 
-libjson-c.a will get created in the json-c-build directory.
+libjson-c.a will get created in the build directory.
 
 You can change newlib to nix20, nix13 or clib2 if you would like to build the library suited for libnix or clib2 instead. Newlib is default.
 
 ### To build for PowerPC Amiga:
 
 ```
-mkdir json-c-build
+mkdir build
 docker run --rm \
     -v ${PWD}:/work \
     -e USER=$( id -u ) -e GROUP=$( id -g ) \
     -it  sacredbanana/amiga-compiler:ppc-amigaos bash
-cd json-c-build
+cd build
 cmake ..
 make
 ```
 
-libjson-c.a will get created in the json-c-build directory.
+libjson-c.a will get created in the build directory.
 
 <a name="linking"></a>
 Linking to `libjson-c`
