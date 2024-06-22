@@ -10,6 +10,7 @@
 *.save
 *.autosav
 *.autosave
+.DS_Store
 
 # Tests
 /tests/Makefile

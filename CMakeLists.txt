@@ -69,17 +69,13 @@ option(DISABLE_JSON_PATCH             "Disable JSON patch (RFC6902) support."   
 option(NEWLOCALE_NEEDS_FREELOCALE     "Work around newlocale bugs in old FreeBSD by calling freelocale"  OFF)
 option(BUILD_APPS                     "Default to building apps" ON)
 
-if (UNIX OR MINGW OR CYGWIN OR AMIGA)
-    list(APPEND CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
-endif()
-
 if (${CMAKE_SYSTEM_NAME} STREQUAL "AmigaOS")
     set(AMIGA ON)
     set(DISABLE_THREAD_LOCAL_STORAGE ON)
     set(ENABLE_THREADING OFF)
     set(BUILD_SHARED_LIBS OFF)
     set(BUILD_APPS OFF)
-    list(APPEND CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
+    set(DISABLE_STATIC_FPIC ON)
     if ($ENV{CROSS_PFX} STREQUAL "m68k-amigaos")
         set(AMIGA_M68K ON)
         set(BUILD_TESTING OFF)
@@ -105,6 +101,10 @@ else()
     message(STATUS "Building for ${CMAKE_SYSTEM_NAME}")
 endif()
 
+if (UNIX OR MINGW OR CYGWIN OR AMIGA)
+    list(APPEND CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
+endif()
+
 if (BUILD_SHARED_LIBS)
     add_definitions(-D JSON_C_DLL)
 endif()
@@ -118,7 +118,7 @@ if (MSVC)
     list(APPEND CMAKE_REQUIRED_FLAGS /wd4996)
 endif()
 
-if (NOT DISABLE_STATIC_FPIC AND NOT AMIGA)
+if (NOT DISABLE_STATIC_FPIC)
     # Use '-fPIC'/'-fPIE' option.
     # This will allow other libraries to statically link in libjson-c.a
     # which in turn prevents crashes in downstream apps that may use
@@ -143,9 +143,7 @@ check_include_file(sys/resource.h   HAVE_SYS_RESOURCE_H) # for getrusage
 check_include_file("dlfcn.h"        HAVE_DLFCN_H)
 check_include_file("endian.h"       HAVE_ENDIAN_H)
 check_include_file("limits.h"       HAVE_LIMITS_H)
-if (NOT AMIGA_M68K)
-    check_include_file("locale.h"       HAVE_LOCALE_H)
-endif()
+check_include_file("locale.h"       HAVE_LOCALE_H)
 check_include_file("memory.h"       HAVE_MEMORY_H)
 
 check_include_file(stdint.h         HAVE_STDINT_H)
