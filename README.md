@@ -279,7 +279,7 @@ Building for Commodore Amiga is supported for both Motorola 68k (AmigaOS 3) and 
 
 Install Docker on your machine if you don't already have it. You can download Docker Desktop for Windows/macOS/Linux [here](https://www.docker.com/products/docker-desktop/).
 
-To build for Motorola 68k Amiga:
+### To build for Motorola 68k Amiga:
 
 ```
 mkdir json-c-build
@@ -296,7 +296,7 @@ libjson-c.a will get created in the json-c-build directory.
 
 You can change newlib to nix20, nix13 or clib2 if you would like to build the library suited for libnix or clib2 instead. Newlib is default.
 
-To build for PowerPC Amiga:
+### To build for PowerPC Amiga:
 
 ```
 mkdir json-c-build
