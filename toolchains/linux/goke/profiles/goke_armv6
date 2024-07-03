@@ -1,0 +1,20 @@
+[settings]
+os=Linux
+arch=armv6
+compiler=gcc
+compiler.version=4.6
+compiler.libcxx=libstdc++
+build_type=Release
+
+[env]
+CONAN_CMAKE_FIND_ROOT_PATH=/opt/toolchain_goke_armv6/4.6.1/usr/arm-goke-linux-uclibcgnueabi/sysroot/
+AR=/opt/toolchain_goke_armv6/4.6.1/usr/bin/arm-goke-linux-uclibcgnueabi-ar
+AS=/opt/toolchain_goke_armv6/4.6.1/usr/bin/arm-goke-linux-uclibcgnueabi-as
+RANLIB=/opt/toolchain_goke_armv6/4.6.1/usr/bin/arm-goke-linux-uclibcgnueabi-ranlib
+CC=/opt/toolchain_goke_armv6/4.6.1/usr/bin/arm-goke-linux-uclibcgnueabi-gcc
+CXX=/opt/toolchain_goke_armv6/4.6.1/usr/bin/arm-goke-linux-uclibcgnueabi-g++
+LD=/opt/toolchain_goke_armv6/4.6.1/usr/bin/arm-goke-linux-uclibcgnueabi-ld
+STRIP=/opt/toolchain_goke_armv6/4.6.1/usr/bin/arm-goke-linux-uclibcgnueabi-strip
+CFLAGS=--sysroot=/opt/toolchain_goke_armv6/4.6.1/usr/arm-goke-linux-uclibcgnueabi/sysroot -I/opt/toolchain_goke_armv6/4.6.1/usr/arm-goke-linux-uclibcgnueabi/include -L/usr/local/lib -I/usr/local/include
+CXXFLAGS=--sysroot=/opt/toolchain_goke_armv6/4.6.1/usr/arm-goke-linux-uclibcgnueabi/sysroot -I/opt/toolchain_goke_armv6/4.6.1/usr/arm-goke-linux-uclibcgnueabi/include -L/usr/local/lib -I/usr/local/include
+LDFLAGS=-L/opt/toolchain_goke_armv6/4.6.1/usr/arm-goke-linux-uclibcgnueabi/sysroot/usr/lib

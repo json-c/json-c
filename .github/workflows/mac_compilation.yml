@@ -1,0 +1,63 @@
+name: Publish coco lib for mac
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  build_mac_images:
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        profile: [ "ios_armv7", "ios_armv8", "ios_x86", "ios_x86_64", "macos_x86_64" ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure
+        run: |
+          brew install cmake
+          brew install autoconf
+          brew install automake
+          brew install libtool
+          brew install cmocka
+          brew install pkg-config
+          brew install conan@1
+
+      - name: Conan overwrite
+        run: |
+          echo "Overwriting conan to conan@1"
+          brew link --overwrite conan@1
+
+      - name: Copy pofiles to conan
+        run: |
+          conan profile new --detect default
+          cp toolchains/apple/profiles/* $HOME/.conan/profiles
+
+      - name: Add elear conan server
+        run: |
+          conan remote add conan_server http://conan.elear.solutions
+          cat $HOME/.conan/remotes.json
+
+      - name: Determine variant
+        run: |
+          release_version="master"
+
+      - name: Determine version
+        run: |
+          echo "package_name=$(grep -e "name.=." ./conanfile.py | awk -F\" '{print $2}')" >> $GITHUB_ENV
+          echo "package_version=$(grep -e "version.=." ./conanfile.py | awk -F\" '{print $2}')" >> $GITHUB_ENV
+
+      - name: Conan build & upload
+        env:
+          CONAN_LOGIN_USERNAME: "jenkins"
+          CONAN_PASSWORD: "tuXAC399nZ4wp6s81urg"
+          package_username: "jenkins"
+        run: |
+          conan install . jenkins/master -if=build -r=conan_server --profile=${{ matrix.profile }}
+          conan build . -bf=build
+          conan export-pkg . jenkins/master -bf=build -f
+          conan upload $package_name/$package_version@jenkins/master --all -r=conan_server --confirm

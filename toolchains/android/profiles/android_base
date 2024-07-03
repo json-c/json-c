@@ -1,0 +1,15 @@
+[settings]
+compiler=clang
+compiler.version=14
+compiler.libcxx=c++_shared
+build_type=Release
+
+[env]
+CONAN_CMAKE_FIND_ROOT_PATH=/opt/android-ndk-r25c/toolchains/llvm/prebuilt/linux-x86_64/sysroot
+AR=/opt/android-ndk-r25c/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
+AS=/opt/android-ndk-r25c/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-as
+RANLIB=/opt/android-ndk-r25c/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
+LD=/opt/android-ndk-r25c/toolchains/llvm/prebuilt/linux-x86_64/bin/ld
+STRIP=/opt/android-ndk-r25c/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip
+CFLAGS=--sysroot=/opt/android-ndk-r25c/toolchains/llvm/prebuilt/linux-x86_64/sysroot
+CXXFLAGS=--sysroot=/opt/android-ndk-r25c/toolchains/llvm/prebuilt/linux-x86_64/sysroot

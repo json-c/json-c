@@ -1,0 +1,10 @@
+include(android_base)
+
+[settings]
+os=Android
+os.api_level=19
+arch=x86
+
+[env]
+CC=/opt/android-ndk-r25c/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android19-clang
+CXX=/opt/android-ndk-r25c/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android19-clang++

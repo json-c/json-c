@@ -1,0 +1,7 @@
+include(default)
+
+[build_requires]
+darwin-toolchain/1.0.8@theodelrieu/stable
+
+[settings]
+arch=x86_64

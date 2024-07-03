@@ -1,0 +1,6 @@
+include(macos_x86_64)
+
+[settings]
+os=iOS
+os.version=10.0
+arch=x86_64

@@ -1,0 +1,10 @@
+include(android_base)
+
+[settings]
+os=Android
+os.api_level=21
+arch=x86_64
+
+[env]
+CC=/opt/android-ndk-r25c/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android21-clang
+CXX=/opt/android-ndk-r25c/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android21-clang++
