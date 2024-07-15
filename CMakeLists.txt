@@ -84,6 +84,8 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "AmigaOS")
             set(NEWLIB ON)
         elseif(${M68K_CRT} STREQUAL "clib2")
             set(CLIB2 ON)
+        elseif(${M68K_CRT} STREQUAL "ixemul")
+            set(IXEMUL ON)
         elseif(${M68K_CRT} STREQUAL "nix20")
             set(NIX20 ON)
         elseif(${M68K_CRT} STREQUAL "nix13")
@@ -205,6 +207,10 @@ endif()
 if (HAVE_LOCALE_H)
     check_symbol_exists(setlocale   "locale.h" HAVE_SETLOCALE)
     check_symbol_exists(uselocale   "locale.h" HAVE_USELOCALE)
+    if (NOT NIX20 AND NOT NIX13)
+        # libnix does not fully support this yet
+        check_symbol_exists(duplocale   "locale.h" HAVE_DUPLOCALE)
+    endif()
 endif()
 
 # uClibc *intentionally* crashes in duplocale(), at least as of:
@@ -379,7 +385,7 @@ if (NOT ("${CMAKE_C_COMPILER_FRONTEND_VARIANT}" STREQUAL "MSVC"))
 
 	# OSX Mach-O doesn't support linking with '-Bsymbolic-functions'.
 	# Others may not support it, too.
-	list(APPEND CMAKE_REQUIRED_LIBRARIES "-Wl,-Bsymbolic-functions")
+	list(APPEND CMAKE_REQUIRED_LIBRARIES "-Wl,-Bsymbolic-functions,-lamiga,-lc")
 	check_c_source_compiles(
 	"
 	int main (void)

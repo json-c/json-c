@@ -345,6 +345,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 
 #ifdef HAVE_USELOCALE
 	{
+#ifdef HAVE_DUPLOCALE
 		locale_t duploc = duplocale(oldlocale);
 		if (duploc == NULL && errno == ENOMEM)
 		{
@@ -352,16 +353,23 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 			return NULL;
 		}
 		newloc = newlocale(LC_NUMERIC_MASK, "C", duploc);
+#else
+		newloc = newlocale(LC_NUMERIC_MASK, "C", oldlocale);
+#endif
 		if (newloc == NULL)
 		{
 			tok->err = json_tokener_error_memory;
+#ifdef HAVE_DUPLOCALE
 			freelocale(duploc);
+#endif
 			return NULL;
 		}
 #ifdef NEWLOCALE_NEEDS_FREELOCALE
+#ifdef HAVE_DUPLOCALE
 		// Older versions of FreeBSD (<12.4) don't free the locale
 		// passed to newlocale(), so do it here
 		freelocale(duploc);
+#endif
 #endif
 		uselocale(newloc);
 	}
