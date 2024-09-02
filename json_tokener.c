@@ -678,6 +678,12 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 					state = json_tokener_state_string_escape;
 					break;
 				}
+				else if ((tok->flags & JSON_TOKENER_STRICT) && c <= 0x1f)
+				{
+					// Disallow control characters in strict mode
+					tok->err = json_tokener_error_parse_string;
+					goto out;
+				}
 				if (!ADVANCE_CHAR(str, tok) || !PEEK_CHAR(c, tok))
 				{
 					printbuf_memappend_checked(tok->pb, case_start,
