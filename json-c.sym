@@ -180,3 +180,7 @@ JSONC_0.17 {
 JSONC_0.18 {
 #  global:
 } JSONC_0.17;
+
+JSONC_0.19 {
+#  global:
+} JSONC_0.18;
