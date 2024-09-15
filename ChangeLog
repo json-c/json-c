@@ -1,6 +1,41 @@
+0.18 (up to commit 6bfab90, 2023-09-15)
+========================================
+
+Deprecated and removed features:
+--------------------------------
+* Clean up pre-3.9 CMake support in CMakeLists.txt
+
+New features
+------------
+* Build pkg-config for msvc as well
+
+Significant changes and bug fixes
+---------------------------------
+* Critical fix for binary compatibility with 0.16: Move the
+  json_tokener_error_memory entry to the end of enum json_tokener_error.
+* Issue #829: attempt to detect clang-cl.exe and pass MSVC-compatile command
+  line arguments.
+* PR #831 - rename WIN32 to _WIN32
+* PR #839 - Fix gcc 5 "may be used uninitialized" failure in json_pointer.c
+* PR #849 - random_seed.c: add a Coverity Scan suppression
+* Issue #854: Set error=json_tokener_error_memory in
+  json_tokener_parser_verbose() when allocating the tokener fails.
+* Issue #857: fix a few places where json_tokener should have been returning
+  json_tokener_error_memory but wasn't.
+* Handle yet another out-of-memory condition in json_tokener, duplocate can 
+  return NULL.
+* Various fixes in the fuzzers
+* A few minor doc fixes
+
+***
 
 0.17 (up to commit 077661f, 2023-08-08)
 ========================================
+
+Known Bugs
+----------
+* DO NOT USE THE 0.17 RELEASE: json_tokener_error_memory in misplaced in the
+  json_tokener_error enum, leading to binary compatibility issues.
 
 Deprecated and removed features:
 --------------------------------

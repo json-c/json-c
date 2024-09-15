@@ -1,7 +1,7 @@
 #!/bin/sh
 
-prev=0.16
-release=0.17
+prev=0.17
+release=0.18
 
 # ... clone json-c, abi-compliance-checker, abi-dumper
 
