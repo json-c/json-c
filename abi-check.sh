@@ -1,14 +1,18 @@
 #!/bin/sh
 
-prev=0.17
+# The 0.17 release is broken
+#prev=0.17
+prev=0.16
 release=0.18
 
 # ... clone json-c, abi-compliance-checker, abi-dumper
 
-mkdir build
-cd build
-CFLAGS=-Og cmake -DCMAKE_INSTALL_PREFIX=~/json-c-installs/json-c-${release} ..
-make && make test && make install
+if [ "$1" != "--skip-build" ] ; then
+	mkdir build
+	cd build
+	CFLAGS=-Og cmake -DCMAKE_INSTALL_PREFIX=~/json-c-installs/json-c-${release} ..
+	make && make test && make install
+fi
 
 # Assume the old version has already been built
 
