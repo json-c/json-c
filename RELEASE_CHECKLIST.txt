@@ -177,7 +177,7 @@ Update the gh-pages branch with new docs:
 Update checksums on wiki page.
 
     cd ..
-    openssl sha -sha256 json-c*gz
+    openssl sha1 -sha256 json-c*gz
     openssl md5 json-c*gz
 
 Copy and paste this output into the wiki page at:
