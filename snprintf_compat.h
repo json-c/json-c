@@ -34,6 +34,27 @@ static int json_c_snprintf(char *str, size_t size, const char *format, ...)
 }
 #define snprintf json_c_snprintf
 
+#elif (defined(__wasi__))
+static int json_c_vsnprintf(char *str, size_t size, const char *format, va_list ap)
+{
+        int ret;
+        ret = vsnprintf(str, size, format, ap);
+        str[size - 1] = '\0';
+        return ret;
+}
+#define vsnprintf json_c_vsnprintf
+
+__attribute__((unused))
+static int json_c_snprintf(char *str, size_t size, const char *format, ...)
+{
+        va_list ap;
+        int ret;
+        va_start(ap, format);
+        ret = json_c_vsnprintf(str, size, format, ap);
+        va_end(ap);
+        return ret;
+}
+#define snprintf json_c_snprintf
 #elif !defined(HAVE_SNPRINTF) /* !HAVE_SNPRINTF */
 #error snprintf is required but was not found
 #endif /* !HAVE_SNPRINTF */
