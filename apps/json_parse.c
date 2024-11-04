@@ -74,11 +74,14 @@ static int parseit(int fd, int (*callback)(struct json_object *))
 		fprintf(stderr, "unable to allocate json_tokener: %s\n", strerror(errno));
 		return 1;
 	}
-	json_tokener_set_flags(tok, JSON_TOKENER_STRICT
-#ifdef JSON_TOKENER_ALLOW_TRAILING_CHARS
-		 | JSON_TOKENER_ALLOW_TRAILING_CHARS
-#endif
-	);
+	if (strict_mode)
+	{
+		json_tokener_set_flags(tok, JSON_TOKENER_STRICT
+	#ifdef JSON_TOKENER_ALLOW_TRAILING_CHARS
+			 | JSON_TOKENER_ALLOW_TRAILING_CHARS
+	#endif
+		);
+	}
 
 	// XXX push this into some kind of json_tokener_parse_fd API?
 	//  json_object_from_fd isn't flexible enough, and mirroring
