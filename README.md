@@ -12,8 +12,9 @@ json-c
 5. [Testing](#testing)
 6. [Building with `vcpkg`](#buildvcpkg)
 7. [Building for Android](#android)
-7. [Linking to libjson-c](#linking)
-8. [Using json-c](#using)
+8. [Building for Commodore Amiga or MorphOS](#amiga)
+9. [Linking to libjson-c](#linking)
+10. [Using json-c](#using)
 
 <a name="overview"></a>
 JSON-C - A JSON implementation in C
@@ -245,7 +246,7 @@ You can download and install JSON-C using the [vcpkg](https://github.com/Microso
 
 The JSON-C port in vcpkg is kept up to date by Microsoft team members and community contributors. If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg) on the vcpkg repository.
 
-<a name="android">
+<a name="android"></a>
 Building for Android
 ----------------------
 
@@ -270,7 +271,64 @@ cmake \
 make install
 ```
 
-<a name="linking">
+<a name="amiga"></a>
+Building for Commodore Amiga or MorphOS
+----------------------
+
+Building for Commodore Amiga is supported for both Motorola 68k (AmigaOS 3) and PowerPC (AmigaOS 4) architectures. MorphOS on compatible PowerPC hardware is also supported. You can set up a cross compiler locally, however it is much easier to use the already preconfigured Amiga development environment wtthin a Docker container.
+
+Install Docker on your machine if you don't already have it. You can download Docker Desktop for Windows/macOS/Linux [here](https://www.docker.com/products/docker-desktop/).
+
+### To build for Motorola 68k Amiga:
+
+```
+mkdir build
+docker run --rm \
+    -v ${PWD}:/work \
+    -e USER=$( id -u ) -e GROUP=$( id -g ) \
+    -it  sacredbanana/amiga-compiler:m68k-amigaos bash
+cd build
+cmake -DM68K_CRT=newlib ..
+make
+```
+
+libjson-c.a will get created in the build directory.
+
+You can change newlib to nix20, nix13, ixemul or clib2 if you would like to build the library suited for libnix or clib2 instead. Newlib is default.
+
+### To build for PowerPC Amiga:
+
+```
+mkdir build
+docker run --rm \
+    -v ${PWD}:/work \
+    -e USER=$( id -u ) -e GROUP=$( id -g ) \
+    -it  sacredbanana/amiga-compiler:ppc-amigaos bash
+cd build
+cmake ..
+make
+```
+
+libjson-c.a will get created in the build directory.
+
+### To build for PowerPC MorphOS:
+
+```
+mkdir build
+docker run --rm \
+    -v ${PWD}:/work \
+    -e USER=$( id -u ) -e GROUP=$( id -g ) \
+    -it  sacredbanana/amiga-compiler:ppc-morphos bash
+cd build
+cmake -DNOIXEMUL=1 ..
+make
+```
+
+If you are making an application that absolutely requires ixemul, then remove the `-DNOIXEMUL=1`.
+
+libjson-c.a will get created in the build directory.
+
+<a name="linking"></a>
 Linking to `libjson-c`
 ----------------------
 
@@ -308,7 +366,7 @@ cd build
 cmake -DCMAKE_PREFIX_PATH=/path/to/json_c/install/lib64/cmake ..
 ```
 
-<a name="using">
+ <a name="using"></a>
 Using json-c
 ------------
 
