@@ -721,6 +721,7 @@ int32_t json_object_get_int(const struct json_object *jso)
 	int64_t cint64 = 0;
 	double cdouble;
 	enum json_type o_type;
+	errno = 0;
 
 	if (!jso)
 		return 0;
@@ -767,6 +768,11 @@ int32_t json_object_get_int(const struct json_object *jso)
 			return INT32_MIN;
 		if (cdouble >= INT32_MAX)
 			return INT32_MAX;
+		if (isnan(cdouble))
+		{
+			errno = EINVAL;
+			return INT32_MIN;
+		}
 		return (int32_t)cdouble;
 	case json_type_boolean: return JC_BOOL_C(jso)->c_boolean;
 	default: return 0;
@@ -801,6 +807,7 @@ struct json_object *json_object_new_uint64(uint64_t i)
 int64_t json_object_get_int64(const struct json_object *jso)
 {
 	int64_t cint;
+	errno = 0;
 
 	if (!jso)
 		return 0;
@@ -826,6 +833,11 @@ int64_t json_object_get_int64(const struct json_object *jso)
 			return INT64_MAX;
 		if (JC_DOUBLE_C(jso)->c_double <= INT64_MIN)
 			return INT64_MIN;
+		if (isnan(JC_DOUBLE_C(jso)->c_double))
+		{
+			errno = EINVAL;
+			return INT64_MIN;
+		}
 		return (int64_t)JC_DOUBLE_C(jso)->c_double;
 	case json_type_boolean: return JC_BOOL_C(jso)->c_boolean;
 	case json_type_string:
@@ -839,6 +851,7 @@ int64_t json_object_get_int64(const struct json_object *jso)
 uint64_t json_object_get_uint64(const struct json_object *jso)
 {
 	uint64_t cuint;
+	errno = 0;
 
 	if (!jso)
 		return 0;
@@ -864,6 +877,11 @@ uint64_t json_object_get_uint64(const struct json_object *jso)
 			return UINT64_MAX;
 		if (JC_DOUBLE_C(jso)->c_double < 0)
 			return 0;
+		if (isnan(JC_DOUBLE_C(jso)->c_double))
+		{
+			errno = EINVAL;
+			return 0;
+		}
 		return (uint64_t)JC_DOUBLE_C(jso)->c_double;
 	case json_type_boolean: return JC_BOOL_C(jso)->c_boolean;
 	case json_type_string:

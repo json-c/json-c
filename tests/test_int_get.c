@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <errno.h>
+#include <math.h>
 
 #include "json.h"
 
@@ -25,6 +26,7 @@
 #define N_I64     json_object_new_int64
 #define N_U64     json_object_new_uint64
 #define N_STR     json_object_new_string
+#define N_DBL     json_object_new_double
 
 int main(int argc, char **argv)
 {
@@ -45,6 +47,8 @@ int main(int argc, char **argv)
 	CHECK_GET_INT(N_I64(INT64_MIN), INT32_MIN && errno == 0);
 	CHECK_GET_INT(N_STR(I64_MAX_S), INT32_MAX && errno == 0);
 	CHECK_GET_INT(N_STR(I64_MIN_S), INT32_MIN && errno == 0);
+	CHECK_GET_INT(N_DBL(NAN),       INT32_MIN && errno == EINVAL);
+
 	printf("INT GET PASSED\n");
 
 	CHECK_GET_INT64(N_I64(INT64_MAX), INT64_MAX && errno == 0);
@@ -53,11 +57,13 @@ int main(int argc, char **argv)
 	CHECK_GET_INT64(N_STR(I64_MIN_S), INT64_MIN && errno == 0);
 	CHECK_GET_INT64(N_STR(I64_OVER),  INT64_MAX && errno == ERANGE);
 	CHECK_GET_INT64(N_STR(I64_UNDER), INT64_MIN && errno == ERANGE);
+	CHECK_GET_INT64(N_DBL(NAN),       INT64_MIN && errno == EINVAL);
 	printf("INT64 GET PASSED\n");
 
 	CHECK_GET_UINT64(N_U64(UINT64_MAX), UINT64_MAX && errno == 0);
 	CHECK_GET_UINT64(N_U64(-1),         UINT64_MAX && errno == 0);
 	CHECK_GET_UINT64(N_STR(U64_OUT_S),  UINT64_MAX && errno == ERANGE);
+	CHECK_GET_UINT64(N_DBL(NAN),        0          && errno == EINVAL);
 	printf("UINT64 GET PASSED\n");
 
 	printf("PASSED\n");
