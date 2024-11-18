@@ -154,6 +154,9 @@ struct json_tokener *json_tokener_new_ex(int depth)
 {
 	struct json_tokener *tok;
 
+	if (depth < 1)
+		return NULL;
+
 	tok = (struct json_tokener *)calloc(1, sizeof(struct json_tokener));
 	if (!tok)
 		return NULL;
