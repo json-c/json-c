@@ -757,17 +757,29 @@ int32_t json_object_get_int(const struct json_object *jso)
 	{
 	case json_type_int:
 		/* Make sure we return the correct values for out of range numbers. */
-		if (cint64 <= INT32_MIN)
+		if (cint64 < INT32_MIN)
+		{
+			errno = ERANGE;
 			return INT32_MIN;
-		if (cint64 >= INT32_MAX)
+		}
+		if (cint64 > INT32_MAX)
+		{
+			errno = ERANGE;
 			return INT32_MAX;
+		}
 		return (int32_t)cint64;
 	case json_type_double:
 		cdouble = JC_DOUBLE_C(jso)->c_double;
-		if (cdouble <= INT32_MIN)
+		if (cdouble < INT32_MIN)
+		{
+			errno = ERANGE;
 			return INT32_MIN;
-		if (cdouble >= INT32_MAX)
+		}
+		if (cdouble > INT32_MAX)
+		{
+			errno = ERANGE;
 			return INT32_MAX;
+		}
 		if (isnan(cdouble))
 		{
 			errno = EINVAL;
@@ -820,8 +832,11 @@ int64_t json_object_get_int64(const struct json_object *jso)
 		{
 		case json_object_int_type_int64: return jsoint->cint.c_int64;
 		case json_object_int_type_uint64:
-			if (jsoint->cint.c_uint64 >= INT64_MAX)
+			if (jsoint->cint.c_uint64 > INT64_MAX)
+			{
+				errno = ERANGE;
 				return INT64_MAX;
+			}
 			return (int64_t)jsoint->cint.c_uint64;
 		default: json_abort("invalid cint_type");
 		}
@@ -829,10 +844,16 @@ int64_t json_object_get_int64(const struct json_object *jso)
 	case json_type_double:
 		// INT64_MAX can't be exactly represented as a double
 		// so cast to tell the compiler it's ok to round up.
-		if (JC_DOUBLE_C(jso)->c_double >= (double)INT64_MAX)
+		if (JC_DOUBLE_C(jso)->c_double > (double)INT64_MAX)
+		{
+			errno = ERANGE;
 			return INT64_MAX;
-		if (JC_DOUBLE_C(jso)->c_double <= INT64_MIN)
+		}
+		if (JC_DOUBLE_C(jso)->c_double < (double)INT64_MIN)
+		{
+			errno = ERANGE;
 			return INT64_MIN;
+		}
 		if (isnan(JC_DOUBLE_C(jso)->c_double))
 		{
 			errno = EINVAL;
@@ -864,7 +885,10 @@ uint64_t json_object_get_uint64(const struct json_object *jso)
 		{
 		case json_object_int_type_int64:
 			if (jsoint->cint.c_int64 < 0)
+			{
+				errno = ERANGE;
 				return 0;
+			}
 			return (uint64_t)jsoint->cint.c_int64;
 		case json_object_int_type_uint64: return jsoint->cint.c_uint64;
 		default: json_abort("invalid cint_type");
@@ -873,10 +897,16 @@ uint64_t json_object_get_uint64(const struct json_object *jso)
 	case json_type_double:
 		// UINT64_MAX can't be exactly represented as a double
 		// so cast to tell the compiler it's ok to round up.
-		if (JC_DOUBLE_C(jso)->c_double >= (double)UINT64_MAX)
+		if (JC_DOUBLE_C(jso)->c_double > (double)UINT64_MAX)
+		{
+			errno = ERANGE;
 			return UINT64_MAX;
+		}
 		if (JC_DOUBLE_C(jso)->c_double < 0)
+		{
+			errno = ERANGE;
 			return 0;
+		}
 		if (isnan(JC_DOUBLE_C(jso)->c_double))
 		{
 			errno = EINVAL;
