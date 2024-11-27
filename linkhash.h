@@ -334,8 +334,9 @@ int lh_table_resize(struct lh_table *t, int new_size);
 /**
  * @deprecated Don't use this outside of linkhash.h:
  */
-#if (defined(AIX_CC) || (defined(_MSC_VER) && (_MSC_VER <= 1800)) )
-/* VS2010 can't handle inline funcs, so skip it there */
+#if !defined (__STDC_VERSION__) || (__STDC_VERSION__ < 199901L)
+/* C89 compilers like VS2010 can't handle inline funcs, so skip it there,
+   note: this also applies to -std=c89 in GCC! */
 #define _LH_INLINE
 #else
 #define _LH_INLINE inline
