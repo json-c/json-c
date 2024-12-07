@@ -12,6 +12,7 @@ Parsed input: {
 		"array_with_zero": [ 0 ],
 		"empty_object": {},
 		"nonempty_object": { "a": 123 },
+		"nan": NaN,
 	}
 Result is not NULL
 new_obj.string_of_digits json_object_get_type()=string
@@ -92,6 +93,12 @@ new_obj.nonempty_object json_object_get_int64()=0
 new_obj.nonempty_object json_object_get_uint64()=0
 new_obj.nonempty_object json_object_get_boolean()=0
 new_obj.nonempty_object json_object_get_double()=0.000000
+new_obj.nan json_object_get_type()=double
+new_obj.nan json_object_get_int()=-2147483648
+new_obj.nan json_object_get_int64()=-9223372036854775808
+new_obj.nan json_object_get_uint64()=0
+new_obj.nan json_object_get_boolean()=1
+new_obj.nan json_object_get_double()=nan
 
 ================================
 json_object_is_type: null,boolean,double,int,object,array,string
@@ -104,3 +111,4 @@ new_obj.boolean_false     : 0,1,0,0,0,0,0
 new_obj.int64_number      : 0,0,0,1,0,0,0
 new_obj.negative_number   : 0,0,0,1,0,0,0
 new_obj.a_null            : 1,0,0,0,0,0,0
+new_obj.nan               : 0,0,1,0,0,0,0

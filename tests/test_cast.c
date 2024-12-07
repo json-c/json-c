@@ -36,6 +36,7 @@ int main(int argc, char **argv)
 		\"array_with_zero\": [ 0 ],\n\
 		\"empty_object\": {},\n\
 		\"nonempty_object\": { \"a\": 123 },\n\
+		\"nan\": NaN,\n\
 	}";
 	/* Note: 2147483649 = INT_MAX + 2 */
 	/* Note: 9223372036854775809 = INT64_MAX + 2 */
@@ -62,6 +63,7 @@ int main(int argc, char **argv)
 	getit(new_obj, "array_with_zero");
 	getit(new_obj, "empty_object");
 	getit(new_obj, "nonempty_object");
+	getit(new_obj, "nan");
 
 	// Now check the behaviour of the json_object_is_type() function.
 	printf("\n================================\n");
@@ -75,6 +77,7 @@ int main(int argc, char **argv)
 	checktype(new_obj, "int64_number");
 	checktype(new_obj, "negative_number");
 	checktype(new_obj, "a_null");
+	checktype(new_obj, "nan");
 
 	json_object_put(new_obj);
 
