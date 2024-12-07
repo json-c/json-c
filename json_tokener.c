@@ -185,6 +185,8 @@ struct json_tokener *json_tokener_new(void)
 
 void json_tokener_free(struct json_tokener *tok)
 {
+	if (!tok)
+		return;
 	json_tokener_reset(tok);
 	if (tok->pb)
 		printbuf_free(tok->pb);
