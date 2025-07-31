@@ -13,6 +13,8 @@ new_obj.to_string("\ud840\u4e16")="�世"
 new_obj.to_string("\ud840")="�"
 new_obj.to_string("\udd27")="�"
 new_obj.to_string([9,'\uDAD)=null
+new_obj.to_string("[9,'\uDAD")=null
+new_obj.to_string("\uD836\uDE87")="�"
 new_obj.to_string(null)=null
 new_obj.to_string(NaN)=NaN
 new_obj.to_string(-NaN)=null
@@ -138,6 +140,9 @@ json_tokener_parse_ex(tok, "ä"        ,   4) ... OK: got object of type [string
 json_tokener_parse_ex(tok, "ä"        ,   4) ... OK: got object of type [string]: "ä"
 json_tokener_parse_ex(tok, { "foo      ,   6) ... OK: got correct error: continue
 json_tokener_parse_ex(tok, : "bar"}    ,   8) ... OK: got correct error: unexpected character
+json_tokener_parse_ex(tok, "\uD836     ,   7) ... OK: got correct error: continue
+json_tokener_parse_ex(tok, \uDE87      ,   6) ... OK: got correct error: continue
+json_tokener_parse_ex(tok, "           ,   1) ... OK: got object of type [string]: "�"
 json_tokener_parse_ex(tok, { "foo      ,   6) ... OK: got correct error: continue
 json_tokener_parse_ex(tok, ": {"bar    ,   8) ... OK: got correct error: continue
 json_tokener_parse_ex(tok, ":13}}XXXX  ,  10) ... OK: got object of type [object]: { "foo": { "bar": 13 } }
@@ -363,5 +368,5 @@ json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
-End Incremental Tests OK=269 ERROR=0
+End Incremental Tests OK=272 ERROR=0
 ==================================
