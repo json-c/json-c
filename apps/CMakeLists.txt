@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 2.8)  # see ../CMakeLists.txt for why 2.8
+cmake_minimum_required(VERSION 3.9...3.12)  # see ../CMakeLists.txt for why
 
 if(POLICY CMP0075)
     cmake_policy(SET CMP0075 NEW)
