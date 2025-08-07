@@ -113,6 +113,9 @@ static void test_basic_parse(void)
 	single_basic_parse("\"\\udd27\"", 0);
 	// Test with a "short" high surrogate
 	single_basic_parse("[9,'\\uDAD", 0);
+	single_basic_parse("\"[9,'\\uDAD\"", 0);
+	// Test with a supplemental character that looks like a high surrogate
+	single_basic_parse("\"\\uD836\\uDE87\"", 0);
 	single_basic_parse("null", 0);
 	single_basic_parse("NaN", 0);
 	single_basic_parse("-NaN", 0); /* non-sensical, returns null */
@@ -331,6 +334,11 @@ struct incremental_step
     /* Check that json_tokener_reset actually resets */
     {"{ \"foo", -1, -1, json_tokener_continue, 1, 0},
     {": \"bar\"}", -1, 0, json_tokener_error_parse_unexpected, 1, 0},
+
+    /* Check a supplemental code point that looks like a high surrogate */
+    {"\"\\uD836", -1, -1, json_tokener_continue, 0, 0},
+    {"\\uDE87", -1, -1, json_tokener_continue, 0, 0},
+    {"\"", -1, -1, json_tokener_success, 1, 0},
 
     /* Check incremental parsing with trailing characters */
     {"{ \"foo", -1, -1, json_tokener_continue, 0, 0},

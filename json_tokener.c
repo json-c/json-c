@@ -145,8 +145,8 @@ enum json_tokener_error json_tokener_get_error(struct json_tokener *tok)
 }
 
 /* Stuff for decoding unicode sequences */
-#define IS_HIGH_SURROGATE(uc) (((uc)&0xFC00) == 0xD800)
-#define IS_LOW_SURROGATE(uc) (((uc)&0xFC00) == 0xDC00)
+#define IS_HIGH_SURROGATE(uc) (((uc)&0xFFFFFC00) == 0xD800)
+#define IS_LOW_SURROGATE(uc) (((uc)&0xFFFFFC00) == 0xDC00)
 #define DECODE_SURROGATE_PAIR(hi, lo) ((((hi)&0x3FF) << 10) + ((lo)&0x3FF) + 0x10000)
 static unsigned char utf8_replacement_char[3] = {0xEF, 0xBF, 0xBD};
 
