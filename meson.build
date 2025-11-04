@@ -223,12 +223,10 @@ endif
 message('target is ' + host_machine.system())
 if host_machine.system() == 'windows'
   # Cover any compiler on Windows attempting to use MSVC's standard library
-  add_project_arguments(['-D_CRT_NONSTDC_NO_DEPRECATE', '-D_CRT_SECURE_NO_WARNINGS'], language: 'c')
+  add_project_arguments('-D_CRT_NONSTDC_NO_DEPRECATE', '-D_CRT_SECURE_NO_WARNINGS', language: 'c')
 endif
 
-if cc.get_id().contains('gcc') or cc.get_id().contains('clang')
-  add_project_arguments(cc.get_supported_arguments(['-Wno-unused-parameter']), language : 'c')
-endif
+add_project_arguments(cc.get_supported_arguments('-Wno-unused-parameter'), language : 'c')
 
 # Source files
 sources = files(
