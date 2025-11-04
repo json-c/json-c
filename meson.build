@@ -220,8 +220,8 @@ if host_machine.system() == 'windows'
 endif
 
 # Compiler flags
-message('target is ' + target_machine.system())
-if target_machine.system() == 'windows'
+message('target is ' + host_machine.system())
+if host_machine.system() == 'windows'
   # Cover any compiler on Windows attempting to use MSVC's standard library
   add_project_arguments(['-D_CRT_NONSTDC_NO_DEPRECATE', '-D_CRT_SECURE_NO_WARNINGS'], language: 'c')
 endif
@@ -269,7 +269,7 @@ install_headers(
 )
 
 # Optional apps
-if get_option('build_apps') and target_machine.system() != 'windows'
+if get_option('build_apps') and host_machine.system() != 'windows'
   subdir('apps')
 endif
 
