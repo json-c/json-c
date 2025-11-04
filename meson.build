@@ -18,169 +18,110 @@ if has_std_lib and has_std_arg and has_string and has_float
   conf_data.set('STDC_HEADERS', 1, description : 'Define to 1 if you have the ANSI C header files.')
 endif
 
-if cc.has_header('dlfcn.h')
-  conf_data.set('HAVE_DLFCN_H', 1, description : 'Define to 1 if you have the <dlfcn.h> header file.')
-endif
+bsd_dep = dependency('libbsd', required: false)
 
-if cc.has_header('endian.h')
-  conf_data.set('HAVE_ENDIAN_H', 1, description : 'Define to 1 if you have the <endian.h> header file')
-endif 
+headers = {
+  'bsd/stdlib.h': bsd_dep,
+  'dlfcn.h': [],
+  'endian.h': [],
+  'fcntl.h': [],
+  'inttypes.h': [],
+  'limits.h': [],
+  'locale.h': [],
+  'memory.h': [],
+  'stdarg.h': [],
+  'stdint.h': [],
+  'stdlib.h': [],
+  'string.h': [],
+  'strings.h': [],
+  'syslog.h': [],
+  'sys/cdefs.h': [],
+  'sys/param.h': [],
+  'sys/random.h': [],
+  'sys/resource.h': [],
+  'sys/stat.h': [],
+  'sys/types.h': [],
+  'unistd.h': [],
+  'xlocale.h': [],
+}
 
-if cc.has_header('fcntl.h')
-  conf_data.set('HAVE_FCNTL_H', 1, description : 'Define to 1 if you have the <fcntl.h> header file.')
-endif
+foreach h, d : headers
+  if cc.has_header(h, dependencies: d)
+    conf_data.set('HAVE_@0@'.format(h.underscorify().to_upper()), 1, description :  'Define to 1 if you have the <@0@> header file'.format(h))
+  endif
+endforeach
 
 if cc.has_header('inttypes.h')
-  conf_data.set('HAVE_INTTYPES_H', 1, description : 'Define to 1 if you have the <inttypes.h> header file.')
   conf_data.set('JSON_C_HAVE_INTTYPES_H', 1, description : 'Define to 1 if you have the <inttypes.h> header file.')
   jconf_data.set('JSON_C_HAVE_INTTYPES_H', 1, description : 'Define to 1 if you have the <inttypes.h> header file.')
-endif 
-
-if cc.has_header('limits.h')
-  conf_data.set('HAVE_LIMITS_H', 1, description : 'Define to 1 if you have the <limits.h> header file.')
 endif
 
-if cc.has_header('locale.h')
-  conf_data.set('HAVE_LOCALE_H', 1, description : 'Define to 1 if you have the <locale.h> header file.')
-endif
-if cc.has_header('memory.h')
-  conf_data.set('HAVE_MEMORY_H', 1, description : 'Define to 1 if you have the <memory.h> header file.')
-endif
-if has_std_arg
-  conf_data.set('HAVE_STDARG_H', 1, description : 'Define to 1 if you have the <stdarg.h> header file.')
-endif
 if cc.has_header('stdint.h')
-  conf_data.set('HAVE_STDINT_H', 1, description : 'Define to 1 if you have the <stdint.h> header file.')
   conf_data.set('JSON_C_HAVE_STDINT_H', 1, description : 'Define to 1 if you have the <stdint.h> header file.')
   jconf_data.set('JSON_C_HAVE_STDINT_H', 1, description : 'Define to 1 if you have the <stdint.h> header file.')
 endif
-if has_std_lib
-  conf_data.set('HAVE_STDLIB_H', 1, description : 'Define to 1 if you have the <stdlib.h> header file.')
-endif
-if cc.has_header('strings.h')
-  conf_data.set('HAVE_STRINGS_H', 1, description : 'Define to 1 if you have the <strings.h> header file.')
-  if cc.has_function('strcasecmp', prefix : '#include <strings.h>')
-    conf_data.set('HAVE_STRCASECMP', 1, description : 'Define to 1 if you have the `strcasecmp` function.')
+
+funcs = [
+  'open',
+  'realloc',
+  'setlocale',
+  'strdup',
+  'strerror',
+  'uselocale',
+  'duplocale',
+  'vsyslog',
+  'getrandom',
+  'getrusage',
+  'strcasecmp',
+  'strncasecmp',
+  'strtoll',
+  'strtoull',
+  'arc4random',
+  'vasprintf',
+]
+
+foreach f : funcs
+  if cc.has_function(f)
+    conf_data.set('HAVE_@0@'.format(f.to_upper()), 1, description : 'Define to 1 if you have the `@0@` function.'.format(f))
   endif
-  if cc.has_function('strncasecmp', prefix : '#include <strings.h>')
-    conf_data.set('HAVE_STRNCASECMP', 1, description : 'Define to 1 if you have the `strncasecmp` function.')
+endforeach
+
+foreach f : ['snprintf', 'vsnprintf', 'vprintf']
+  if cc.has_header_symbol('stdio.h', f)
+    conf_data.set('HAVE_@0@'.format(f.to_upper()), 1, description : 'Define to 1 if you have the `@0@` function.'.format(f))
   endif
-endif
-if has_string
-  conf_data.set('HAVE_STRING_H', 1, description : 'Define to 1 if you have the <string.h> header file.')
-endif
-if cc.has_header('syslog.h')
-  conf_data.set('HAVE_SYSLOG_H', 1, description : 'Define to 1 if you have the <syslog.h> header file.')
-endif
-if cc.has_header('sys/cdefs.h')
-  conf_data.set('HAVE_SYS_CDEFS_H', 1, description : 'Define to 1 if you have the <sys/cdefs.h> header file.')
-endif
-if cc.has_header('sys/param.h')
-  conf_data.set('HAVE_SYS_PARAM_H', 1, description : 'Define to 1 if you have the <sys/param.h> header file.')
-endif
-if cc.has_header('sys/random.h')
-  conf_data.set('HAVE_SYS_RANDOM_H', 1, description : 'Define to 1 if you have the <sys/random.h> header file.')
-endif
-if cc.has_header('sys/resource.h')
-  conf_data.set('HAVE_SYS_RESOURCE_H', 1, description : 'Define to 1 if you have the <sys/resource.h> header file.')
-endif
-if cc.has_header('sys/stat.h')
-  conf_data.set('HAVE_SYS_STAT_H', 1, description : 'Define to 1 if you have the <sys/stat.h> header file.')
-endif
-if cc.has_header('sys/types.h')
-  conf_data.set('HAVE_SYS_TYPES_H', 1, description : 'Define to 1 if you have the <sys/types.h> header file.')
-endif
-if cc.has_header('unistd.h')
-  conf_data.set('HAVE_UNISTD_H', 1, description : 'Define to 1 if you have the <unistd.h> header file.')
-endif
-if cc.has_header('xlocale.h')
-  conf_data.set('HAVE_XLOCALE_H', 1, description : 'Define to 1 if you have the <xlocale.h> header file.')
-endif
-has_bsd_stdlib = cc.has_header('bsd/stdlib.h')
-if has_bsd_stdlib
-  conf_data.set('HAVE_BSD_STDLIB_H', 1, description : 'Define to 1 if you have the <bsd/stdlib.h> header file.')
-endif
-if cc.has_function('vprintf', prefix : '#include <stdarg.h>\n#include <stdio.h>')
-  conf_data.set('HAVE_VPRINTF', 1, description : 'Define to 1 if you have the `vprintf` function.')
-elif cc.has_function('_doprnt')
-  conf_data.set('HAVE_DOPRNT', 1, description : 'Define to 1 if you have _doprnt but not vprintf.') 
-endif
-if cc.has_define('INFINITY', prefix : '#include <float.h>\n#include <math.h>')
-  conf_data.set('HAVE_DECL_INFINITY', 1, description : 'Define to 1 if you have the declaration of `INFINITY`')
-endif
-if cc.has_define('isinf', prefix : '#include <float.h>\n#include <math.h>') or cc.has_function('isinf', prefix : '#include <float.h>\n#include <math.h>')
-  conf_data.set('HAVE_DECL_ISINF', 1, description : 'Define to 1 if you have the declaration of `isinf`')
-endif
-if cc.has_define('isnan', prefix : '#include <float.h>\n#include <math.h>') or cc.has_function('isnan', prefix : '#include <float.h>\n#include <math.h>')
-  conf_data.set('HAVE_DECL_ISNAN', 1, description : 'Define to 1 if you have the declaration of `isnan`')
-endif
-if cc.has_define('NAN', prefix : '#include <float.h>\n#include <math.h>')
-  conf_data.set('HAVE_DECL_NAN', 1, description : 'Define to 1 if you have the declaration of `NAN`')
-endif
-if cc.has_define('_finite', prefix : '#include <float.h>\n#include <math.h>') or cc.has_function('_finite', prefix : '#include <float.h>\n#include <math.h>')
-  conf_data.set('HAVE_DECL__FINITE', 1, description : 'Define to 1 if you have the declaration of `_finite`')
-endif
-if cc.has_define('_isnan', prefix : '#include <float.h>\n#include <math.h>') or cc.has_function('_isnan', prefix : '#include <float.h>\n#include <math.h>')
-  conf_data.set('HAVE_DECL__ISNAN', 1, description : 'Define to 1 if you have the declaration of `_isnan`')
+endforeach
+
+if not conf_data.has('HAVE_VPRINTF') and cc.has_function('_doprnt')
+  conf_data.set('HAVE_DOPRNT', 1, description : 'Define to 1 if you have _doprnt but not vprintf.')
 endif
 
-if cc.has_function('open', prefix : '#include <fcntl.h>')
-  conf_data.set('HAVE_OPEN', 1, description : 'Define to 1 if you have the `open` function.')
-endif
-if cc.has_function('realloc', prefix : '#include <stdlib.h>')
-  conf_data.set('HAVE_REALLOC', 1, description : 'Define to 1 if you have the `realloc` function.')
-endif
-if cc.has_function('setlocale', prefix : '#include <locale.h>')
-  conf_data.set('HAVE_SETLOCALE', 1, description : 'Define to 1 if you have the `setlocale` function.')
-endif
-if cc.has_function('snprintf', prefix : '#include <stdio.h>')
-  conf_data.set('HAVE_SNPRINTF', 1, description : 'Define to 1 if you have the `snprintf` function.')
-endif
-if cc.has_function('strdup')
-  conf_data.set('HAVE_STRDUP', 1, description : 'Define to 1 if you have the `strdup` function.')
-endif
-if cc.has_function('strerror')
-  conf_data.set('HAVE_STRERROR', 1, description : 'Define to 1 if you have the `strerror` function.')
-endif
-
-if cc.has_function('uselocale', prefix : '#include <locale.h>')
-  conf_data.set('HAVE_USELOCALE', 1, description : 'Define to 1 if you have the `uselocale` function.')
-endif
-if cc.has_function('duplocale', prefix : '#include <locale.h>')
-  conf_data.set('HAVE_DUPLOCALE', 1, description : 'Define to 1 if you have the `duplocale` function.')
-endif
-if cc.has_function('vasprintf', prefix : '#define _GNU_SOURCE\n#include <stdarg.h>\n#include <stdio.h>')
-  conf_data.set('HAVE_VASPRINTF', 1, description : 'Define to 1 if you have the `vasprintf` function.')
-endif
-if cc.has_function('vsnprintf', prefix : '#include <stdarg.h>\n#include <stdio.h>')
-  conf_data.set('HAVE_VSNPRINTF', 1, description : 'Define to 1 if you have the `vsnprintf` function.')
-endif
-if cc.has_function('vsyslog')
-  conf_data.set('HAVE_VSYSLOG', 1, description : 'Define to 1 if you have the `vsyslog` function.')
-endif
-if cc.has_function('getrandom')
-  conf_data.set('HAVE_GETRANDOM', 1, description : 'Define to 1 if you have the `getrandom` function.')
-endif
-if cc.has_function('getrusage', prefix : '#include <sys/resource.h>')
-  conf_data.set('HAVE_GETRUSAGE', 1, description : 'Define to 1 if you have the `getrusage` function.')
-endif
-
-have_strtoll = cc.has_function('strtoll')
-have_strtoull = cc.has_function('strtoull')
-
-if have_strtoll
-  conf_data.set('HAVE_STRTOLL', 1)
+if conf_data.has('HAVE_STRTOLL')
   conf_data.set('json_c_strtoll', 'strtoll')
 elif cc.has_function('_strtoi64', prefix : '#include <stdlib.h>')
   conf_data.set('json_c_strtoll', '_strtoi64')
 endif
 
-if have_strtoull
-  conf_data.set('HAVE_STRTOULL', 1)
+if conf_data.has('HAVE_STRTOULL')
   conf_data.set('json_c_strtoull', 'strtoull')
 elif cc.has_function('_strtoui64', prefix : '#include <stdlib.h>')
   conf_data.set('json_c_strtoull', '_strtoui64')
 endif
+
+decls = {
+  'INFINITY': 'math.h',
+  'isinf': 'math.h',
+  'isnan': 'math.h',
+  'NAN': 'math.h',
+  '_finite': 'float.h',
+  '_isnan': 'float.h',
+}
+
+foreach d, h : decls
+  if cc.has_header_symbol(h, d)
+    conf_data.set('HAVE_DECL_@0@'.format(d.to_upper()), 1, description : 'Define to 1 if you have the declaration of `@0@`'.format(d))
+  endif
+endforeach
 
 check_thread = cc.compiles('''
     __thread int x = 0;
@@ -205,16 +146,6 @@ if gnu_warning_section_support
   conf_data.set('HAS_GNU_WARNING_LONG', 1, description : 'Define to 1 if the compiler supports .gnu.warning sections.')
 endif
 
-if has_bsd_stdlib
-  if cc.has_function('arc4random', prefix: '#include <bsd/stdlib.h>')
-    conf_data.set('HAVE_ARC4RANDOM', 1)
-  endif
-else
-  if cc.has_function('arc4random', prefix: '#include <stdlib.h>')
-    conf_data.set('HAVE_ARC4RANDOM', 1)
-  endif
-endif
-
 atomic_builtin_support = cc.compiles('''
     int main() {
       int x = 0;
@@ -228,7 +159,7 @@ if atomic_builtin_support
 endif
 
 if get_option('enable_rdrand')
-  conf_data.set('ENABLE_RDRAND', 1)  
+  conf_data.set('ENABLE_RDRAND', 1)
 endif
 if get_option('override_get_random_seed')
   conf_data.set('OVERRIDE_GET_RANDOM_SEED', get_option('override_get_random_seed'))
@@ -244,8 +175,8 @@ conf_data.set('SIZEOF_INT', cc.sizeof('int'))
 conf_data.set('SIZEOF_INT64_T', cc.sizeof('int64_t', prefix : '#include <stdint.h>'))
 conf_data.set('SIZEOF_LONG', cc.sizeof('long'))
 conf_data.set('SIZEOF_LONG_LONG', cc.sizeof('long long'))
-conf_data.set('SIZEOF_SIZE_T', cc.sizeof('size_t'))
-if target_machine.system() == 'windows'
+conf_data.set('SIZEOF_SIZE_T', cc.sizeof('size_t', prefix : '#include <stddef.h'))
+if cc.get_argument_syntax() == 'msvc'
   conf_data.set('SIZEOF_SSIZE_T', cc.sizeof('SSIZE_T', prefix : '#include <BaseTsd.h>\n#include <stddef.h>'))
 else
   conf_data.set('SIZEOF_SSIZE_T', cc.sizeof('ssize_t', prefix : '#include <sys/types.h>'))
@@ -289,15 +220,13 @@ if host_machine.system() == 'windows'
 endif
 
 # Compiler flags
-message('target is ' + target_machine.system())
-if target_machine.system() == 'windows'
+message('target is ' + host_machine.system())
+if host_machine.system() == 'windows'
   # Cover any compiler on Windows attempting to use MSVC's standard library
-  add_project_arguments(['-D_CRT_NONSTDC_NO_DEPRECATE', '-D_CRT_SECURE_NO_WARNINGS'], language: 'c')
-endif 
-
-if cc.get_id().contains('gcc') or cc.get_id().contains('clang')
-  add_project_arguments(cc.get_supported_arguments(['-Wno-unused-parameter']), language : 'c')
+  add_project_arguments('-D_CRT_NONSTDC_NO_DEPRECATE', '-D_CRT_SECURE_NO_WARNINGS', language: 'c')
 endif
+
+add_project_arguments(cc.get_supported_arguments('-Wno-unused-parameter'), language : 'c')
 
 # Source files
 sources = files(
@@ -321,6 +250,7 @@ inc = include_directories('.')
 libjson = library('json-c',
   sources,
   include_directories: inc,
+  dependencies: bsd_dep,
   install: true,
   version: '5.4.0',
   soversion: '5',
@@ -337,7 +267,7 @@ install_headers(
 )
 
 # Optional apps
-if get_option('build_apps') and target_machine.system() != 'windows'
+if get_option('build_apps') and host_machine.system() != 'windows'
   subdir('apps')
 endif
 
