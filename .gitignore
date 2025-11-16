@@ -39,6 +39,7 @@
 /tests/test_set_value
 /tests/test_util_file
 /tests/test_visit
+/tests/test_*
 /tests/*.vg.out
 /tests/*.log
 /tests/*.trs
@@ -91,6 +92,13 @@
 /libjson-c.so
 /libjson-c.so.*
 
+# Build artefacts
+/apps
+/doc
+/check-version-script.sym
+/install_manifest.txt
+
 # Benchmarking input and output
 /bench/data
 /bench/work
+/apps_config.h
