@@ -124,16 +124,12 @@ foreach d, h : decls
   endif
 endforeach
 
-check_thread = cc.compiles('''
-    __thread int x = 0;
-    int main() { return x; }
-  ''',
-  name: 'Check for __thread support')
+check_thread = cc.compiles('__thread int x;', name: 'Check for __thread support')
 
 if check_thread
   conf_data.set('HAVE___THREAD', 1)
   conf_data.set('SPEC___THREAD', '__thread')
-elif cc.get_id().contains('msvc')
+elif cc.get_argument_syntax() == 'msvc'
   conf_data.set('SPEC___THREAD', '__declspec(thread)')
 endif
 
@@ -211,7 +207,6 @@ json_header = configure_file(
   output: 'json.h',
   configuration: jhconf_data
 )
-
 
 # Platform-specific flags
 add_project_arguments('-D_GNU_SOURCE', language: 'c')
