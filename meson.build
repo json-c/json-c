@@ -240,20 +240,17 @@ if not get_option('disable_json_pointer')
   endif
 endif
 
-# Include directories
-inc = include_directories('.')
-
 # Build library
 libjson = library('json-c',
   sources,
-  include_directories: inc,
   dependencies: bsd_dep,
   install: true,
+  vs_module_defs: 'json-c.def',
   version: '5.4.0',
-  soversion: '5',
+  soversion: host_machine.system() == 'windows' ? '' : '5',
 )
 
-jsonc_dep = declare_dependency(link_with: libjson, include_directories: inc)
+jsonc_dep = declare_dependency(link_with: libjson, include_directories: '.')
 meson.override_dependency('json-c', jsonc_dep)
 
 # Install headers

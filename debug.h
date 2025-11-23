@@ -24,11 +24,7 @@ extern "C" {
 #endif
 
 #ifndef JSON_EXPORT
-#if defined(_MSC_VER) && defined(JSON_C_DLL)
-#define JSON_EXPORT __declspec(dllexport)
-#else
 #define JSON_EXPORT extern
-#endif
 #endif
 
 JSON_EXPORT void mc_set_debug(int debug);
