@@ -124,16 +124,12 @@ foreach d, h : decls
   endif
 endforeach
 
-check_thread = cc.compiles('''
-    __thread int x = 0;
-    int main() { return x; }
-  ''',
-  name: 'Check for __thread support')
+check_thread = cc.compiles('__thread int x;', name: 'Check for __thread support')
 
 if check_thread
   conf_data.set('HAVE___THREAD', 1)
   conf_data.set('SPEC___THREAD', '__thread')
-elif cc.get_id().contains('msvc')
+elif cc.get_argument_syntax() == 'msvc'
   conf_data.set('SPEC___THREAD', '__declspec(thread)')
 endif
 
@@ -176,7 +172,7 @@ conf_data.set('SIZEOF_INT', cc.sizeof('int'))
 conf_data.set('SIZEOF_INT64_T', cc.sizeof('int64_t', prefix : '#include <stdint.h>'))
 conf_data.set('SIZEOF_LONG', cc.sizeof('long'))
 conf_data.set('SIZEOF_LONG_LONG', cc.sizeof('long long'))
-conf_data.set('SIZEOF_SIZE_T', cc.sizeof('size_t', prefix : '#include <stddef.h'))
+conf_data.set('SIZEOF_SIZE_T', cc.sizeof('size_t', prefix : '#include <stddef.h>'))
 if cc.get_argument_syntax() == 'msvc'
   conf_data.set('SIZEOF_SSIZE_T', cc.sizeof('SSIZE_T', prefix : '#include <BaseTsd.h>\n#include <stddef.h>'))
 else
@@ -211,7 +207,6 @@ json_header = configure_file(
   output: 'json.h',
   configuration: jhconf_data
 )
-
 
 # Platform-specific flags
 add_project_arguments('-D_GNU_SOURCE', language: 'c')
