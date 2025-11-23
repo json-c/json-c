@@ -1,6 +1,7 @@
 
 project('json-c', 'c', version: '0.18.99',
   meson_version: '>=0.54.0',
+  license: 'MIT',
   default_options: ['buildtype=release', 'warning_level=2'])
 
 cc = meson.get_compiler('c')
