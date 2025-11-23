@@ -1,5 +1,6 @@
 
 project('json-c', 'c', version: '0.18.99',
+  meson_version: '>=0.54.0',
   default_options: ['buildtype=release', 'warning_level=2'])
 
 cc = meson.get_compiler('c')
@@ -257,6 +258,7 @@ libjson = library('json-c',
 )
 
 jsonc_dep = declare_dependency(link_with: libjson, include_directories: inc)
+meson.override_dependency('json-c', jsonc_dep)
 
 # Install headers
 install_headers(
