@@ -74,13 +74,15 @@ funcs = [
   'vsyslog',
   'getrandom',
   'getrusage',
-  'strcasecmp',
-  'strncasecmp',
   'strtoll',
   'strtoull',
   'arc4random',
   'vasprintf',
 ]
+
+if conf_data.has('HAVE_STRINGS_H')
+  funcs += ['strcasecmp', 'strncasecmp']
+endif
 
 foreach f : funcs
   if cc.has_function(f)
