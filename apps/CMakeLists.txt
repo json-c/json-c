@@ -94,6 +94,9 @@ endif() # end "standalone mode" block
 
 # ---------------------------------
 
+# Check whether getopt.h exists
+check_include_file(getopt.h HAVE_GETOPT_H)
+
 check_include_file(sys/resource.h   HAVE_SYS_RESOURCE_H) # for getrusage
 if (HAVE_SYS_RESOURCE_H)
     check_symbol_exists(getrusage   "sys/resource.h" HAVE_GETRUSAGE)
