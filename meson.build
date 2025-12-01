@@ -175,7 +175,7 @@ conf_data.set('SIZEOF_INT', cc.sizeof('int'))
 conf_data.set('SIZEOF_INT64_T', cc.sizeof('int64_t', prefix : '#include <stdint.h>'))
 conf_data.set('SIZEOF_LONG', cc.sizeof('long'))
 conf_data.set('SIZEOF_LONG_LONG', cc.sizeof('long long'))
-conf_data.set('SIZEOF_SIZE_T', cc.sizeof('size_t', prefix : '#include <stddef.h'))
+conf_data.set('SIZEOF_SIZE_T', cc.sizeof('size_t', prefix : '#include <stddef.h>'))
 if cc.get_argument_syntax() == 'msvc'
   conf_data.set('SIZEOF_SSIZE_T', cc.sizeof('SSIZE_T', prefix : '#include <BaseTsd.h>\n#include <stddef.h>'))
 else
