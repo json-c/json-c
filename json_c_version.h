@@ -24,11 +24,7 @@ extern "C" {
 #define JSON_C_VERSION "0.18.99"
 
 #ifndef JSON_EXPORT
-#if defined(_MSC_VER) && defined(JSON_C_DLL)
-#define JSON_EXPORT __declspec(dllexport)
-#else
 #define JSON_EXPORT extern
-#endif
 #endif
 
 /**
