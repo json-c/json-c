@@ -4,22 +4,22 @@ When changing the style, commit that separately from other changes.
 For new code and major changes to a function, switch to the official json-c style.
 
 Official json-c style:
+
 Aim for readability, not strict conformance to fixed style rules.
-These rules are not comprehensive.  Look to existing code for guidelines.
-Indentation is tab based, with continuations of long lines starting with tabs then spaces for alignment.
-Try to line up components of continuation lines with corresponding part of the line above (i.e. "indent -lp" effect), but avoid excessive indentation tha causes extra line wraps.
- e.g. (T=tab, S=space):
-TTTTsome_long_func_call(arg1, arg2,
-TTTTSSSSSSSSSSSSSSSSSSSarg3, arg4);
-TTTTsome_reallly_really_long_func_name(arg1,
-TTTTTarg2, arg3, arg4);
-There should be a space between "if"/"while" and the following parenthesis.
-"case" lines are indented at the same level as the "switch" statement.
-Commas are followed by a single space.
-Include spaces around most non-unary, non-postfix operators, "=", "==', "&", "||", etc...
-Function calls have no space between the name and the parenthesis.
-Curly braces go on their own line.
-Curly braces may be omitted.
+Formatting is tab based; previous attempts at proper alignment with
+spaces for continuation lines have been abandoned in favor of the
+convenience of using clang-format.
+Refer to the .clang-format file for details, and run the tool before commit:
+
+    clang-format -i somefile.c foo.h
+
+For sections of code that would be significantly negatively impacted, surround
+them with magic comments to disable formatting:
+
+    /* clang-format off */
+    ...code...
+    /* clang-format on */
+
 
 Naming:
 Words within function and variable names are separated with underscores.  Avoid camel case.

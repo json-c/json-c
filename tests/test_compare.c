@@ -2,19 +2,27 @@
 * Tests if json_object_equal behaves correct.
 */
 
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
+#include "config.h"
 #include <stdio.h>
 #include <string.h>
-#include "config.h"
 
 #include "json_inttypes.h"
 #include "json_object.h"
 
-int main()
+int main(int argc, char **argv)
 {
 	/* integer tests */
 	struct json_object *int1 = json_object_new_int(0);
 	struct json_object *int2 = json_object_new_int(1);
 	struct json_object *int3 = json_object_new_int(1);
+	struct json_object *int4 = json_object_new_int(-1);
+	struct json_object *uint1 = json_object_new_uint64(0);
+	struct json_object *uint2 = json_object_new_uint64(1);
+	struct json_object *uint3 = json_object_new_uint64(1);
+	struct json_object *uint4 = json_object_new_uint64((uint64_t)INT64_MAX + 100);
 
 	if (!json_object_equal(int1, int2))
 		printf("JSON integer comparison is correct\n");
@@ -31,9 +39,69 @@ int main()
 	else
 		printf("JSON same integer comparison failed\n");
 
+	if (!json_object_equal(uint1, uint2))
+		printf("JSON usigned integer comparison is correct\n");
+	else
+		printf("JSON usigned integer comparison failed\n");
+
+	if (json_object_equal(uint1, uint1))
+		printf("JSON same usigned object comparison is correct\n");
+	else
+		printf("JSON same usigned object comparison failed\n");
+
+	if (json_object_equal(uint2, uint3))
+		printf("JSON same usigned integer comparison is correct\n");
+	else
+		printf("JSON same usigned integer comparison failed\n");
+
+	if (json_object_equal(int2, uint2))
+		printf("JSON integer & usigned integer comparison is correct\n");
+	else
+		printf("JSON integer & usigned integer comparison failed\n");
+
+	if (!json_object_equal(int2, uint4))
+		printf("JSON integer & usigned integer comparison is correct\n");
+	else
+		printf("JSON integer & usigned integer comparison failed\n");
+
+	if (!json_object_equal(int4, uint2))
+		printf("JSON integer & usigned integer comparison is correct\n");
+	else
+		printf("JSON integer & usigned integer comparison failed\n");
+
+	if (!json_object_equal(int4, uint4))
+		printf("JSON integer & usigned integer comparison is correct\n");
+	else
+		printf("JSON integer & usigned integer comparison failed\n");
+
+	if (json_object_equal(uint2, int2))
+		printf("JSON usigned integer & integer comparison is correct\n");
+	else
+		printf("JSON usigned integer & integer comparison failed\n");
+
+	if (!json_object_equal(uint2, int4))
+		printf("JSON usigned integer & integer comparison is correct\n");
+	else
+		printf("JSON usigned integer & integer comparison failed\n");
+
+	if (!json_object_equal(uint4, int2))
+		printf("JSON usigned integer & integer comparison is correct\n");
+	else
+		printf("JSON usigned integer & integer comparison failed\n");
+
+	if (!json_object_equal(uint4, int4))
+		printf("JSON usigned integer & integer comparison is correct\n");
+	else
+		printf("JSON usigned integer & integer comparison failed\n");
+
 	json_object_put(int1);
 	json_object_put(int2);
 	json_object_put(int3);
+	json_object_put(int4);
+	json_object_put(uint1);
+	json_object_put(uint2);
+	json_object_put(uint3);
+	json_object_put(uint4);
 
 	/* string tests */
 	struct json_object *str1 = json_object_new_string("TESTSTRING");
@@ -143,8 +211,50 @@ int main()
 	else
 		printf("Comparing different objects is incorrect\n");
 
+	/* iterate over jso2 keys to see if any exist that are not in jso1 */
+	json_object_object_add(obj2, "test3", json_object_new_int(320));
+	json_object_object_add(obj2, "test6", json_object_new_int(321));
+	if (!json_object_equal(obj1, obj2))
+		printf("Comparing different objects is correct\n");
+	else
+		printf("Comparing different objects is incorrect\n");
+
+	/* iterate over jso1 keys and see if they exist in jso1 */
+	json_object_object_add(obj1, "test6", json_object_new_int(321));
+	if (json_object_equal(obj1, obj2))
+		printf("Comparing different objects is correct\n");
+	else
+		printf("Comparing different objects is incorrect\n");
+	json_object_object_add(obj1, "test7", json_object_new_int(322));
+	if (!json_object_equal(obj1, obj2))
+		printf("Comparing different objects is correct\n");
+	else
+		printf("Comparing different objects is incorrect\n");
+
 	json_object_put(obj1);
 	json_object_put(obj2);
+
+	/* different types tests */
+	struct json_object *int5 = json_object_new_int(0);
+	struct json_object *dbl5 = json_object_new_double(3.14159);
+
+	if (!json_object_equal(int5, NULL))
+		printf("JSON integer and NULL comparison is correct\n");
+	else
+		printf("JSON integer and NULL comparison failed\n");
+
+	if (!json_object_equal(NULL, dbl5))
+		printf("JSON NULL and double comparison is correct\n");
+	else
+		printf("JSON NULL and double comparison failed\n");
+
+	if (!json_object_equal(int5, dbl5))
+		printf("JSON integer and double comparison is correct\n");
+	else
+		printf("JSON integer and double comparison failed\n");
+
+	json_object_put(int5);
+	json_object_put(dbl5);
 
 	return 0;
 }

@@ -1,46 +1,63 @@
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
 #include "strerror_override.h"
-#include "strerror_override_private.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <stddef.h>
-#include <string.h>
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <io.h>
+#include <windows.h>
+#endif /* defined(_WIN32) */
 #include <fcntl.h>
 #include <limits.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#if HAVE_UNISTD_H
 #include <unistd.h>
-#include <sys/types.h>
+#endif /* HAVE_UNISTD_H */
+#include <assert.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 #include "json.h"
 #include "json_util.h"
+#include "snprintf_compat.h"
 
 static void test_read_valid_with_fd(const char *testdir);
 static void test_read_valid_nested_with_fd(const char *testdir);
-static void test_read_nonexistant();
+static void test_read_nonexistant(void);
+#ifndef _WIN32
 static void test_read_closed(void);
+#endif
 
-static void test_write_to_file();
+static void test_write_to_file(void);
 static void stat_and_cat(const char *file);
+static void test_read_fd_equal(const char *testdir);
 
-static void test_write_to_file()
+#ifndef PATH_MAX
+#define PATH_MAX 256
+#endif
+
+static void test_write_to_file(void)
 {
 	json_object *jso;
 
 	jso = json_tokener_parse("{"
-		"\"foo\":1234,"
-		"\"foo1\":\"abcdefghijklmnopqrstuvwxyz\","
-		"\"foo2\":\"abcdefghijklmnopqrstuvwxyz\","
-		"\"foo3\":\"abcdefghijklmnopqrstuvwxyz\","
-		"\"foo4\":\"abcdefghijklmnopqrstuvwxyz\","
-		"\"foo5\":\"abcdefghijklmnopqrstuvwxyz\","
-		"\"foo6\":\"abcdefghijklmnopqrstuvwxyz\","
-		"\"foo7\":\"abcdefghijklmnopqrstuvwxyz\","
-		"\"foo8\":\"abcdefghijklmnopqrstuvwxyz\","
-		"\"foo9\":\"abcdefghijklmnopqrstuvwxyz\""
-		"}");
+	                         "\"foo\":1234,"
+	                         "\"foo1\":\"abcdefghijklmnopqrstuvwxyz\","
+	                         "\"foo2\":\"abcdefghijklmnopqrstuvwxyz\","
+	                         "\"foo3\":\"abcdefghijklmnopqrstuvwxyz\","
+	                         "\"foo4\":\"abcdefghijklmnopqrstuvwxyz\","
+	                         "\"foo5\":\"abcdefghijklmnopqrstuvwxyz\","
+	                         "\"foo6\":\"abcdefghijklmnopqrstuvwxyz\","
+	                         "\"foo7\":\"abcdefghijklmnopqrstuvwxyz\","
+	                         "\"foo8\":\"abcdefghijklmnopqrstuvwxyz\","
+	                         "\"foo9\":\"abcdefghijklmnopqrstuvwxyz\""
+	                         "}");
 	const char *outfile = "json.out";
 	int rv = json_object_to_file(outfile, jso);
-	printf("%s: json_object_to_file(%s, jso)=%d\n",
-		(rv == 0) ? "OK" : "FAIL", outfile, rv);
+	printf("%s: json_object_to_file(%s, jso)=%d\n", (rv == 0) ? "OK" : "FAIL", outfile, rv);
 	if (rv == 0)
 		stat_and_cat(outfile);
 
@@ -54,7 +71,7 @@ static void test_write_to_file()
 		stat_and_cat(outfile2);
 
 	const char *outfile3 = "json3.out";
-	int d = open(outfile3, O_WRONLY|O_CREAT, 0600);
+	int d = open(outfile3, O_WRONLY | O_CREAT, 0600);
 	if (d < 0)
 	{
 		printf("FAIL: unable to open %s %s\n", outfile3, strerror(errno));
@@ -77,22 +94,25 @@ static void test_write_to_file()
 static void stat_and_cat(const char *file)
 {
 	struct stat sb;
-	int d = open(file, O_RDONLY, 0600);
+	int flags = O_RDONLY;
+#ifdef O_BINARY
+	// This fixes Windows which otherwise opens this in text mode and returns different counts
+	flags |= O_BINARY;
+#endif
+	int d = open(file, flags);
 	if (d < 0)
 	{
-		printf("FAIL: unable to open %s: %s\n",
-		       file, strerror(errno));
+		printf("FAIL: unable to open %s: %s\n", file, strerror(errno));
 		return;
 	}
 	if (fstat(d, &sb) < 0)
 	{
-		printf("FAIL: unable to stat %s: %s\n",
-		       file, strerror(errno));
+		printf("FAIL: unable to stat %s: %s\n", file, strerror(errno));
 		close(d);
 		return;
 	}
 	char *buf = malloc(sb.st_size + 1);
-	if(!buf)
+	if (!buf)
 	{
 		printf("FAIL: unable to allocate memory\n");
 		close(d);
@@ -100,8 +120,7 @@ static void stat_and_cat(const char *file)
 	}
 	if (read(d, buf, sb.st_size) < sb.st_size)
 	{
-		printf("FAIL: unable to read all of %s: %s\n",
-		       file, strerror(errno));
+		printf("FAIL: unable to read all of %s: %s\n", file, strerror(errno));
 		free(buf);
 		close(d);
 		return;
@@ -114,27 +133,45 @@ static void stat_and_cat(const char *file)
 
 int main(int argc, char **argv)
 {
-//	json_object_to_file(file, obj);
-//	json_object_to_file_ext(file, obj, flags);
-
-	_json_c_strerror_enable = 1;
+	//	json_object_to_file(file, obj);
+	//	json_object_to_file_ext(file, obj, flags);
 
 	const char *testdir;
 	if (argc < 2)
 	{
 		fprintf(stderr,
-			"Usage: %s <testdir>\n"
-			"  <testdir> is the location of input files\n",
-			argv[0]);
+		        "Usage: %s <testdir>\n"
+		        "  <testdir> is the location of input files\n",
+		        argv[0]);
 		return EXIT_FAILURE;
 	}
 	testdir = argv[1];
 
+	//	Test json_c_version.c
+	if (strncmp(json_c_version(), JSON_C_VERSION, sizeof(JSON_C_VERSION)))
+	{
+		printf("FAIL: Output from json_c_version(): %s "
+		       "does not match %s",
+		       json_c_version(), JSON_C_VERSION);
+		return EXIT_FAILURE;
+	}
+	if (json_c_version_num() != JSON_C_VERSION_NUM)
+	{
+		printf("FAIL: Output from json_c_version_num(): %d "
+		       "does not match %d",
+		       json_c_version_num(), JSON_C_VERSION_NUM);
+		return EXIT_FAILURE;
+	}
+
 	test_read_valid_with_fd(testdir);
 	test_read_valid_nested_with_fd(testdir);
 	test_read_nonexistant();
+	#ifndef _WIN32
+	// Disabled because the Windows CRT causes a crash during this test that cannot be disabled/stopped/worked around
 	test_read_closed();
+	#endif
 	test_write_to_file();
+	test_read_fd_equal(testdir);
 	return EXIT_SUCCESS;
 }
 
@@ -142,27 +179,27 @@ static void test_read_valid_with_fd(const char *testdir)
 {
 	char filename[PATH_MAX];
 	(void)snprintf(filename, sizeof(filename), "%s/valid.json", testdir);
-
-	int d = open(filename, O_RDONLY, 0);
+	int flags = O_RDONLY;
+#ifdef O_BINARY
+	// This fixes Windows which otherwise opens this in text mode and returns different counts
+	flags |= O_BINARY;
+#endif
+	int d = open(filename, flags);
 	if (d < 0)
 	{
-		fprintf(stderr,
-			"FAIL: unable to open %s: %s\n",
-			filename, strerror(errno));
+		fprintf(stderr, "FAIL: unable to open %s: %s\n", filename, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 	json_object *jso = json_object_from_fd(d);
 	if (jso != NULL)
 	{
-		printf("OK: json_object_from_fd(valid.json)=%s\n",
-		       json_object_to_json_string(jso));
+		printf("OK: json_object_from_fd(valid.json)=%s\n", json_object_to_json_string(jso));
 		json_object_put(jso);
 	}
 	else
 	{
-		fprintf(stderr,
-		        "FAIL: unable to parse contents of %s: %s\n",
-		        filename, json_util_get_last_err());
+		fprintf(stderr, "FAIL: unable to parse contents of %s: %s\n", filename,
+		        json_util_get_last_err());
 	}
 	close(d);
 }
@@ -171,15 +208,18 @@ static void test_read_valid_nested_with_fd(const char *testdir)
 {
 	char filename[PATH_MAX];
 	(void)snprintf(filename, sizeof(filename), "%s/valid_nested.json", testdir);
-
-	int d = open(filename, O_RDONLY, 0);
+	int flags = O_RDONLY;
+#ifdef O_BINARY
+	// This fixes Windows which otherwise opens this in text mode and returns different counts
+	flags |= O_BINARY;
+#endif
+	int d = open(filename, flags);
 	if (d < 0)
 	{
-		fprintf(stderr,
-			"FAIL: unable to open %s: %s\n",
-			filename, strerror(errno));
+		fprintf(stderr, "FAIL: unable to open %s: %s\n", filename, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
+	assert(NULL == json_object_from_fd_ex(d, -2));
 	json_object *jso = json_object_from_fd_ex(d, 20);
 	if (jso != NULL)
 	{
@@ -189,9 +229,8 @@ static void test_read_valid_nested_with_fd(const char *testdir)
 	}
 	else
 	{
-		fprintf(stderr,
-		        "FAIL: unable to parse contents of %s: %s\n",
-		        filename, json_util_get_last_err());
+		fprintf(stderr, "FAIL: unable to parse contents of %s: %s\n", filename,
+		        json_util_get_last_err());
 	}
 
 	(void)lseek(d, SEEK_SET, 0);
@@ -199,43 +238,45 @@ static void test_read_valid_nested_with_fd(const char *testdir)
 	jso = json_object_from_fd_ex(d, 3);
 	if (jso != NULL)
 	{
-		printf("FAIL: json_object_from_fd_ex(%s, 3)=%s\n",
-		       filename, json_object_to_json_string(jso));
+		printf("FAIL: json_object_from_fd_ex(%s, 3)=%s\n", filename,
+		       json_object_to_json_string(jso));
 		json_object_put(jso);
 	}
 	else
 	{
-		printf("OK: correctly unable to parse contents of valid_nested.json with low max depth: %s\n",
-		        json_util_get_last_err());
+		printf("OK: correctly unable to parse contents of valid_nested.json with low max "
+		       "depth: %s\n",
+		       json_util_get_last_err());
 	}
 	close(d);
 }
 
-static void test_read_nonexistant()
+static void test_read_nonexistant(void)
 {
 	const char *filename = "./not_present.json";
 
 	json_object *jso = json_object_from_file(filename);
 	if (jso != NULL)
 	{
-		printf("FAIL: json_object_from_file(%s) returned %p when NULL expected\n",
-		       filename, (void *)jso);
+		printf("FAIL: json_object_from_file(%s) returned %p when NULL expected\n", filename,
+		       (void *)jso);
 		json_object_put(jso);
 	}
 	else
 	{
-		printf("OK: json_object_from_file(%s) correctly returned NULL: %s\n",
-		       filename, json_util_get_last_err());
+		printf("OK: json_object_from_file(%s) correctly returned NULL: %s\n", filename,
+		       json_util_get_last_err());
 	}
 }
-
-static void test_read_closed()
+#ifndef _WIN32
+static void test_read_closed(void)
 {
 	// Test reading from a closed fd
-	int d = open("/dev/null", O_RDONLY, 0);
-	if(d < 0)
+	int d = open("/dev/null", O_RDONLY);
+	if (d < 0)
 	{
 		puts("FAIL: unable to open");
+		return;
 	}
 	// Copy over to a fixed fd number so test output is consistent.
 	int fixed_d = 10;
@@ -249,8 +290,7 @@ static void test_read_closed()
 	json_object *jso = json_object_from_fd(fixed_d);
 	if (jso != NULL)
 	{
-		printf("FAIL: read from closed fd returning non-NULL: %p\n",
-		       (void *)jso);
+		printf("FAIL: read from closed fd returning non-NULL: %p\n", (void *)jso);
 		fflush(stdout);
 		printf("  jso=%s\n", json_object_to_json_string(jso));
 		json_object_put(jso);
@@ -259,4 +299,31 @@ static void test_read_closed()
 	printf("OK: json_object_from_fd(closed_fd), "
 	       "expecting NULL, EBADF, got:NULL, %s\n",
 	       json_util_get_last_err());
+}
+#endif
+
+static void test_read_fd_equal(const char *testdir)
+{
+	char filename[PATH_MAX];
+	(void)snprintf(filename, sizeof(filename), "%s/valid_nested.json", testdir);
+
+	json_object *jso = json_object_from_file(filename);
+	int flags = O_RDONLY;
+#ifdef O_BINARY
+	// This fixes Windows which otherwise opens this in text mode and returns different counts
+	flags |= O_BINARY;
+#endif
+	int d = open(filename, flags);
+	if (d < 0)
+	{
+		fprintf(stderr, "FAIL: unable to open %s: %s\n", filename, strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+	json_object *new_jso = json_object_from_fd(d);
+	close(d);
+
+	printf("OK: json_object_from_file(valid.json)=%s\n", json_object_to_json_string(jso));
+	printf("OK: json_object_from_fd(valid.json)=%s\n", json_object_to_json_string(new_jso));
+	json_object_put(jso);
+	json_object_put(new_jso);
 }

@@ -8,3 +8,5 @@ Check that the custom serializer isn't free'd until the last json_object_put:
 my_object.to_string(custom serializer)=Custom Output
 Next line of output should be from the custom freeit function:
 freeit, value=123
+Check that the custom serializer does not include nul byte:
+my_object.to_string(custom serializer)={"double":                                                                                                                            1}

@@ -1,7 +1,7 @@
 PASSED - loaded input data
-PASSED - all json_object_deep_copy() returned succesful
+PASSED - all json_object_deep_copy() returned successful
 PASSED - all json_object_deep_copy() returned EINVAL for non-null pointer
-PASSED - all json_object_equal() tests returned succesful
+PASSED - all json_object_equal() tests returned successful
 PASSED - comparison of string output
 PASSED - trying to overrwrite an object that has refcount > 1
 Printing JSON objects for visual inspection
@@ -11,8 +11,12 @@ Printing JSON objects for visual inspection
   "glossary":{
     "title":"example glossary",
     "GlossDiv":{
+      "number":16446744073709551615,
       "title":"S",
       "null_obj":null,
+      "exist":false,
+      "quantity":20,
+      "univalent":19.8,
       "GlossList":{
         "GlossEntry":{
           "ID":"SGML",

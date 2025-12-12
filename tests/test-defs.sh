@@ -1,5 +1,10 @@
 #!/bin/sh
 
+if [ ! -z "$JSONC_TEST_TRACE" ] ; then
+	VERBOSE=1
+	set -x
+	set -v
+fi
 # Make sure srcdir is an absolute path.  Supply the variable
 # if it does not exist.  We want to be able to run the tests
 # stand-alone!!
@@ -85,7 +90,7 @@ run_output_test()
 	fi
 	TEST_COMMAND="$1"
 	shift
-	if [ -z "${TEST_OUTPUT}" ] ; then	
+	if [ -z "${TEST_OUTPUT}" ] ; then
 		TEST_OUTPUT=${TEST_COMMAND}
 	fi
 

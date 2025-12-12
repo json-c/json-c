@@ -1,7 +1,9 @@
-/* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Enable RDRAND Hardware RNG Hash Seed */
 #cmakedefine ENABLE_RDRAND "@ENABLE_RDRAND@"
+
+/* Override json_c_get_random_seed() with custom code */
+#cmakedefine OVERRIDE_GET_RANDOM_SEED @OVERRIDE_GET_RANDOM_SEED@
 
 /* Enable partial threading support */
 #cmakedefine ENABLE_THREADING "@@"
@@ -54,6 +56,12 @@
 /* Define to 1 if you have the <sys/param.h> header file. */
 #cmakedefine HAVE_SYS_PARAM_H @HAVE_SYS_PARAM_H@
 
+/* Define to 1 if you have the <sys/random.h> header file. */
+#cmakedefine HAVE_SYS_RANDOM_H
+
+/* Define to 1 if you have the <sys/resource.h> header file. */
+#cmakedefine HAVE_SYS_RESOURCE_H
+
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #cmakedefine HAVE_SYS_STAT_H
 
@@ -65,6 +73,12 @@
 
 /* Define to 1 if you have the <xlocale.h> header file. */
 #cmakedefine HAVE_XLOCALE_H
+
+/* Define to 1 if you have the <bsd/stdlib.h> header file. */
+#cmakedefine HAVE_BSD_STDLIB_H
+
+/* Define to 1 if you have `arc4random' */
+#cmakedefine HAVE_ARC4RANDOM
 
 /* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
 #cmakedefine HAVE_DOPRNT
@@ -123,6 +137,12 @@
 /* Define to 1 if you have the `uselocale' function. */
 #cmakedefine HAVE_USELOCALE
 
+/* Define to 1 if you have the `duplocale' function. */
+#cmakedefine HAVE_DUPLOCALE
+
+/* Define to 1 if newlocale() needs freelocale() called on it's `base` argument */
+#cmakedefine NEWLOCALE_NEEDS_FREELOCALE
+
 /* Define to 1 if you have the `vasprintf' function. */
 #cmakedefine HAVE_VASPRINTF
 
@@ -135,8 +155,23 @@
 /* Define to 1 if you have the `vsyslog' function. */
 #cmakedefine HAVE_VSYSLOG @HAVE_VSYSLOG@
 
+/* Define if you have the `getrandom' function. */
+#cmakedefine HAVE_GETRANDOM
+
+/* Define if you have the `getrusage' function. */
+#cmakedefine HAVE_GETRUSAGE
+
 #cmakedefine HAVE_STRTOLL
-#cmakedefine strtoll @json_c_strtoll@
+#if !defined(HAVE_STRTOLL)
+#define strtoll @json_c_strtoll@
+/* #cmakedefine json_c_strtoll @json_c_strtoll@*/
+#endif
+
+#cmakedefine HAVE_STRTOULL
+#if !defined(HAVE_STRTOULL)
+#define strtoull @json_c_strtoull@
+/* #cmakedefine json_c_strtoull @json_c_strtoull@ */
+#endif
 
 /* Have __thread */
 #cmakedefine HAVE___THREAD
@@ -179,6 +214,9 @@
 
 /* The number of bytes in type size_t */
 #cmakedefine SIZEOF_SIZE_T @SIZEOF_SIZE_T@
+
+/* The number of bytes in type ssize_t */
+#cmakedefine SIZEOF_SSIZE_T @SIZEOF_SSIZE_T@
 
 /* Specifier for __thread */
 #cmakedefine SPEC___THREAD @SPEC___THREAD@

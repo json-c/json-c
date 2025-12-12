@@ -1,3 +1,6 @@
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
 #include <assert.h>
 #include <stdio.h>
 
@@ -30,8 +33,10 @@ int main(int argc, char **argv)
 	tmp = json_object_new_int64(INT64_MAX);
 	json_object_int_inc(tmp, 100);
 	assert(json_object_get_int64(tmp) == INT64_MAX);
+	assert(json_object_get_uint64(tmp) == (uint64_t)INT64_MAX + 100U);
 	json_object_int_inc(tmp, -100);
-	assert(json_object_get_int64(tmp) != INT64_MAX);
+	assert(json_object_get_int64(tmp) == INT64_MAX);
+	assert(json_object_get_uint64(tmp) == (uint64_t)INT64_MAX);
 	json_object_put(tmp);
 	printf("INT64 ADD OVERFLOW PASSED\n");
 	tmp = json_object_new_int64(INT64_MIN);
@@ -41,6 +46,28 @@ int main(int argc, char **argv)
 	assert(json_object_get_int64(tmp) != INT64_MIN);
 	json_object_put(tmp);
 	printf("INT64 ADD UNDERFLOW PASSED\n");
+	// uint64 + negative int64--> negative int64
+	tmp = json_object_new_uint64(400);
+	json_object_int_inc(tmp, -200);
+	assert(json_object_get_int64(tmp) == 200);
+	assert(json_object_get_uint64(tmp) == 200);
+	json_object_int_inc(tmp, 200);
+	assert(json_object_get_int64(tmp) == 400);
+	assert(json_object_get_uint64(tmp) == 400);
+	json_object_put(tmp);
+	printf("UINT64 ADD PASSED\n");
+	tmp = json_object_new_uint64(UINT64_MAX-50);
+	json_object_int_inc(tmp, 100);
+	assert(json_object_get_int64(tmp) == INT64_MAX);
+	assert(json_object_get_uint64(tmp) == UINT64_MAX);
+	json_object_put(tmp);
+	printf("UINT64 ADD OVERFLOW PASSED\n");
+	tmp = json_object_new_uint64(100);
+	json_object_int_inc(tmp, -200);
+	assert(json_object_get_int64(tmp) == -100);
+	assert(json_object_get_uint64(tmp) == 0);
+	json_object_put(tmp);
+	printf("UINT64 ADD UNDERFLOW PASSED\n");
 
 	printf("PASSED\n");
 	return 0;

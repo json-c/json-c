@@ -9,17 +9,24 @@
 /* Define isnan, isinf, infinity and nan on Windows/MSVC */
 
 #ifndef HAVE_DECL_ISNAN
-# ifdef HAVE_DECL__ISNAN
+#ifdef HAVE_DECL__ISNAN
 #include <float.h>
 #define isnan(x) _isnan(x)
-# endif
+#else
+/* On platforms like AIX and "IBM i" we need to provide our own isnan */
+#define isnan(x) ((x) != (x))
+#endif
 #endif
 
 #ifndef HAVE_DECL_ISINF
-# ifdef HAVE_DECL__FINITE
+#ifdef HAVE_DECL__FINITE
 #include <float.h>
 #define isinf(x) (!_finite(x))
-# endif
+#else
+#include <float.h>
+/* On platforms like AIX and "IBM i" we need to provide our own isinf */
+#define isinf(x) ((x) < -DBL_MAX || (x) > DBL_MAX)
+#endif
 #endif
 
 #ifndef HAVE_DECL_INFINITY

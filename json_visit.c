@@ -13,45 +13,39 @@
 #include "json_visit.h"
 #include "linkhash.h"
 
-static int _json_c_visit(json_object *jso, json_object *parent_jso,
-                         const char *jso_key, size_t *jso_index,
-                         json_c_visit_userfunc *userfunc, void *userarg);
+static int _json_c_visit(json_object *jso, json_object *parent_jso, const char *jso_key,
+                         size_t *jso_index, json_c_visit_userfunc *userfunc, void *userarg);
 
-int json_c_visit(json_object *jso, int future_flags,
-                 json_c_visit_userfunc *userfunc, void *userarg)
+int json_c_visit(json_object *jso, int future_flags, json_c_visit_userfunc *userfunc, void *userarg)
 {
 	int ret = _json_c_visit(jso, NULL, NULL, NULL, userfunc, userarg);
-	switch(ret)
+	switch (ret)
 	{
 	case JSON_C_VISIT_RETURN_CONTINUE:
 	case JSON_C_VISIT_RETURN_SKIP:
 	case JSON_C_VISIT_RETURN_POP:
-	case JSON_C_VISIT_RETURN_STOP:
-		return 0;
-	default:
-		return JSON_C_VISIT_RETURN_ERROR;
+	case JSON_C_VISIT_RETURN_STOP: return 0;
+	default: return JSON_C_VISIT_RETURN_ERROR;
 	}
 }
-static int _json_c_visit(json_object *jso, json_object *parent_jso,
-                         const char *jso_key, size_t *jso_index,
-                         json_c_visit_userfunc *userfunc, void *userarg)
+static int _json_c_visit(json_object *jso, json_object *parent_jso, const char *jso_key,
+                         size_t *jso_index, json_c_visit_userfunc *userfunc, void *userarg)
 {
 	int userret = userfunc(jso, 0, parent_jso, jso_key, jso_index, userarg);
-	switch(userret)
+	switch (userret)
 	{
-	case JSON_C_VISIT_RETURN_CONTINUE:
-		break;
+	case JSON_C_VISIT_RETURN_CONTINUE: break;
 	case JSON_C_VISIT_RETURN_SKIP:
 	case JSON_C_VISIT_RETURN_POP:
 	case JSON_C_VISIT_RETURN_STOP:
-	case JSON_C_VISIT_RETURN_ERROR:
-		return userret;
+	case JSON_C_VISIT_RETURN_ERROR: return userret;
 	default:
-		fprintf(stderr, "ERROR: invalid return value from json_c_visit userfunc: %d\n", userret);
+		fprintf(stderr, "ERROR: invalid return value from json_c_visit userfunc: %d\n",
+		        userret);
 		return JSON_C_VISIT_RETURN_ERROR;
 	}
 
-	switch(json_object_get_type(jso))
+	switch (json_object_get_type(jso))
 	{
 	case json_type_null:
 	case json_type_boolean:
@@ -69,12 +63,13 @@ static int _json_c_visit(json_object *jso, json_object *parent_jso,
 			if (userret == JSON_C_VISIT_RETURN_POP)
 				break;
 			if (userret == JSON_C_VISIT_RETURN_STOP ||
-				userret == JSON_C_VISIT_RETURN_ERROR)
+			    userret == JSON_C_VISIT_RETURN_ERROR)
 				return userret;
 			if (userret != JSON_C_VISIT_RETURN_CONTINUE &&
-				userret != JSON_C_VISIT_RETURN_SKIP)
+			    userret != JSON_C_VISIT_RETURN_SKIP)
 			{
-				fprintf(stderr, "INTERNAL ERROR: _json_c_visit returned %d\n", userret);
+				fprintf(stderr, "INTERNAL ERROR: _json_c_visit returned %d\n",
+				        userret);
 				return JSON_C_VISIT_RETURN_ERROR;
 			}
 		}
@@ -91,19 +86,21 @@ static int _json_c_visit(json_object *jso, json_object *parent_jso,
 			if (userret == JSON_C_VISIT_RETURN_POP)
 				break;
 			if (userret == JSON_C_VISIT_RETURN_STOP ||
-				userret == JSON_C_VISIT_RETURN_ERROR)
+			    userret == JSON_C_VISIT_RETURN_ERROR)
 				return userret;
 			if (userret != JSON_C_VISIT_RETURN_CONTINUE &&
-				userret != JSON_C_VISIT_RETURN_SKIP)
+			    userret != JSON_C_VISIT_RETURN_SKIP)
 			{
-				fprintf(stderr, "INTERNAL ERROR: _json_c_visit returned %d\n", userret);
+				fprintf(stderr, "INTERNAL ERROR: _json_c_visit returned %d\n",
+				        userret);
 				return JSON_C_VISIT_RETURN_ERROR;
 			}
 		}
 		break;
 	}
 	default:
-		fprintf(stderr, "INTERNAL ERROR: _json_c_visit found object of unknown type: %d\n", json_object_get_type(jso));
+		fprintf(stderr, "INTERNAL ERROR: _json_c_visit found object of unknown type: %d\n",
+		        json_object_get_type(jso));
 		return JSON_C_VISIT_RETURN_ERROR;
 	}
 
@@ -112,22 +109,20 @@ static int _json_c_visit(json_object *jso, json_object *parent_jso,
 	// Non-container types will have already returned before this point.
 
 	userret = userfunc(jso, JSON_C_VISIT_SECOND, parent_jso, jso_key, jso_index, userarg);
-	switch(userret)
+	switch (userret)
 	{
 	case JSON_C_VISIT_RETURN_SKIP:
 	case JSON_C_VISIT_RETURN_POP:
-		// These are not really sensible during JSON_C_VISIT_SECOND, 
+		// These are not really sensible during JSON_C_VISIT_SECOND,
 		// but map them to JSON_C_VISIT_CONTINUE anyway.
 		// FALLTHROUGH
-	case JSON_C_VISIT_RETURN_CONTINUE:
-		return JSON_C_VISIT_RETURN_CONTINUE;
+	case JSON_C_VISIT_RETURN_CONTINUE: return JSON_C_VISIT_RETURN_CONTINUE;
 	case JSON_C_VISIT_RETURN_STOP:
-	case JSON_C_VISIT_RETURN_ERROR:
-		return userret;
+	case JSON_C_VISIT_RETURN_ERROR: return userret;
 	default:
-		fprintf(stderr, "ERROR: invalid return value from json_c_visit userfunc: %d\n", userret);
+		fprintf(stderr, "ERROR: invalid return value from json_c_visit userfunc: %d\n",
+		        userret);
 		return JSON_C_VISIT_RETURN_ERROR;
 	}
 	// NOTREACHED
 }
-

@@ -13,7 +13,7 @@
 
 #include <stdarg.h>
 
-#if !defined(HAVE_SNPRINTF) && defined(_MSC_VER)
+#if !defined(HAVE_SNPRINTF) && (defined(_MSC_VER) || defined(__MINGW32__))
 static int json_c_vsnprintf(char *str, size_t size, const char *format, va_list ap)
 {
 	int ret;
@@ -35,7 +35,7 @@ static int json_c_snprintf(char *str, size_t size, const char *format, ...)
 #define snprintf json_c_snprintf
 
 #elif !defined(HAVE_SNPRINTF) /* !HAVE_SNPRINTF */
-# error Need vsnprintf!
-#endif /* !HAVE_SNPRINTF && defined(WIN32) */
+#error snprintf is required but was not found
+#endif /* !HAVE_SNPRINTF */
 
 #endif /* __snprintf_compat_h */

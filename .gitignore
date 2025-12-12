@@ -10,11 +10,10 @@
 *.save
 *.autosav
 *.autosave
+.DS_Store
 
 # Tests
-/test-driver
 /tests/Makefile
-/tests/Makefile.in
 /tests/test1
 /tests/test1Formatted
 /tests/test2
@@ -29,6 +28,7 @@
 /tests/test_double_serializer
 /tests/test_float
 /tests/test_int_add
+/tests/test_int_get
 /tests/test_json_pointer
 /tests/test_locale
 /tests/test_null
@@ -44,16 +44,11 @@
 /tests/*.trs
 
 # Generated folders
+/build
 /Debug
 /Release
 /*/Debug
 /*/Release
-
-# Generated binaries
-*.lo
-*.o
-/libjson-c.la
-/libjson.la
 
 # Archives
 *.zip
@@ -74,39 +69,28 @@
 *.dmg
 *.ipa
 
-.deps/
-.libs/
-/aclocal.m4
-/autoconf-archive
-/autom4te.cache
-/config.guess
-/config.h.in
+# It's not good practice to build directly in the source tree
+# but ignore cmake auto-generated files anyway:
 /json_config.h
-/compile
+/json.h
 /config.h
-/config.log
-/config.status
-/config.sub
-/configure
-/depcomp
-/doc
-/install-sh
-/json.pc
 /json-c.pc
-/json-c-uninstalled.pc
-/libtool
-/ltmain.sh
 /Makefile
-/Makefile.in
-/missing
-/stamp-h1
-/stamp-h2
-
-# cmake auto-generated files
-/build
 /CMakeCache.txt
 /CMakeFiles
-/cmake_install.cmake
-/include
+/CMakeDoxyfile.in
+/*.cmake
+/DartConfiguration.tcl
+/tests/CMakeFiles/
+/tests/*.cmake
+/Testing/
+
+# ...and build artifacts.
+/doc/html
 /libjson-c.a
 /libjson-c.so
+/libjson-c.so.*
+
+# Benchmarking input and output
+/bench/data
+/bench/work

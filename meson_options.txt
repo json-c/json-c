@@ -1,0 +1,11 @@
+
+option('disable_bsymbolic', type: 'boolean', value: false, description: 'Avoid linking with -Bsymbolic-function')
+option('disable_thread_local_storage', type: 'boolean', value: false, description: 'Disable Thread-Local Storage')
+option('enable_rdrand', type: 'boolean', value: false, description: 'Enable RDRAND Hardware RNG')
+option('enable_threading', type: 'boolean', value: false, description: 'Enable partial threading support')
+option('override_get_random_seed', type: 'boolean', value: false, description: 'Override json_c_get_random_seed()')
+option('disable_extra_libs', type: 'boolean', value: false, description: 'Avoid linking extra libraries like libbsd')
+option('disable_json_pointer', type: 'boolean', value: false, description: 'Disable JSON pointer support')
+option('disable_json_patch', type: 'boolean', value: false, description: 'Disable JSON patch support')
+option('newlocale_needs_freelocale', type: 'boolean', value: false, description: 'FreeBSD workaround for newlocale')
+option('build_apps', type: 'boolean', value: true, description: 'Build command-line apps')

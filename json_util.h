@@ -12,20 +12,19 @@
 /**
  * @file
  * @brief Miscllaneous utility functions and macros.
- */ 
+ */
 #ifndef _json_util_h_
 #define _json_util_h_
 
 #include "json_object.h"
 
 #ifndef json_min
-#define json_min(a,b) ((a) < (b) ? (a) : (b))
+#define json_min(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
 #ifndef json_max
-#define json_max(a,b) ((a) > (b) ? (a) : (b))
+#define json_max(a, b) ((a) > (b) ? (a) : (b))
 #endif
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,7 +39,7 @@ extern "C" {
  *
  * Returns NULL on failure.  See json_util_get_last_err() for details.
  */
-JSON_EXPORT struct json_object* json_object_from_file(const char *filename);
+JSON_EXPORT struct json_object *json_object_from_file(const char *filename);
 
 /**
  * Create a JSON object from already opened file descriptor.
@@ -56,7 +55,7 @@ JSON_EXPORT struct json_object* json_object_from_file(const char *filename);
  *
  * Returns NULL on failure.  See json_util_get_last_err() for details.
  */
-JSON_EXPORT struct json_object* json_object_from_fd_ex(int fd, int depth);
+JSON_EXPORT struct json_object *json_object_from_fd_ex(int fd, int depth);
 
 /**
  * Create a JSON object from an already opened file descriptor, using
@@ -64,7 +63,7 @@ JSON_EXPORT struct json_object* json_object_from_fd_ex(int fd, int depth);
  *
  * See json_object_from_fd_ex() for details.
  */
-JSON_EXPORT struct json_object* json_object_from_fd(int fd);
+JSON_EXPORT struct json_object *json_object_from_fd(int fd);
 
 /**
  * Equivalent to:
@@ -101,8 +100,21 @@ JSON_EXPORT int json_object_to_fd(int fd, struct json_object *obj, int flags);
  */
 JSON_EXPORT const char *json_util_get_last_err(void);
 
-
+/**
+ * A parsing helper for integer values.  Returns 0 on success,
+ * with the parsed value assigned to *retval.  Overflow/underflow
+ * are NOT considered errors, but errno will be set to ERANGE,
+ * just like the strtol/strtoll functions do.
+ */
 JSON_EXPORT int json_parse_int64(const char *buf, int64_t *retval);
+/**
+ * A parsing help for integer values, providing one extra bit of 
+ * magnitude beyond json_parse_int64().
+ */
+JSON_EXPORT int json_parse_uint64(const char *buf, uint64_t *retval);
+/**
+ * @deprecated
+ */
 JSON_EXPORT int json_parse_double(const char *buf, double *retval);
 
 /**

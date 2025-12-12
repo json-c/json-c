@@ -1,6 +1,213 @@
+0.18.99 (future release)
+========================================
 
-Next version, 0.14
-==================
+Deprecated and removed features:
+--------------------------------
+* none yet
+
+New features
+------------
+* none yet
+
+Significant changes and bug fixes
+---------------------------------
+* none yet
+
+0.18 (up to commit 6bfab90, 2024-09-15)
+========================================
+
+Deprecated and removed features:
+--------------------------------
+* Clean up pre-3.9 CMake support in CMakeLists.txt
+
+New features
+------------
+* Build pkg-config for msvc as well
+
+Significant changes and bug fixes
+---------------------------------
+* Critical fix for binary compatibility with 0.16: Move the
+  json_tokener_error_memory entry to the end of enum json_tokener_error.
+* Issue #829: attempt to detect clang-cl.exe and pass MSVC-compatile command
+  line arguments.
+* PR #831 - rename WIN32 to _WIN32
+* PR #839 - Fix gcc 5 "may be used uninitialized" failure in json_pointer.c
+* PR #849 - random_seed.c: add a Coverity Scan suppression
+* Issue #854: Set error=json_tokener_error_memory in
+  json_tokener_parser_verbose() when allocating the tokener fails.
+* Issue #857: fix a few places where json_tokener should have been returning
+  json_tokener_error_memory but wasn't.
+* Handle yet another out-of-memory condition in json_tokener, duplocate can 
+  return NULL.
+* Various fixes in the fuzzers
+* A few minor doc fixes
+
+***
+
+0.17 (up to commit 077661f, 2023-08-08)
+========================================
+
+Known Bugs
+----------
+* DO NOT USE THE 0.17 RELEASE: json_tokener_error_memory in misplaced in the
+  json_tokener_error enum, leading to binary compatibility issues.
+
+Deprecated and removed features:
+--------------------------------
+* None
+
+New features
+------------
+* json_patch: add first implementation only with patch application
+* Add --disable-static and --disable-dynamic options to the cmake-configure script.
+* Add -DBUILD_APPS=NO option to disable app build
+* Minimum cmake version is now 3.9
+
+Significant changes and bug fixes
+---------------------------------
+* When serializing with JSON_C_TO_STRING_PRETTY set, keep the opening and 
+  closing curly or square braces on same line for empty objects or arrays.
+* Disable locale handling when targeting a uClibc system due to problems
+  with its duplocale() function.
+* When parsing with JSON_TOKENER_STRICT set, integer overflow/underflow
+  now result in a json_tokener_error_parse_number.  Without that flag
+  values are capped at INT64_MIN/UINT64_MAX.
+* Fix memory leak with emtpy strings in json_object_set_string
+* json_object_from_fd_ex: fail if file is too large (>=INT_MAX bytes)
+* Add back json_number_chars, but only because it's part of the public API.
+* Entirely drop mode bits from open(O_RDONLY) to avoid warnings on certain
+  platforms.
+* Specify dependent libraries, including -lbsd, in a more consistent way so
+  linking against a static json-c works better
+* Fix a variety of build problems and add & improve tests
+* Update RFC reference to https://www.rfc-editor.org/rfc/rfc8259
+
+***
+
+0.16 (up to commit 66dcdf5, 2022-04-13)
+========================================
+
+Deprecated and removed features:
+--------------------------------
+* JSON_C_OBJECT_KEY_IS_CONSTANT is deprecated in favor of
+  JSON_C_OBJECT_ADD_CONSTANT_KEY
+* Direct access to lh_table and lh_entry structure members is deprecated.  
+  Use access functions instead, lh_table_head(), lh_entry_next(), etc...
+* Drop REFCOUNT_DEBUG code.
+
+New features
+------------
+* The 0.16 release introduces no new features
+
+Build changes
+-------------
+* Add a DISABLE_EXTRA_LIBS option to skip using libbsd
+* Add a DISABLE_JSON_POINTER option to skip compiling in json_pointer support.
+
+Significant changes and bug fixes
+---------------------------------
+* Cap string length at INT_MAX to avoid various issues with very long strings.
+* json_object_deep_copy: fix deep copy of strings containing '\0'
+* Fix read past end of buffer in the "json_parse" command
+* Avoid out of memory accesses in the locally provided vasprintf() function
+  (for those platforms that use it)
+* Handle allocation failure in json_tokener_new_ex
+* Fix use-after-free in json_tokener_new_ex() in the event of printbuf_new() returning NULL
+* printbuf_memset(): set gaps to zero - areas within the print buffer which
+  have not been initialized by using printbuf_memset
+* printbuf: return -1 on invalid arguments (len < 0 or total buffer > INT_MAX)
+* sprintbuf(): propagate printbuf_memappend errors back to the caller
+
+Optimizations
+--------------
+* Speed up parsing by replacing ctype functions with simplified, faster 
+  non-locale-sensitive ones in json_tokener and json_object_to_json_string.
+* Neither vertical tab nor formfeed are considered whitespace per the JSON spec
+* json_object: speed up creation of objects, calloc() -> malloc() + set fields
+* Avoid needless extra strlen() call in json_c_shallow_copy_default() and
+  json_object_equal() when the object is known to be a json_type_string.
+
+Other changes
+-------------
+* Validate size arguments in arraylist functions.
+* Use getrandom() if available; with GRND_NONBLOCK to allow use of json-c
+  very early during boot, such as part of cryptsetup.
+* Use arc4random() if it's available.
+* random_seed: on error, continue to next method instead of exiting the process
+* Close file when unable to read from /dev/urandom in get_dev_random_seed()
+
+***
+
+0.15 (up to commit 870965e, 2020/07/26)
+========================================
+
+Deprecated and removed features:
+--------------------------------
+* Deprecate `array_list_new()` in favor of `array_list_new2()`
+* Remove the THIS_FUNCTION_IS_DEPRECATED define.
+* Remove config.h.win32
+
+New features
+------------
+* Add a `JSON_TOKENER_ALLOW_TRAILING_CHARS` flag to allow multiple objects
+  to be parsed even when `JSON_TOKENER_STRICT` is set.
+* Add `json_object_new_array_ext(int)` and `array_list_new_2(int)` to allow
+   arrays to be allocated with the exact size needed, when known.
+* Add `json_object_array_shrink()` (and `array_list_shrink()`) and use it in 
+   json_tokener to minimize the amount of memory used.
+* Add a json_parse binary, for use in testing changes (not installed, but 
+   available in the apps directory).
+
+Build changes
+-------------
+* #639/#621 - Add symbol versions to all exported symbols
+* #508/#634 - Always enable -fPIC to allow use of the json-c static library in
+   other libraries
+* Build both static and shared libraries at the same time.
+* #626 - Restore compatibility with cmake 2.8 
+* #471 - Always create directories with mode 0755, regardless of umask.
+* #606/#604 - Improve support for OSes like AIX and IBM i, as well as for
+   MINGW32 and old versions of MSVC
+* #451/#617 - Add a DISABLE_THREAD_LOCAL_STORAGE cmake option to disable 
+   the use of thread-local storage.
+
+Significant changes and bug fixes
+---------------------------------
+* Split the internal json_object structure into several sub-types, one for
+   each json_type (json_object_object, json_object_string, etc...).
+  This improves memory usage and speed, with the benchmark under
+   bench/ report 5.8% faster test time and 6%(max RSS)-12%(peak heap)
+   less memory usage.
+  Memory used just for json_object structures decreased 27%, so use cases
+   with fewer arrays and/or strings would benefit more.
+* Minimize memory usage in array handling in json_tokener by shrinking
+   arrays to the exact number of elements parsed.  On bench/ benchmark:
+   9% faster test time, 39%(max RSS)-50%(peak heap) less memory usage.
+   Add json_object_array_shrink() and array_list_shrink() functions.
+* #616 - Parsing of surrogate pairs in unicode escapes now properly handles
+   incremental parsing.
+* Fix incremental parsing of numbers, especially those with exponents, e.g.
+   so parsing "[0", "e+", "-]" now properly returns an error.
+  Strict mode now rejects missing exponents ("0e").
+* Successfully return number objects at the top level even when they are
+   followed by a "-", "." or "e".  This makes parsing things like "123-45"
+   behave consistently with things like "123xyz".
+
+Other changes
+-------------
+* #589 - Detect broken RDRAND during initialization; also, fix segfault
+    in the CPUID check.
+* #592 - Fix integer overflows to prevert out of bounds write on large input.
+* Protect against division by zero in linkhash, when created with zero size.
+* #602 - Fix json_parse_uint64() internal error checking, leaving the retval
+    untouched in more failure cases.
+* #614 - Prevent truncation when custom double formatters insert extra \0's
+
+
+***
+
+0.14 (up to commit 9ed00a6, 2020/04/14)
+=========================================
 
 Deprecated and removed features:
 --------------------------------
@@ -11,6 +218,71 @@ Deprecated and removed features:
 
 Build changes:
 --------------
+## Deprecated and removed features:
+* bits.h has been removed
+* lh_abort() has been removed
+* lh_table_lookup() has been removed, use lh_table_lookup_ex() instead.
+* Remove TRUE and FALSE defines, use 1 and 0 instead.
+* autoconf support, including autogen.sh, has been removed.  See details about cmake, below.
+* With the addition of json_tokener_get_parse_end(), access to internal fields of json_tokener, as well as use of many other symbols and types in json_tokener.h, is deprecated now.
+* The use of Android.configure.mk to build for Android no longer works, and it is unknown how (or if) the new cmake-based build machinery can be used.
+    * Reports of success, or pull requests to correct issues are welcome.
+
+## Notable improvements and new features
+
+### Builds and documentation
+* Build machinery has been switched to CMake.  See README.md for details about how to build.
+    * TL;DR: `mkdir build ; cd build ; cmake -DCMAKE_INSTALL_PREFIX=/some/path ../json-c ; make all test install`
+    * To ease the transition, there is a `cmake-configure` wrapper that emulates the old autoconf-based configure script.
+    * This has enabled improvements to the build on Windows system; also all public functions have been fixed to be properly exported.  For best results, use Visual Studio 2015 or newer.
+* The json-c style guide has been updated to specify the use of clang-format, and all code has been reformatted.
+    * Since many lines of code have trivial changes now, when using git blame, be sure to specify -w
+* Numerous improvements have been made to the documentation including function effects on refcounts, when passing a NULL is safe, and so on.
+
+### json_tokener changes
+* Added a json_tokener_get_parse_end() function to replace direct access of tok->char_offset.
+    * The char_offset field, and the rest of the json_tokener structure remain exposed for now, but expect a future release to hide it like is done with json_object_private.h
+* json_tokener_parse_ex() now accepts a new JSON_TOKENER_VALIDATE_UTF8 flag to validate that input is UTF8.
+    * If validation fails, json_tokener_get_error(tok) will return json_tokener_error_parse_utf8_string (see enum json_tokener_error).
+
+### Other changes and additions
+* Add support for unsigned 64-bit integers, uint64_t, to gain one extra bit of magnitude for positive ints.
+    * json_tokener will now parse values up to UINT64_MAX (18446744073709551615)
+    * Existing methods returning int32_t or int64_t will cap out-of-range values at INT32_MAX or INT64_MAX, preserving existing behavior.
+    * The implementation includes the possibility of easily extending this to larger sizes in the future.
+* A total of 7 new functions were added:
+    * json_object_get_uint64 ( struct json_object const* jso )
+    * json_object_new_uint64 ( uint64_t i )
+    * json_object_set_uint64 ( struct json_object* jso, uint64_t new_value )
+    * json_parse_uint64 ( char const* buf, uint64_t* retval )
+        * See description of uint64 support, above.
+    * json_tokener_get_parse_end ( struct json_tokener* tok )
+        * See details under "json_tokener changes", above.
+    * json_object_from_fd_ex ( int fd, int in_depth )
+        * Allows the max nesting depth to be specified.
+    * json_object_new_null ( )
+        * Simply returns NULL.  Its use is not recommended.
+* The size of struct json_object has decreased from 96 bytes to 88 bytes.
+
+### Testing
+* Many updates were made to test cases, increasing code coverage.
+* There is now a quick way (JSONC_TEST_TRACE=1) to turn on shell tracing in tests.
+* To run tests, use `make test`; the old "check" target no longer exists.
+
+## Significant bug fixes
+For the full list of issues and pull requests since the previous release, please see issues_closed_for_0.14.md
+
+* [Issue #389](https://github.com/json-c/json-c/issues/389): Add an assert to explicitly crash when _ref_count is corrupted, instead of a later "double free" error.
+* [Issue #407](https://github.com/json-c/json-c/issues/407): fix incorrect casts in calls to ctype functions (isdigit and isspace) so we don't crash when asserts are enabled on certain platforms and characters > 128 are parsed.
+* [Issue #418](https://github.com/json-c/json-c/issues/418): Fix docs for json_util_from_fd and json_util_from_file to say that they return NULL on failures.
+* [Issue #422](https://github.com/json-c/json-c/issues/422): json_object.c:set errno in json_object_get_double() when called on a json_type_string object with bad content.
+* [Issue #453](https://github.com/json-c/json-c/issues/453): Fixed misalignment in JSON serialization when JSON_C_TO_STRING_SPACED and JSON_C_TO_STRING_PRETTY are used together.
+* [Issue #463](https://github.com/json-c/json-c/issues/463): fix newlocale() call to use LC_NUMERIC_MASK instead of LC_NUMERIC, and remove incorrect comment.
+* [Issue #486](https://github.com/json-c/json-c/issues/486): append a missing ".0" to negative double values to ensure they are serialized as floating point numbers.
+* [Issue #488](https://github.com/json-c/json-c/issues/488): use JSON_EXPORT on functions so they are properly exported on Windows.
+* [Issue #539](https://github.com/json-c/json-c/issues/539): use an internal-only serializer function in json_object_new_double_s() to avoid potential conflicts with user code that uses the json_object_userdata_to_json_string serializer.
+
+***
 
 0.13.1 (up to commit 0f814e5, 2018/03/04)
 =========================================
@@ -52,7 +324,7 @@ Behavior changes:
 * Use size_t for array length and size.  Platforms where sizeof(size_t) != sizeof(int) may not be backwards compatible
 	See commits 45c56b, 92e9a5 and others.
 
-* Check for failue when allocating memory, returning NULL and errno=ENOMEM.
+* Check for failure when allocating memory, returning NULL and errno=ENOMEM.
 	 See commit 2149a04.
 
 * Change json_object_object_add() return type from void to int, and will return -1 on failures, instead of exiting. (Note: this is not an ABI change)
@@ -243,7 +515,7 @@ List of new functions added:
   * Add an alternative iterator implementation, see json_object_iterator.h
   * Make json_object_iter public to enable external use of the
      json_object_object_foreachC macro.
-  * Add a printbuf_memset() function to provide an effecient way to set and
+  * Add a printbuf_memset() function to provide an efficient way to set and
      append things like whitespace indentation.
   * Adjust json_object_is_type and json_object_get_type so they return
       json_type_null for NULL objects and handle NULL passed to
@@ -329,7 +601,7 @@ List of new functions added:
 0.7
 ===
   * Add escaping of backslash to json output
-  * Add escaping of foward slash on tokenizing and output
+  * Add escaping of forward slash on tokenizing and output
   * Changes to internal tokenizer from using recursion to
     using a depth state structure to allow incremental parsing
 

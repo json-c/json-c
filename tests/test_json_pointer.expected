@@ -32,5 +32,8 @@ PASSED - SET - Final JSON is: { "foo": [ "bar", "cod" ], "": 9, "a\/b": 1, "c%d"
 10
 PASSED - SET - LOADED TEST JSON
 { "foo": [ "bar", "baz" ], "": 0, "a\/b": 1, "c%d": 2, "e^f": 3, "g|h": 4, "i\\j": 5, "k\"l": 6, " ": 7, "m~n": 8 }
+PASSED - SET - failed with NULL params for input json & path
 PASSED - SET - failed 'cod' with path 'foo/bar'
+PASSED - SET - failed 'cod' with path 'foo/bar'
+PASSED - SET - failed with invalid array index'
 PASSED - SET - failed to set index to non-array

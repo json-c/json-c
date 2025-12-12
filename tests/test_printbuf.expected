@@ -29,5 +29,6 @@ sprintbuf to just after resize(31+1): 32, [XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX], st
 16, [plain12147483647]
 27, [plain12147483647-2147483648]
 29, [plain12147483647-2147483648%s]
+284, [plain12147483647-2147483648%sif string is greater than stack buffer, then use dynamic string with vasprintf.  Note: some implementation of vsnprintf return -1  if output is truncated whereas some return the number of bytes that  would have been written - this code handles both cases.]
 test_sprintbuf: end test
 ========================================
