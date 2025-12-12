@@ -226,10 +226,15 @@ static void json_object_generic_delete(struct json_object* jso)
 static struct json_object* json_object_new(enum json_type o_type)
 {
 	struct json_object *jso;
-
-	jso = (struct json_object*)calloc( 1,sizeof(struct json_object));
-	if (!jso)
-		return NULL;
+        if (alloc_size == sizeof(struct json_object)) {
+          jso = (struct json_object *)calloc(1, sizeof(struct json_object));
+  } else {
+    jso = (struct json_object *)malloc(alloc_size);
+    if (jso)
+      memset(jso, 0, sizeof(struct json_object));
+  }
+  if (!jso)
+    return NULL;
 	jso->o_type = o_type;
 	jso->_ref_count = 1;
 	jso->_delete = &json_object_generic_delete;

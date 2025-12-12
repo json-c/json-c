@@ -39,18 +39,25 @@
 struct array_list*
 array_list_new(array_list_free_fn *free_fn)
 {
-  struct array_list *arr;
+  #if defined(HAVE_ARRAY_LIST_NEW2)
+  return array_list_new2(free_fn, ARRAY_LIST_DEFAULT_SIZE);
+  #else
+  struct array_list *arr =
+      (struct array_list *)calloc(1, sizeof(struct array_list));
+  if (!arr) return NULL;
 
-  arr = (struct array_list*)calloc(1, sizeof(struct array_list));
-  if(!arr) return NULL;
   arr->size = ARRAY_LIST_DEFAULT_SIZE;
   arr->length = 0;
   arr->free_fn = free_fn;
-  if(!(arr->array = (void**)calloc( arr->size, sizeof(void*)))) {
+
+  arr->array = calloc(arr->size, sizeof(void *));
+  if (!arr->array) {
     free(arr);
     return NULL;
   }
+
   return arr;
+  #endif
 }
 
 extern void
