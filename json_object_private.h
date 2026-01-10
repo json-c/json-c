@@ -28,7 +28,7 @@ struct json_object;
 #include <unistd.h>
 #endif /* HAVE_UNISTD_H */
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(ssize_t)
 #include <BaseTsd.h>
 typedef SSIZE_T ssize_t;
 #endif
