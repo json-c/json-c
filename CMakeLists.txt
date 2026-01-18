@@ -486,6 +486,13 @@ set(JSON_C_SOURCES
     ${PROJECT_SOURCE_DIR}/strerror_override.c
 )
 
+set(JSON_C_RESOURCES)
+
+if (BUILD_SHARED_LIBS AND WIN32)
+    enable_language(RC)
+    set(JSON_C_RESOURCES ${JSON_C_RESOURCES} ${PROJECT_SOURCE_DIR}/libjson.rc)
+endif()
+
 if (NOT DISABLE_JSON_POINTER)
     set(JSON_C_PUBLIC_HEADERS   ${JSON_C_PUBLIC_HEADERS}  ${PROJECT_SOURCE_DIR}/json_pointer.h)
     set(JSON_C_SOURCES          ${JSON_C_SOURCES}         ${PROJECT_SOURCE_DIR}/json_pointer.c)
@@ -525,6 +532,7 @@ endif()
 add_library(${PROJECT_NAME}
     ${JSON_C_SOURCES}
     ${JSON_C_HEADERS}
+    ${JSON_C_RESOURCES}
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VERSION 5.4.0
