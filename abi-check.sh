@@ -1,9 +1,10 @@
 #!/bin/sh
 
+set -e
+
 # The 0.17 release is broken
-#prev=0.17
-prev=0.16
-release=0.18
+prev=0.18
+release=0.19
 
 # ... clone json-c, abi-compliance-checker, abi-dumper
 
@@ -20,6 +21,9 @@ cd ~/abi-compliance-checker
 mkxml()
 {
 	ver="$1"
+	if [ ! -e ../json-c-installs/json-c-${ver}/lib64 ] ; then
+		ln -s lib ../json-c-installs/json-c-${ver}/lib64
+	fi
 cat <<EOF > json-c-${ver}.xml
 <foo>
 <version>
