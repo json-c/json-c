@@ -115,10 +115,6 @@ if (UNIX OR MINGW OR CYGWIN OR AMIGA)
     list(APPEND CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
 endif()
 
-if (BUILD_SHARED_LIBS)
-    add_definitions(-D JSON_C_DLL)
-endif()
-
 if (UNIX OR AMIGA)
     list(APPEND CMAKE_REQUIRED_LIBRARIES   m)
 endif()
@@ -484,6 +480,7 @@ set(JSON_C_SOURCES
     ${PROJECT_SOURCE_DIR}/printbuf.c
     ${PROJECT_SOURCE_DIR}/random_seed.c
     ${PROJECT_SOURCE_DIR}/strerror_override.c
+    ${PROJECT_SOURCE_DIR}/json-c.def
 )
 
 set(JSON_C_RESOURCES)
