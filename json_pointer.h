@@ -21,6 +21,14 @@ extern "C" {
 #endif
 
 /**
+ * Maximum array index for JSON Pointer, preventing excessive memory allocations.
+ * The default value is 10,000,000.
+ */
+#ifndef JSON_C_POINTER_MAX_ARRAY_IDX
+#define JSON_C_POINTER_MAX_ARRAY_IDX 10000000
+#endif
+
+/**
  * Retrieves a JSON sub-object from inside another JSON object
  * using the JSON pointer notation as defined in RFC 6901
  *   https://tools.ietf.org/html/rfc6901
