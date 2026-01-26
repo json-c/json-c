@@ -423,3 +423,39 @@ out:
 	free(path_copy);
 	return rc;
 }
+
+int json_pointer_set_with_limit_index(struct json_object **obj, const char *path,
+                                    struct json_object *value, size_t limit_index)
+{
+	// -1 means no limits
+    if (limit_index == (size_t)-1)
+    {
+        return json_pointer_set_with_array_cb(obj, path, value, json_object_array_put_idx_cb, NULL);
+    }
+    return json_pointer_set_with_array_cb(obj, path, value,
+                      json_object_array_put_idx_with_limit_cb, &limit_index);
+}
+
+/* safe callback for array index limit */
+int json_object_array_put_idx_with_limit_cb(struct json_object *jso, size_t idx,
+                                       struct json_object *jso_new, void *priv)
+{
+    // use priv as a size_t pointer to pass in the maximum allowed index
+	if (!priv)
+	{
+		errno = EINVAL;
+		return -1;
+	}
+    size_t max_idx = *(size_t*)priv;
+
+    // Check against a maximum to prevent excessive memory allocations.
+	// An extremely large index, even if it doesn't overflow size_t,
+	// will cause a huge memory allocation request via realloc,
+	// leading to an OOM.
+	if (idx > max_idx)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+    return json_object_array_put_idx(jso, idx, jso_new);
+}

@@ -21,14 +21,6 @@ extern "C" {
 #endif
 
 /**
- * Maximum array index for JSON Pointer, preventing excessive memory allocations.
- * The default value is 10,000,000.
- */
-#ifndef JSON_C_POINTER_MAX_ARRAY_IDX
-#define JSON_C_POINTER_MAX_ARRAY_IDX 10000000
-#endif
-
-/**
  * Retrieves a JSON sub-object from inside another JSON object
  * using the JSON pointer notation as defined in RFC 6901
  *   https://tools.ietf.org/html/rfc6901
@@ -89,6 +81,10 @@ JSON_EXPORT int json_pointer_getf(struct json_object *obj, struct json_object **
  * That also implies that 'json_pointer_set()' does not do any refcount incrementing.
  * (Just that single decrement that was mentioned above).
  *
+ * @warning This function is vulnerable to an OOM.
+ *          To prevent this, use the safer variant 'json_pointer_set_with_limit_index()'
+ *          or the flexible 'json_pointer_set_with_array_cb()' with a custom callback.
+ *
  * @param obj the json_object instance/tree to which to add a sub-object
  * @param path a (RFC6901) string notation for the sub-object to set in the tree
  * @param value object to set at path
@@ -117,6 +113,65 @@ JSON_EXPORT int json_pointer_set(struct json_object **obj, const char *path,
  */
 JSON_EXPORT int json_pointer_setf(struct json_object **obj, struct json_object *value,
                                   const char *path_fmt, ...);
+
+/**
+ * A convenient and safe variant of 'json_pointer_set()' that prevents excessive memory allocations
+ * by enforcing a limit on array indices.
+ *
+ * @param obj the json_object instance/tree to which to add a sub-object
+ * @param path a (RFC6901) string notation for the sub-object to set in the tree
+ * @param value object to set at path
+ * @param limit_index The maximum allowed value for an array index. If a path
+ *                    contains an index larger than this, the function will fail
+ *                    with errno set to EINVAL. A value of -1 can be used to specify
+ *                    no limit, reverting to the original behavior
+ *
+ * @return negative if an error (or not found), or 0 if succeeded
+ */
+JSON_EXPORT int json_pointer_set_with_limit_index(struct json_object **obj, const char *path,
+                                                struct json_object *value, size_t limit_index);
+
+/**
+ * Callback function type.
+ */
+typedef int(*json_pointer_array_set_cb)(json_object *parent, size_t idx,
+                                        json_object *value, void *priv);
+
+/**
+ * Variant of 'json_pointer_set()' that allows specifying a custom callback
+ *
+ * @param obj the json_object instance/tree to which to add a sub-object
+ * @param path a (RFC6901) string notation for the sub-object to set in the tree
+ * @param value object to set at path
+ * @param array_set_cb A custom callback function to handle setting the element
+ *                     within an array
+ * @param priv A private pointer passed through to the array_set_cb callback,
+ *             for user-defined context
+ *
+ * @return negative if an error (or not found), or 0 if succeeded
+ */
+JSON_EXPORT int json_pointer_set_with_array_cb(struct json_object **obj, const char *path,
+                                   struct json_object *value,
+                                   json_pointer_array_set_cb array_set_cb, void *priv);
+
+/**
+ * A secure callback for 'json_pointer_set_with_array_cb()' that enforces a
+ * maximum array index.
+ *
+ * This function can be used as the 'array_set_cb' argument to prevent OOM.
+ * It expects the 'priv' argument to be a valid pointer to a 'size_t' variable
+ * that holds the maximum allowed index.
+ *
+ * @param jso the parent json_object array.
+ * @param idx the index where the element is to be placed.
+ * @param jso_new the new json_object to place at the index.
+ * @param priv A pointer to a 'size_t' variable specifying the maximum index.
+ *             This pointer must not be NULL.
+ *
+ * @return 0 on success, or a negative value if idx exceeds the limit or 'priv' is NULL.
+ */
+JSON_EXPORT int json_object_array_put_idx_with_limit_cb(struct json_object *jso, size_t idx,
+                                                   struct json_object *jso_new, void *priv);
 
 #ifdef __cplusplus
 }
