@@ -79,16 +79,6 @@ static int is_valid_index(const char *path, size_t *idx)
 	// but ULLONG_MAX will be longer than any array length so that's ok.
 	*idx = strtoull(path, NULL, 10);
 
-	// Check against a maximum to prevent excessive memory allocations.
-	// An extremely large index, even if it doesn't overflow size_t,
-	// will cause a huge memory allocation request via realloc,
-	// leading to an OOM.
-	if (*idx > JSON_C_POINTER_MAX_ARRAY_IDX)
-	{
-    	errno = EINVAL;
-    	return 0;
-	}
-
 	return 1;
 }
 
