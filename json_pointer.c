@@ -430,13 +430,14 @@ int json_pointer_set_with_limit_index(struct json_object **obj, const char *path
 int json_object_array_put_idx_with_limit_cb(struct json_object *jso, size_t idx,
                                        struct json_object *jso_new, void *priv)
 {
+	size_t max_idx;
     // use priv as a size_t pointer to pass in the maximum allowed index
 	if (!priv)
 	{
 		errno = EINVAL;
 		return -1;
 	}
-    size_t max_idx = *(size_t*)priv;
+    max_idx = *(size_t*)priv;
 
     // Check against a maximum to prevent excessive memory allocations.
 	// An extremely large index, even if it doesn't overflow size_t,
