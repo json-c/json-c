@@ -66,8 +66,16 @@ option(OVERRIDE_GET_RANDOM_SEED       "Override json_c_get_random_seed() with cu
 option(DISABLE_EXTRA_LIBS             "Avoid linking against extra libraries, such as libbsd." OFF)
 option(DISABLE_JSON_POINTER           "Disable JSON pointer (RFC6901) and JSON patch support." OFF)
 option(DISABLE_JSON_PATCH             "Disable JSON patch (RFC6902) support."                 OFF)
-option(NEWLOCALE_NEEDS_FREELOCALE     "Work around newlocale bugs in old FreeBSD by calling freelocale"  OFF)
+option(NEWLOCALE_NEEDS_FREELOCALE     "Work around newlocale bugs in old FreeBSD and macOS by calling freelocale"  OFF)
 option(BUILD_APPS                     "Default to building apps" ON)
+
+# macOS (Darwin) has the same newlocale() bug as older FreeBSD versions:
+# newlocale() does not free the locale object passed to it, causing memory leaks.
+# See: https://github.com/json-c/json-c/issues/668
+if(APPLE AND NOT NEWLOCALE_NEEDS_FREELOCALE)
+    message(STATUS "macOS detected: enabling NEWLOCALE_NEEDS_FREELOCALE to prevent memory leaks")
+    set(NEWLOCALE_NEEDS_FREELOCALE ON CACHE BOOL "macOS needs freelocale workaround" FORCE)
+endif()
 
 if (AMIGA)
     set(DISABLE_THREAD_LOCAL_STORAGE ON)
