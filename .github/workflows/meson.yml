@@ -1,0 +1,228 @@
+name: meson
+
+on: [push, pull_request]
+
+concurrency:
+  group: ${{github.workflow}}-${{github.head_ref}}
+  cancel-in-progress: true
+
+jobs:
+  Linux-GCC:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        cc: ['9', '13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: egor-tensin/setup-gcc@v1
+        with:
+          version: ${{matrix.cc}}
+
+      - name: Install packages
+        run: |
+          python3 -m pip install meson ninja
+
+      - name: Compile and Test
+        run: |
+          meson setup "${{github.workspace}}/build" -Dwarning_level=3 -Dbuildtype=debug
+          meson compile -C "${{github.workspace}}/build" --verbose
+          meson test -C "${{github.workspace}}/build" --verbose
+  Linux-Clang:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        cc: ['9', '22']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: egor-tensin/setup-clang@v1
+
+      - name: Install packages
+        run: |
+          python3 -m pip install meson ninja
+
+      - name: Compile and Test
+        run: |
+          meson setup "${{github.workspace}}/build" -Dwarning_level=3 -Dbuildtype=debug
+          meson compile -C "${{github.workspace}}/build" --verbose
+          meson test -C "${{github.workspace}}/build" --verbose
+  VisualStudio:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        platform: ['x64', 'x86']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install packages
+        run: |
+          python -m pip install meson ninja
+
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{matrix.platform}}
+
+      - name: Compile and Test
+        env:
+          CFLAGS: '/analyze'
+        run: |
+          meson setup "${{github.workspace}}/build" --wrap-mode=forcefallback -Dwarning_level=3 -Dbuildtype=debug
+          meson compile -C "${{github.workspace}}/build" --verbose
+          meson test -C "${{github.workspace}}/build" --verbose
+  VisualStudio-clang-cl:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install packages
+        run: |
+          python -m pip install meson ninja
+
+      - uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Compile and Test
+        env:
+          CC: clang-cl
+        run: |
+          meson setup "${{github.workspace}}/build" -Dwarning_level=3 -Dbuildtype=debug
+          meson compile -C "${{github.workspace}}/build" --verbose
+          meson test -C "${{github.workspace}}/build" --verbose
+  MSYS2:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        platform: ['UCRT64', 'CLANG64']
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{matrix.platform}}
+          pacboy: >-
+            cc:p
+            cmake:p
+            meson:p
+            ninja:p
+            pkgconf:p
+
+      - name: Compile and Test
+        run: |
+          meson setup "${{github.workspace}}/build" -Dwarning_level=3 -Dbuildtype=debug
+          meson compile -C "${{github.workspace}}/build" --verbose
+          meson test -C "${{github.workspace}}/build" --verbose
+  Cygwin:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: 'MSYS'
+          install: >-
+            gcc
+            meson
+            ninja
+      - name: Compile and Test
+        run: |
+          meson setup build -Dwarning_level=3 -Dcpp_std=gnu++20 -Dbuildtype=debug
+          meson compile -C build --verbose
+          meson test -C build --verbose
+  MacOS:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install packages
+        run: |
+          brew install meson
+
+      - name: Compile and Test
+        run: |
+          meson setup "${{github.workspace}}/build" -Dwarning_level=3 -Dbuildtype=debug
+          meson compile -C "${{github.workspace}}/build" --verbose
+          meson test -C "${{github.workspace}}/build" --verbose
+  DragonflyBSD:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/dragonflybsd-vm@v1
+        with:
+          prepare: |
+            pkg install -y ninja meson pkgconf
+          run: |
+            meson setup "${{github.workspace}}/build" -Dwarning_level=3 -Dbuildtype=debug
+            meson compile -C "${{github.workspace}}/build" --verbose
+            meson test -C "${{github.workspace}}/build" --verbose
+  FreeBSD:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/freebsd-vm@v1
+        with:
+          prepare: |
+            pkg install -y ninja meson pkgconf
+          run: |
+            meson setup "${{github.workspace}}/build" -Dwarning_level=3 -Dbuildtype=debug
+            meson compile -C "${{github.workspace}}/build" --verbose
+            meson test -C "${{github.workspace}}/build" --verbose
+  NetBSD:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/netbsd-vm@v1
+        with:
+          prepare: |
+            /usr/sbin/pkg_add meson pkgconf
+          run: |
+            meson setup "${{github.workspace}}/build" -Dwarning_level=3 -Dbuildtype=debug
+            meson compile -C "${{github.workspace}}/build" --verbose
+            meson test -C "${{github.workspace}}/build" --verbose
+  OmniOS:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/omnios-vm@v1
+        with:
+          prepare: |
+            pkg install gcc14 meson-313 ninja pkg-config python-313
+          run: |
+            /usr/lib/python3.13/bin/meson setup "${{github.workspace}}/build" -Dwarning_level=3 -Dbuildtype=debug
+            /usr/lib/python3.13/bin/meson compile -C "${{github.workspace}}/build" --verbose
+            /usr/lib/python3.13/bin/meson test -C "${{github.workspace}}/build" --verbose
+  OpenBSD:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/openbsd-vm@v1
+        with:
+          prepare: |
+            pkg_add ninja meson pkgconf
+          run: |
+            meson setup "${{github.workspace}}/build" -Dwarning_level=3 -Dbuildtype=debug
+            meson compile -C "${{github.workspace}}/build" --verbose
+            meson test -C "${{github.workspace}}/build" --verbose
+  Alpine:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: ['x86_64', 'x86', 'armhf', 'armv7', 'aarch64', 'ppc64le', 'riscv64', 's390x']
+    defaults:
+      run:
+        shell: alpine.sh {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jirutka/setup-alpine@v1
+        with:
+          branch: edge
+          arch: ${{matrix.platform}}
+          packages: >
+            build-base pkgconf meson samurai
+      - name: Compile and Test
+        run: |
+          meson setup "${{github.workspace}}/build" -Dwarning_level=3 -Dbuildtype=debug
+          meson compile -C "${{github.workspace}}/build" --verbose
+          meson test -C "${{github.workspace}}/build" --verbose
