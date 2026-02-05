@@ -225,6 +225,12 @@ endif
 
 add_project_arguments(cc.get_supported_arguments('-Wno-unused-parameter'), language : 'c')
 
+sym = cc.get_supported_link_arguments(
+  '-Wl,--version-script,@0@/json-c.sym'.format(
+    meson.current_source_dir(),
+  ),
+)
+
 # Source files
 sources = files(
   'arraylist.c', 'debug.c', 'json_c_version.c', 'json_object.c',
@@ -249,6 +255,7 @@ libjson = library('json-c',
   include_directories: inc,
   dependencies: bsd_dep,
   install: true,
+  link_args: sym,
   version: '5.4.0',
   soversion: '5',
 )
