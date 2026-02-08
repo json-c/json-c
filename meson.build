@@ -1,5 +1,7 @@
 
 project('json-c', 'c', version: '0.18.99',
+  meson_version: '>=0.54.0',
+  license: 'MIT',
   default_options: ['buildtype=release', 'warning_level=2'])
 
 cc = meson.get_compiler('c')
@@ -72,13 +74,15 @@ funcs = [
   'vsyslog',
   'getrandom',
   'getrusage',
-  'strcasecmp',
-  'strncasecmp',
   'strtoll',
   'strtoull',
   'arc4random',
   'vasprintf',
 ]
+
+if conf_data.has('HAVE_STRINGS_H')
+  funcs += ['strcasecmp', 'strncasecmp']
+endif
 
 foreach f : funcs
   if cc.has_function(f)
@@ -123,16 +127,12 @@ foreach d, h : decls
   endif
 endforeach
 
-check_thread = cc.compiles('''
-    __thread int x = 0;
-    int main() { return x; }
-  ''',
-  name: 'Check for __thread support')
+check_thread = cc.compiles('__thread int x;', name: 'Check for __thread support')
 
 if check_thread
   conf_data.set('HAVE___THREAD', 1)
   conf_data.set('SPEC___THREAD', '__thread')
-elif cc.get_id().contains('msvc')
+elif cc.get_argument_syntax() == 'msvc'
   conf_data.set('SPEC___THREAD', '__declspec(thread)')
 endif
 
@@ -211,7 +211,6 @@ json_header = configure_file(
   configuration: jhconf_data
 )
 
-
 # Platform-specific flags
 add_project_arguments('-D_GNU_SOURCE', language: 'c')
 
@@ -227,6 +226,12 @@ if host_machine.system() == 'windows'
 endif
 
 add_project_arguments(cc.get_supported_arguments('-Wno-unused-parameter'), language : 'c')
+
+sym = cc.get_supported_link_arguments(
+  '-Wl,--version-script,@0@/json-c.sym'.format(
+    meson.current_source_dir(),
+  ),
+)
 
 # Source files
 sources = files(
@@ -252,11 +257,13 @@ libjson = library('json-c',
   include_directories: inc,
   dependencies: bsd_dep,
   install: true,
+  link_args: sym,
   version: '5.4.0',
   soversion: '5',
 )
 
 jsonc_dep = declare_dependency(link_with: libjson, include_directories: inc)
+meson.override_dependency('json-c', jsonc_dep)
 
 # Install headers
 install_headers(

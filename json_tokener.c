@@ -46,7 +46,7 @@
 
 #define jt_hexdigit(x) (((x) <= '9') ? (x) - '0' : ((x)&7) + 9)
 
-#if !HAVE_STRNCASECMP && defined(_MSC_VER)
+#if !HAVE_STRNCASECMP && defined(_WIN32)
 /* MSC has the version as _strnicmp */
 #define strncasecmp _strnicmp
 #elif !HAVE_STRNCASECMP
