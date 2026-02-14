@@ -38,6 +38,7 @@ test_cases = [
   ['test_visit', 'test_visit.expected'],
   ['test_object_iterator', 'test_object_iterator.expected'],
   ['test_json_pointer', 'test_json_pointer.expected'],
+  ['test_safe_json_pointer_set', 'test_safe_json_pointer_set.expected'],
   ['test_json_patch', 'test_json_patch.expected'],
 ]
 

@@ -39,6 +39,7 @@ set(ALL_TEST_NAMES
 
 if (NOT DISABLE_JSON_POINTER)
     set(ALL_TEST_NAMES ${ALL_TEST_NAMES} test_json_pointer)
+    set(ALL_TEST_NAMES ${ALL_TEST_NAMES} test_safe_json_pointer_set)
     if (NOT DISABLE_JSON_PATCH)
         set(ALL_TEST_NAMES ${ALL_TEST_NAMES} test_json_patch)
     endif()

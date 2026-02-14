@@ -182,5 +182,8 @@ JSONC_0.18 {
 } JSONC_0.17;
 
 JSONC_0.19 {
-#  global:
+  global:
+    json_pointer_set_with_limit_index;
+    json_pointer_set_with_cb;
+    json_object_array_put_with_idx_limit_cb;
 } JSONC_0.18;

@@ -1,0 +1,36 @@
+PASSED - SET_WITH_LIMIT - LOADED TEST JSON
+{ "foo": [ "bar", "baz" ], "": 0, "a\/b": 1, "c%d": 2, "e^f": 3, "g|h": 4, "i\\j": 5, "k\"l": 6, " ": 7, "m~n": 8 }
+PASSED - SET_WITH_LIMIT - 'cod' in /foo/1
+PASSED - SET_WITH_LIMIT - non-existing /fud/gaw
+PASSED - SET_WITH_LIMIT - /fud == {}
+PASSED - SET_WITH_LIMIT - /fug/gaw == [1,2,3]
+PASSED - SET_WITH_LIMIT - /fug/gaw == [0,2,3]
+PASSED - SET_WITH_LIMIT - /fug/gaw == [0,2,3,4]
+PASSED - SET_WITH_LIMIT - / == 9
+PASSED - SET_WITH_LIMIT - Final JSON is: { "foo": [ "bar", "cod" ], "": 9, "a\/b": 1, "c%d": 2, "e^f": 3, "g|h": 4, "i\\j": 5, "k\"l": 6, " ": 7, "m~n": 8, "fud": { "gaw": [ 0, 2, 3, 4 ] } }
+10
+PASSED - SET_LIMIT - Set value within limit (/foo/1 with limit 10)
+PASSED - SET_LIMIT - Set value on an object (limit is ignored)
+PASSED - SET_LIMIT - Set value with limit_index = -1 (no limit)
+PASSED - SET_WITH_LIMIT - LOADED TEST JSON
+{ "foo": [ "bar", "baz" ], "": 0, "a\/b": 1, "c%d": 2, "e^f": 3, "g|h": 4, "i\\j": 5, "k\"l": 6, " ": 7, "m~n": 8 }
+PASSED - SET_WITH_LIMIT - failed with NULL params for input json & path
+PASSED - SET_WITH_LIMIT - failed 'cod' with path 'foo/bar'
+PASSED - SET_WITH_LIMIT - failed with invalid array index'
+PASSED - SET_WITH_LIMIT - failed to set index to non-array
+PASSED - SET_LIMIT - Failed to set index 20 with limit 10
+PASSED - SET_LIMIT - Succeeded to set index 10 with limit 10
+PASSED - SET_WITH_CB - LOADED TEST JSON
+{ "foo": [ "bar", "baz" ], "": 0, "a\/b": 1, "c%d": 2, "e^f": 3, "g|h": 4, "i\\j": 5, "k\"l": 6, " ": 7, "m~n": 8 }
+PASSED - SET_WITH_CB - This callback is called
+PASSED - SET_WITH_CB - callback test_cb_print_msg for /foo/1
+PASSED - SET_WITH_CB - callback json_object_array_put_with_idx_limit_cb for /foo/4 with limit_index 5
+PASSED - SET_WITH_CB - failed with callback json_object_array_put_with_idx_limit_cb for /foo/5 with limit_index 5
+PASSED - SET_WITH_CB - failed with callback json_object_array_put_with_idx_limit_cb for /foo/10 with limit_index 5
+PASSED - SET_WITH_CB - failed with callback json_object_array_put_with_idx_limit_cb with NULL priv
+PASSED - SET_WITH_CB - This callback is called
+PASSED - SET_WITH_CB - cb_handles_obj=1: callback was triggered for object operation
+PASSED - SET_WITH_CB - cb_handles_obj=0: callback was NOT triggered for object operation, default logic was used
+PASSED - SET_WITH_CB - Rejection callback approved an allowed key
+PASSED - SET_WITH_CB - Callback correctly identified key 'reject' to reject
+PASSED - SET_WITH_CB - Rejection callback rejected a forbidden key
