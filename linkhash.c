@@ -704,6 +704,18 @@ int lh_table_delete_entry(struct lh_table *t, struct lh_entry *e)
 	return 0;
 }
 
+int lh_table_delete_entry_to_tail(struct lh_table *t, struct lh_entry *first_entry)
+{
+	struct lh_entry *del_entry = t->tail;
+	do
+	{
+		// Could probably micro-optimize this, but better to avoid code duplication for now
+		if (lh_table_delete_entry(t, del_entry) != 0)
+			return -1;
+	} while (del_entry != first_entry);
+	return 0;
+}
+
 int lh_table_delete(struct lh_table *t, const void *k)
 {
 	struct lh_entry *e = lh_table_lookup_entry(t, k);
