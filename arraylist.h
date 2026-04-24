@@ -72,7 +72,7 @@ extern int array_list_add(struct array_list *al, void *data);
  * Set the value at index i.  Caller is responsible for freeing the previous value.
  * To automatically free the existing value, use array_list_put_idx() instead.
  */
-extern int array_list_set_idx(struct array_list *al, size_t i, void  *data);
+extern int array_list_set_idx(struct array_list *al, size_t i, void *data);
 
 extern size_t array_list_length(struct array_list *al);
 

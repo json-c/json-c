@@ -47,7 +47,10 @@ struct json_object
 	json_object_to_json_string_fn *_to_json_string;
 	struct printbuf *_pb;
 	json_object_delete_fn *_user_delete;
-	void *_userdata;
+	union {
+		void *_userdata;
+		void *_delete_parent;  // Used during json_object_put
+	};
 	// Actually longer, always malloc'd as some more-specific type.
 	// The rest of a struct json_object_${o_type} follows
 };
