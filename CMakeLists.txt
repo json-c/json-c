@@ -267,6 +267,7 @@ if (HAVE_SYS_RANDOM_H)
 endif()
 if (HAVE_SYS_RESOURCE_H)
     check_symbol_exists(getrusage   "sys/resource.h" HAVE_GETRUSAGE)
+    check_symbol_exists(setrlimit   "sys/resource.h" HAVE_SETRLIMIT)
 endif()
 
 check_symbol_exists(strtoll     "stdlib.h" HAVE_STRTOLL)
