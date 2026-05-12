@@ -15,8 +15,7 @@
 
 #define NESTING_DEPTH 100000
 
-static char *generate_json_string(void);
-static char *generate_json_string()
+static char *generate_json_string(void)
 {
 	char *str;
 	int depth = NESTING_DEPTH;
@@ -27,7 +26,6 @@ static char *generate_json_string()
 	return str;
 }
 
-static void test_deep_nesting_put(const char *str);
 static void test_deep_nesting_put(const char *str)
 {
 	json_object *my_array;
@@ -42,7 +40,6 @@ static void test_deep_nesting_put(const char *str)
 	json_tokener_free(tok);
 }
 
-static void test_deep_nesting_tostring(const char *str);
 static void test_deep_nesting_tostring(const char *str)
 {
 	json_object *my_array;
