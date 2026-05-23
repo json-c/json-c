@@ -3,6 +3,7 @@
 * @file json_object_iterator.h
 *
 * Copyright (c) 2009-2012 Hewlett-Packard Development Company, L.P.
+* Copyright (c) 2026 Eric Hawicz
 *
 * This library is free software; you can redistribute it and/or modify
 * it under the terms of the MIT license. See COPYING for details.
@@ -37,6 +38,12 @@ extern "C" {
 struct json_object_iterator
 {
 	const void *opaque_;
+	// These could be used to make an interator that fails "faster" 
+	// in the face of certain changes to the underlying object, but
+	// would still be vulnerable to skipping entries.
+	// Changing this structure size is an ABI change
+	// const lh_table *table;
+	// size_t begin_size;
 };
 
 /**
@@ -68,10 +75,20 @@ struct json_object;
  */
 JSON_EXPORT struct json_object_iterator json_object_iter_init_default(void);
 
-/** Retrieves an iterator to the first pair of the JSON Object.
+/** Retrieves an iterator to the first key/value pair of the JSON Object.
  *
- * @warning 	Any modification of the underlying pair invalidates all
- * 		iterators to that pair.
+ * @warning 	Any modification of the fields present on the object
+ *              invalidates all iterators on that object, regardless of
+ *              what key/value pair they are pointing to, other than the
+ *              end iterator.
+ *              Modifications include adding or removing any pair, even if
+ *              set of keys appears unchanged after the modification.
+ *              Modifying *values* is allowed, including replacing a value
+ *              by calling json_object_add(), provided the key already exists.
+ *              Attempting to use an invalidated iterator in any way, other
+ *              than comparing it to the end iterator, is *undefined behavior*.
+ *              Passing such an iterator to any of the the json_object_iterator
+ *              functions is not even guaranteed to fail in any consistent way.
  *
  * @param obj	JSON Object instance (MUST be of type json_object)
  *
@@ -133,8 +150,9 @@ JSON_EXPORT struct json_object_iterator json_object_iter_end(const struct json_o
 
 /** Returns an iterator to the next pair, if any
  *
- * @warning	Any modification of the underlying pair
- *       	invalidates all iterators to that pair.
+ * @warning 	Any modification of the fields of the object invalidates
+ * 		the iterator, see the warning on json_object_iter_begin()
+ *              for details.
  *
  * @param iter [IN/OUT] Pointer to iterator that references a
  *         name/value pair; MUST be a valid, non-end iterator.
@@ -154,8 +172,9 @@ JSON_EXPORT void json_object_iter_next(struct json_object_iterator *iter);
  * @param iter pointer to iterator that references a name/value
  *             pair; MUST be a valid, non-end iterator.
  *
- * @warning	bad things will happen if an invalid or
- *             	"end" iterator is passed.
+ * @warning	bad things will happen if an invalid or "end" iterator
+ *             	is passed.  See the warning on json_object_iter_begin()
+ *              for details.
  *
  * @return const char* Pointer to the name of the referenced
  *         name/value pair.  The name memory belongs to the
@@ -172,8 +191,9 @@ JSON_EXPORT const char *json_object_iter_peek_name(const struct json_object_iter
  * @param iter 	pointer to iterator that references a name/value
  *             	pair; MUST be a valid, non-end iterator.
  *
- * @warning	bad things will happen if invalid or
- *             "end" iterator is passed.
+ * @warning	bad things will happen if an invalid or "end" iterator
+ *             	is passed.  See the warning on json_object_iter_begin()
+ *              for details.
  *
  * @return struct json_object* Pointer to the json-c value
  *         instance of the referenced name/value pair;  the
