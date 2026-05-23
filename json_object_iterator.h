@@ -31,11 +31,6 @@ extern "C" {
 #endif
 
 /**
- * Forward declaration for the opaque iterator information.
- */
-struct json_object_iter_info_;
-
-/**
  * The opaque iterator that references a name/value pair within
  * a JSON Object instance or the "end" iterator value.
  */
