@@ -71,11 +71,6 @@ matrix:
             - cmake
       env: CHECK="true"
 
-# osx
-    - os: osx
-      osx_image: xcode13.4
-      env: XCODE="true" CHECK="true"
-
 # run coveralls
     - os: linux
       dist: xenial
@@ -109,9 +104,6 @@ matrix:
         - lcov -r build/all_coverage.info '/usr/*' '*CMakeFiles*' '*fuzz*' '*test*' -o build/coverage.info
         - coveralls-lcov --verbose build/coverage.info
 
-#  allow_failures:
-#    - os: osx
-
 before_install:
   - echo $CC
   - echo $LANG
@@ -125,8 +117,6 @@ before_install:
     fi
 
 before_script:
-  # XXX osx on travis doesn't work w/ set -e, so turn it off :(
-  - set +e
   - mkdir -p build || echo "Failed to mkdir build"
   - cd build || echo "Failed to cd build"
   - cmake .. || echo "Failed to run cmake"
@@ -135,12 +125,8 @@ script:
   - make
   # when using bionic, Travis seems to ignore the "addons" section, so installing the packages with apt-get...
   - if [ -n "$CHECK" ]; then
-      if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-        brew install doxygen;
-      else
-        if [ "$TRAVIS_DIST" = "bionic" ]; then
-          sudo apt-get install -y valgrind cppcheck doxygen;
-        fi;
+      if [ "$TRAVIS_DIST" = "bionic" ]; then
+        sudo apt-get install -y valgrind cppcheck doxygen;
       fi;
       make distcheck;
       if type cppcheck &> /dev/null ; then cppcheck --error-exitcode=1 --quiet *.h *.c tests/ ; fi;
