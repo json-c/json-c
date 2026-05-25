@@ -1,14 +1,25 @@
-string_of_digits
-"123"
-regular_number
-222
-decimal_number
-99.55
-boolean_true
-true
-boolean_false
-false
-big_number
-2147483649
-a_null
-null
+sizeof(struct json_object_iterator)/sizeof(void *)=1
+key: string_of_digits
+pre change:  "123"
+post change: "switched"
+key: regular_number
+pre change:  222
+post change: "switched"
+key: decimal_number
+pre change:  99.55
+post change: "switched"
+key: boolean_true
+pre change:  true
+post change: "switched"
+key: boolean_false
+pre change:  false
+post change: "switched"
+key: big_number
+pre change:  2147483649
+post change: "switched"
+key: a_null
+pre change:  null
+post change: "switched"
+key: an_object
+pre change:  { "foo": "bar" }
+post change: { "foo": "change foo", "newkey": "new value" }
