@@ -39,6 +39,7 @@
 
 static int formatted_output = JSON_C_TO_STRING_SPACED;
 static int show_output = 1;
+static int show_diag = 1;
 static int strict_mode = 0;
 static int validate_utf8 = 0;
 static int tokener_flags = 0;
@@ -56,6 +57,8 @@ static int showobj(struct json_object *new_obj);
 
 static void showmem(void)
 {
+	if (!show_diag)
+		return;
 #ifdef HAVE_GETRUSAGE
 	struct rusage rusage;
 	memset(&rusage, 0, sizeof(rusage));
@@ -171,10 +174,11 @@ static void usage(const char *argv0, int exitval, const char *errmsg)
 		fp = stderr;
 	if (errmsg != NULL)
 		fprintf(fp, "ERROR: %s\n\n", errmsg);
-	fprintf(fp, "Usage: %s [-f|-F <arg>] [-n] [-s] [-u] [filename]\n", argv0);
+	fprintf(fp, "Usage: %s [-f|-F <arg>] [-n] [-s] [-u] [-N] [filename]\n", argv0);
 	fprintf(fp, "  -f - Format the output to stdout with JSON_C_TO_STRING_PRETTY (default is JSON_C_TO_STRING_SPACED)\n");
 	fprintf(fp, "  -F - Format the output to stdout with <arg>, e.g. 0 for JSON_C_TO_STRING_PLAIN\n");
 	fprintf(fp, "  -n - No output\n");
+	fprintf(fp, "  -N - Omit diagnostic information, such as memory usage\n");
 	fprintf(fp, "  -c - Set JSON_C_TO_STRING_COLOR to colorize the output\n");
 	fprintf(fp, "  -P - Initialize tokener flags to the given value\n");
 	fprintf(fp, "  -s - Parse in strict mode, add flags:\n");
@@ -191,7 +195,7 @@ int main(int argc, char **argv)
 {
 	int opt;
 
-	while ((opt = getopt(argc, argv, "cfF:hnP:su")) != -1)
+	while ((opt = getopt(argc, argv, "cfF:hnNP:su")) != -1)
 	{
 		switch (opt)
 		{
@@ -199,6 +203,7 @@ int main(int argc, char **argv)
 		case 'f': formatted_output = JSON_C_TO_STRING_PRETTY; break;
 		case 'F': formatted_output = atoi(optarg); break;
 		case 'n': show_output = 0; break;
+		case 'N': show_diag = 0; break;
 		case 'P': tokener_flags = atoi(optarg); break;
 		case 's': strict_mode = 1; break;
 		case 'u': validate_utf8 = 1; break;

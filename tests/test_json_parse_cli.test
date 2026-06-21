@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Common definitions
+if test -z "$srcdir"; then
+    srcdir="${0%/*}"
+    test "$srcdir" = "$0" && srcdir=.
+    test -z "$srcdir" && srcdir=.
+fi
+. "$srcdir/test-defs.sh"
+
+set -x -v
+
+echo -n '"tenant=blue;note=CANARY_STACK_WINDOW_2026;status=ok"' > file1.dat
+(printf '"' ; printf 'A%.0s' $(seq 1 16) ; echo 'e2'  | xxd -r -p) > file2.dat
+
+TESTNAME="${0##*/}"
+TESTNAME="${TESTNAME%.test}"
+( cat file1.dat ; cat file2.dat ) | run_output_test -o "${TESTNAME}" --exit 1 ../apps/json_parse -u -N -n -
+_err=$?
+
+exit $_err

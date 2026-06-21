@@ -38,6 +38,10 @@ set(ALL_TEST_NAMES
     test_visit
     test_object_iterator)
 
+set(NOBUILD_TEST_NAMES
+    test_json_parse_cli
+)
+
 if (NOT DISABLE_JSON_POINTER)
     set(ALL_TEST_NAMES ${ALL_TEST_NAMES} test_json_pointer)
     set(ALL_TEST_NAMES ${ALL_TEST_NAMES} test_safe_json_pointer_set)
@@ -45,6 +49,10 @@ if (NOT DISABLE_JSON_POINTER)
         set(ALL_TEST_NAMES ${ALL_TEST_NAMES} test_json_patch)
     endif()
 endif()
+
+foreach(TESTNAME ${NOBUILD_TEST_NAMES})
+add_test(NAME ${TESTNAME} COMMAND ${PROJECT_SOURCE_DIR}/tests/${TESTNAME}.test)
+endforeach(TESTNAME)
 
 foreach(TESTNAME ${ALL_TEST_NAMES})
 
