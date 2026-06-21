@@ -111,12 +111,12 @@ static int parseit(int fd, int (*callback)(struct json_object *))
 			size_t parse_end = json_tokener_get_parse_end(tok);
 			if (obj == NULL && jerr != json_tokener_continue)
 			{
-				const char *aterr = (start_pos + parse_end < (int)sizeof(buf)) ?
+				const char *aterr = (start_pos + parse_end < retu) ?
 					&buf[start_pos + parse_end] : "";
 				fflush(stdout);
 				size_t fail_offset = total_read - retu + start_pos + parse_end;
-				fprintf(stderr, "Failed at offset %lu: %s %c\n", (unsigned long)fail_offset,
-				        json_tokener_error_desc(jerr), aterr[0]);
+				fprintf(stderr, "Failed at offset %lu: %s: char=0x%02x\n", (unsigned long)fail_offset,
+				        json_tokener_error_desc(jerr), (unsigned char)aterr[0]);
 				json_tokener_free(tok);
 				return 1;
 			}
