@@ -21,6 +21,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef HAVE_LOCALE_H
+#include <locale.h>
+#endif /* HAVE_LOCALE_H */
 
 #include "arraylist.h"
 #include "debug.h"
@@ -1381,12 +1384,42 @@ double json_object_get_double(const struct json_object *jso)
 		}
 	case json_type_boolean: return JC_BOOL_C(jso)->c_boolean;
 	case json_type_string:
+	{
+		const char *cstr = get_string_component(jso);
+		const char *parse = cstr;
+		char *radixconv = NULL;
+#ifdef HAVE_LOCALE_H
+		/* A json_type_string holds the value with a '.' radix, as it
+		 * appears in JSON, but strtod() honours the current locale.  In a
+		 * locale whose decimal point is not '.' the '.' is treated as a
+		 * stray character, so e.g. "19.95" is read as 0.  Parse a copy
+		 * with the radix translated so the value comes back unchanged. */
+		const char *decimal_point = localeconv()->decimal_point;
+		if (decimal_point && decimal_point[0] != '.' && decimal_point[1] == '\0')
+		{
+			const char *dot = strchr(cstr, '.');
+			if (dot)
+			{
+				size_t slen = strlen(cstr);
+				radixconv = (char *)malloc(slen + 1);
+				if (radixconv == NULL)
+				{
+					errno = ENOMEM;
+					return 0.0;
+				}
+				memcpy(radixconv, cstr, slen + 1);
+				radixconv[dot - cstr] = decimal_point[0];
+				parse = radixconv;
+			}
+		}
+#endif
 		errno = 0;
-		cdouble = strtod(get_string_component(jso), &errPtr);
+		cdouble = strtod(parse, &errPtr);
 
 		/* if conversion stopped at the first character, return 0.0 */
-		if (errPtr == get_string_component(jso))
+		if (errPtr == parse)
 		{
+			free(radixconv);
 			errno = EINVAL;
 			return 0.0;
 		}
@@ -1398,6 +1431,7 @@ double json_object_get_double(const struct json_object *jso)
 		 */
 		if (*errPtr != '\0')
 		{
+			free(radixconv);
 			errno = EINVAL;
 			return 0.0;
 		}
@@ -1415,7 +1449,9 @@ double json_object_get_double(const struct json_object *jso)
 		 */
 		if ((HUGE_VAL == cdouble || -HUGE_VAL == cdouble) && (ERANGE == errno))
 			cdouble = 0.0;
+		free(radixconv);
 		return cdouble;
+	}
 	default: errno = EINVAL; return 0.0;
 	}
 }

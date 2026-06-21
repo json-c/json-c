@@ -40,6 +40,18 @@ int main(int argc, char **argv)
 	if (strcmp(buf1, buf2) != 0)
 		printf("ERROR: Original locale not restored \"%s\" != \"%s\"", buf1, buf2);
 
+	// json_object_get_double() on a json_type_string must not depend on the
+	// locale's decimal point.  Under a comma-radix locale such as de_DE the
+	// '.' used to be treated as a stray char, so "19.95" came back as 0.
+	// (If the de_DE locale isn't installed we're still in "C" here, where
+	// this passes anyway, so the check is safe to always run.)
+	{
+		json_object *numstr = json_object_new_string("19.95");
+		double d = json_object_get_double(numstr);
+		assert(d > 19.94 && d < 19.96);
+		json_object_put(numstr);
+	}
+
 #ifdef HAVE_SETLOCALE
 	setlocale(LC_NUMERIC, "C");
 #endif
