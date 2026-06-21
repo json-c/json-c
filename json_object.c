@@ -369,7 +369,7 @@ int json_object_put(struct json_object *jso)
 		while (slots_left > 0)
 		{
 			size_t cur_slot = slots_left - 1;
-			json_object *child;
+			json_object *child = NULL;
 
 			// First, clear the slot in the current jso object
 			// The slot itself will be freed when jso is freed, or
