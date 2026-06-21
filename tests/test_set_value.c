@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "json.h"
 
@@ -106,7 +107,9 @@ int main(int argc, char **argv)
 	tmp = json_tokener_parse("1.234");
 	json_object_set_double(tmp, 12.3);
 	const char *serialized = json_object_to_json_string(tmp);
-	fprintf(stderr, "%s\n", serialized);
+	if (getenv("JSONC_TEST_TRACE") != NULL)
+		// This output might be different on different systems
+		fprintf(stderr, "%s\n", serialized);
 	assert(strncmp(serialized, "12.3", 4) == 0);
 	json_object_put(tmp);
 	printf("PARSE AND SET PASSED\n");

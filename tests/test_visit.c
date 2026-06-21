@@ -77,6 +77,7 @@ static int emit_object(json_object *jso, int flags, json_object *parent_jso, con
 	printf("flags: 0x%x, key: %s, index: %ld, value: %s\n", flags,
 	       (jso_key ? jso_key : "(null)"), (jso_index ? (long)*jso_index : -1L),
 	       json_object_to_json_string(jso));
+	fflush(stdout);
 	return JSON_C_VISIT_RETURN_CONTINUE;
 }
 
@@ -148,5 +149,6 @@ static int err_return(json_object *jso, int flags, json_object *parent_jso, cons
 	printf("flags: 0x%x, key: %s, index: %ld, value: %s\n", flags,
 	       (jso_key ? jso_key : "(null)"), (jso_index ? (long)*jso_index : -1L),
 	       json_object_to_json_string(jso));
+	fflush(stdout);
 	return 100;
 }
