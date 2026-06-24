@@ -156,3 +156,4 @@ Testing 'Removing deep nonexistent path', doc '{ "foo": "bar" }' patch '[ { "op"
 Testing 'Removing nonexistent index', doc '[ "foo", "bar" ]' patch '[ { "op": "remove", "path": "\/2" } ]' : OK
  => json_patch_apply failed as expected: ERRNO=ENOENT at patch idx 0: Did not find element referenced by path field
 Testing 'Patch with different capitalisation than doc', doc '{ "foo": "bar" }' patch '[ { "op": "add", "path": "\/FOO", "value": "BAR" } ]' : OK
+Testing 'copy must duplicate the value, not alias it, so no cycle can form', doc '{ "a": { "p": { } } }' patch '[ { "op": "copy", "from": "\/a", "path": "\/b" }, { "op": "copy", "from": "\/b", "path": "\/a\/p\/x" } ]' : OK
