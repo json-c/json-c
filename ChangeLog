@@ -1,5 +1,5 @@
 
-0.19 (up to commit 8948568, 2026-01-18)
+0.19 (up to commit 3c1cf2b, 2026-06-27)
 ========================================
 
 Deprecated and removed features:
@@ -32,6 +32,14 @@ Significant changes and bug fixes
 * Fix bug involving supplemental code points that look like high surrogates
 * Fix runtime issue with test_util_file.c in Windows (add O_BINARY)
 * Fix macro WIN32_LEAN_AND_MEAN redefined
+* Issue #914: Fix Memory usage regression due to newlocale() on macOS
+* Issue #916: Fix OOM via large array index in json_pointer_set
+* Issue #923: Avoid stack recursion in json_object_put()
+* Issue #927: CVE-2026-9146 - update json_object_iterator documentation
+* Issue #929: CVE-2026-11322 - fix information disclosure bug in apps/json_parse (not installed by default)
+* Issue #930: fix locale-dependent strtod in json_object_get_double
+* Issue #931: deep copy values in json_patch copy op to avoid aliasing and cycles
+
 
 0.18 (up to commit 6bfab90, 2024-09-15)
 ========================================
