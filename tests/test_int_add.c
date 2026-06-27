@@ -68,6 +68,17 @@ int main(int argc, char **argv)
 	assert(json_object_get_uint64(tmp) == 0);
 	json_object_put(tmp);
 	printf("UINT64 ADD UNDERFLOW PASSED\n");
+	// Decrement by INT64_MIN: -val would overflow int64_t, so the magnitude
+	// has to be taken in unsigned space.
+	tmp = json_object_new_uint64(100);
+	json_object_int_inc(tmp, INT64_MIN);
+	assert(json_object_get_int64(tmp) == INT64_MIN + 100);
+	json_object_put(tmp);
+	tmp = json_object_new_uint64(UINT64_MAX);
+	json_object_int_inc(tmp, INT64_MIN);
+	assert(json_object_get_uint64(tmp) == (uint64_t)INT64_MAX);
+	json_object_put(tmp);
+	printf("UINT64 ADD INT64_MIN PASSED\n");
 
 	printf("PASSED\n");
 	return 0;

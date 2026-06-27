@@ -1113,14 +1113,14 @@ int json_object_int_inc(struct json_object *jso, int64_t val)
 		{
 			jsoint->cint.c_uint64 = UINT64_MAX;
 		}
-		else if (val < 0 && jsoint->cint.c_uint64 < (uint64_t)(-val))
+		else if (val < 0 && jsoint->cint.c_uint64 < (0 - (uint64_t)val))
 		{
 			jsoint->cint.c_int64 = (int64_t)jsoint->cint.c_uint64 + val;
 			jsoint->cint_type = json_object_int_type_int64;
 		}
-		else if (val < 0 && jsoint->cint.c_uint64 >= (uint64_t)(-val))
+		else if (val < 0 && jsoint->cint.c_uint64 >= (0 - (uint64_t)val))
 		{
-			jsoint->cint.c_uint64 -= (uint64_t)(-val);
+			jsoint->cint.c_uint64 -= (0 - (uint64_t)val);
 		}
 		else
 		{
