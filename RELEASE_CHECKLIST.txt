@@ -186,4 +186,15 @@ Copy and paste this output into the wiki page at:
 
 ------------
 
+Create a release on GitHub
+
+* https://github.com/json-c/json-c/releases
+* Click on "Draft a new release"
+* Choose the appropriate tag
+* Fill in title, refer to the ChangeLog in the release notes
+* Attach the same tarballs as were uploaded to S3
+* When satisfied, click Publish release.
+
+------------
+
 Send an email to the mailing list.
