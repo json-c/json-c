@@ -535,6 +535,13 @@
        "doc": {"foo":"bar"},
        "patch": [{"op": "add", "path": "/FOO", "value": "BAR"}],
        "expected": {"foo": "bar", "FOO": "BAR"}
+    },
+
+    { "comment": "copy must duplicate the value, not alias it, so no cycle can form",
+       "doc": {"a": {"p": {}}},
+       "patch": [{"op": "copy", "from": "/a", "path": "/b"},
+                 {"op": "copy", "from": "/b", "path": "/a/p/x"}],
+       "expected": {"a": {"p": {"x": {"p": {}}}}, "b": {"p": {}}}
     }
 
 ]

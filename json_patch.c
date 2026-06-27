@@ -198,6 +198,7 @@ static int json_patch_apply_move_copy(struct json_object **res,
 	json_pointer_set_cb array_set_cb;
 	struct json_pointer_get_result from;
 	struct json_object *jfrom;
+	struct json_object *value;
 	const char *from_s;
 	size_t from_s_len;
 	int rc;
@@ -233,24 +234,39 @@ static int json_patch_apply_move_copy(struct json_object **res,
 
 	// Note: it's impossible for json_pointer to find the root obj, due
 	// to the path check above, so from.parent is guaranteed non-NULL
-	json_object_get(from.obj);
 
 	if (!move) {
+		/* RFC 6902 section 4.5: "copy" duplicates the value, it does
+		 * not share it.  Sharing the source via a reference (as a plain
+		 * json_object_get() would) lets a later op insert the value
+		 * beneath itself through a different pointer path, which the
+		 * from/path string check above can't detect because both paths
+		 * resolve to the same object, producing a reference cycle that
+		 * loops forever on serialisation and breaks teardown.  An
+		 * independent deep copy can never alias an existing node. */
+		value = NULL;
+		if (from.obj != NULL &&
+		    json_object_deep_copy(from.obj, &value, NULL) < 0) {
+			_set_err(ENOMEM, "Unable to copy value referenced by 'from' field");
+			return -1;
+		}
 		array_set_cb = json_object_array_insert_idx_cb;
 	} else {
+		json_object_get(from.obj);
+		value = from.obj;
 		rc = __json_patch_apply_remove(&from);
 		if (rc < 0) {
-			json_object_put(from.obj);
+			json_object_put(value);
 			return rc;
 		}
 		array_set_cb = json_object_array_move_cb;
 	}
 
-	rc = json_pointer_set_with_cb(res, path, from.obj, array_set_cb, 0, &from);
+	rc = json_pointer_set_with_cb(res, path, value, array_set_cb, 0, &from);
 	if (rc)
 	{
 		_set_err(errno, "Failed to set value at path referenced by 'path' field");
-		json_object_put(from.obj);
+		json_object_put(value);
 	}
 
 	return rc;
