@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.9...3.12)
 
 # JSON-C library is C only project.
 # PROJECT_VERSION{,_MAJOR,_MINOR,_PATCH} set by project():
-project(json-c LANGUAGES C VERSION 0.18.99)
+project(json-c LANGUAGES C VERSION 0.19)
 
 # set default build type if not specified by user
 if(NOT CMAKE_BUILD_TYPE)
@@ -544,7 +544,7 @@ add_library(${PROJECT_NAME}
     ${JSON_C_RESOURCES}
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    VERSION 5.4.0
+    VERSION 5.5.0
     SOVERSION 5)
 list(APPEND CMAKE_TARGETS ${PROJECT_NAME})
 # If json-c is used as subroject it set to target correct interface -I flags and allow
