@@ -49,7 +49,7 @@ typedef struct json_object json_object;
 /**
  * Type of custom user delete functions.  See json_object_set_serializer.
  */
-typedef void(json_object_delete_fn)(struct json_object *jso, void *userdata);
+typedef void(json_object_delete_fn)(struct json_object *jso, void **userdata);
 
 /**
  * Type of a custom serialization function.  See json_object_set_serializer.

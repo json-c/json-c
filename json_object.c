@@ -301,9 +301,11 @@ static inline int _json_object_put_maybe_free(struct json_object *jso, int free_
 		return 0;  // All done, caller doesn't need to do anything else
 	}
 
-	if (jso->_user_delete)
-		jso->_user_delete(jso, jso->_userdata);
-
+	if (jso->_user_delete) {
+		jso->_user_delete(jso, &jso->_userdata);
+		jso->_userdata = NULL;
+	}
+	
 	switch (jso->o_type)
 	{
 	case json_type_object: 
@@ -504,7 +506,7 @@ void json_object_set_userdata(json_object *jso, void *userdata, json_object_dele
 
 	// First, clean up any previously existing user info
 	if (jso->_user_delete)
-		jso->_user_delete(jso, jso->_userdata);
+		jso->_user_delete(jso, &jso->_userdata);
 
 	jso->_userdata = userdata;
 	jso->_user_delete = user_delete;
@@ -1360,9 +1362,10 @@ int json_object_userdata_to_json_string(struct json_object *jso, struct printbuf
 	return userdata_len;
 }
 
-void json_object_free_userdata(struct json_object *jso, void *userdata)
+void json_object_free_userdata(struct json_object *jso, void **userdata)
 {
-	free(userdata);
+	free(*userdata);
+	*userdata = NULL;
 }
 
 double json_object_get_double(const struct json_object *jso)
