@@ -301,8 +301,10 @@ static inline int _json_object_put_maybe_free(struct json_object *jso, int free_
 		return 0;  // All done, caller doesn't need to do anything else
 	}
 
-	if (jso->_user_delete)
+	if (jso->_user_delete) {
 		jso->_user_delete(jso, jso->_userdata);
+		jso->_userdata = NULL;
+	}
 
 	switch (jso->o_type)
 	{
