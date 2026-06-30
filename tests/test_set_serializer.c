@@ -14,9 +14,9 @@ struct myinfo
 };
 
 static int freeit_was_called = 0;
-static void freeit(json_object *jso, void *userdata)
+static void freeit(json_object *jso, void **userdata)
 {
-	struct myinfo *info = userdata;
+	struct myinfo *info = *userdata;
 	printf("freeit, value=%d\n", info->value);
 	// Don't actually free anything here, the userdata is stack allocated.
 	freeit_was_called = 1;
