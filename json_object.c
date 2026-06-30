@@ -435,11 +435,16 @@ int json_object_put(struct json_object *jso)
 		// All slots are cleared, now pop back up to the parent
 		{
 			json_object *parent = jso->_delete_parent;
+			int rc;
 			// jso is a child that's already been detached from its parent
 			// so we need to actually free it now
 			assert(jso->_ref_count == 0);
 			jso->_ref_count++;   // We're the exclusive owner of jso, non-atomic add is ok.
-			assert(_json_object_put_maybe_free(jso, 1) == 0);
+			// Note: the call must not be inside assert(), or it gets
+			// compiled out when NDEBUG is defined and the memory leaks.
+			rc = _json_object_put_maybe_free(jso, 1);
+			assert(rc == 0);
+			(void)rc;
 			jso = parent;
 			// iteration will be reset at the top of the loop
 		}
