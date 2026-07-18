@@ -297,19 +297,11 @@ endif
 install_headers(installed_headers, subdir: 'json-c')
 
 # pkg-config file
-configure_file(
-  input: 'json-c.pc.in',
-  output: 'json-c.pc',
-  install: true,
-  install_dir: get_option('libdir') / 'pkgconfig',
-  configuration: {
-    'prefix': get_option('prefix'),
-    'exec_prefix': get_option('prefix'),
-    'libdir': get_option('libdir'),
-    'includedir': get_option('includedir'),
-    'VERSION': meson.project_version(),
-    'LIBS': '',
-  }
+pkg = import('pkgconfig')
+pkg.generate(
+  libjson,
+  description: 'A JSON implementation in C',
+  subdirs: 'json-c',
 )
 
 # Optional apps
