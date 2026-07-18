@@ -317,7 +317,4 @@ if get_option('build_apps') and host_machine.system() != 'windows'
   subdir('apps')
 endif
 
-# Optional tests
-if get_option('buildtype') == 'debug'
-  subdir('tests')
-endif 
+subdir('tests')
