@@ -11,6 +11,8 @@ conf_data = configuration_data()
 jconf_data = configuration_data()
 conf_data.set('VERSION', meson.project_version())
 
+libjson_deps = []
+
 has_std_lib = cc.has_header('stdlib.h')
 has_std_arg = cc.has_header('stdarg.h')
 has_string = cc.has_header('string.h')
@@ -20,10 +22,7 @@ if has_std_lib and has_std_arg and has_string and has_float
   conf_data.set('STDC_HEADERS', 1, description : 'Define to 1 if you have the ANSI C header files.')
 endif
 
-bsd_dep = dependency('libbsd', required: false)
-
 headers = {
-  'bsd/stdlib.h': bsd_dep,
   'dlfcn.h': [],
   'endian.h': [],
   'fcntl.h': [],
@@ -47,6 +46,15 @@ headers = {
   'xlocale.h': [],
 }
 
+may_need_libbsd = true
+if cc.has_function('arc4random')
+  may_need_libbsd = false
+  conf_data.set('HAVE_@0@'.format('arc4random'.underscorify().to_upper()), 1, description :  'Define to 1 if you have the <@0@> header file'.format('arc4random'))
+else
+  bsd_dep = dependency('libbsd', required: get_option('extra_libs'))
+  headers += { 'bsd/stdlib.h': [bsd_dep] }
+endif
+
 foreach h, d : headers
   if cc.has_header(h, dependencies: d)
     conf_data.set('HAVE_@0@'.format(h.underscorify().to_upper()), 1, description :  'Define to 1 if you have the <@0@> header file'.format(h))
@@ -63,29 +71,35 @@ if cc.has_header('stdint.h')
   jconf_data.set('JSON_C_HAVE_STDINT_H', 1, description : 'Define to 1 if you have the <stdint.h> header file.')
 endif
 
-funcs = [
-  'open',
-  'realloc',
-  'setlocale',
-  'strdup',
-  'strerror',
-  'uselocale',
-  'duplocale',
-  'vsyslog',
-  'getrandom',
-  'getrusage',
-  'strtoll',
-  'strtoull',
-  'arc4random',
-  'vasprintf',
-]
+funcs = {
+  'open': [],
+  'realloc': [],
+  'setlocale': [],
+  'strdup': [],
+  'strerror': [],
+  'uselocale': [],
+  'duplocale': [],
+  'vsyslog': [],
+  'getrandom': [],
+  'getrusage': [],
+  'strtoll': [],
+  'strtoull': [],
+  'vasprintf': [],
+}
 
-if conf_data.has('HAVE_STRINGS_H')
-  funcs += ['strcasecmp', 'strncasecmp']
+if may_need_libbsd
+  funcs += { 'arc4random': [bsd_dep] }
+  libjson_deps += [bsd_dep]
+else
+  funcs += { 'arc4random': [] }
 endif
 
-foreach f : funcs
-  if cc.has_function(f)
+if conf_data.has('HAVE_STRINGS_H')
+  funcs += {'strcasecmp': [], 'strncasecmp': []}
+endif
+
+foreach f, d : funcs
+  if cc.has_function(f, dependencies: d)
     conf_data.set('HAVE_@0@'.format(f.to_upper()), 1, description : 'Define to 1 if you have the `@0@` function.'.format(f))
   endif
 endforeach
@@ -255,7 +269,7 @@ inc = include_directories('.')
 libjson = library('json-c',
   sources,
   include_directories: inc,
-  dependencies: bsd_dep,
+  dependencies: libjson_deps,
   install: true,
   link_args: sym,
   version: '5.4.0',
