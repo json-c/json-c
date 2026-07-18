@@ -1,5 +1,5 @@
 
-project('json-c', 'c', version: '0.18.99',
+project('json-c', 'c', version: '0.19.99',
   meson_version: '>=0.54.0',
   license: 'MIT',
   default_options: ['buildtype=release', 'warning_level=2'])
@@ -272,7 +272,7 @@ libjson = library('json-c',
   dependencies: libjson_deps,
   install: true,
   link_args: sym,
-  version: '5.4.0',
+  version: '5.5.0',
   soversion: '5',
 )
 

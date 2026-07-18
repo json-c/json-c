@@ -75,6 +75,9 @@ library version.  Generally, unless we're doing a major release, change:
 to
 	VERSION x.y+1.z
 
+        Update the version in meson.build (both at the top, and down under
+        '# Build library')
+
     git commit -a -m "Bump version to ${release}"
 
 If we're doing a major release (SONAME bump), also bump the version
