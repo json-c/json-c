@@ -1,5 +1,5 @@
 
-project('json-c', 'c', version: '0.18.99',
+project('json-c', 'c', version: '0.19.99',
   meson_version: '>=0.54.0',
   license: 'MIT',
   default_options: ['buildtype=release', 'warning_level=2'])
@@ -111,6 +111,9 @@ if conf_data.has('HAVE_STRTOULL')
 elif cc.has_function('_strtoui64', prefix : '#include <stdlib.h>')
   conf_data.set('json_c_strtoull', '_strtoui64')
 endif
+
+# Math library (needed for INFINITY, isnan, etc.)
+m_dep = cc.find_library('m', required: false)
 
 decls = {
   'INFINITY': 'math.h',
@@ -255,7 +258,7 @@ inc = include_directories('.')
 libjson = library('json-c',
   sources,
   include_directories: inc,
-  dependencies: bsd_dep,
+  dependencies: [bsd_dep, m_dep],
   install: true,
   link_args: sym,
   version: '5.4.0',
@@ -271,6 +274,32 @@ install_headers(
   'json_object.h', 'json_object_iterator.h', 'json_tokener.h',
   'json_types.h', 'json_util.h', 'json_visit.h', 'linkhash.h',
   'printbuf.h', json_configure_header, json_header
+]
+
+if not get_option('disable_json_pointer')
+  installed_headers += ['json_pointer.h']
+  if not get_option('disable_json_patch')
+    installed_headers += ['json_patch.h']
+  endif
+endif
+
+install_headers(installed_headers, subdir: 'json-c')
+
+# pkg-config file
+pc_libs = m_dep.found() ? '-lm' : ''
+configure_file(
+  input: 'json-c.pc.in',
+  output: 'json-c.pc',
+  install: true,
+  install_dir: get_option('libdir') / 'pkgconfig',
+  configuration: {
+    'prefix': get_option('prefix'),
+    'exec_prefix': get_option('prefix'),
+    'libdir': get_option('prefix') / get_option('libdir'),
+    'includedir': get_option('prefix') / get_option('includedir'),
+    'VERSION': meson.project_version(),
+    'LIBS': pc_libs,
+  }
 )
 
 # Optional apps
