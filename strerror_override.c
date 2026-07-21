@@ -69,6 +69,7 @@ char *_json_c_strerror(int errno_in)
 	int start_idx;
 	char digbuf[20];
 	int ii, jj;
+	unsigned int uerr;
 
 	if (!_json_c_strerror_enable)
 		_json_c_strerror_enable = (getenv("_JSON_C_STRERROR_ENABLE") == NULL) ? -1 : 1;
@@ -94,14 +95,22 @@ char *_json_c_strerror(int errno_in)
 	}
 
 	// It's not one of the known errno values, return the numeric value.
-	for (ii = 0; errno_in >= 10; errno_in /= 10, ii++)
+	// Work on the magnitude in unsigned space: a negative errno_in makes
+	// errno_in % 10 negative, which would index before the "0123456789"
+	// literal (an out-of-bounds read).  Computing 0u - errno_in in unsigned
+	// is also well defined for INT_MIN, where -errno_in would overflow.
+	uerr = (errno_in < 0) ? (0u - (unsigned int)errno_in) : (unsigned int)errno_in;
+	for (ii = 0; uerr >= 10; uerr /= 10, ii++)
 	{
-		digbuf[ii] = "0123456789"[(errno_in % 10)];
+		digbuf[ii] = "0123456789"[(uerr % 10)];
 	}
-	digbuf[ii] = "0123456789"[(errno_in % 10)];
+	digbuf[ii] = "0123456789"[(uerr % 10)];
 
-	// Reverse the digits
-	for (start_idx = sizeof(PREFIX) - 1; ii >= 0; ii--, start_idx++)
+	// Reverse the digits, keeping the sign for negative values
+	start_idx = sizeof(PREFIX) - 1;
+	if (errno_in < 0)
+		errno_buf[start_idx++] = '-';
+	for (; ii >= 0; ii--, start_idx++)
 	{
 		errno_buf[start_idx] = digbuf[ii];
 	}

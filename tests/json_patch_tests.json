@@ -542,6 +542,24 @@
        "patch": [{"op": "copy", "from": "/a", "path": "/b"},
                  {"op": "copy", "from": "/b", "path": "/a/p/x"}],
        "expected": {"a": {"p": {"x": {"p": {}}}}, "b": {"p": {}}}
+    },
+
+    { "comment": "null op field must be rejected, not dereferenced",
+       "doc": {"foo": "bar"},
+       "patch": [{"op": null, "path": "/foo"}],
+       "error": "a null op field should fail rather than crash"
+    },
+
+    { "comment": "null from field must be rejected, not dereferenced",
+       "doc": {"foo": "bar"},
+       "patch": [{"op": "move", "from": null, "path": "/foo"}],
+       "error": "a null from field should fail rather than crash"
+    },
+
+    { "comment": "null path field must be rejected, not dereferenced",
+       "doc": {"foo": "bar"},
+       "patch": [{"op": "remove", "path": null}],
+       "error": "a null path field should fail rather than crash"
     }
 
 ]

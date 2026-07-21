@@ -1,3 +1,10 @@
 Parsed depth 100000 string to json_object: yes
 Freed json_object
 in user_delete, userdata_val=1
+put(empty object) returned 1
+put(empty array) returned 1
+put(string) returned 1
+put(int) returned 1
+put(non-empty object) returned 1
+put(still-referenced object) returned 0
+put(last reference) returned 1

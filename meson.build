@@ -268,8 +268,8 @@ libjson = library('json-c',
 jsonc_dep = declare_dependency(link_with: libjson, include_directories: inc)
 meson.override_dependency('json-c', jsonc_dep)
 
-# Install headers
-install_headers(
+# Install headers into json-c/ subdirectory (matches CMake layout)
+installed_headers = [
   'arraylist.h', 'debug.h', 'json_c_version.h', 'json_inttypes.h',
   'json_object.h', 'json_object_iterator.h', 'json_tokener.h',
   'json_types.h', 'json_util.h', 'json_visit.h', 'linkhash.h',
@@ -310,4 +310,4 @@ endif
 # Optional tests
 if get_option('buildtype') == 'debug'
   subdir('tests')
-endif
+endif 

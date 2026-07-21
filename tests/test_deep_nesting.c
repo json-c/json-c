@@ -81,10 +81,34 @@ static void test_nesting_with_user_delete(void)
 		1, malloc(8192)
 	};
 
- 	jso = json_object_new_object();
+	jso = json_object_new_object();
 	json_object_set_userdata(jso, &userdata_val, user_delete_test);
 	json_object_object_add(jso, "somekey", json_object_new_string("foo"));
 	json_object_put(jso);
+}
+
+/*
+ * Check that json_object_put() returns 1 whenever the object is freed,
+ * including for scalars and empty containers, and 0 only when a
+ * reference remains.
+ */
+static void test_put_return_values(void)
+{
+	json_object *jso;
+
+	printf("put(empty object) returned %d\n", json_object_put(json_object_new_object()));
+	printf("put(empty array) returned %d\n", json_object_put(json_object_new_array()));
+	printf("put(string) returned %d\n", json_object_put(json_object_new_string("foo")));
+	printf("put(int) returned %d\n", json_object_put(json_object_new_int(42)));
+
+	jso = json_object_new_object();
+	json_object_object_add(jso, "somekey", json_object_new_string("foo"));
+	printf("put(non-empty object) returned %d\n", json_object_put(jso));
+
+	jso = json_object_new_object();
+	json_object_get(jso);
+	printf("put(still-referenced object) returned %d\n", json_object_put(jso));
+	printf("put(last reference) returned %d\n", json_object_put(jso));
 }
 
 int main(int argc, char **argv)
@@ -109,6 +133,8 @@ int main(int argc, char **argv)
 	free(str);
 
 	test_nesting_with_user_delete();
+
+	test_put_return_values();
 
 	return EXIT_SUCCESS;
 }

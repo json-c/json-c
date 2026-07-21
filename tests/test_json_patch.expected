@@ -123,7 +123,7 @@ Testing 'test add with bad number should fail', doc '[ "foo", "sil" ]' patch '[ 
 Testing 'missing 'path' parameter', doc '{ }' patch '[ { "op": "add", "value": "bar" } ]' : OK
  => json_patch_apply failed as expected: ERRNO=EINVAL at patch idx 0: Patch object does not contain 'path' field
 Testing ''path' parameter with null value', doc '{ }' patch '[ { "op": "add", "path": null, "value": "bar" } ]' : OK
- => json_patch_apply failed as expected: ERRNO=EINVAL at patch idx 0: Failed to set value at path referenced by 'path' field
+ => json_patch_apply failed as expected: ERRNO=EINVAL at patch idx 0: Patch object 'path' field is not a string
 Testing 'invalid JSON Pointer token', doc '{ }' patch '[ { "op": "add", "path": "foo", "value": "bar" } ]' : OK
  => json_patch_apply failed as expected: ERRNO=EINVAL at patch idx 0: Failed to set value at path referenced by 'path' field
 Testing 'missing 'value' parameter to add', doc '[ 1 ]' patch '[ { "op": "add", "path": "\/-" } ]' : OK
@@ -157,3 +157,9 @@ Testing 'Removing nonexistent index', doc '[ "foo", "bar" ]' patch '[ { "op": "r
  => json_patch_apply failed as expected: ERRNO=ENOENT at patch idx 0: Did not find element referenced by path field
 Testing 'Patch with different capitalisation than doc', doc '{ "foo": "bar" }' patch '[ { "op": "add", "path": "\/FOO", "value": "BAR" } ]' : OK
 Testing 'copy must duplicate the value, not alias it, so no cycle can form', doc '{ "a": { "p": { } } }' patch '[ { "op": "copy", "from": "\/a", "path": "\/b" }, { "op": "copy", "from": "\/b", "path": "\/a\/p\/x" } ]' : OK
+Testing 'null op field must be rejected, not dereferenced', doc '{ "foo": "bar" }' patch '[ { "op": null, "path": "\/foo" } ]' : OK
+ => json_patch_apply failed as expected: ERRNO=EINVAL at patch idx 0: Patch object 'op' field is not a string
+Testing 'null from field must be rejected, not dereferenced', doc '{ "foo": "bar" }' patch '[ { "op": "move", "from": null, "path": "\/foo" } ]' : OK
+ => json_patch_apply failed as expected: ERRNO=EINVAL at patch idx 0: Patch object 'from' field is not a string
+Testing 'null path field must be rejected, not dereferenced', doc '{ "foo": "bar" }' patch '[ { "op": "remove", "path": null } ]' : OK
+ => json_patch_apply failed as expected: ERRNO=EINVAL at patch idx 0: Patch object 'path' field is not a string
