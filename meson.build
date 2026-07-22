@@ -20,7 +20,11 @@ if has_std_lib and has_std_arg and has_string and has_float
   conf_data.set('STDC_HEADERS', 1, description : 'Define to 1 if you have the ANSI C header files.')
 endif
 
-bsd_dep = dependency('libbsd', required: false)
+extra_libs = get_option('extra_libs')
+bsd_dep = disabler()
+if not extra_libs.disabled()
+  bsd_dep = dependency('libbsd', required: false)
+endif
 
 headers = {
   'bsd/stdlib.h': bsd_dep,
@@ -76,7 +80,6 @@ funcs = [
   'getrusage',
   'strtoll',
   'strtoull',
-  'arc4random',
   'vasprintf',
 ]
 
@@ -95,6 +98,24 @@ foreach f : ['snprintf', 'vsnprintf', 'vprintf']
     conf_data.set('HAVE_@0@'.format(f.to_upper()), 1, description : 'Define to 1 if you have the `@0@` function.'.format(f))
   endif
 endforeach
+
+# arc4random() is provided by libc on BSDs, but on some Linux libc versions it is
+# only available via libbsd. Only try libbsd when extra_libs is enabled.
+arc4random_found = false
+arc4random_dep = disabler()
+if cc.has_function('arc4random', prefix : '#include <stdlib.h>')
+  arc4random_found = true
+elif not extra_libs.disabled()
+  if cc.has_header('bsd/stdlib.h', dependencies: bsd_dep) and cc.has_function('arc4random', prefix : '#include <bsd/stdlib.h>', dependencies: bsd_dep)
+    conf_data.set('HAVE_BSD_STDLIB_H', 1, description : 'Define to 1 if you have the <bsd/stdlib.h> header file.')
+    arc4random_dep = bsd_dep
+    arc4random_found = true
+  endif
+endif
+
+if arc4random_found
+  conf_data.set('HAVE_ARC4RANDOM', 1, description : 'Define to 1 if you have the `arc4random` function.')
+endif
 
 if not conf_data.has('HAVE_VPRINTF') and cc.has_function('_doprnt')
   conf_data.set('HAVE_DOPRNT', 1, description : 'Define to 1 if you have _doprnt but not vprintf.')
@@ -258,7 +279,7 @@ m_dep = cc.find_library('m', required: false)
 libjson = library('json-c',
   sources,
   include_directories: inc,
-  dependencies: [bsd_dep, m_dep],
+  dependencies: [arc4random_dep, m_dep],
   install: true,
   link_args: sym,
   version: '5.4.0',
@@ -290,7 +311,7 @@ pkg = import('pkgconfig')
 pkg.generate(
   libjson,
   description: 'A JSON implementation in C',
-  libraries_private: m_dep,
+  libraries_private: [m_dep, arc4random_dep],
   subdirs: 'json-c',
 )
 
