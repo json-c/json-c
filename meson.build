@@ -265,7 +265,7 @@ libjson = library('json-c',
 jsonc_dep = declare_dependency(link_with: libjson, include_directories: inc)
 meson.override_dependency('json-c', jsonc_dep)
 
-# Install headers into json-c/ subdirectory (matches CMake layout)
+# Install headers
 installed_headers = [
   'arraylist.h', 'debug.h', 'json_c_version.h', 'json_inttypes.h',
   'json_object.h', 'json_object_iterator.h', 'json_tokener.h',
@@ -283,19 +283,11 @@ endif
 install_headers(installed_headers, subdir: 'json-c')
 
 # pkg-config file
-configure_file(
-  input: 'json-c.pc.in',
-  output: 'json-c.pc',
-  install: true,
-  install_dir: get_option('libdir') / 'pkgconfig',
-  configuration: {
-    'prefix': get_option('prefix'),
-    'exec_prefix': get_option('prefix'),
-    'libdir': get_option('libdir'),
-    'includedir': get_option('includedir'),
-    'VERSION': meson.project_version(),
-    'LIBS': '',
-  }
+pkg = import('pkgconfig')
+pkg.generate(
+  libjson,
+  description: 'A JSON implementation in C',
+  subdirs: 'json-c',
 )
 
 # Optional apps
