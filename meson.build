@@ -1,5 +1,5 @@
 
-project('json-c', 'c', version: '0.18.99',
+project('json-c', 'c', version: '0.19.99',
   meson_version: '>=0.54.0',
   license: 'MIT',
   default_options: ['buildtype=release', 'warning_level=2'])
@@ -251,11 +251,14 @@ endif
 # Include directories
 inc = include_directories('.')
 
+# Math library (needed for INFINITY, isnan, etc.)
+m_dep = cc.find_library('m', required: false)
+
 # Build library
 libjson = library('json-c',
   sources,
   include_directories: inc,
-  dependencies: bsd_dep,
+  dependencies: [bsd_dep, m_dep],
   install: true,
   link_args: sym,
   version: '5.4.0',
@@ -287,6 +290,7 @@ pkg = import('pkgconfig')
 pkg.generate(
   libjson,
   description: 'A JSON implementation in C',
+  libraries_private: m_dep,
   subdirs: 'json-c',
 )
 
