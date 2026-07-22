@@ -265,6 +265,10 @@ endif
 # Include directories
 inc = include_directories('.')
 
+# Math library (needed for INFINITY, isnan, etc.)
+m_dep = cc.find_library('m', required: false)
+libjson_deps += [m_dep]
+
 # Build library
 libjson = library('json-c',
   sources,
