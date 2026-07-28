@@ -366,6 +366,15 @@ struct incremental_step
     {"12{", 3, 2, json_tokener_success, 1, 0},
     /* Parse number in strict mode */
     {"[02]", -1, 3, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+    /* Leading zeros are rejected in strict mode, for every sign and type ... */
+    {"[00]", -1, 3, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+    {"[-00]", -1, 4, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+    {"[-01]", -1, 4, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+    {"[-0123]", -1, 6, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+    {"[01.5]", -1, 5, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+    /* ... but a lone zero, "-0" and a zero before the fraction stay valid. */
+    {"[-0]", -1, -1, json_tokener_success, 1, JSON_TOKENER_STRICT},
+    {"[0.5]", -1, -1, json_tokener_success, 1, JSON_TOKENER_STRICT},
 
     {"0e+0", 5, 4, json_tokener_success, 1, 0},
     {"[0e+0]", -1, -1, json_tokener_success, 1, 0},
