@@ -156,6 +156,13 @@ json_tokener_parse_ex(tok, 1           ,   1) ... OK: got correct error: continu
 json_tokener_parse_ex(tok, 2           ,   2) ... OK: got object of type [int]: 12
 json_tokener_parse_ex(tok, 12{         ,   3) ... OK: got object of type [int]: 12
 json_tokener_parse_ex(tok, [02]        ,   4) ... OK: got correct error: number expected
+json_tokener_parse_ex(tok, [00]        ,   4) ... OK: got correct error: number expected
+json_tokener_parse_ex(tok, [-00]       ,   5) ... OK: got correct error: number expected
+json_tokener_parse_ex(tok, [-01]       ,   5) ... OK: got correct error: number expected
+json_tokener_parse_ex(tok, [-0123]     ,   7) ... OK: got correct error: number expected
+json_tokener_parse_ex(tok, [01.5]      ,   6) ... OK: got correct error: number expected
+json_tokener_parse_ex(tok, [-0]        ,   4) ... OK: got object of type [array]: [ 0 ]
+json_tokener_parse_ex(tok, [0.5]       ,   5) ... OK: got object of type [array]: [ 0.5 ]
 json_tokener_parse_ex(tok, 0e+0        ,   5) ... OK: got object of type [double]: 0e+0
 json_tokener_parse_ex(tok, [0e+0]      ,   6) ... OK: got object of type [array]: [ 0e+0 ]
 json_tokener_parse_ex(tok, 0e          ,   2) ... OK: got correct error: continue
@@ -368,5 +375,5 @@ json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
-End Incremental Tests OK=272 ERROR=0
+End Incremental Tests OK=279 ERROR=0
 ==================================

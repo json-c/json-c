@@ -1043,6 +1043,22 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				tok->st_pos = 0;
 				goto redo_char;
 			}
+			if (tok->flags & JSON_TOKENER_STRICT)
+			{
+				/* RFC 8259 forbids leading zeros in the integer part:
+				 * a '0' may only be followed by '.', 'e'/'E' or the end
+				 * of the number, so "01", "00" and "-0123" are invalid
+				 * while "0", "-0" and "0.5" remain valid.
+				 */
+				const char *num = tok->pb->buf;
+				if (*num == '-')
+					num++;
+				if (num[0] == '0' && num[1] >= '0' && num[1] <= '9')
+				{
+					tok->err = json_tokener_error_parse_number;
+					goto out;
+				}
+			}
 			if (tok->is_double && !(tok->flags & JSON_TOKENER_STRICT))
 			{
 				/* Trim some chars off the end, to allow things
@@ -1083,12 +1099,6 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				         json_parse_uint64(tok->pb->buf, &numuint64) == 0)
 				{
 					if (errno == ERANGE && (tok->flags & JSON_TOKENER_STRICT))
-					{
-						tok->err = json_tokener_error_parse_number;
-						goto out;
-					}
-					if (numuint64 && tok->pb->buf[0] == '0' &&
-					    (tok->flags & JSON_TOKENER_STRICT))
 					{
 						tok->err = json_tokener_error_parse_number;
 						goto out;
