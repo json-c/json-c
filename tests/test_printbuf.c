@@ -155,6 +155,27 @@ static void test_printbuf_self_append(void)
 	assert(pb->buf[pb->bpos] == '\0');
 
 	printbuf_free(pb);
+
+	/* Formatted arguments may also point into a buffer that must grow. */
+	pb = printbuf_new();
+	assert(pb != NULL);
+	initial_size = pb->size;
+	data_size = initial_size - 2;
+	data = malloc(data_size);
+	assert(data != NULL);
+	memset(data, 'X', data_size);
+	assert(printbuf_memappend(pb, data, data_size) == data_size);
+	free(data);
+	assert(pb->size == initial_size);
+
+	assert(sprintbuf(pb, "%s", pb->buf + 1) == data_size - 1);
+	assert(pb->size > initial_size);
+	assert(pb->bpos == data_size * 2 - 1);
+	for (i = 0; i < pb->bpos; i++)
+		assert(pb->buf[i] == 'X');
+	assert(pb->buf[pb->bpos] == '\0');
+
+	printbuf_free(pb);
 	printf("%s: end test\n", __func__);
 }
 
