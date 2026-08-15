@@ -23,6 +23,7 @@ if has_std_lib and has_std_arg and has_string and has_float
 endif
 
 headers = {
+  'bsd/stdlib.h': [],
   'dlfcn.h': [],
   'endian.h': [],
   'fcntl.h': [],
@@ -46,15 +47,6 @@ headers = {
   'xlocale.h': [],
 }
 
-may_need_libbsd = true
-if cc.has_function('arc4random')
-  may_need_libbsd = false
-  conf_data.set('HAVE_@0@'.format('arc4random'.underscorify().to_upper()), 1, description :  'Define to 1 if you have the <@0@> header file'.format('arc4random'))
-else
-  bsd_dep = dependency('libbsd', required: get_option('extra_libs'))
-  headers += { 'bsd/stdlib.h': [bsd_dep] }
-endif
-
 foreach h, d : headers
   if cc.has_header(h, dependencies: d)
     conf_data.set('HAVE_@0@'.format(h.underscorify().to_upper()), 1, description :  'Define to 1 if you have the <@0@> header file'.format(h))
@@ -71,7 +63,16 @@ if cc.has_header('stdint.h')
   jconf_data.set('JSON_C_HAVE_STDINT_H', 1, description : 'Define to 1 if you have the <stdint.h> header file.')
 endif
 
+bsd_dep = []
+if get_option('extra_libs')
+    _bsd_dep = dependency('libbsd', required: false)
+    if _bsd_dep.found()
+      bsd_dep = [ _bsd_dep ]
+    endif
+endif
+
 funcs = {
+  'arc4random': bsd_dep,
   'open': [],
   'realloc': [],
   'setlocale': [],
@@ -87,20 +88,19 @@ funcs = {
   'vasprintf': [],
 }
 
-if may_need_libbsd
-  funcs += { 'arc4random': [bsd_dep] }
-  libjson_deps += [bsd_dep]
-else
-  funcs += { 'arc4random': [] }
-endif
-
 if conf_data.has('HAVE_STRINGS_H')
   funcs += {'strcasecmp': [], 'strncasecmp': []}
 endif
 
+
 foreach f, d : funcs
-  if cc.has_function(f, dependencies: d)
+  if cc.has_function(f)
     conf_data.set('HAVE_@0@'.format(f.to_upper()), 1, description : 'Define to 1 if you have the `@0@` function.'.format(f))
+  else
+    if d.length() > 0 and cc.has_function(f, dependencies: d)
+        conf_data.set('HAVE_@0@'.format(f.to_upper()), 1, description : 'Define to 1 if you have the `@0@` function.'.format(f))
+        libjson_deps += d
+    endif
   endif
 endforeach
 
