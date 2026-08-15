@@ -52,6 +52,8 @@ JSON_EXPORT struct printbuf *printbuf_new(void);
  *
  * Your code should not use printbuf_memappend() directly unless it
  * checks the return code. Use printbuf_memappend_fast() instead.
+ * The source may point into p->buf, including a region that overlaps the
+ * appended destination.
  */
 JSON_EXPORT int printbuf_memappend(struct printbuf *p, const char *buf, int size);
 
@@ -112,6 +114,8 @@ JSON_EXPORT int printbuf_memset(struct printbuf *pb, int offset, int charvalue, 
  * important than speed. Avoid using this function in high performance code or
  * tight loops; in these scenarios, consider using snprintf() with a static
  * buffer in conjunction with one of the printbuf_*append() functions.
+ * Format arguments may point into p->buf, including when appending the
+ * formatted result grows the buffer.
  *
  * See also:
  *   printbuf_memappend_fast()

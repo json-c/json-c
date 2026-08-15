@@ -28,6 +28,7 @@
 #endif /* HAVE_STDARG_H */
 
 #include "debug.h"
+#include "json_inttypes.h"
 #include "printbuf.h"
 #include "snprintf_compat.h"
 #include "vasprintf_compat.h"
@@ -104,10 +105,19 @@ int printbuf_memappend(struct printbuf *p, const char *buf, int size)
 	}
 	if (p->size <= p->bpos + size + 1)
 	{
+		int buf_offset = -1;
+		const uintptr_t buf_addr = (uintptr_t)(const void *)buf;
+		const uintptr_t p_buf_addr = (uintptr_t)(const void *)p->buf;
+
+		/* realloc() invalidates source pointers into the old buffer. */
+		if (buf_addr >= p_buf_addr && buf_addr - p_buf_addr < (uintptr_t)p->size)
+			buf_offset = (int)(buf_addr - p_buf_addr);
 		if (printbuf_extend(p, p->bpos + size + 1) < 0)
 			return -1;
+		if (buf_offset >= 0)
+			buf = p->buf + buf_offset;
 	}
-	memcpy(p->buf + p->bpos, buf, size);
+	memmove(p->buf + p->bpos, buf, size);
 	p->bpos += size;
 	p->buf[p->bpos] = '\0';
 	return size;
