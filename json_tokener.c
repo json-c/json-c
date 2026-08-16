@@ -1045,15 +1045,67 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 			}
 			if (tok->flags & JSON_TOKENER_STRICT)
 			{
-				/* RFC 8259 forbids leading zeros in the integer part:
-				 * a '0' may only be followed by '.', 'e'/'E' or the end
-				 * of the number, so "01", "00" and "-0123" are invalid
-				 * while "0", "-0" and "0.5" remain valid.
+				/* Check the accumulated text against the RFC 8259 grammar:
+				 *
+				 *   number = [ minus ] int [ frac ] [ exp ]
+				 *   int    = zero / ( digit1-9 *DIGIT )
+				 *   frac   = decimal-point 1*DIGIT
+				 *   exp    = e [ minus / plus ] 1*DIGIT
+				 *
+				 * so the integer part is mandatory and may not carry a
+				 * leading zero, and both the fraction and the exponent
+				 * need at least one digit of their own. That rejects
+				 * "01", ".5", "-.123", "1.", "2.e3" and "1e", while
+				 * "0", "-0", "0.5" and "2e3" stay valid.
 				 */
 				const char *num = tok->pb->buf;
 				if (*num == '-')
 					num++;
-				if (num[0] == '0' && num[1] >= '0' && num[1] <= '9')
+				if (*num == '0')
+				{
+					num++;
+					if (*num >= '0' && *num <= '9')
+					{
+						tok->err = json_tokener_error_parse_number;
+						goto out;
+					}
+				}
+				else if (*num >= '1' && *num <= '9')
+				{
+					while (*num >= '0' && *num <= '9')
+						num++;
+				}
+				else
+				{
+					/* no integer part at all, e.g. ".5" or "-.123" */
+					tok->err = json_tokener_error_parse_number;
+					goto out;
+				}
+				if (*num == '.')
+				{
+					num++;
+					if (!(*num >= '0' && *num <= '9'))
+					{
+						tok->err = json_tokener_error_parse_number;
+						goto out;
+					}
+					while (*num >= '0' && *num <= '9')
+						num++;
+				}
+				if (*num == 'e' || *num == 'E')
+				{
+					num++;
+					if (*num == '+' || *num == '-')
+						num++;
+					if (!(*num >= '0' && *num <= '9'))
+					{
+						tok->err = json_tokener_error_parse_number;
+						goto out;
+					}
+					while (*num >= '0' && *num <= '9')
+						num++;
+				}
+				if (*num != '\0')
 				{
 					tok->err = json_tokener_error_parse_number;
 					goto out;

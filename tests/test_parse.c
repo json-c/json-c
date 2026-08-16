@@ -375,6 +375,24 @@ struct incremental_step
     /* ... but a lone zero, "-0" and a zero before the fraction stay valid. */
     {"[-0]", -1, -1, json_tokener_success, 1, JSON_TOKENER_STRICT},
     {"[0.5]", -1, -1, json_tokener_success, 1, JSON_TOKENER_STRICT},
+    /* RFC 8259 wants a digit either side of the decimal point and after the
+     * exponent marker, so a bare "1." or "2.e3" is not a number ... */
+    {"[1.]", -1, 3, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+    {"[-2.]", -1, 4, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+    {"[2.e3]", -1, 5, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+    {"[2.e+3]", -1, 6, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+    {"[0.e1]", -1, 5, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+    {"[1e]", -1, 3, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+    {"[1e+]", -1, 4, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+    /* ... and the integer part is mandatory, so "-.123" is not a number either
+     * (a bare ".5" never reaches the number state at all). */
+    {"[-.123]", -1, 6, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+    /* The well-formed spellings of the same values stay valid. */
+    {"[1.0]", -1, -1, json_tokener_success, 1, JSON_TOKENER_STRICT},
+    {"[2e3]", -1, -1, json_tokener_success, 1, JSON_TOKENER_STRICT},
+    {"[2E-3]", -1, -1, json_tokener_success, 1, JSON_TOKENER_STRICT},
+    {"[0.123]", -1, -1, json_tokener_success, 1, JSON_TOKENER_STRICT},
+    {"[-0.123]", -1, -1, json_tokener_success, 1, JSON_TOKENER_STRICT},
 
     {"0e+0", 5, 4, json_tokener_success, 1, 0},
     {"[0e+0]", -1, -1, json_tokener_success, 1, 0},
