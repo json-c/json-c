@@ -263,7 +263,13 @@ int json_parse_uint64(const char *buf, uint64_t *retval)
 	uint64_t val;
 
 	errno = 0;
-	while (*buf == ' ')
+	/* strtoull() skips leading whitespace and then quietly negates a
+	 * leading '-', wrapping the result into a huge value. We only skipped
+	 * spaces here, so a '-' behind a tab/newline/etc slipped past the check
+	 * below. Skip the same whitespace set strtoull() does so the rejection
+	 * actually holds. */
+	while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\v' || *buf == '\f' ||
+	       *buf == '\r')
 		buf++;
 	if (*buf == '-')
 		return 1; /* error: uint cannot be negative */

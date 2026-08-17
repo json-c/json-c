@@ -145,6 +145,11 @@ int main(int argc, char **argv)
 	strcpy(buf, "-9223372036854775808");
 	checkit_uint(buf);
 
+	// A negative value hidden behind non-space whitespace must still be
+	// rejected; strtoull() skips this whitespace and would wrap the '-'.
+	strcpy(buf, "\t-1");
+	checkit_uint(buf);
+
 	strcpy(buf, "   1");
 	checkit_uint(buf);
 
