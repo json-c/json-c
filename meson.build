@@ -1,5 +1,5 @@
 
-project('json-c', 'c', version: '0.18.99',
+project('json-c', 'c', version: '0.19.99',
   meson_version: '>=0.54.0',
   license: 'MIT',
   default_options: ['buildtype=release', 'warning_level=2'])
@@ -11,6 +11,8 @@ conf_data = configuration_data()
 jconf_data = configuration_data()
 conf_data.set('VERSION', meson.project_version())
 
+libjson_deps = []
+
 has_std_lib = cc.has_header('stdlib.h')
 has_std_arg = cc.has_header('stdarg.h')
 has_string = cc.has_header('string.h')
@@ -20,10 +22,8 @@ if has_std_lib and has_std_arg and has_string and has_float
   conf_data.set('STDC_HEADERS', 1, description : 'Define to 1 if you have the ANSI C header files.')
 endif
 
-bsd_dep = dependency('libbsd', required: false)
-
 headers = {
-  'bsd/stdlib.h': bsd_dep,
+  'bsd/stdlib.h': [],
   'dlfcn.h': [],
   'endian.h': [],
   'fcntl.h': [],
@@ -63,30 +63,44 @@ if cc.has_header('stdint.h')
   jconf_data.set('JSON_C_HAVE_STDINT_H', 1, description : 'Define to 1 if you have the <stdint.h> header file.')
 endif
 
-funcs = [
-  'open',
-  'realloc',
-  'setlocale',
-  'strdup',
-  'strerror',
-  'uselocale',
-  'duplocale',
-  'vsyslog',
-  'getrandom',
-  'getrusage',
-  'strtoll',
-  'strtoull',
-  'arc4random',
-  'vasprintf',
-]
-
-if conf_data.has('HAVE_STRINGS_H')
-  funcs += ['strcasecmp', 'strncasecmp']
+bsd_dep = []
+if get_option('extra_libs')
+    _bsd_dep = dependency('libbsd', required: false)
+    if _bsd_dep.found()
+      bsd_dep = [ _bsd_dep ]
+    endif
 endif
 
-foreach f : funcs
+funcs = {
+  'arc4random': bsd_dep,
+  'open': [],
+  'realloc': [],
+  'setlocale': [],
+  'strdup': [],
+  'strerror': [],
+  'uselocale': [],
+  'duplocale': [],
+  'vsyslog': [],
+  'getrandom': [],
+  'getrusage': [],
+  'strtoll': [],
+  'strtoull': [],
+  'vasprintf': [],
+}
+
+if conf_data.has('HAVE_STRINGS_H')
+  funcs += {'strcasecmp': [], 'strncasecmp': []}
+endif
+
+
+foreach f, d : funcs
   if cc.has_function(f)
     conf_data.set('HAVE_@0@'.format(f.to_upper()), 1, description : 'Define to 1 if you have the `@0@` function.'.format(f))
+  else
+    if d.length() > 0 and cc.has_function(f, dependencies: d)
+        conf_data.set('HAVE_@0@'.format(f.to_upper()), 1, description : 'Define to 1 if you have the `@0@` function.'.format(f))
+        libjson_deps += d
+    endif
   endif
 endforeach
 
@@ -251,14 +265,18 @@ endif
 # Include directories
 inc = include_directories('.')
 
+# Math library (needed for INFINITY, isnan, etc.)
+m_dep = cc.find_library('m', required: false)
+libjson_deps += [m_dep]
+
 # Build library
 libjson = library('json-c',
   sources,
   include_directories: inc,
-  dependencies: bsd_dep,
+  dependencies: libjson_deps,
   install: true,
   link_args: sym,
-  version: '5.4.0',
+  version: '5.5.0',
   soversion: '5',
 )
 
@@ -283,19 +301,11 @@ endif
 install_headers(installed_headers, subdir: 'json-c')
 
 # pkg-config file
-configure_file(
-  input: 'json-c.pc.in',
-  output: 'json-c.pc',
-  install: true,
-  install_dir: get_option('libdir') / 'pkgconfig',
-  configuration: {
-    'prefix': get_option('prefix'),
-    'exec_prefix': get_option('prefix'),
-    'libdir': get_option('libdir'),
-    'includedir': get_option('includedir'),
-    'VERSION': meson.project_version(),
-    'LIBS': '',
-  }
+pkg = import('pkgconfig')
+pkg.generate(
+  libjson,
+  description: 'A JSON implementation in C',
+  subdirs: 'json-c',
 )
 
 # Optional apps
@@ -303,7 +313,4 @@ if get_option('build_apps') and host_machine.system() != 'windows'
   subdir('apps')
 endif
 
-# Optional tests
-if get_option('buildtype') == 'debug'
-  subdir('tests')
-endif 
+subdir('tests')

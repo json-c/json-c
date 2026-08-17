@@ -4,6 +4,7 @@ test_lib = static_library(
   objects: libjson.extract_all_objects(
     recursive: false,
   ),
+  build_by_default: false,
   install: false,
 )
 
@@ -65,7 +66,8 @@ foreach t : test_cases
   name = t[0]
   expected = t[1]
   exe = executable(name, name + '.c',
-    dependencies: test_deps
+    dependencies: test_deps,
+    build_by_default: false
   )
 
   test(name, exe,
