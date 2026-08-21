@@ -38,9 +38,10 @@ set(ALL_TEST_NAMES
     test_visit
     test_object_iterator)
 
-set(NOBUILD_TEST_NAMES
-    test_json_parse_cli
-)
+set(NOBUILD_TEST_NAMES "")
+if (BUILD_APPS)
+  set(NOBUILD_TEST_NAMES ${NOBUILD_TEST_NAMES} test_json_parse_cli)
+endif()
 
 if (NOT DISABLE_JSON_POINTER)
     set(ALL_TEST_NAMES ${ALL_TEST_NAMES} test_json_pointer)
