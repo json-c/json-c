@@ -19,6 +19,7 @@ test_cases = [
   ['test2', 'test2.expected'],
   ['test4', 'test4.expected'],
   ['testReplaceExisting', 'testReplaceExisting.expected'],
+  ['test_object_add_failure', 'test_object_add_failure.expected'],
   ['test_cast', 'test_cast.expected'],
   ['test_charcase', 'test_charcase.expected'],
   ['test_compare', 'test_compare.expected'],
