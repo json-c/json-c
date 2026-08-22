@@ -753,11 +753,21 @@ int json_object_object_add_ex(struct json_object *jso, const char *const key,
 
 	if (!existing_entry)
 	{
-		const void *const k =
-		    (opts & JSON_C_OBJECT_ADD_CONSTANT_KEY) ? (const void *)key : strdup(key);
-		if (k == NULL)
+		char *key_copy = NULL;
+		const void *k = key;
+		if (!(opts & JSON_C_OBJECT_ADD_CONSTANT_KEY))
+		{
+			key_copy = strdup(key);
+			if (key_copy == NULL)
+				return -1;
+			k = key_copy;
+		}
+		if (lh_table_insert_w_hash(JC_OBJECT(jso)->c_object, k, val, hash, opts) < 0)
+		{
+			free(key_copy);
 			return -1;
-		return lh_table_insert_w_hash(JC_OBJECT(jso)->c_object, k, val, hash, opts);
+		}
+		return 0;
 	}
 	existing_value = (json_object *)lh_entry_v(existing_entry);
 	if (existing_value)
