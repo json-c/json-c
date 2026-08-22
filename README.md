@@ -314,6 +314,23 @@ cmake -DM68K_CRT=newlib -DM68K_CPU=68020 ..
 cmake -DM68K_CRT=newlib -DM68K_CPU=68040 -DM68K_BASEREL=baserel32 ..
 ```
 
+A note on base-relative addressing (`-fbaserel`, i.e. `M68K_BASEREL=baserel`)
+on m68k: a base-relative library keeps its globals at an offset from `a4`, and
+`a4` is established once by the program's startup code. Such a library is only
+safe inside a program that is itself base-relative **and** that declares every
+function the OS can call back into (BOOPSI/MUI dispatchers, `struct Hook`
+entries, interrupt servers) with `__saveds`, so `a4` is re-established on entry.
+Without that, a hook entered from the OS runs with a foreign `a4` and every
+`a4`-relative access made by this library -- or by libnix's `malloc` -- reads
+from a wrong address.
+
+Conversely, a library built *without* `-fbaserel` and compiled at `-O1` or above
+may allocate `a4` as a scratch register. That is harmless in a program that is
+also non-base-relative, but it corrupts the base pointer of a base-relative one.
+
+In short: match `M68K_BASEREL` to the consuming program, and if that program is
+base-relative make sure its OS callbacks are `__saveds`.
+
 ### To build for PowerPC Amiga:
 
 ```
