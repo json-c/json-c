@@ -296,6 +296,24 @@ libjson-c.a will get created in the build directory.
 
 You can change newlib to nix20, nix13, ixemul or clib2 if you would like to build the library suited for libnix or clib2 instead. Newlib is default.
 
+By default the m68k build uses `-fbaserel`. You can select a different base-relative mode with `-DM68K_BASEREL=`:
+
+* `baserel` (default) — `-fbaserel`
+* `baserel32` — `-fbaserel32`
+* `off` — no base-relative flag
+
+```
+cmake -DM68K_CRT=newlib -DM68K_BASEREL=baserel32 ..
+cmake -DM68K_CRT=newlib -DM68K_BASEREL=off ..
+```
+
+You can also set the target CPU with `-DM68K_CPU=`. This is passed to the compiler as `-m<cpu>` (for example `68020` becomes `-m68020`). If omitted, the compiler default is used.
+
+```
+cmake -DM68K_CRT=newlib -DM68K_CPU=68020 ..
+cmake -DM68K_CRT=newlib -DM68K_CPU=68040 -DM68K_BASEREL=baserel32 ..
+```
+
 ### To build for PowerPC Amiga:
 
 ```
