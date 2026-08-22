@@ -268,6 +268,25 @@ static void test_example_set(void)
 	printf("PASSED - SET - Final JSON is: %s\n", json_object_get_string(jo1));
 	json_object_put(jo2);
 
+	/* RFC 6901 escapes must be decoded on the set path too, just as the
+	 * getter does, so "/a~1b" addresses the member "a/b" and "/m~0n"
+	 * addresses "m~n" rather than creating keys spelled "a~1b"/"m~0n". */
+	{
+		struct json_object *esc = json_tokener_parse("{ 'a/b': 1, 'm~n': 2 }");
+		struct json_object *v = NULL;
+		assert(0 == json_pointer_set(&esc, "/a~1b", json_object_new_int(11)));
+		assert(0 == json_pointer_setf(&esc, json_object_new_int(22), "/m~0n"));
+		assert(0 == json_pointer_get(esc, "/a~1b", &v));
+		assert(11 == json_object_get_int(v));
+		assert(0 == json_pointer_get(esc, "/m~0n", &v));
+		assert(22 == json_object_get_int(v));
+		assert(NULL == json_object_object_get(esc, "a~1b"));
+		assert(NULL == json_object_object_get(esc, "m~0n"));
+		assert(2 == json_object_object_length(esc));
+		printf("PASSED - SET - escaped keys /a~1b and /m~0n\n");
+		json_object_put(esc);
+	}
+
 	assert(0 == json_pointer_set(&jo1, "", json_object_new_int(10)));
 	assert(10 == json_object_get_int(jo1));
 	printf("%s\n", json_object_get_string(jo1));
