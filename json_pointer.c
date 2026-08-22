@@ -141,19 +141,28 @@ static int json_pointer_set_single_path(struct json_object *parent, const char *
 		return set_cb(parent, NULL, idx, value, priv);
 	}
 
-	/* path replacements should have been done in json_pointer_get_single_path(),
-	 * and we should still be good here
-	 */
 	if (json_object_is_type(parent, json_type_object))
 	{
+		/* Unlike the getter, which decodes the reference token in
+		 * json_pointer_get_single_path(), nothing had decoded the '~1'/'~0'
+		 * escapes on the way here, so a member whose name contains '/' or '~'
+		 * was addressed under its still-escaped spelling. Decode a copy per
+		 * RFC 6901 (first '~1' then '~0') before using it as the key.
+		 */
+		char *key = strdup(path);
+		int rc;
+
+		if (key == NULL)
+			return -1;
+		string_replace_all_occurrences_with_char(key, "~1", '/');
+		string_replace_all_occurrences_with_char(key, "~0", '~');
+
 		if (cb_handles_obj)
-		{
-			return set_cb(parent, path, (size_t)-1, value, priv);
-		}
+			rc = set_cb(parent, key, (size_t)-1, value, priv);
 		else
-		{
-			return json_object_object_add(parent, path, value);
-		}
+			rc = json_object_object_add(parent, key, value);
+		free(key);
+		return rc;
 	}
 
 	/* Getting here means that we tried to "dereference" a primitive JSON type
