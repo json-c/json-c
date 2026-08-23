@@ -1,11 +1,11 @@
-Short:         JSON parser and generator library (static libs + headers)
-Author:        Michael Clark, Eric Haszlakiewicz et al.
-Uploader:      Cameron Armstrong <cameronscottarmstrong@gmail.com>
-Type:          dev/lib
-Version:       0.19.99
+Short: JSON parser and generator library (static libs + headers)
+Author: Michael Clark, Eric Haszlakiewicz et al.
+Uploader: Cameron Armstrong (Nightfox) <cameronscottarmstrong@gmail.com>
+Type: dev/lib
+Version: 0.19
 Architecture:  m68k-amigaos >= 2.0; ppc-amigaos; ppc-morphos
-Distribution:  Aminet
-Requires:      an Amiga gcc cross compiler
+Requires: an Amiga gcc compiler
+Replaces: dev/lib/json-c.lha
 
 json-c implements a reference-counted object model for JSON, a parser that
 builds it from text, and a serialiser that writes it back out. This archive
