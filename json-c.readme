@@ -1,0 +1,110 @@
+Short:         JSON parser and generator library (static libs + headers)
+Author:        Michael Clark, Eric Haszlakiewicz et al.
+Uploader:      Cameron Armstrong <cameronscottarmstrong@gmail.com>
+Type:          dev/lib
+Version:       0.19.99
+Architecture:  m68k-amigaos >= 2.0; ppc-amigaos; ppc-morphos
+Distribution:  Aminet
+Requires:      an Amiga gcc cross compiler
+
+json-c implements a reference-counted object model for JSON, a parser that
+builds it from text, and a serialiser that writes it back out. This archive
+contains static libraries and public headers for Amiga development.
+
+    https://github.com/json-c/json-c
+
+
+Contents
+
+    json-c.readme                    this file
+    json-c/AmigaOS3/...              m68k AmigaOS libraries and headers
+    json-c/AmigaOS4/...              ppc-amigaos libraries and headers
+    json-c/MorphOS/...               ppc-morphos libraries and headers
+
+    Under each OS directory the trees follow the compiler's own layout, so
+    they can be copied straight over an existing SDK, e.g.
+
+        cp -a json-c/AmigaOS3/* /opt/amiga/m68k-amigaos/
+
+    AmigaOS3 ships one set per C runtime -- newlib at the top level, plus
+    libnix/ and clib2/ -- and within each, one library per multilib:
+
+        lib/                   68000, absolute addressing
+        lib/libm020/           68020, absolute addressing
+        lib/libb/              68000, -fbaserel
+        lib/libb/libm020/      68020, -fbaserel
+        lib/libb32/libm020/    68020, -fbaserel32
+
+    On PPC a C runtime is not a separate tree but a multilib slot beneath one
+    shared lib/, with headers in the single shared include/:
+
+        AmigaOS4    lib/               newlib
+                    lib/clib2/         clib2
+                    lib/clib4/         clib4
+
+        MorphOS     lib/               ixemul
+                    lib/libb32/        ixemul, -mbaserel32
+                    lib/libnix/        native C library (-noixemul)
+                    lib/libb32/libnix/ native C library, -mbaserel32
+
+    -mclib=libnix and -noixemul select the same MorphOS multilib. That ABI is
+    the self-contained one -- an ixemul build needs ixemul.library on the
+    target -- so prefer lib/libnix/ for new code.
+
+
+Usage
+
+    #include <json-c/json.h>
+
+    struct json_object *o = json_tokener_parse("{\"a\":1}");
+    printf("%s\n", json_object_to_json_string(o));
+    json_object_put(o);
+
+    Link with -ljson-c -lm, after your own objects on the command line. For
+    clib2 add -lunix as well, since clib2 keeps its POSIX layer there.
+
+
+Which variants link
+
+    Verified by compiling the snippet above against each shipped library.
+
+    AmigaOS3  libnix    all 5 slots link.
+
+              clib2     lib/libm020/ and lib/libb32/libm020/ link. The other
+                        three fail inside clib2 itself: its 68000 multilib has
+                        no strtoll()/strtoull(), and 16-bit -fbaserel overflows
+                        with "truncated to fit: DREL16" once json-c's data is
+                        added. -fbaserel32 has no such limit.
+
+              newlib    builds, but does not link: the m68k newlib tree has no
+                        gettimeofday(). The libraries are shipped anyway, since
+                        that is a gap in the SDK rather than in json-c and a
+                        newlib with gettimeofday() implemented would link.
+
+    AmigaOS4  all three (newlib, clib2, clib4) link.
+
+    MorphOS   all four slots link.
+
+
+A note on base-relative addressing (AmigaOS3)
+
+    A base-relative library addresses its globals through a4, which the
+    program's startup code sets up once. Only link the libb/ or libb32/
+    variants into a program that is itself base-relative AND that marks every
+    function the OS calls back into (BOOPSI/MUI dispatchers, struct Hook
+    entries, interrupt servers) with __saveds. The m68k SDI_hook.h macros set
+    up register arguments but do not add __saveds, so this is easy to get
+    wrong, and the failure mode is intermittent memory corruption rather than
+    a clean error -- libnix keeps malloc's heap state in a4-relative storage.
+
+    Conversely a non-base-relative library built at -O1 or above may use a4 as
+    a scratch register, which is harmless in a non-base-relative program but
+    corrupts the base pointer of one that is.
+
+    Match the variant to the program. If in doubt, use the plain lib/ or
+    lib/libm020/ builds.
+
+
+Licence
+
+    MIT; see COPYING in the source distribution.

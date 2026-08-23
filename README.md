@@ -346,6 +346,13 @@ make
 
 libjson-c.a will get created in the build directory.
 
+Select the C runtime with `-DPPC_CRT=`: `newlib` (default), `clib2` or `clib4`.
+Anything other than `newlib` is passed to the compiler as `-mcrt=<value>`.
+
+```
+cmake -DPPC_CRT=clib4 ..
+```
+
 ### To build for PowerPC MorphOS:
 
 ```
@@ -362,6 +369,72 @@ make
 If you are making an application that absolutely requires ixemul, then remove the `-DNOIXEMUL=1`.
 
 libjson-c.a will get created in the build directory.
+
+Two further options apply to MorphOS:
+
+* `-DMORPHOS_CLIB=` selects `default` (ixemul) or `libnix` (passed as
+  `-mclib=libnix`). That is the same multilib `-noixemul` selects, and is the
+  self-contained ABI -- an ixemul build needs `ixemul.library` on the target.
+* `-DMORPHOS_BASEREL32=ON` adds `-mbaserel32`.
+
+```
+cmake -DMORPHOS_CLIB=libnix ..
+cmake -DMORPHOS_BASEREL32=ON ..
+```
+
+### Building and packaging every variant
+
+Two scripts at the repository root build the whole matrix across all three
+systems, so you do not have to drive the container by hand.
+
+* `build-amiga-sdk.sh [OS ...]` — builds every variant and installs
+  `libjson-c.a` plus the `json-c/` headers into an SDK tree. The location comes
+  from `$AMIGA_SDK` (default `/opt/amiga`); either a `<target>/` or an
+  AmigaSDK-gcc-style `amigaos3/sdk/<target>/` layout is accepted, and an OS
+  whose subdirectory is absent is skipped rather than failing.
+* `package-amiga.sh [OS ...]` — builds the same matrix into a staging tree and
+  produces `dist/json-c.lha` for distribution.
+
+Both default to `AmigaOS3 AmigaOS4 MorphOS`, and both take the variant list
+from the same table in `build-amiga-sdk.sh`, so they cannot disagree. 22
+libraries are built in total: 15 for AmigaOS 3 (newlib, libnix and clib2, each
+across the five multilib slots), 3 for AmigaOS 4 (newlib, clib2, clib4) and 4
+for MorphOS (ixemul and native, each with and without `-mbaserel32`).
+
+Which of them actually *link* is a separate question from whether they build,
+and was checked by compiling a program against each one:
+
+| target | links |
+|--------|-------|
+| AmigaOS 3, libnix | all 5 slots |
+| AmigaOS 3, clib2 | `lib/libm020/` and `lib/libb32/libm020/` only |
+| AmigaOS 3, newlib | none -- the m68k newlib tree has no `gettimeofday()` |
+| AmigaOS 4 | all 3 (newlib, clib2, clib4) |
+| MorphOS | all 4 slots |
+
+The clib2 failures are inside clib2 itself: its 68000 multilib provides no
+`strtoll`/`strtoull`, and 16-bit `-fbaserel` overflows with *truncated to fit:
+DREL16* once json-c's data is added -- `-fbaserel32` has no 64 KB limit. Link
+with `-ljson-c -lm` after your own objects, and add `-lunix` for clib2.
+
+The archive is laid out with the readme at the root and one directory per
+system, each following the compiler's own layout so it can be copied straight
+over an SDK:
+
+```
+json-c.readme
+json-c/AmigaOS3/{include,lib,...}/     plus libnix/ and clib2/ subtrees
+json-c/AmigaOS4/{include,lib,lib/clib2,lib/clib4}/
+json-c/MorphOS/{include,lib,lib/libb32,lib/libnix}/
+```
+
+Note that m68k and PPC lay their C runtimes out differently, and the variant
+table follows each. On m68k a runtime is a separate tree (`libnix/`, `clib2/`),
+each with its own `include/` and `lib/`. On PPC a runtime is a multilib *slot*
+beneath a single shared `lib/`: `-mcrt=clib4` searches `<target>/lib/clib4/`
+and takes headers from `<target>/include/`. This was read off
+`-print-search-dirs` rather than assumed, because installing to the wrong one
+produces a library the compiler silently never finds.
 
 <a name="linking"></a>
 Linking to `libjson-c`
