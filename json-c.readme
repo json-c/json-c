@@ -16,7 +16,7 @@ contains static libraries and public headers for Amiga development.
 
 Contents
 
-    json-c.readme                    this file
+    json-c/json-c.readme             this file
     json-c/AmigaOS3/...              m68k AmigaOS libraries and headers
     json-c/AmigaOS4/...              ppc-amigaos libraries and headers
     json-c/MorphOS/...               ppc-morphos libraries and headers

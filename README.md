@@ -417,12 +417,12 @@ The clib2 failures are inside clib2 itself: its 68000 multilib provides no
 DREL16* once json-c's data is added -- `-fbaserel32` has no 64 KB limit. Link
 with `-ljson-c -lm` after your own objects, and add `-lunix` for clib2.
 
-The archive is laid out with the readme at the root and one directory per
-system, each following the compiler's own layout so it can be copied straight
-over an SDK:
+The archive is a single `json-c/` directory at the root, with the readme and
+one directory per system, each following the compiler's own layout so it can
+be copied straight over an SDK:
 
 ```
-json-c.readme
+json-c/json-c.readme
 json-c/AmigaOS3/{include,lib,...}/     plus libnix/ and clib2/ subtrees
 json-c/AmigaOS4/{include,lib,lib/clib2,lib/clib4}/
 json-c/MorphOS/{include,lib,lib/libb32,lib/libnix}/

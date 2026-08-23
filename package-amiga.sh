@@ -4,8 +4,8 @@
 #
 #   ./package-amiga.sh [OS ...]        # default: all three
 #
-# Archive layout:
-#     json-c.readme          at the archive root
+# Archive layout (single directory at the root):
+#     json-c/json-c.readme
 #     json-c/AmigaOS3/...    per-OS libraries and headers
 #     json-c/AmigaOS4/...
 #     json-c/MorphOS/...
@@ -23,7 +23,7 @@ command -v lha >/dev/null || { echo "error: lha not found on PATH" >&2; exit 1; 
 # script's SDK layout ($SDK/<target>) is the same shape we want per OS, so each
 # OS gets staged under its own directory.
 rm -rf "$DIST"; mkdir -p "$STAGE/json-c"
-cp "$ROOT/json-c.readme" "$STAGE/json-c.readme"
+cp "$ROOT/json-c.readme" "$STAGE/json-c/json-c.readme"
 
 built=()
 for os in "${OSES[@]}"; do
