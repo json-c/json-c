@@ -18,6 +18,15 @@ STAGE=$DIST/stage
 OSES=("$@"); [[ ${#OSES[@]} -eq 0 ]] && OSES=(AmigaOS3 AmigaOS4 MorphOS)
 
 command -v lha >/dev/null || { echo "error: lha not found on PATH" >&2; exit 1; }
+# Ubuntu's `lha` package is lhasa, which can only extract.
+_lha_probe=$(mktemp -d)
+echo x > "$_lha_probe/f"
+if ! ( cd "$_lha_probe" && lha -aq2 t.lha f >/dev/null 2>&1 && [[ -s t.lha ]] ); then
+  echo "error: lha cannot create archives (is it lhasa?). Install LHa for UNIX: https://github.com/jca02266/lha" >&2
+  rm -rf "$_lha_probe"
+  exit 1
+fi
+rm -rf "$_lha_probe"
 
 # Build straight into the staging tree by pointing AMIGA_SDK at it: the build
 # script's SDK layout ($SDK/<target>) is the same shape we want per OS, so each
