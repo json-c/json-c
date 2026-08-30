@@ -2,14 +2,15 @@
 # Cross-build json-c for Amiga systems across every multilib slot and install
 # the archives plus headers into an SDK tree.
 #
-#   ./build-amiga-sdk.sh [OS ...]        # default: AmigaOS3 AmigaOS4 MorphOS
+#   ./amiga/build-amiga-sdk.sh [OS ...]   # default: AmigaOS3 AmigaOS4 MorphOS
 #
 # SDK location comes from $AMIGA_SDK (default /opt/amiga).
 set -uo pipefail
 
 SDK=${AMIGA_SDK:-/opt/amiga}
-cd "$(dirname "$0")"
-ROOT=$PWD
+AMIGA_DIR=$(cd "$(dirname "$0")" && pwd)
+ROOT=$(cd "$AMIGA_DIR/.." && pwd)
+cd "$ROOT"
 OSES=("$@"); [[ ${#OSES[@]} -eq 0 ]] && OSES=(AmigaOS3 AmigaOS4 MorphOS)
 
 # os | image tag | sdk subdir

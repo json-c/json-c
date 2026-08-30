@@ -275,7 +275,9 @@ make install
 Building for Commodore Amiga or MorphOS
 ----------------------
 
-Building for Commodore Amiga is supported for both Motorola 68k (AmigaOS 3) and PowerPC (AmigaOS 4) architectures. MorphOS on compatible PowerPC hardware is also supported. You can set up a cross compiler locally, however it is much easier to use the already preconfigured Amiga development environment wtthin a Docker container.
+Building for Commodore Amiga is supported for both Motorola 68k (AmigaOS 3) and PowerPC (AmigaOS 4) architectures. MorphOS on compatible PowerPC hardware is also supported. You can set up a cross compiler locally, however it is much easier to use the already preconfigured Amiga development environment within a Docker container.
+
+Included below are instructions for building for specific individual systems, as well as how to build for *all* Amiga variants.
 
 Install Docker on your machine if you don't already have it. You can download Docker Desktop for Windows/macOS/Linux [here](https://www.docker.com/products/docker-desktop/).
 
@@ -384,19 +386,19 @@ cmake -DMORPHOS_BASEREL32=ON ..
 
 ### Building and packaging every variant
 
-Two scripts at the repository root build the whole matrix across all three
+Two scripts in the `amiga/` directory build the whole matrix across all three
 systems, so you do not have to drive the container by hand.
 
-* `build-amiga-sdk.sh [OS ...]` — builds every variant and installs
+* `amiga/build-amiga-sdk.sh [OS ...]` — builds every variant and installs
   `libjson-c.a` plus the `json-c/` headers into an SDK tree. The location comes
   from `$AMIGA_SDK` (default `/opt/amiga`); either a `<target>/` or an
   AmigaSDK-gcc-style `amigaos3/sdk/<target>/` layout is accepted, and an OS
   whose subdirectory is absent is skipped rather than failing.
-* `package-amiga.sh [OS ...]` — builds the same matrix into a staging tree and
+* `amiga/package-amiga.sh [OS ...]` — builds the same matrix into a staging tree and
   produces `dist/json-c.lha` for distribution.
 
 Both default to `AmigaOS3 AmigaOS4 MorphOS`, and both take the variant list
-from the same table in `build-amiga-sdk.sh`, so they cannot disagree. 22
+from the same table in `amiga/build-amiga-sdk.sh`, so they cannot disagree. 22
 libraries are built in total: 15 for AmigaOS 3 (newlib, libnix and clib2, each
 across the five multilib slots), 3 for AmigaOS 4 (newlib, clib2, clib4) and 4
 for MorphOS (ixemul and native, each with and without `-mbaserel32`).

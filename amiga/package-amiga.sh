@@ -2,7 +2,7 @@
 # Build every json-c variant for the requested Amiga systems and package them
 # into dist/json-c.lha.
 #
-#   ./package-amiga.sh [OS ...]        # default: all three
+#   ./amiga/package-amiga.sh [OS ...]     # default: all three
 #
 # Archive layout (single directory at the root):
 #     json-c/json-c.readme
@@ -11,8 +11,9 @@
 #     json-c/MorphOS/...
 set -uo pipefail
 
-cd "$(dirname "$0")"
-ROOT=$PWD
+AMIGA_DIR=$(cd "$(dirname "$0")" && pwd)
+ROOT=$(cd "$AMIGA_DIR/.." && pwd)
+cd "$ROOT"
 DIST=$ROOT/dist
 STAGE=$DIST/stage
 OSES=("$@"); [[ ${#OSES[@]} -eq 0 ]] && OSES=(AmigaOS3 AmigaOS4 MorphOS)
@@ -32,7 +33,7 @@ rm -rf "$_lha_probe"
 # script's SDK layout ($SDK/<target>) is the same shape we want per OS, so each
 # OS gets staged under its own directory.
 rm -rf "$DIST"; mkdir -p "$STAGE/json-c"
-cp "$ROOT/json-c.readme" "$STAGE/json-c/json-c.readme"
+cp "$AMIGA_DIR/json-c.readme" "$STAGE/json-c/json-c.readme"
 
 built=()
 for os in "${OSES[@]}"; do
@@ -47,7 +48,7 @@ for os in "${OSES[@]}"; do
   echo "=== $os ==="
   # Stage whatever landed even if some variants failed -- a single unsupported
   # multilib should not drop the whole OS from the archive.
-  AMIGA_SDK="$tmp" ./build-amiga-sdk.sh "$os" || echo "  ($os: some variants failed, see above)"
+  AMIGA_SDK="$tmp" "$AMIGA_DIR/build-amiga-sdk.sh" "$os" || echo "  ($os: some variants failed, see above)"
   if [[ -n $(find "$tmp/$sub" -name 'libjson-c.a' -print -quit 2>/dev/null) ]]; then
     mkdir -p "$STAGE/json-c/$os"
     cp -a "$tmp/$sub/." "$STAGE/json-c/$os/"
