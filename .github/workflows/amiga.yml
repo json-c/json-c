@@ -1,0 +1,73 @@
+name: amiga
+
+# Verifies that AmigaOS 3/4 and MorphOS still cross-compile. The uploaded
+# json-c.lha is a CI convenience artifact only — official json-c releases
+# remain source-only. Aminet uploads are a separate, manual process and
+# are not published from this job.
+
+on: [push, pull_request, workflow_dispatch]
+
+concurrency:
+  group: ${{github.workflow}}-${{github.event.pull_request.number || github.ref}}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+
+      # Ubuntu's `lha` package is lhasa: extract-only, cannot create archives.
+      # Build LHa for UNIX (https://github.com/jca02266/lha) instead.
+      - name: Cache LHa for UNIX
+        id: cache-lha
+        uses: actions/cache@v6
+        with:
+          path: ~/.local/bin/lha
+          key: lha-16619b066b189ef289bb8b07b37d1c38d550da99-${{ runner.os }}
+
+      - name: Install LHa for UNIX
+        if: steps.cache-lha.outputs.cache-hit != 'true'
+        working-directory: ${{runner.temp}}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y autoconf automake
+          curl -fsSL -o lha.tar.gz \
+            https://github.com/jca02266/lha/archive/16619b066b189ef289bb8b07b37d1c38d550da99.tar.gz
+          tar -xzf lha.tar.gz
+          cd lha-16619b066b189ef289bb8b07b37d1c38d550da99
+          autoreconf -is
+          ./configure --prefix="$HOME/.local"
+          make -j"$(nproc)"
+          make install
+
+      - name: Add LHa to PATH
+        run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Check lha can create archives
+        run: |
+          command -v lha
+          d=$(mktemp -d)
+          echo probe > "$d/f"
+          ( cd "$d" && lha -aq2 t.lha f )
+          test -s "$d/t.lha"
+
+      - name: Pull compiler images
+        run: |
+          docker pull sacredbanana/amiga-compiler:m68k-amigaos &
+          docker pull sacredbanana/amiga-compiler:ppc-amigaos &
+          docker pull sacredbanana/amiga-compiler:ppc-morphos &
+          wait
+
+      - name: Build and package
+        run: ./amiga/package-amiga.sh
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: json-c.lha
+          path: dist/json-c.lha
+          if-no-files-found: error
