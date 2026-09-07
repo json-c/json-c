@@ -233,7 +233,7 @@ static void test_read_valid_nested_with_fd(const char *testdir)
 		        json_util_get_last_err());
 	}
 
-	(void)lseek(d, SEEK_SET, 0);
+	(void)lseek(d, 0, SEEK_SET);
 
 	jso = json_object_from_fd_ex(d, 3);
 	if (jso != NULL)
