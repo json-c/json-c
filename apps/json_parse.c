@@ -217,6 +217,11 @@ int main(int argc, char **argv)
 	{
 		fname = argv[optind];
 		fd = open(fname, O_RDONLY, 0);
+		if (fd < 0)
+		{
+			fprintf(stderr, "error opening %s: %s\n", fname, strerror(errno));
+			exit(EXIT_FAILURE);
+		}
 	}
 	showmem();
 	if (parseit(fd, showobj) != 0)
