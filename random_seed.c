@@ -176,6 +176,12 @@ retry:
 #include <sys/random.h>
 #endif
 
+/* Return best effort random data even if random pool is not yet
+ * initialized. Available since Linux 5.6 */
+#ifndef GRND_INSECURE
+#define GRND_INSECURE 0
+#endif
+
 static int get_getrandom_seed(int *seed)
 {
 	DEBUG_SEED("get_getrandom_seed");
@@ -184,7 +190,7 @@ static int get_getrandom_seed(int *seed)
 
 	do
 	{
-		ret = getrandom(seed, sizeof(*seed), GRND_NONBLOCK);
+		ret = getrandom(seed, sizeof(*seed), GRND_NONBLOCK | GRND_INSECURE);
 	} while ((ret == -1) && (errno == EINTR));
 
 	if (ret == -1)
