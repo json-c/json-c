@@ -1676,10 +1676,11 @@ static int json_object_array_to_json_string(struct json_object *jso, struct prin
                                             int flags)
 {
 	int had_children = 0;
-	size_t ii;
+	size_t ii, array_len;
 
 	printbuf_strappend(pb, "[");
-	for (ii = 0; ii < json_object_array_length(jso); ii++)
+	array_len = json_object_array_length(jso);
+	for (ii = 0; ii < array_len; ii++)
 	{
 		struct json_object *val;
 		if (had_children)
