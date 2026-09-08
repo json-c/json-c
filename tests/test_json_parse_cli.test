@@ -18,4 +18,22 @@ TESTNAME="${TESTNAME%.test}"
 ( cat file1.dat ; cat file2.dat ) | run_output_test -o "${TESTNAME}" --exit 1 ../apps/json_parse -u -N -n -
 _err=$?
 
+printf '{' | "${top_builddir}/../apps/json_parse" -N -n - > /dev/null 2>&1
+if test $? -eq 0; then
+	echo "ERROR: json_parse accepted incomplete input" 1>&2
+	_err=1
+fi
+
+printf '123' | "${top_builddir}/../apps/json_parse" -N -n - > /dev/null 2>&1
+if test $? -ne 0; then
+	echo "ERROR: json_parse rejected valid EOF-terminated scalar input" 1>&2
+	_err=1
+fi
+
+"${top_builddir}/../apps/json_parse" -N -n - <&- > /dev/null 2>&1
+if test $? -eq 0; then
+	echo "ERROR: json_parse returned success after read failure" 1>&2
+	_err=1
+fi
+
 exit $_err

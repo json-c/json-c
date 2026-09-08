@@ -140,6 +140,29 @@ static int parseit(int fd, int (*callback)(struct json_object *))
 	if (ret < 0)
 	{
 		fprintf(stderr, "error reading fd %d: %s\n", fd, strerror(errno));
+		json_tokener_free(tok);
+		return 1;
+	}
+	if (json_tokener_get_error(tok) == json_tokener_continue)
+	{
+		obj = json_tokener_parse_ex(tok, "", 1);
+		if (obj != NULL)
+		{
+			int cb_ret = callback(obj);
+			json_object_put(obj);
+			if (cb_ret != 0)
+			{
+				json_tokener_free(tok);
+				return 1;
+			}
+		}
+		if (json_tokener_get_error(tok) != json_tokener_success)
+		{
+			fprintf(stderr, "Failed at offset %lu: unexpected end of data\n",
+			        (unsigned long)total_read);
+			json_tokener_free(tok);
+			return 1;
+		}
 	}
 
 	json_tokener_free(tok);
