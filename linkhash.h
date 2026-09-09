@@ -295,7 +295,7 @@ extern json_bool lh_table_lookup_ex(struct lh_table *t, const void *k, void **v)
  * Delete a record from the table.
  *
  * If a callback free function is provided then it is called for the
- * for the item being deleted.
+ * item being deleted.
  * @param t the table to delete from.
  * @param e a pointer to the entry to delete.
  * @return 0 if the item was deleted.
@@ -318,7 +318,7 @@ extern int lh_table_delete_entry_to_tail(struct lh_table *t, struct lh_entry *e)
  * Delete a record from the table.
  *
  * If a callback free function is provided then it is called for the
- * for the item being deleted.
+ * item being deleted.
  * @param t the table to delete from.
  * @param k a pointer to the key to delete.
  * @return 0 if the item was deleted.

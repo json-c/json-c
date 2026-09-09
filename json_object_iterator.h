@@ -84,7 +84,8 @@ JSON_EXPORT struct json_object_iterator json_object_iter_init_default(void);
  *              Modifications include adding or removing any pair, even if
  *              set of keys appears unchanged after the modification.
  *              Modifying *values* is allowed, including replacing a value
- *              by calling json_object_add(), provided the key already exists.
+ *              by calling json_object_object_add(), provided the key already
+ *              exists.
  *              Attempting to use an invalidated iterator in any way, other
  *              than comparing it to the end iterator, is *undefined behavior*.
  *              Passing such an iterator to any of the the json_object_iterator
