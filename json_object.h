@@ -265,7 +265,7 @@ JSON_EXPORT void *json_object_get_userdata(json_object *jso);
  *
  * Note: Objects created by parsing strings may have custom serializers set
  * which expect the userdata to contain specific data (due to use of
- * json_object_new_double_s()). In this case, json_object_set_serialiser() with
+ * json_object_new_double_s()). In this case, json_object_set_serializer() with
  * NULL as to_string_func should be used instead to set the userdata and reset
  * the serializer to its default value.
  *
