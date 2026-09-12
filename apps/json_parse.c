@@ -140,6 +140,8 @@ static int parseit(int fd, int (*callback)(struct json_object *))
 	if (ret < 0)
 	{
 		fprintf(stderr, "error reading fd %d: %s\n", fd, strerror(errno));
+		json_tokener_free(tok);
+		return 1;
 	}
 
 	json_tokener_free(tok);
