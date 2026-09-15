@@ -83,7 +83,10 @@ static int array_list_expand_internal(struct array_list *arr, size_t max)
 	void *t;
 	size_t new_size;
 
-	if (max < arr->size)
+	/* The array can already hold max entries when max == arr->size, since
+	 * the caller only ever indexes up to max - 1.
+	 */
+	if (max <= arr->size)
 		return 0;
 	/* Avoid undefined behaviour on size_t overflow */
 	if (arr->size >= SIZE_T_MAX / 2)

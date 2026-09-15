@@ -1157,7 +1157,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 					}
 					if (numuint64 <= INT64_MAX)
 					{
-						num64 = (uint64_t)numuint64;
+						num64 = (int64_t)numuint64;
 						current = json_object_new_int64(num64);
 						if (current == NULL)
 						{
