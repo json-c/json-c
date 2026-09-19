@@ -44,6 +44,13 @@
 #include <strings.h>
 #endif /* HAVE_STRINGS_H */
 
+#ifdef _AIX
+/* On AIX, <sys/resource.h> redefines INFINITY  as 0x7fffffff, which overwrites
+ * the IEEE 754 infinity from <math.h>. */
+#undef INFINITY
+#define INFINITY (1.0 / 0.0)
+#endif
+
 #define jt_hexdigit(x) (((x) <= '9') ? (x) - '0' : ((x)&7) + 9)
 
 #if !HAVE_STRNCASECMP && defined(_WIN32)
