@@ -2,7 +2,7 @@ Short: JSON parser and generator library (static libs + headers)
 Author: Michael Clark, Eric Hawicz et al.
 Uploader: Cameron Armstrong (Nightfox) <cameronscottarmstrong@gmail.com>
 Type: dev/lib
-Version: 0.19
+Version: VERSION
 Architecture:  m68k-amigaos >= 2.0; ppc-amigaos; ppc-morphos
 Requires: an Amiga gcc compiler
 Replaces: dev/lib/json-c.lha
