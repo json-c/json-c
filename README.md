@@ -275,7 +275,9 @@ make install
 Building for Commodore Amiga or MorphOS
 ----------------------
 
-Building for Commodore Amiga is supported for both Motorola 68k (AmigaOS 3) and PowerPC (AmigaOS 4) architectures. MorphOS on compatible PowerPC hardware is also supported. You can set up a cross compiler locally, however it is much easier to use the already preconfigured Amiga development environment wtthin a Docker container.
+Building for Commodore Amiga is supported for both Motorola 68k (AmigaOS 3) and PowerPC (AmigaOS 4) architectures. MorphOS on compatible PowerPC hardware is also supported. You can set up a cross compiler locally, however it is much easier to use the already preconfigured Amiga development environment within a Docker container.
+
+Included below are instructions for building for specific individual systems, as well as how to build for *all* Amiga variants.
 
 Install Docker on your machine if you don't already have it. You can download Docker Desktop for Windows/macOS/Linux [here](https://www.docker.com/products/docker-desktop/).
 
@@ -296,6 +298,41 @@ libjson-c.a will get created in the build directory.
 
 You can change newlib to nix20, nix13, ixemul or clib2 if you would like to build the library suited for libnix or clib2 instead. Newlib is default.
 
+By default the m68k build uses `-fbaserel`. You can select a different base-relative mode with `-DM68K_BASEREL=`:
+
+* `baserel` (default) — `-fbaserel`
+* `baserel32` — `-fbaserel32`
+* `off` — no base-relative flag
+
+```
+cmake -DM68K_CRT=newlib -DM68K_BASEREL=baserel32 ..
+cmake -DM68K_CRT=newlib -DM68K_BASEREL=off ..
+```
+
+You can also set the target CPU with `-DM68K_CPU=`. This is passed to the compiler as `-m<cpu>` (for example `68020` becomes `-m68020`). If omitted, the compiler default is used.
+
+```
+cmake -DM68K_CRT=newlib -DM68K_CPU=68020 ..
+cmake -DM68K_CRT=newlib -DM68K_CPU=68040 -DM68K_BASEREL=baserel32 ..
+```
+
+A note on base-relative addressing (`-fbaserel`, i.e. `M68K_BASEREL=baserel`)
+on m68k: a base-relative library keeps its globals at an offset from `a4`, and
+`a4` is established once by the program's startup code. Such a library is only
+safe inside a program that is itself base-relative **and** that declares every
+function the OS can call back into (BOOPSI/MUI dispatchers, `struct Hook`
+entries, interrupt servers) with `__saveds`, so `a4` is re-established on entry.
+Without that, a hook entered from the OS runs with a foreign `a4` and every
+`a4`-relative access made by this library -- or by libnix's `malloc` -- reads
+from a wrong address.
+
+Conversely, a library built *without* `-fbaserel` and compiled at `-O1` or above
+may allocate `a4` as a scratch register. That is harmless in a program that is
+also non-base-relative, but it corrupts the base pointer of a base-relative one.
+
+In short: match `M68K_BASEREL` to the consuming program, and if that program is
+base-relative make sure its OS callbacks are `__saveds`.
+
 ### To build for PowerPC Amiga:
 
 ```
@@ -310,6 +347,13 @@ make
 ```
 
 libjson-c.a will get created in the build directory.
+
+Select the C runtime with `-DPPC_CRT=`: `newlib` (default), `clib2` or `clib4`.
+Anything other than `newlib` is passed to the compiler as `-mcrt=<value>`.
+
+```
+cmake -DPPC_CRT=clib4 ..
+```
 
 ### To build for PowerPC MorphOS:
 
@@ -327,6 +371,72 @@ make
 If you are making an application that absolutely requires ixemul, then remove the `-DNOIXEMUL=1`.
 
 libjson-c.a will get created in the build directory.
+
+Two further options apply to MorphOS:
+
+* `-DMORPHOS_CLIB=` selects `default` (ixemul) or `libnix` (passed as
+  `-mclib=libnix`). That is the same multilib `-noixemul` selects, and is the
+  self-contained ABI -- an ixemul build needs `ixemul.library` on the target.
+* `-DMORPHOS_BASEREL32=ON` adds `-mbaserel32`.
+
+```
+cmake -DMORPHOS_CLIB=libnix ..
+cmake -DMORPHOS_BASEREL32=ON ..
+```
+
+### Building and packaging every variant
+
+Two scripts in the `amiga/` directory build the whole matrix across all three
+systems, so you do not have to drive the container by hand.
+
+* `amiga/build-amiga-sdk.sh [OS ...]` — builds every variant and installs
+  `libjson-c.a` plus the `json-c/` headers into an SDK tree. The location comes
+  from `$AMIGA_SDK` (default `/opt/amiga`); either a `<target>/` or an
+  AmigaSDK-gcc-style `amigaos3/sdk/<target>/` layout is accepted, and an OS
+  whose subdirectory is absent is skipped rather than failing.
+* `amiga/package-amiga.sh [OS ...]` — builds the same matrix into a staging tree and
+  produces `dist/json-c.lha` for distribution.
+
+Both default to `AmigaOS3 AmigaOS4 MorphOS`, and both take the variant list
+from the same table in `amiga/build-amiga-sdk.sh`, so they cannot disagree. 22
+libraries are built in total: 15 for AmigaOS 3 (newlib, libnix and clib2, each
+across the five multilib slots), 3 for AmigaOS 4 (newlib, clib2, clib4) and 4
+for MorphOS (ixemul and native, each with and without `-mbaserel32`).
+
+Which of them actually *link* is a separate question from whether they build,
+and was checked by compiling a program against each one:
+
+| target | links |
+|--------|-------|
+| AmigaOS 3, libnix | all 5 slots |
+| AmigaOS 3, clib2 | `lib/libm020/` and `lib/libb32/libm020/` only |
+| AmigaOS 3, newlib | none -- the m68k newlib tree has no `gettimeofday()` |
+| AmigaOS 4 | all 3 (newlib, clib2, clib4) |
+| MorphOS | all 4 slots |
+
+The clib2 failures are inside clib2 itself: its 68000 multilib provides no
+`strtoll`/`strtoull`, and 16-bit `-fbaserel` overflows with *truncated to fit:
+DREL16* once json-c's data is added -- `-fbaserel32` has no 64 KB limit. Link
+with `-ljson-c -lm` after your own objects, and add `-lunix` for clib2.
+
+The archive is a single `json-c/` directory at the root, with the readme and
+one directory per system, each following the compiler's own layout so it can
+be copied straight over an SDK:
+
+```
+json-c/json-c.readme
+json-c/AmigaOS3/{include,lib,...}/     plus libnix/ and clib2/ subtrees
+json-c/AmigaOS4/{include,lib,lib/clib2,lib/clib4}/
+json-c/MorphOS/{include,lib,lib/libb32,lib/libnix}/
+```
+
+Note that m68k and PPC lay their C runtimes out differently, and the variant
+table follows each. On m68k a runtime is a separate tree (`libnix/`, `clib2/`),
+each with its own `include/` and `lib/`. On PPC a runtime is a multilib *slot*
+beneath a single shared `lib/`: `-mcrt=clib4` searches `<target>/lib/clib4/`
+and takes headers from `<target>/include/`. This was read off
+`-print-search-dirs` rather than assumed, because installing to the wrong one
+produces a library the compiler silently never finds.
 
 <a name="linking"></a>
 Linking to `libjson-c`
