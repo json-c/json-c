@@ -34,15 +34,8 @@ rm -rf "$_lha_probe"
 # OS gets staged under its own directory.
 rm -rf "$DIST"; mkdir -p "$STAGE/json-c"
 
-# Extract the version from either a release tag, or the dev version + abbreviated commit hash
-GIT_DESCR=$(git describe --tags --always)
-if [[ "$GIT_DESCR" == json-c-* ]] ; then
-  # e.g. 0.19-20260627
-  JSON_C_VERS=${GIT_DESCR#json-c-}
-else
-  # e.g. 0.19.99-09e45f6
-  JSON_C_VERS=$(sed -ne'/define JSON_C_VERSION / { s/"$//;  s/.*"//; p }' "${ROOT}/json_c_version.h")-${GIT_DESCR}
-fi
+. "${ROOT}/reltools/reltools.subr"
+JSON_C_VERS=$(get_ver_descr)
 sed -e"s/VERSION/${JSON_C_VERS}/" "$AMIGA_DIR/json-c.readme.template" > "$STAGE/json-c/json-c.readme"
 
 built=()

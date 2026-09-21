@@ -4,19 +4,37 @@
 ## Pre-release tasks
 
 * Figure out whether a release is worthwhile to do.
+
+Tiny/patch releases require some manual work:
+
+* Apply changes to the release branch, merge or cherry-pick
+* Append to previous issues_closed_for*md file
+* Add new tiny release section to ChangeLog
+* Manually adjust versions in json_c_version, CMakeLists.txt, meson.build
+
+The rest of these instructions assume you're creating a minor or major release.
+
+* Load release shell functions
+    * `. reltools/reltools.subr`
+    * `set_rel_vars`
 * Analyze the previous release branch to see if anything should have been
   applied to master.
+    * `git log -r "${RELBASE}..${RELBRANCH}" | less`
+    * Look for anything other than generating docs, bumping the release
+      version, or changes cherry-picked from master.
 * Collect changes and assemble tentative release notes.
-    * Identify previous release branch point
+    * Create "Notes for v0.xx release" page at https://github.com/json-c/json-c/wiki
     * Check commit logs between previous branch point and now for
-       notable changes worth mentioning
+       notable changes worth mentioning. 
+        * `git log --reverse -r "${RELBASE}"..master | less`
     * Create a new issues_closed_for_X.Y.md file
+        * `./reltools/gen_issues_closed.md`
         * Include notable entries from here in the release notes.
     * Analyze APIs between previous release branch and master to produce list of
       changes (added/removed/updated funcs, etc...), and detect backwards compat
       issues.
         * https://github.com/lvc/abi-compliance-checker
-        * See also `abi-check.sh`
+        * `./abi-check.sh`
         * If the new release is not backwards compatible, then this is a MAJOR release.
         * Mention removed features in ChangeLog
 		* Consider re-adding backwards compatible support, through symbol
@@ -24,16 +42,14 @@
 		* Be sure any new symbols are listed in json-c.sym as part of
 		  the _new_ release version.
     * Update the AUTHORS file
-
-        PREV=$(git tag | tail -1)
-        ( git log -r ${PREV}..HEAD | grep Author: | sed -e's/Author: //' ; cat AUTHORS ) | sort -u > A1
-        mv A1 AUTHORS
+        * `update_authors`
 
     * Exclude mentioning changes that have already been included in a point 
       release of the previous release branch.
 
-* Update ChangeLog with relevant notes before branching.
+* Update ChangeLog with relevant notes *before* branching.
 
+* Check that GitHub Actions are all working - https://github.com/json-c/json-c/actions
 * Check that the compile works on Linux - automatic through Travis
 * Check that the compile works on NetBSD
 * Check that the compile works on Windows - automatic through AppVeyor
@@ -42,11 +58,9 @@
 
 Start creating the new release:
 
-    PREV=$(git tag | tail -1)
-    PREV=${PREV#json-c-}
-    PREV=${PREV%-*}
-    release=0.$((${PREV#*.} + 1))
-    cd ~
+    . reltools/reltools.subr
+    release=$(get_next_relver)
+    cd ${HOME}
     git clone https://github.com/json-c/json-c json-c-${release}
 
     rm -rf distcheck
@@ -66,6 +80,9 @@ Make any fixes/changes *before* branching.
 ------------
 
 Using ${release}:
+
+    # TODO: write me: ./reltools/bump_version.sh --release
+
 	Update the version in json_c_version.h
 	Update the version in CMakeLists.txt (VERSION in the project(...) line)
 
@@ -75,7 +92,7 @@ library version.  Generally, unless we're doing a major release, change:
 to
 	VERSION x.y+1.z
 
-        Update the version in meson.build (both at the top, and down under
+        Update the version in meson.build (both at the top, and soversion down under
         '# Build library')
 
     git commit -a -m "Bump version to ${release}"
@@ -120,6 +137,9 @@ Tag the branch:
     git push origin json-c-${release}
     git push --tags
 
+    # Double check that API difference match previous run
+    ./abi-check.sh
+
 ------------
 
 Go to Amazon S3 service at:
@@ -136,43 +156,22 @@ Logout of Amazon S3, and verify that the files are visible.
 
 Post-release checklist:
 
+Update master branch version to ${version}.99, in ChangeLog, json_c_version.h, etc...
+
     git checkout master
+    ./reltools/bump_relrease.sh --dev
 
-Add new section to ChangeLog for ${release}+1
-
-Use ${release}.99 to indicate a version "newer" than anything on the branch:
-	Update the version in json_c_version.h
-	Update the version in CMakeLists.txt
-
-Update the set_target_properties() line in CmakeLists.txt to match the release branch.
-
-Add a new empty section to the json-c.sym file, for ${release}+1
-
-    git commit -a -m "Update the master branch to version ${release}.99"
+    # check results, then:
     git push
 
 ------------
 
-Update the gh-pages branch with new docs:
+Update the gh-pages branch with new docs (already generated earlier):
 
-    cd json-c-${release}
-    git checkout json-c-${release}
-    cd ..
+    reltag=$(get_most_recent_reltag)
+    ./reltools/publish_docs.sh "${reltag}"
 
-    git clone -b gh-pages https://github.com/json-c/json-c json-c-pages
-    cd json-c-pages
-    mkdir json-c-${release}
-    cp -R ../json-c-${release}/doc json-c-${release}/.
-    git add json-c-${release}
-    rm json-c-current-release
-    ln -s json-c-${release} json-c-current-release
-    git commit -a -m "Add the ${release} docs."
-
-    vi index.html
-    # Add/change links to current release.
-
-    git commit -a -m "Update the doc links to point at ${release}"
-
+    # check results, then:
     git push
 
 ------------

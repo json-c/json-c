@@ -1,0 +1,80 @@
+
+rt_RUNDIR=$(dirname "${BASH_SOURCE[0]}")
+rt=RUNDIR=$(realpath "${rt_RUNDIR}")
+JSON_C_TOP=${rt_RUNDIR}/..
+
+get_most_recent_reltag()
+{
+	local RELTAG
+	RELTAG=$(git tag | tail -1)
+	echo "${RELTAG}"
+}
+get_most_recent_relver()
+{
+	local RELVER
+	RELVER=$(get_most_recent_reltag)
+	RELVER=${RELVER#json-c-}
+	RELVER=${RELVER%-*}
+	echo "${RELVER}"
+}
+
+get_most_recent_relbranch()
+{
+	local RELVER
+	RELVER=$(get_most_recent_relver)
+	if [[ "${RELVER}" = *.*.* ]] ; then
+		# Strip off tiny version
+		RELVER="${RELVER%.*}"
+	fi
+	echo "origin/json-c-${RELVER}"
+}
+
+
+get_next_relver()
+{
+	local PREV
+	PREV=$(get_most_recent_relver)
+	echo "0.$((${PREV#*.} + 1))"
+}
+
+get_most_recent_relbase()
+{
+	local RELBRANCH RELBASE
+	RELBRANCH=$(get_most_recent_relbranch)
+	RELBASE=$(git merge-base master "${RELBRANCH}")
+	echo "${RELBASE}"
+}
+
+set_rel_vars()
+{
+	# Set non-local variables for convenience
+	RELTAG=$(get_most_recent_reltag)
+	RELVER=$(get_most_recent_relver)
+	RELBRANCH=$(get_most_recent_relbranch)
+	RELBASE=$(get_most_recent_relbase)
+	NEXT_RELVER=$(get_next_relver)
+}
+
+# Extract the version from either a release tag, or the dev version + abbreviated commit hash
+get_ver_descr()
+{
+	local GITDESCR JSON_C_VERS
+
+	GIT_DESCR=$(git describe --tags --always)
+	if [[ "$GIT_DESCR" == json-c-* ]] ; then
+	  # e.g. 0.19-20260627
+	  JSON_C_VERS=${GIT_DESCR#json-c-}
+	else
+	  # e.g. 0.19.99-09e45f6
+	  JSON_C_VERS=$(sed -ne'/define JSON_C_VERSION / { s/"$//;  s/.*"//; p }' "${JSON_C_TOP}/json_c_version.h")-${GIT_DESCR}
+	fi
+	echo "${JSON_C_VERS}"
+}
+
+update_authors()
+{
+	PREV=$(get_most_recent_reltag)
+	NEW_AUTHORS=$( git log -r ${PREV}..HEAD | grep Author: | sed -e's/Author: //' ; cat "${JSON_C_TOP}/AUTHORS" )
+	echo "${NEW_AUTHORS}" | sort -u > "${JSON_C_TOP}/AUTHORS"
+}
+
