@@ -370,6 +370,16 @@
       "patch": [{"op": "move", "from": "/foo", "path": "/foo"}],
       "expected": {"foo": 1} },
 
+    { "comment": "Move between sibling keys sharing a name prefix is not a parent/child move",
+      "doc": {"aa": 1, "aab": 2},
+      "patch": [{"op": "move", "from": "/aa", "path": "/aab"}],
+      "expected": {"aab": 1} },
+
+    { "comment": "Copy between sibling keys sharing a name prefix is not a parent/child move",
+      "doc": {"aa": 1, "aab": 2},
+      "patch": [{"op": "copy", "from": "/aa", "path": "/aab"}],
+      "expected": {"aa": 1, "aab": 1} },
+
     { "doc": {"foo": 1, "baz": [{"qux": "hello"}]},
       "patch": [{"op": "move", "from": "/foo", "path": "/bar"}],
       "expected": {"baz": [{"qux": "hello"}], "bar": 1} },
