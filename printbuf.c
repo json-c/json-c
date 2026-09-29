@@ -136,9 +136,12 @@ int printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len)
 		return -1;
 	}
 	size_needed = offset + len;
-	if (pb->size < size_needed)
+	/* + 1 keeps the printbuf invariant that buf[bpos] is '\0' after every
+	 * operation; without it, reading pb->buf as a C string right after an
+	 * indent() consumes uninitialized bytes. */
+	if (pb->size < size_needed + 1)
 	{
-		if (printbuf_extend(pb, size_needed) < 0)
+		if (printbuf_extend(pb, size_needed + 1) < 0)
 			return -1;
 	}
 
@@ -147,6 +150,7 @@ int printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len)
 	memset(pb->buf + offset, charvalue, len);
 	if (pb->bpos < size_needed)
 		pb->bpos = size_needed;
+	pb->buf[pb->bpos] = '\0';
 
 	return 0;
 }
