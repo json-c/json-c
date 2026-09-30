@@ -16,6 +16,11 @@
 #define PATH_MAX 256
 #endif
 
+/* printf("%s", NULL) prints emptry string on AIX.
+ * Use this macro to guard all printf %s args that may be NULL*/
+#define STR_OR_NULL(s) ((s) ? (s) : "(null)")
+
+
 void test_json_patch_op(struct json_object *jo)
 {
 	const char *comment = json_object_get_string(json_object_object_get(jo, "comment"));
@@ -29,7 +34,7 @@ void test_json_patch_op(struct json_object *jo)
 	int ret;
 
 	printf("Testing '%s', doc '%s' patch '%s' : ",
-		comment ? comment : error_s,
+                STR_OR_NULL(comment ? comment : error_s),
 		json_object_get_string(doc),
 		json_object_get_string(patch));
 	if (!error && !have_expected) {
