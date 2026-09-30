@@ -211,24 +211,27 @@ static int json_escape_str(struct printbuf *pb, const char *str, size_t len, int
 			}
 
 			if (pos > start_offset)
-				printbuf_memappend(pb, str + start_offset, pos - start_offset);
+			{
+				if (printbuf_memappend(pb, str + start_offset, pos - start_offset) < 0)
+					return -1;
+			}
 
-			if (c == '\b')
-				printbuf_memappend(pb, "\\b", 2);
-			else if (c == '\n')
-				printbuf_memappend(pb, "\\n", 2);
-			else if (c == '\r')
-				printbuf_memappend(pb, "\\r", 2);
-			else if (c == '\t')
-				printbuf_memappend(pb, "\\t", 2);
-			else if (c == '\f')
-				printbuf_memappend(pb, "\\f", 2);
-			else if (c == '"')
-				printbuf_memappend(pb, "\\\"", 2);
-			else if (c == '\\')
-				printbuf_memappend(pb, "\\\\", 2);
-			else if (c == '/')
-				printbuf_memappend(pb, "\\/", 2);
+			{
+				const char *esc;
+				switch (c)
+				{
+				case '\b': esc = "\\b"; break;
+				case '\n': esc = "\\n"; break;
+				case '\r': esc = "\\r"; break;
+				case '\t': esc = "\\t"; break;
+				case '\f': esc = "\\f"; break;
+				case '"':  esc = "\\\""; break;
+				case '\\': esc = "\\\\"; break;
+				default:   esc = "\\/"; break;
+				}
+				if (printbuf_memappend(pb, esc, 2) < 0)
+					return -1;
+			}
 
 			start_offset = ++pos;
 			break;
@@ -237,11 +240,15 @@ static int json_escape_str(struct printbuf *pb, const char *str, size_t len, int
 			{
 				char sbuf[7];
 				if (pos > start_offset)
-					printbuf_memappend(pb, str + start_offset,
-					                   pos - start_offset);
+				{
+					if (printbuf_memappend(pb, str + start_offset,
+					                       pos - start_offset) < 0)
+						return -1;
+				}
 				snprintf(sbuf, sizeof(sbuf), "\\u00%c%c", json_hex_chars[c >> 4],
 				         json_hex_chars[c & 0xf]);
-				printbuf_memappend_fast(pb, sbuf, (int)sizeof(sbuf) - 1);
+				if (printbuf_memappend(pb, sbuf, (int)sizeof(sbuf) - 1) < 0)
+					return -1;
 				start_offset = ++pos;
 			}
 			else
@@ -249,7 +256,10 @@ static int json_escape_str(struct printbuf *pb, const char *str, size_t len, int
 		}
 	}
 	if (pos > start_offset)
-		printbuf_memappend(pb, str + start_offset, pos - start_offset);
+	{
+		if (printbuf_memappend(pb, str + start_offset, pos - start_offset) < 0)
+			return -1;
+	}
 	return 0;
 }
 
@@ -1517,7 +1527,8 @@ static int json_object_string_to_json_string(struct json_object *jso, struct pri
 	if (flags & JSON_C_TO_STRING_COLOR)
 		printbuf_strappend(pb, ANSI_COLOR_FG_GREEN);
 	printbuf_strappend(pb, "\"");
-	json_escape_str(pb, get_string_component(jso), len < 0 ? -(ssize_t)len : len, flags);
+	if (json_escape_str(pb, get_string_component(jso), len < 0 ? -(ssize_t)len : len, flags) < 0)
+		return -1;
 	printbuf_strappend(pb, "\"");
 	if (flags & JSON_C_TO_STRING_COLOR)
 		printbuf_strappend(pb, ANSI_COLOR_RESET);
