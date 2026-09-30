@@ -312,6 +312,15 @@ if (CMAKE_GNU_C_MACHINE MATCHES "uclibc")
 	set(HAVE_USELOCALE 0)
 endif()
 
+# On AIX, locale category objects allocated by duplocale() are not released
+# back to the process heap by freelocale(), leaking ~776 bytes per parse call
+# regardless of whether freelocale() is called correctly.
+# REUSE_LOCALE_FOR_PARSE avoids duplocale() entirely by creating a C-numeric
+# locale once as a static and reusing it across all parse calls.
+if (CMAKE_SYSTEM_NAME STREQUAL "AIX")
+    set(REUSE_LOCALE_FOR_PARSE 1)
+endif()
+
 if (HAVE_STRINGS_H)
     check_symbol_exists(strcasecmp  "strings.h" HAVE_STRCASECMP)
     check_symbol_exists(strncasecmp "strings.h" HAVE_STRNCASECMP)

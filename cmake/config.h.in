@@ -143,6 +143,9 @@
 /* Define to 1 if newlocale() needs freelocale() called on it's `base` argument */
 #cmakedefine NEWLOCALE_NEEDS_FREELOCALE
 
+/* Define to 1 to reuse a single static locale instead of duplocale+newlocale */
+#cmakedefine REUSE_LOCALE_FOR_PARSE
+
 /* Define to 1 if you have the `vasprintf' function. */
 #cmakedefine HAVE_VASPRINTF
 

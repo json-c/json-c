@@ -345,6 +345,23 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 
 #ifdef HAVE_USELOCALE
 	{
+#ifdef REUSE_LOCALE_FOR_PARSE
+               /* On AIX, locale category objects allocated by duplocale() are not
+                * released back to the process heap by freelocale().
+                * Avoid duplocale() entirely by creating a C-numeric locale once
+                * and reusing it. */
+               static locale_t c_numeric_locale = (locale_t)0;
+               if (c_numeric_locale == (locale_t)0)
+               {
+                       c_numeric_locale = newlocale(LC_NUMERIC_MASK, "C", (locale_t)0);
+                       if (c_numeric_locale == (locale_t)0)
+                       {
+                               tok->err = json_tokener_error_memory;
+                               return NULL;
+                       }
+               }
+               newloc = c_numeric_locale;
+#else
 #ifdef HAVE_DUPLOCALE
 		locale_t duploc = duplocale(oldlocale);
 		if (duploc == NULL && errno == ENOMEM)
@@ -370,7 +387,8 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 		// passed to newlocale(), so do it here
 		freelocale(duploc);
 #endif
-#endif
+#endif /* NEWLOCALE_NEEDS_FREELOCALE */
+#endif /* REUSE_LOCALE_FOR_PARSE */
 		uselocale(newloc);
 	}
 #elif defined(HAVE_SETLOCALE)
@@ -1409,7 +1427,9 @@ out:
 
 #ifdef HAVE_USELOCALE
 	uselocale(oldlocale);
+#ifndef REUSE_LOCALE_FOR_PARSE
 	freelocale(newloc);
+#endif
 #elif defined(HAVE_SETLOCALE)
 	setlocale(LC_NUMERIC, oldlocale);
 	free(oldlocale);
