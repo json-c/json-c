@@ -147,6 +147,12 @@ struct json_object *json_object_from_file(const char *filename)
 	struct json_object *obj;
 	int fd;
 
+	if (!filename)
+	{
+		_json_c_set_last_err("json_object_from_file: filename is null\n");
+		return NULL;
+	}
+
 	if ((fd = open(filename, O_RDONLY)) < 0)
 	{
 		_json_c_set_last_err("json_object_from_file: error opening file %s: %s\n",
@@ -164,6 +170,12 @@ int json_object_to_file_ext(const char *filename, struct json_object *obj, int f
 {
 	int fd, ret;
 	int saved_errno;
+
+	if (!filename)
+	{
+		_json_c_set_last_err("json_object_to_file_ext: filename is null\n");
+		return -1;
+	}
 
 	if (!obj)
 	{
@@ -236,6 +248,8 @@ int json_object_to_file(const char *filename, struct json_object *obj)
 int json_parse_double(const char *buf, double *retval)
 {
 	char *end;
+	if (!buf || !retval)
+		return 1;
 	*retval = strtod(buf, &end);
 	return end == buf ? 1 : 0;
 }
@@ -244,6 +258,12 @@ int json_parse_int64(const char *buf, int64_t *retval)
 {
 	char *end = NULL;
 	int64_t val;
+
+	if (!buf || !retval)
+	{
+		errno = EINVAL;
+		return 1;
+	}
 
 	errno = 0;
 	val = strtoll(buf, &end, 10);
@@ -261,6 +281,12 @@ int json_parse_uint64(const char *buf, uint64_t *retval)
 {
 	char *end = NULL;
 	uint64_t val;
+
+	if (!buf || !retval)
+	{
+		errno = EINVAL;
+		return 1;
+	}
 
 	errno = 0;
 	/* strtoull() skips leading whitespace and then quietly negates a

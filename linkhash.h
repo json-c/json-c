@@ -359,7 +359,7 @@ int lh_table_resize(struct lh_table *t, int new_size);
  */
 static _LH_INLINE struct lh_entry *lh_table_head(const lh_table *t)
 {
-	return t->head;
+	return t ? t->head : NULL;
 }
 
 /**
