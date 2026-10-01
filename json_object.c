@@ -1845,6 +1845,7 @@ static int json_array_equal(struct json_object *jso1, struct json_object *jso2)
 
 int json_object_array_shrink(struct json_object *jso, int empty_slots)
 {
+	assert(json_object_get_type(jso) == json_type_array);
 	if (empty_slots < 0)
 		json_abort("json_object_array_shrink called with negative empty_slots");
 	return array_list_shrink(JC_ARRAY(jso)->c_array, empty_slots);
