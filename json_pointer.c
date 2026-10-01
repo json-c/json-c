@@ -238,7 +238,7 @@ int json_pointer_get_internal(struct json_object *obj, const char *path,
 	char *path_copy = NULL;
 	int rc;
 
-	if (!obj || !path)
+	if (!obj || !path || !res)
 	{
 		errno = EINVAL;
 		return -1;

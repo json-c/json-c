@@ -539,6 +539,9 @@ void *json_object_get_userdata(json_object *jso)
 
 void json_object_set_userdata(json_object *jso, void *userdata, json_object_delete_fn *user_delete)
 {
+	if (!jso)
+		return;
+
 	// Can't return failure, so abort if we can't perform the operation.
 	assert(jso != NULL);
 
@@ -555,6 +558,9 @@ void json_object_set_userdata(json_object *jso, void *userdata, json_object_dele
 void json_object_set_serializer(json_object *jso, json_object_to_json_string_fn *to_string_func,
                                 void *userdata, json_object_delete_fn *user_delete)
 {
+	if (!jso)
+		return;
+
 	json_object_set_userdata(jso, userdata, user_delete);
 
 	if (to_string_func == NULL)
@@ -746,7 +752,8 @@ int json_object_object_add_ex(struct json_object *jso, const char *const key,
 	struct lh_entry *existing_entry;
 	unsigned long hash;
 
-	assert(json_object_get_type(jso) == json_type_object);
+	if (!jso || !key || json_object_get_type(jso) != json_type_object)
+		return -1;
 
 	// We lookup the entry and replace the value, rather than just deleting
 	// and re-adding it, so the existing key remains valid.
@@ -793,7 +800,8 @@ int json_object_object_add(struct json_object *jso, const char *key, struct json
 
 int json_object_object_length(const struct json_object *jso)
 {
-	assert(json_object_get_type(jso) == json_type_object);
+	if (!jso || json_object_get_type(jso) != json_type_object)
+		return 0;
 	return lh_table_length(JC_OBJECT_C(jso)->c_object);
 }
 
@@ -832,7 +840,8 @@ json_bool json_object_object_get_ex(const struct json_object *jso, const char *k
 
 void json_object_object_del(struct json_object *jso, const char *key)
 {
-	assert(json_object_get_type(jso) == json_type_object);
+	if (!jso || !key || json_object_get_type(jso) != json_type_object)
+		return;
 	lh_table_delete(JC_OBJECT(jso)->c_object, key);
 }
 
@@ -1547,6 +1556,9 @@ static struct json_object *_json_object_new_string(const char *s, const size_t l
 	size_t objsize;
 	struct json_object_string *jso;
 
+	if (!s)
+		return NULL;
+
 	/*
 	 * Structures           Actual memory layout
 	 * -------------------  --------------------
@@ -1582,11 +1594,15 @@ static struct json_object *_json_object_new_string(const char *s, const size_t l
 
 struct json_object *json_object_new_string(const char *s)
 {
+	if (!s)
+		return NULL;
 	return _json_object_new_string(s, strlen(s));
 }
 
 struct json_object *json_object_new_string_len(const char *s, const int len)
 {
+	if (!s || len < 0)
+		return NULL;
 	return _json_object_new_string(s, len);
 }
 
@@ -1623,7 +1639,7 @@ static int _json_object_set_string_len(json_object *jso, const char *s, size_t l
 	char *dstbuf;
 	ssize_t curlen;
 	ssize_t newlen;
-	if (jso == NULL || jso->o_type != json_type_string)
+	if (jso == NULL || s == NULL || jso->o_type != json_type_string)
 		return 0;
 
 	if (len >= INT_MAX - 1)
@@ -1673,11 +1689,15 @@ static int _json_object_set_string_len(json_object *jso, const char *s, size_t l
 
 int json_object_set_string(json_object *jso, const char *s)
 {
+	if (!jso || !s)
+		return 0;
 	return _json_object_set_string_len(jso, s, strlen(s));
 }
 
 int json_object_set_string_len(json_object *jso, const char *s, int len)
 {
+	if (!jso || !s || len < 0)
+		return 0;
 	return _json_object_set_string_len(jso, s, len);
 }
 
@@ -1771,7 +1791,8 @@ struct array_list *json_object_get_array(const struct json_object *jso)
 
 void json_object_array_sort(struct json_object *jso, int (*sort_fn)(const void *, const void *))
 {
-	assert(json_object_get_type(jso) == json_type_array);
+	if (!jso || !sort_fn || json_object_get_type(jso) != json_type_array)
+		return;
 	array_list_sort(JC_ARRAY(jso)->c_array, sort_fn);
 }
 
@@ -1781,7 +1802,8 @@ struct json_object *json_object_array_bsearch(const struct json_object *key,
 {
 	struct json_object **result;
 
-	assert(json_object_get_type(jso) == json_type_array);
+	if (!jso || !key || !sort_fn || json_object_get_type(jso) != json_type_array)
+		return NULL;
 	result = (struct json_object **)array_list_bsearch((const void **)(void *)&key,
 	                                                   JC_ARRAY_C(jso)->c_array, sort_fn);
 
@@ -1792,37 +1814,43 @@ struct json_object *json_object_array_bsearch(const struct json_object *key,
 
 size_t json_object_array_length(const struct json_object *jso)
 {
-	assert(json_object_get_type(jso) == json_type_array);
+	if (!jso || json_object_get_type(jso) != json_type_array)
+		return 0;
 	return array_list_length(JC_ARRAY_C(jso)->c_array);
 }
 
 int json_object_array_add(struct json_object *jso, struct json_object *val)
 {
-	assert(json_object_get_type(jso) == json_type_array);
+	if (!jso || json_object_get_type(jso) != json_type_array)
+		return -1;
 	return array_list_add(JC_ARRAY(jso)->c_array, val);
 }
 
 int json_object_array_insert_idx(struct json_object *jso, size_t idx, struct json_object *val)
 {
-	assert(json_object_get_type(jso) == json_type_array);
+	if (!jso || json_object_get_type(jso) != json_type_array)
+		return -1;
 	return array_list_insert_idx(JC_ARRAY(jso)->c_array, idx, val);
 }
 
 int json_object_array_put_idx(struct json_object *jso, size_t idx, struct json_object *val)
 {
-	assert(json_object_get_type(jso) == json_type_array);
+	if (!jso || json_object_get_type(jso) != json_type_array)
+		return -1;
 	return array_list_put_idx(JC_ARRAY(jso)->c_array, idx, val);
 }
 
 int json_object_array_del_idx(struct json_object *jso, size_t idx, size_t count)
 {
-	assert(json_object_get_type(jso) == json_type_array);
+	if (!jso || json_object_get_type(jso) != json_type_array)
+		return -1;
 	return array_list_del_idx(JC_ARRAY(jso)->c_array, idx, count);
 }
 
 struct json_object *json_object_array_get_idx(const struct json_object *jso, size_t idx)
 {
-	assert(json_object_get_type(jso) == json_type_array);
+	if (!jso || json_object_get_type(jso) != json_type_array)
+		return NULL;
 	return (struct json_object *)array_list_get_idx(JC_ARRAY_C(jso)->c_array, idx);
 }
 
@@ -1845,7 +1873,8 @@ static int json_array_equal(struct json_object *jso1, struct json_object *jso2)
 
 int json_object_array_shrink(struct json_object *jso, int empty_slots)
 {
-	assert(json_object_get_type(jso) == json_type_array);
+	if (!jso || json_object_get_type(jso) != json_type_array)
+		return -1;
 	if (empty_slots < 0)
 		json_abort("json_object_array_shrink called with negative empty_slots");
 	return array_list_shrink(JC_ARRAY(jso)->c_array, empty_slots);

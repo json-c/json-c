@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #include "json.h"
+#include "printbuf.h"
 
 int main(int argc, char **argv)
 {
@@ -113,6 +114,60 @@ int main(int argc, char **argv)
 	assert(strncmp(serialized, "12.3", 4) == 0);
 	json_object_put(tmp);
 	printf("PARSE AND SET PASSED\n");
+
+	/* Defensive NULL and boundary checks */
+	assert(json_object_new_string(NULL) == NULL);
+	assert(json_object_new_string_len(NULL, 10) == NULL);
+	assert(json_object_new_string_len("abc", -1) == NULL);
+	assert(json_object_set_string(NULL, "test") == 0);
+	assert(json_object_set_string_len(NULL, "test", 4) == 0);
+
+	struct json_object *str_obj = json_object_new_string("hello");
+	assert(str_obj != NULL);
+	assert(json_object_set_string(str_obj, NULL) == 0);
+	assert(json_object_set_string_len(str_obj, NULL, 5) == 0);
+	assert(json_object_set_string_len(str_obj, "world", -1) == 0);
+	json_object_set_userdata(NULL, NULL, NULL);
+	json_object_set_serializer(NULL, NULL, NULL, NULL);
+	json_object_put(str_obj);
+
+	/* Object and array NULL checks */
+	assert(json_object_object_length(NULL) == 0);
+	assert(json_object_object_add(NULL, "k", NULL) == -1);
+	json_object_object_del(NULL, "k");
+	assert(json_object_array_length(NULL) == 0);
+	assert(json_object_array_add(NULL, NULL) == -1);
+	assert(json_object_array_get_idx(NULL, 0) == NULL);
+	assert(json_object_array_insert_idx(NULL, 0, NULL) == -1);
+	assert(json_object_array_put_idx(NULL, 0, NULL) == -1);
+	assert(json_object_array_del_idx(NULL, 0, 1) == -1);
+	assert(json_object_array_shrink(NULL, 0) == -1);
+	json_object_array_sort(NULL, NULL);
+	assert(json_object_array_bsearch(NULL, NULL, NULL) == NULL);
+
+	/* Iterator NULL checks */
+	struct json_object_iterator it = json_object_iter_begin(NULL);
+	struct json_object_iterator it_end = json_object_iter_end(NULL);
+	assert(json_object_iter_equal(&it, &it_end));
+	assert(json_object_iter_peek_name(&it) == NULL);
+	assert(json_object_iter_peek_value(&it) == NULL);
+	json_object_iter_next(&it);
+
+	/* Printbuf NULL checks */
+	assert(printbuf_memappend(NULL, "abc", 3) == -1);
+	assert(printbuf_memset(NULL, 0, 'a', 5) == -1);
+	assert(sprintbuf(NULL, "test") == -1);
+	printbuf_reset(NULL);
+
+	/* Util NULL checks */
+	double d;
+	int64_t i64;
+	uint64_t u64;
+	assert(json_parse_double(NULL, &d) != 0);
+	assert(json_parse_int64(NULL, &i64) != 0);
+	assert(json_parse_uint64(NULL, &u64) != 0);
+	assert(json_object_from_file(NULL) == NULL);
+	assert(json_object_to_file_ext(NULL, NULL, 0) == -1);
 
 	printf("PASSED\n");
 	return 0;

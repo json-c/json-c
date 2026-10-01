@@ -98,7 +98,7 @@ static int printbuf_extend(struct printbuf *p, int min_size)
 int printbuf_memappend(struct printbuf *p, const char *buf, int size)
 {
 	/* Prevent signed integer overflows with large buffers. */
-	if (size < 0 || size > INT_MAX - p->bpos - 1)
+	if (!p || !buf || size < 0 || size > INT_MAX - p->bpos - 1)
 	{
 		errno = EFBIG;
 		return -1;
@@ -126,6 +126,12 @@ int printbuf_memappend(struct printbuf *p, const char *buf, int size)
 int printbuf_memset(struct printbuf *pb, int offset, int charvalue, int len)
 {
 	int size_needed;
+
+	if (!pb)
+	{
+		errno = EINVAL;
+		return -1;
+	}
 
 	if (offset == -1)
 		offset = pb->bpos;
@@ -162,6 +168,9 @@ int sprintbuf(struct printbuf *p, const char *msg, ...)
 	int size;
 	char buf[128];
 
+	if (!p || !msg)
+		return -1;
+
 	/* use stack buffer first */
 	va_start(ap, msg);
 	size = vsnprintf(buf, 128, msg, ap);
@@ -192,6 +201,8 @@ int sprintbuf(struct printbuf *p, const char *msg, ...)
 
 void printbuf_reset(struct printbuf *p)
 {
+	if (!p || !p->buf)
+		return;
 	p->buf[0] = '\0';
 	p->bpos = 0;
 }
