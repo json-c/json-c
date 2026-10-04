@@ -215,7 +215,17 @@ static int json_patch_apply_move_copy(struct json_object **res,
 	}
 
 	from_s_len = strlen(from_s);
-	if (strncmp(from_s, path, from_s_len) == 0) {
+	/**
+	 * "from" is only a (possibly improper) prefix of "path" when the
+	 * shared run of characters ends on a reference-token boundary in
+	 * "path", i.e. the next character is '/' or the strings end there.
+	 * Without the boundary check, "from" being a plain string prefix of
+	 * "path" (e.g. "/aa" and "/aab") was mistaken for "from" being an
+	 * ancestor pointer of "path", rejecting moves/copies between mere
+	 * sibling keys that happen to share a name prefix.
+	 */
+	if (strncmp(from_s, path, from_s_len) == 0 &&
+	    (path[from_s_len] == '\0' || path[from_s_len] == '/')) {
 		/**
 		 * If lengths match, it's a noop, if they don't,
 		 * then we're trying to move a parent under a child
@@ -223,7 +233,7 @@ static int json_patch_apply_move_copy(struct json_object **res,
 		 *   The "from" location MUST NOT be a proper prefix of the "path"
 		 *   location; i.e., a location cannot be moved into one of its children.
 		 */
-		if (from_s_len == strlen(path))
+		if (path[from_s_len] == '\0')
 			return 0;
 		_set_err(EINVAL, "Invalid attempt to move parent under a child");
 		return -1;
