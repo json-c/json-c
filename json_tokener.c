@@ -1434,26 +1434,67 @@ out:
 static json_bool json_tokener_validate_utf8(const char c, unsigned int *nBytes)
 {
 	unsigned char chr = c;
-	if (*nBytes == 0)
+	/* The low byte of *nBytes holds how many continuation bytes are still
+	 * expected; the next byte up remembers the leading byte of the sequence.
+	 * Keeping the lead lets the first continuation byte be range-checked so
+	 * that overlong forms, UTF-16 surrogate halves and code points above
+	 * U+10FFFF are rejected, instead of only checking the byte framing.
+	 */
+	if ((*nBytes & 0xff) == 0)
 	{
-		if (chr >= 0x80)
+		if (chr < 0x80)
+			return 1;
+		if ((chr & 0xe0) == 0xc0)
 		{
-			if ((chr & 0xe0) == 0xc0)
-				*nBytes = 1;
-			else if ((chr & 0xf0) == 0xe0)
-				*nBytes = 2;
-			else if ((chr & 0xf8) == 0xf0)
-				*nBytes = 3;
-			else
+			if (chr < 0xc2) /* 0xc0 and 0xc1 are always overlong */
 				return 0;
+			*nBytes = 1;
 		}
-	}
-	else
-	{
-		if ((chr & 0xC0) != 0x80)
+		else if ((chr & 0xf0) == 0xe0)
+			*nBytes = 2;
+		else if ((chr & 0xf8) == 0xf0)
+		{
+			if (chr > 0xf4) /* past the end of the Unicode range */
+				return 0;
+			*nBytes = 3;
+		}
+		else
 			return 0;
-		(*nBytes)--;
+		*nBytes |= (unsigned int)chr << 8;
+		return 1;
 	}
+
+	if ((chr & 0xc0) != 0x80) /* not a continuation byte */
+		return 0;
+
+	/* The first continuation byte has to be restricted for the leads that
+	 * would otherwise admit an overlong, surrogate or out-of-range encoding.
+	 */
+	switch ((*nBytes >> 8) & 0xff)
+	{
+	case 0xe0:
+		if (chr < 0xa0) /* overlong three-byte form */
+			return 0;
+		break;
+	case 0xed:
+		if (chr > 0x9f) /* U+D800..U+DFFF surrogate */
+			return 0;
+		break;
+	case 0xf0:
+		if (chr < 0x90) /* overlong four-byte form */
+			return 0;
+		break;
+	case 0xf4:
+		if (chr > 0x8f) /* above U+10FFFF */
+			return 0;
+		break;
+	default: break;
+	}
+
+	/* Drop the remembered lead; any further continuation bytes only need to
+	 * be plain 0x80..0xbf bytes.
+	 */
+	*nBytes = (*nBytes & 0xff) - 1;
 	return 1;
 }
 
