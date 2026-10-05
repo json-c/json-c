@@ -614,9 +614,24 @@ struct incremental_step
      JSON_TOKENER_VALIDATE_UTF8},
     {"\x22\xe6\x9d\x4e\x22", -1, 5, json_tokener_success, 1, 0},
     // GBK encoding
-    {"\x22\xc0\xee\xc5\xf4\x22", -1, 2, json_tokener_error_parse_utf8_string, 1,
+    {"\x22\xc0\xee\xc5\xf4\x22", -1, 1, json_tokener_error_parse_utf8_string, 1,
      JSON_TOKENER_VALIDATE_UTF8},
     {"\x22\xc0\xee\xc5\xf4\x22", -1, 6, json_tokener_success, 1, 0},
+    // overlong forms, UTF-16 surrogate halves and code points above U+10FFFF
+    // are not well-formed utf-8 and must be rejected, not just checked for the
+    // right number of continuation bytes
+    {"\x22\xc0\x80\x22", -1, 1, json_tokener_error_parse_utf8_string, 1,
+     JSON_TOKENER_VALIDATE_UTF8},
+    {"\x22\xed\xa0\x80\x22", -1, 2, json_tokener_error_parse_utf8_string, 1,
+     JSON_TOKENER_VALIDATE_UTF8},
+    {"\x22\xf4\x90\x80\x80\x22", -1, 2, json_tokener_error_parse_utf8_string, 1,
+     JSON_TOKENER_VALIDATE_UTF8},
+    {"\x22\xf5\x80\x80\x80\x22", -1, 1, json_tokener_error_parse_utf8_string, 1,
+     JSON_TOKENER_VALIDATE_UTF8},
+    // the boundary values either side of those must still be accepted
+    {"\x22\xf4\x8f\xbf\xbf\x22", -1, -1, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8},
+    {"\x22\xed\x9f\xbf\x22", -1, -1, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8},
+    {"\x22\xf0\x90\x80\x80\x22", -1, -1, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8},
     // char after space
     {"\x20\x20\x22\xe4\xb8\x96\x22", -1, -1, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8},
     {"\x20\x20\x81\x22\xe4\xb8\x96\x22", -1, 2, json_tokener_error_parse_utf8_string, 1,
@@ -630,9 +645,9 @@ struct incremental_step
     // char in escape unicode
     {"\x22\x5c\x75\x64\x38\x35\x35\x5c\x75\x64\x63\x35\x35\x22", 15, 14, json_tokener_success, 1,
      JSON_TOKENER_VALIDATE_UTF8},
-    {"\x22\x5c\x75\x64\x38\x35\x35\xc0\x75\x64\x63\x35\x35\x22", -1, 8,
+    {"\x22\x5c\x75\x64\x38\x35\x35\xc0\x75\x64\x63\x35\x35\x22", -1, 7,
      json_tokener_error_parse_utf8_string, 1, JSON_TOKENER_VALIDATE_UTF8},
-    {"\x22\x5c\x75\x64\x30\x30\x33\x31\xc0\x22", -1, 9, json_tokener_error_parse_utf8_string, 1,
+    {"\x22\x5c\x75\x64\x30\x30\x33\x31\xc0\x22", -1, 8, json_tokener_error_parse_utf8_string, 1,
      JSON_TOKENER_VALIDATE_UTF8},
     // char in number
     {"\x31\x31\x81\x31\x31", -1, 2, json_tokener_error_parse_utf8_string, 1,
