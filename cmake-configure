@@ -33,7 +33,7 @@ $0 [<configure_options>] [-- [<cmake options>]]
   --disable-extra-libs    Avoid linking against extra libraries, such as libbsd
 
 EOF
-	exit
+	exit "$exitval"
 }
 
 if [ "$CURDIR" = "$RUNDIR" ] ; then
