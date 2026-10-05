@@ -40,6 +40,13 @@ set(ALL_TEST_NAMES
     test_object_iterator)
 
 set(NOBUILD_TEST_NAMES "")
+if (UNIX)
+  find_program(JSON_C_BASH_EXECUTABLE bash)
+  if (JSON_C_BASH_EXECUTABLE)
+    add_test(NAME test_cmake_configure COMMAND ${JSON_C_BASH_EXECUTABLE}
+      ${PROJECT_SOURCE_DIR}/tests/test_cmake_configure.test)
+  endif()
+endif()
 if (BUILD_APPS)
   set(NOBUILD_TEST_NAMES ${NOBUILD_TEST_NAMES} test_json_parse_cli)
 endif()
