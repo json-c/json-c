@@ -380,6 +380,17 @@
       "patch": [{"op": "copy", "from": "/aa", "path": "/aab"}],
       "expected": {"aa": 1, "aab": 1} },
 
+    { "comment": "Remove members whose names need escaping",
+      "doc": {"a/b": 1, "m~n": 2, "c": 3},
+      "patch": [{"op": "remove", "path": "/a~1b"},
+                {"op": "remove", "path": "/m~0n"}],
+      "expected": {"c": 3} },
+
+    { "comment": "Move from a member whose name needs escaping",
+      "doc": {"a/b": 1},
+      "patch": [{"op": "move", "from": "/a~1b", "path": "/c"}],
+      "expected": {"c": 1} },
+
     { "doc": {"foo": 1, "baz": [{"qux": "hello"}]},
       "patch": [{"op": "move", "from": "/foo", "path": "/bar"}],
       "expected": {"baz": [{"qux": "hello"}], "bar": 1} },
