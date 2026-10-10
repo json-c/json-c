@@ -214,6 +214,7 @@ void json_tokener_reset(struct json_tokener *tok)
 		json_tokener_reset_level(tok, i);
 	tok->depth = 0;
 	tok->err = json_tokener_success;
+	tok->high_surrogate = 0;
 }
 
 struct json_object *json_tokener_parse(const char *str)
