@@ -335,6 +335,14 @@ struct incremental_step
     {"{ \"foo", -1, -1, json_tokener_continue, 1, 0},
     {": \"bar\"}", -1, 0, json_tokener_error_parse_unexpected, 1, 0},
 
+    /* Reset must discard a pending high surrogate from the previous document. */
+    {"\"\\uD834", -1, -1, json_tokener_continue, 1, 0},
+    {"\"\\u0041\"", -1, -1, json_tokener_success, 1, 0},
+    {"\"\\uD834", -1, -1, json_tokener_continue, 1, 0},
+    {"\"\\uDD1E\"", -1, -1, json_tokener_success, 1, 0},
+    {"\"\\uD834\\uZZZZ\"", -1, 9, json_tokener_error_parse_string, 1, 0},
+    {"\"\\u0041\"", -1, -1, json_tokener_success, 1, 0},
+
     /* Check a supplemental code point that looks like a high surrogate */
     {"\"\\uD836", -1, -1, json_tokener_continue, 0, 0},
     {"\\uDE87", -1, -1, json_tokener_continue, 0, 0},
