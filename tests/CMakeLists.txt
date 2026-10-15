@@ -39,6 +39,12 @@ set(ALL_TEST_NAMES
     test_visit
     test_object_iterator)
 
+# test_tokener_oom replaces the C runtime allocator to inject allocation
+# failures; only build it where that is reliable (not Windows, not macOS).
+if (NOT WIN32 AND NOT APPLE)
+    set(ALL_TEST_NAMES ${ALL_TEST_NAMES} test_tokener_oom)
+endif()
+
 set(NOBUILD_TEST_NAMES "")
 if (BUILD_APPS)
   set(NOBUILD_TEST_NAMES ${NOBUILD_TEST_NAMES} test_json_parse_cli)
