@@ -45,6 +45,7 @@
 
 # Generated folders
 /build
+/build.abi-check
 /Debug
 /Release
 /*/Debug

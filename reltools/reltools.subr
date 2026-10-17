@@ -5,8 +5,9 @@ JSON_C_TOP=${rt_RUNDIR}/..
 
 get_most_recent_reltag()
 {
+	local PATTERN="json-c-${1}*"
 	local RELTAG
-	RELTAG=$(git tag | tail -1)
+	RELTAG=$(git tag --list "${PATTERN}" | tail -1)
 	echo "${RELTAG}"
 }
 get_most_recent_relver()
