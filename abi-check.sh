@@ -209,6 +209,7 @@ abidump ${release}
 
 echo "=== Comparing ABIs ==="
 perl "${ACC}" -l json-c -old ABI-${prev}.dump -new ABI-${release}.dump
+perl "${ACC}" -l json-c -old ABI-${prev}.dump -new ABI-${release}.dump -report-format xml
 
 echo
 echo "Look in $(pwd)/compat_reports/json-c/${prev}_to_${release}"
