@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck shell=bash
 # Build every json-c variant for the requested Amiga systems and package them
 # into dist/json-c.lha.
 #
@@ -13,7 +14,7 @@ set -uo pipefail
 
 AMIGA_DIR=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(cd "$AMIGA_DIR/.." && pwd)
-cd "$ROOT"
+cd "$ROOT" || exit 1
 DIST=$ROOT/dist
 STAGE=$DIST/stage
 OSES=("$@"); [[ ${#OSES[@]} -eq 0 ]] && OSES=(AmigaOS3 AmigaOS4 MorphOS)
@@ -68,7 +69,7 @@ done
 # to refresh a single entry (e.g. the readme) in an existing archive with
 # `lha u` -- it APPENDS a second entry with the same name rather than replacing
 # it, and extraction then yields the stale copy.
-( cd "$STAGE" && lha -aq2 "$DIST/json-c.lha" * >/dev/null )
+( cd "$STAGE" && lha -aq2 "$DIST/json-c.lha" ./* >/dev/null )
 rm -rf "$STAGE"
 echo
 echo "packaged: ${built[*]}"

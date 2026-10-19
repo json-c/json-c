@@ -24,6 +24,7 @@ jobs:
       - name: Install packages
         run: |
           python3 -m pip install meson ninja
+          sudo apt install shellcheck
 
       - name: Compile and Test
         run: |
@@ -42,6 +43,7 @@ jobs:
       - name: Install packages
         run: |
           python3 -m pip install meson ninja
+          sudo apt install shellcheck
 
       - name: Compile and Test
         run: |

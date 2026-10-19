@@ -39,7 +39,9 @@ set(ALL_TEST_NAMES
     test_visit
     test_object_iterator)
 
-set(NOBUILD_TEST_NAMES "")
+set(NOBUILD_TEST_NAMES 
+    shellcheck
+   )
 if (BUILD_APPS)
   set(NOBUILD_TEST_NAMES ${NOBUILD_TEST_NAMES} test_json_parse_cli)
 endif()

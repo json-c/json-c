@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Benchmarking harness for json-c
 #
@@ -19,17 +19,17 @@ usage()
 {
 	exitval=$1
 	errmsg=$2
-	if [ $exitval -ne 0 ] ; then
+	if [ "$exitval" -ne 0 ] ; then
 		exec 1>&2
 	fi
-	if [ ! -z "$errmsg" ] ; then
+	if [ -n "$errmsg" ] ; then
 		echo "ERROR: $errmsg" 1>&2
 	fi
 	cat <<EOF
 Usage: $0 [-h] [-v] [--build] [--run] [--compare] ...XAX...
 EOF
 
-	exit $extival
+	exit "$exitval"
 }
 
 before_arg=
@@ -90,18 +90,18 @@ done
 echo
 
 # Identify "after" commit hash, in order of preference
-if [ ! -z "$after_arg" -a -d "$after_arg" ] ; then
+if [ -n "$after_arg" ] && [ "$after_arg" ] ; then
 	# Use provided directory
 	after_src_dir="$after_arg"
 	after_commit=
 	echo "Using provided directory [$after_arg] as 'after'"
 else
 	_commit=
-	if [ ! -z "$after_arg" ] ; then
+	if [ -n "$after_arg" ] ; then
 		# Use provided commit hash
 		_commit=$(git rev-parse --verify "$after_arg")
 	fi
-	if [ ! -z "$_commit" ] ;then
+	if [ -n "$_commit" ] ;then
 		after_src_dir=  # i.e. current tree
 		after_commit="$_commit"
 		echo "Using provided commit [$after_arg => $_commit] as 'after'"
@@ -115,18 +115,18 @@ else
 fi
 
 # Identify "before" commit hash, in order of preference
-if [ ! -z "$before_arg" -a -d "$before_arg" ] ; then
+if [ -n "$before_arg" ] && [ -d "$before_arg" ] ; then
    	# Use provided directory
 	before_src_dir="$before_arg"
 	before_commit=
 	echo "Using provided directory [$before_arg] as 'before'"
 else
 	_commit=
-	if [ ! -z "$before_arg" ] ; then
+	if [ -n "$before_arg" ] ; then
 		# Use provided commit hash
 		_commit=$(git rev-parse --verify "$before_arg")
 	fi
-	if [ ! -z "$_commit" ] ;then
+	if [ -n "$_commit" ] ;then
 		before_src_dir=  # i.e. current tree
 		before_commit="$_commit"
 		echo "Using provided commit [$before_arg => $_commit] as 'before'"
@@ -134,7 +134,7 @@ else
 		# Use origin/${cur_branch}, if different from ${after_commit}
 		_cur_branch=$(git rev-parse --abbrev-ref HEAD)
 		_commit=
-		if [ ! -z "${_cur_branch}" ] ; then
+		if [ -n "${_cur_branch}" ] ; then
 			_commit=$(git rev-parse --verify "origin/${_cur_branch}")
 			echo "Using origin/${_cur_branch} [$_commit] as 'before'"
 		fi
@@ -143,7 +143,7 @@ else
 		fi
 	fi
 
-	if [ ! -z "$_commit" ] ; then
+	if [ -n "$_commit" ] ; then
 		before_src_dir=  # i.e. current tree
 		before_commit="$_commit"
 	else
@@ -174,9 +174,9 @@ compile_benchmark()
 	mkdir -p "${inst_dir}"
 	mkdir -p "${bench_dir}"
 
-	if [ ! -z "$src_commit" ] ; then
+	if [ -n "$src_commit" ] ; then
 		# Resolve the short hash, tag or branch name to full hash
-		src_commit=$(git rev-parse $src_commit)
+		src_commit=$(git rev-parse "$src_commit")
 	fi
 
 	# No src dir specified, clone and checkout $src_commit
@@ -213,7 +213,7 @@ compile_benchmark()
 
 # XXX TODO: name "after" and "before" uniquely using the dir & commit
 
-if [ $do_all -ne 0 -o $do_build -ne 0 ] ; then
+if [ $do_all -ne 0 ] || [ $do_build -ne 0 ] ; then
 	sleep 5   # Wait slightly, to allow the human to read the message
 	          #  about what exactly we're doing to benchmark.
 	compile_benchmark "after" "${after_src_dir}" "${after_commit}"
@@ -242,12 +242,12 @@ run_benchmark()
 	echo "DONE with $bname"
 }
 
-if [ $do_all -ne 0 -o $do_run -ne 0 ] ; then
+if [ "$do_all" -ne 0 ] || [ "$do_run" -ne 0 ] ; then
 	run_benchmark "after"
 	run_benchmark "before"
 fi
 
-if [ $do_compare -ne 0 ] ; then
+if [ "$do_compare" -ne 0 ] ; then
 	# XXX this needs better analysis
 	cd "${WORK}"
 	diff -udr before/bench/results after/bench/results || true

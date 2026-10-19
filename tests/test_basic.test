@@ -17,5 +17,5 @@ filename="${filename%.*}"
 # more stuff could be extended
 cp -f "$srcdir/valid.json" .
 
-run_output_test $filename "$srcdir"
+run_output_test "$filename" "$srcdir"
 exit $?

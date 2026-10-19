@@ -10,6 +10,8 @@ exitval=0
 
 XMLREPORT="$1"
 if [[ "${XMLREPORT}" = -* ]] || [ ! -r "${XMLREPORT}" ] ; then
+	echo "Usage: $0 <abireport.xml>" 1>&2
+	exit 1
 fi
 
 XSLTPROC=${XSLTPROC:-xsltproc}

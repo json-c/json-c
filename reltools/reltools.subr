@@ -1,11 +1,11 @@
 
 rt_RUNDIR=$(dirname "${BASH_SOURCE[0]}")
-rt=RUNDIR=$(realpath "${rt_RUNDIR}")
+rt_RUNDIR=$(realpath "${rt_RUNDIR}")
 JSON_C_TOP=${rt_RUNDIR}/..
 
 get_most_recent_reltag()
 {
-	local PATTERN="json-c-${1}*"
+	local PATTERN="json-c-${1:-}*"
 	local RELTAG
 	RELTAG=$(git tag --list "${PATTERN}" | tail -1)
 	echo "${RELTAG}"
@@ -46,6 +46,7 @@ get_most_recent_relbase()
 	echo "${RELBASE}"
 }
 
+# shellcheck disable=SC2034
 set_rel_vars()
 {
 	# Set non-local variables for convenience
@@ -59,7 +60,7 @@ set_rel_vars()
 # Extract the version from either a release tag, or the dev version + abbreviated commit hash
 get_ver_descr()
 {
-	local GITDESCR JSON_C_VERS
+	local GIT_DESCR JSON_C_VERS
 
 	GIT_DESCR=$(git describe --tags --always)
 	if [[ "$GIT_DESCR" == json-c-* ]] ; then
@@ -75,7 +76,7 @@ get_ver_descr()
 update_authors()
 {
 	PREV=$(get_most_recent_reltag)
-	NEW_AUTHORS=$( git log -r ${PREV}..HEAD | grep Author: | sed -e's/Author: //' ; cat "${JSON_C_TOP}/AUTHORS" )
+	NEW_AUTHORS=$(git log -r "${PREV}..HEAD" | grep Author: | sed -e's/Author: //' ; cat "${JSON_C_TOP}/AUTHORS" )
 	echo "${NEW_AUTHORS}" | sort -u > "${JSON_C_TOP}/AUTHORS"
 }
 

@@ -23,7 +23,7 @@ usage()
 {
 	local exitval="$1" ; shift
 	local errmsg="$1"
-	if [ $exitval -ne 0 ] ; then
+	if [ "$exitval" -ne 0 ] ; then
 		exec 1>&2
 	fi
 	if [ -n "$errmsg" ] ; then
@@ -117,9 +117,9 @@ build_new()
 	if [ ! -d "${BUILD_DEST}" ] || [ "${REBUILD_NEW}" -eq 1 ] ; then
 		echo "Building $(pwd) (${release}) into ${BUILD_DEST}"
 		rm -rf build.abi-check
-		mkdir -p build.abi-check/${release}
+		mkdir -p "build.abi-check/${release}"
 		(
-			cd build.abi-check/${release}
+			cd "build.abi-check/${release}"
 			CFLAGS=-Og cmake -DCMAKE_INSTALL_PREFIX="${BUILD_DEST}" ../..
 			make && make test
 			rm -rf "${BUILD_DEST}"
@@ -160,7 +160,7 @@ mkxml()
 	if [ ! -e "${INSTBASE}/json-c-${ver}/lib64" ] ; then
 		ln -s lib "${INSTBASE}/json-c-${ver}/lib64"
 	fi
-cat <<EOF > json-c-${ver}.xml
+cat <<EOF > "json-c-${ver}.xml"
 <foo>
 <version>
    ${ver}
@@ -186,7 +186,7 @@ abidump()
 		rm -f "${dumppath}"
 	fi
 	if [ ! -e "${dumppath}" ] ; then
-		perl "${ACC}" -lib json-c -dump json-c-${libver}.xml -dump-path "${dumppath}"
+		perl "${ACC}" -lib json-c -dump "json-c-${libver}.xml" -dump-path "${dumppath}"
 	else
 		echo "ABI dump already exists at ${dumppath}"
 	fi
@@ -200,16 +200,16 @@ build_old
 build_new
 
 cd "${REPORTDIR}"
-mkxml ${release}
-mkxml ${prev}
+mkxml "${release}"
+mkxml "${prev}"
 
 echo "=== Generating ABI dumps ==="
-abidump ${prev}
-abidump ${release}
+abidump "${prev}"
+abidump "${release}"
 
 echo "=== Comparing ABIs ==="
-perl "${ACC}" -l json-c -old ABI-${prev}.dump -new ABI-${release}.dump
-perl "${ACC}" -l json-c -old ABI-${prev}.dump -new ABI-${release}.dump -report-format xml
+perl "${ACC}" -l json-c -old "ABI-${prev}.dump" -new "ABI-${release}.dump"
+perl "${ACC}" -l json-c -old "ABI-${prev}.dump" -new "ABI-${release}.dump" -report-format xml
 
 echo
 echo "Look in $(pwd)/compat_reports/json-c/${prev}_to_${release}"

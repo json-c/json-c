@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck shell=bash
 # Cross-build json-c for Amiga systems across every multilib slot and install
 # the archives plus headers into an SDK tree.
 #
@@ -10,7 +11,7 @@ set -uo pipefail
 SDK=${AMIGA_SDK:-/opt/amiga}
 AMIGA_DIR=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(cd "$AMIGA_DIR/.." && pwd)
-cd "$ROOT"
+cd "$ROOT" || exit 1
 OSES=("$@"); [[ ${#OSES[@]} -eq 0 ]] && OSES=(AmigaOS3 AmigaOS4 MorphOS)
 
 # os | image tag | sdk subdir
@@ -30,6 +31,7 @@ os_sdkdir() { case "$1" in
 esac; }
 
 # Per-OS variant table: "tree|slot|cmake args"
+# shellcheck disable=SC2034  # used in vars nameref, below
 variants_AmigaOS3=(
   "libnix|.|-DM68K_CRT=nix20 -DM68K_CPU=68000 -DM68K_BASEREL=off"
   "libnix|libm020|-DM68K_CRT=nix20 -DM68K_CPU=68020 -DM68K_BASEREL=off"
@@ -54,6 +56,7 @@ variants_AmigaOS3=(
 #   ppc-amigaos  -mcrt=clib4  -> <target>/lib/clib4/
 #   ppc-morphos  -mclib=libnix-> <target>/lib/libnix/
 #   ppc-morphos  -mbaserel32  -> <target>/lib/libb32/
+# shellcheck disable=SC2034  # used in vars nameref, below
 variants_AmigaOS4=(
   ".|.|-DPPC_CRT=newlib"
   ".|clib2|-DPPC_CRT=clib2"
@@ -61,6 +64,7 @@ variants_AmigaOS4=(
 )
 # MORPHOS_CLIB=libnix (-mclib=libnix) and NOIXEMUL (-noixemul) select the same
 # multilib; it is the self-contained ABI, needing no ixemul.library on target.
+# shellcheck disable=SC2034  # used in vars nameref, below
 variants_MorphOS=(
   ".|.|"
   ".|libb32|-DMORPHOS_BASEREL32=ON"
@@ -79,7 +83,7 @@ for os in "${OSES[@]}"; do
   elif [[ -d $SDK/$osdir/$sdksub ]]; then SDKROOT=$SDK/$osdir/$sdksub
   else echo "skip $os: neither $SDK/$sdksub nor $SDK/$osdir/$sdksub"; continue; fi
 
-  eval "vars=(\"\${variants_$os[@]}\")"
+  declare -n vars="variants_${os}"  # nameref
   for v in "${vars[@]}"; do
     IFS='|' read -r tree slot cargs <<<"$v"
     bdir="bld-$os-$(echo "$tree$slot$cargs" | tr -c 'A-Za-z0-9' '-' | cut -c1-40)"

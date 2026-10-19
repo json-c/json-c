@@ -7,7 +7,8 @@ RUNDIR=$(dirname "$0")
 
 NEXT_VER=$(get_next_relver)
 
-MOST_RECENT=$(ls ${RUNDIR}/../issues_closed*md | sort -V | tail -1)
+# shellcheck disable=SC2012  # Using find is overkill
+MOST_RECENT=$(ls "${RUNDIR}"/../issues_closed*md | sort -V | tail -1)
 PREV=$(grep 'NOW=' "${MOST_RECENT}" | sed -e's/.*=//')
 NOW=$(date +%Y-%m-%d)
 set -x -v

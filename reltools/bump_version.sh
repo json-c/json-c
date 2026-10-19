@@ -35,18 +35,20 @@ bump_release_ver()
 {
 	echo "ERROR: bump_release_ver() not yet implemented in $0" 1>&2
 	echo "See RELEASE_CHECKLIST.txt for steps to take" 1>&2
-	trap - EXIT
-	exit 1
+	return 1
 }
 
 bump_dev_ver()
 {
+	# Update the working directory to get it ready for the next release.
+	# This runs just _after_ a release has been done
+
+	# shellcheck disable=SC2143
 	if [ -n "$(git status --porcelain | grep -v reltools/bump_version.sh)" ] ; then
 		usage 1 "local changes in working directory, aborting"
 	fi
 
 	RELVER=$(get_most_recent_relver)
-	DEVVER=${RELVER}.99
 	NEXTVER=$(get_next_relver)
 
 	if ! grep -q "^${NEXTVER}" ChangeLog ; then
@@ -75,7 +77,7 @@ EOF
 
 
 	# Use ${release}.99 to indicate a version "newer" than anything on the branch:
-	if ! grep -q ${RELVER}.99 json_c_version.h ; then
+	if ! grep -q "${RELVER}.99" json_c_version.h ; then
 		local MAJOR MINOR
 		MAJOR=${RELVER%%.*}
 		MINOR=${RELVER#*.}
@@ -100,11 +102,11 @@ EOF
 	fi
 
 	local RELTAG
-	RELTAG=$(get_most_recent_reltag)
+	RELTAG=$(get_most_recent_reltag "")
 	echo "Extracting VERSION, SOVERSION from ${RELTAG}:CMakeLists.txt"
 
 	local REL_SOVER REL_SOVERNUM
-	REL_SOVER=$(git show ${RELTAG}:CMakeLists.txt | awk '/set_target_prop.*PROJECT_NAME/,/)/')
+	REL_SOVER=$(git show "${RELTAG}:CMakeLists.txt" | awk '/set_target_prop.*PROJECT_NAME/,/)/')
 	REL_VERNUM=$(echo "${REL_SOVER}" | grep " VERSION " | sed -e's/  *VERSION  *//' )
 	REL_SOVERNUM=$(echo "${REL_SOVER}" | grep " SOVERSION " | sed -e's/  *SOVERSION  *//' -e's/)//' )
 	echo "  VERSION=${REL_VERNUM}"
@@ -157,7 +159,7 @@ EOF
 		echo "Warning: json-c-sym already has JSONC_${NEXTVER}" 1>&2
 	fi
 
-	git commit -a -m "Update the master branch to version ${release}.99"
+	git commit -a -m "Update the master branch to version ${RELVER}.99"
 }
 
 while [ $# -gt 0 ] ; do
@@ -177,7 +179,6 @@ while [ $# -gt 0 ] ; do
 		;;
 	*)
 		usage 1 "Unknown args: $*"
-		exit 1
 	;;
 	esac
 done

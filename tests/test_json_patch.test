@@ -13,5 +13,5 @@ fi
 filename=$(basename "$0")
 filename="${filename%.*}"
 
-run_output_test $filename "$srcdir"
+run_output_test "$filename" "$srcdir"
 exit $?

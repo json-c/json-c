@@ -1,0 +1,33 @@
+#!/bin/sh
+#
+# Run shellcheck on all shell scripts in the source tree
+#
+
+set -e
+
+if ! type shellcheck > /dev/null ; then
+	echo "$0: SKIPPED, shellcheck not found"
+	exit 0
+fi
+
+if test -z "$srcdir"; then
+    srcdir="${0%/*}"
+    test "$srcdir" = "$0" && srcdir=.
+    test -z "$srcdir" && srcdir=.
+fi
+
+: "${VERBOSE:=1}"
+. "$srcdir/test-defs.sh"
+TOP="$srcdir/.."
+
+cd "$TOP"
+if find ./* -name \*.sh -o \
+	\( -name \*.test -type f \) -print0 | \
+	xargs -0 shellcheck ; then
+	echo "$0: SUCCESS"
+	exit 0
+else
+	echo "$0: FAIL"
+	exit 1
+fi
+

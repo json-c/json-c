@@ -8,6 +8,8 @@ test_lib = static_library(
   install: false,
 )
 
+fs = import('fs')
+
 test_deps = declare_dependency(
   include_directories: '..',
   link_with: test_lib,
@@ -15,6 +17,7 @@ test_deps = declare_dependency(
 
 # List of test sources and expected output files
 test_cases = [
+  ['shellcheck.test'],
   ['test1', 'test1.expected'],
   ['test2', 'test2.expected'],
   ['test4', 'test4.expected'],
@@ -47,7 +50,9 @@ test_cases = [
 # Copy expected files and test data
 expected_files = []
 foreach t : test_cases
-  expected_files += t[1]
+  if t.length() > 1
+    expected_files += t[1]
+  endif
 endforeach
 
 foreach f : expected_files + ['valid.json', 'valid_nested.json', 'json_patch_spec_tests.json', 'json_patch_tests.json']
@@ -65,15 +70,24 @@ message('Test data directory: ' + testdir)
 
 foreach t : test_cases
   name = t[0]
-  expected = t[1]
-  exe = executable(name, name + '.c',
-    dependencies: test_deps,
-    build_by_default: false
-  )
+  env_expected = []
+  if t.length() > 1
+    expected = t[1]
+    # XXX does this do anything?
+    env_expected = ['EXPECTED_FILE=' + meson.current_build_dir() / expected]
+  endif
+  if fs.exists(name + '.c')
+    exe = executable(name, name + '.c',
+      dependencies: test_deps,
+      build_by_default: false
+    )
+  else
+    exe = find_program(name)
+  endif
 
   test(name, exe,
     args: special_args.get(name, []),
-    env: ['EXPECTED_FILE=' + meson.current_build_dir() / expected],
+    env: env_expected,
     workdir: testdir
   )
 endforeach

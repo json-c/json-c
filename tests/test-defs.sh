@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ ! -z "$JSONC_TEST_TRACE" ] ; then
+if [ -n "$JSONC_TEST_TRACE" ] ; then
 	VERBOSE=1
 	set -x
 	set -v
@@ -10,7 +10,7 @@ fi
 # stand-alone!!
 #
 srcdir=${srcdir-.}
-if test ! -d $srcdir ; then
+if test ! -d "$srcdir" ; then
     echo "test-defs.sh: installation error" 1>&2
     exit 1
 fi
@@ -18,18 +18,17 @@ fi
 # Use absolute paths
 case "$srcdir" in
     /* | [A-Za-z]:\\*) ;;
-    *) srcdir=`\cd $srcdir && pwd` ;;
+    *) srcdir=$(cd "$srcdir" && pwd) ;;
 esac
 
 case "$top_builddir" in
     /* | [A-Za-z]:\\*) ;;
-    *) top_builddir=`\cd ${top_builddir-..} && pwd` ;;
+    *) top_builddir=$(cd "${top_builddir-..}" && pwd) ;;
 esac
 
 top_builddir=${top_builddir}/tests
 
-progname=`echo "$0" | sed 's,^.*/,,'`
-testname=`echo "$progname" | sed 's,-.*$,,'`
+progname=$(echo "$0" | sed 's,^.*/,,')
 testsubdir=${testsubdir-testSubDir}
 testsubdir=${testsubdir}/${progname}
 
@@ -64,7 +63,7 @@ case "${use_valgrind}" in
 		;;
 esac
 valgrind_path=$(which valgrind 2> /dev/null)
-if [ -z "${valgrind_path}" -o ! -x "${valgrind_path}" ] ; then
+if [ -z "${valgrind_path}" ] || [ ! -x "${valgrind_path}" ] ; then
 	use_valgrind=0
 fi
 
@@ -99,11 +98,12 @@ run_output_test()
 	fi
 
 	REDIR_OUTPUT="> \"${TEST_OUTPUT}.out\" 2>&1"
-	if [ $VERBOSE -gt 1 ] ; then
+	if [ "$VERBOSE" -gt 1 ] ; then
 		REDIR_OUTPUT="2>&1 | tee \"${TEST_OUTPUT}.out\""
 	fi
 
-	if [ $use_valgrind -eq 1 ] ; then
+	local exitval
+	if [ "$use_valgrind" -eq 1 ] ; then
 		eval valgrind --tool=memcheck \
 			--trace-children=yes \
 			--demangle=yes \
@@ -111,20 +111,21 @@ run_output_test()
 			--leak-check=full \
 			--show-reachable=yes \
 			--run-libc-freeres=yes \
-		"\"${top_builddir}/${TEST_COMMAND}\"" \"\$@\" ${REDIR_OUTPUT}
+		"\"${top_builddir}/${TEST_COMMAND}\" \"\$@\" ${REDIR_OUTPUT}"
 		exitval=$?
 
 	else
-		eval "\"${top_builddir}/${TEST_COMMAND}"\" \"\$@\" ${REDIR_OUTPUT}
+		eval "\"${top_builddir}/${TEST_COMMAND}\" \"\$@\" ${REDIR_OUTPUT}"
 		exitval=$?
 	fi
 
-	if [ $exitval -ne $EXPECTED_EXITVAL ] ; then
-		echo "ERROR: \"${TEST_COMMAND} $@\" exited with incorrect exit status: $err != $EXPECTED_EXITVAL" 1>&2
+	local err=0
+	if [ "$exitval" -ne "$EXPECTED_EXITVAL" ] ; then
+		echo "ERROR: \"${TEST_COMMAND} $*\" exited with incorrect exit status: $err != $EXPECTED_EXITVAL" 1>&2
 		err=1
 	fi
 
-	if [ $use_valgrind -eq 1 ] ; then
+	if [ "$use_valgrind" -eq 1 ] ; then
 		if ! tail -1 "${TEST_OUTPUT}.vg.out" | grep -q "ERROR SUMMARY: 0 errors" ; then
 			echo "ERROR: valgrind found errors during execution:" 1>&2
 			cat "${TEST_OUTPUT}.vg.out"
@@ -133,12 +134,12 @@ run_output_test()
 	fi
 
 	if ! "$CMP" -s "${srcdir}/${TEST_OUTPUT}.expected" "${TEST_OUTPUT}.out" ; then
-		echo "ERROR: \"${TEST_COMMAND} $@\" (${TEST_OUTPUT}) failed (set VERBOSE=1 to see full output):" 1>&2
-		(cd "${CURDIR}" ; set -x ; diff "${srcdir}/${TEST_OUTPUT}.expected" "$testsubdir/${TEST_OUTPUT}.out")
+		echo "ERROR: \"${TEST_COMMAND} $*\" (${TEST_OUTPUT}) failed (set VERBOSE=1 to see full output):" 1>&2
+		(cd "${CURDIR}" && set -x && diff "${srcdir}/${TEST_OUTPUT}.expected" "$testsubdir/${TEST_OUTPUT}.out")
 		echo "cp \"$testsubdir/${TEST_OUTPUT}.out\" \"${srcdir}/${TEST_OUTPUT}.expected\"" 1>&2
 
 		err=1
 	fi
 
-	return $err
+	return "$err"
 }
