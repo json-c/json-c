@@ -1233,6 +1233,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				tok->err = json_tokener_error_memory;
 				goto out;
 			}
+			obj = NULL; /* ownership transferred to the array */
 			saved_state = json_tokener_state_array_sep;
 			state = json_tokener_state_eatws;
 			goto redo_char;
@@ -1358,6 +1359,7 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				tok->err = json_tokener_error_memory;
 				goto out;
 			}
+			obj = NULL; /* ownership transferred to the object */
 			free(obj_field_name);
 			obj_field_name = NULL;
 			saved_state = json_tokener_state_object_sep;
@@ -1414,6 +1416,11 @@ out:
 	setlocale(LC_NUMERIC, oldlocale);
 	free(oldlocale);
 #endif
+
+	/* If a completed value could not be transferred into its parent container
+	 * (e.g. json_object_object_add() failed above), obj still holds its last
+	 * reference and must be released here to avoid leaking it. */
+	json_object_put(obj);
 
 	if (tok->err == json_tokener_success)
 	{
