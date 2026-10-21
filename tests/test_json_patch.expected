@@ -102,6 +102,8 @@ Testing '(null)', doc '{ "foo": [ "bar", "baz" ], "": 0, "a\/b": 1, "c%d": 2, "e
 Testing 'Move to same location has no effect', doc '{ "foo": 1 }' patch '[ { "op": "move", "from": "\/foo", "path": "\/foo" } ]' : OK
 Testing 'Move between sibling keys sharing a name prefix is not a parent/child move', doc '{ "aa": 1, "aab": 2 }' patch '[ { "op": "move", "from": "\/aa", "path": "\/aab" } ]' : OK
 Testing 'Copy between sibling keys sharing a name prefix is not a parent/child move', doc '{ "aa": 1, "aab": 2 }' patch '[ { "op": "copy", "from": "\/aa", "path": "\/aab" } ]' : OK
+Testing 'Remove members whose names need escaping', doc '{ "a\/b": 1, "m~n": 2, "c": 3 }' patch '[ { "op": "remove", "path": "\/a~1b" }, { "op": "remove", "path": "\/m~0n" } ]' : OK
+Testing 'Move from a member whose name needs escaping', doc '{ "a\/b": 1 }' patch '[ { "op": "move", "from": "\/a~1b", "path": "\/c" } ]' : OK
 Testing '(null)', doc '{ "foo": 1, "baz": [ { "qux": "hello" } ] }' patch '[ { "op": "move", "from": "\/foo", "path": "\/bar" } ]' : OK
 Testing '(null)', doc '{ "baz": [ { "qux": "hello" } ], "bar": 1 }' patch '[ { "op": "move", "from": "\/baz\/0\/qux", "path": "\/baz\/1" } ]' : OK
 Testing '(null)', doc '{ "baz": [ { "qux": "hello" } ], "bar": 1 }' patch '[ { "op": "copy", "from": "\/baz\/0", "path": "\/boo" } ]' : OK

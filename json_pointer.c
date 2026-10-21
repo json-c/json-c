@@ -18,6 +18,7 @@
 #include "json_object_private.h"
 #include "json_pointer.h"
 #include "json_pointer_private.h"
+#include "linkhash.h"
 #include "strdup_compat.h"
 #include "vasprintf_compat.h"
 
@@ -260,9 +261,17 @@ int json_pointer_get_internal(struct json_object *obj, const char *path,
 		return -1;
 	}
 	rc = json_pointer_result_get_recursive(obj, path_copy, res);
-	/* re-map the path string to the const-path string */
+	/* key_in_parent points at the decoded reference token in path_copy,
+	 * which is freed below.  The same offset in the caller's path is still
+	 * escaped ("a~1b" rather than "a/b"), so use the key as it is stored in
+	 * the parent object instead.
+	 */
 	if (rc == 0 && json_object_is_type(res->parent, json_type_object) && res->key_in_parent)
-		res->key_in_parent = path + (res->key_in_parent - path_copy);
+	{
+		struct lh_entry *entry =
+		    lh_table_lookup_entry(json_object_get_object(res->parent), res->key_in_parent);
+		res->key_in_parent = entry ? (const char *)lh_entry_k(entry) : NULL;
+	}
 	free(path_copy);
 
 	return rc;

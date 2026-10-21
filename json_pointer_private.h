@@ -20,7 +20,8 @@ struct json_pointer_get_result {
 	struct json_object *parent;
 	struct json_object *obj;
 	// The key of the found object; only valid when parent is json_type_object
-	// Caution: re-uses tail end of the `path` argument to json_pointer_get_internal
+	// Caution: points at the key stored in `parent`, so it is only valid
+	// as long as that member exists
 	const char *key_in_parent;
 	// the index of the found object; only valid when parent is json_type_array
 	uint32_t index_in_parent;
