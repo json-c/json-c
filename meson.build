@@ -241,11 +241,17 @@ endif
 
 add_project_arguments(cc.get_supported_arguments('-Wno-unused-parameter'), language : 'c')
 
-sym = cc.get_supported_link_arguments(
-  '-Wl,--version-script,@0@/json-c.sym'.format(
-    meson.current_source_dir(),
-  ),
+version_script_arg = '-Wl,--version-script,@0@/json-c.sym'.format(
+  meson.current_source_dir(),
 )
+
+sym = []
+if cc.has_link_argument(version_script_arg) or cc.has_multi_link_arguments(
+  version_script_arg,
+  '-Wl,--undefined-version',
+)
+  sym = [version_script_arg]
+endif
 
 # Source files
 sources = files(
