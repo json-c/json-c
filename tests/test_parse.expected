@@ -310,6 +310,13 @@ json_tokener_parse_ex(tok, "æN"       ,   5) ... OK: got correct error: invalid
 json_tokener_parse_ex(tok, "æN"       ,   5) ... OK: got object of type [string]: "æN"
 json_tokener_parse_ex(tok, "ÀîÅô"      ,   6) ... OK: got correct error: invalid utf-8 string
 json_tokener_parse_ex(tok, "ÀîÅô"      ,   6) ... OK: got object of type [string]: "ÀîÅô"
+json_tokener_parse_ex(tok, "À€"        ,   4) ... OK: got correct error: invalid utf-8 string
+json_tokener_parse_ex(tok, "í €"       ,   5) ... OK: got correct error: invalid utf-8 string
+json_tokener_parse_ex(tok, "ô€€"      ,   6) ... OK: got correct error: invalid utf-8 string
+json_tokener_parse_ex(tok, "õ€€€"      ,   6) ... OK: got correct error: invalid utf-8 string
+json_tokener_parse_ex(tok, "ô¿¿"      ,   6) ... OK: got object of type [string]: "ô¿¿"
+json_tokener_parse_ex(tok, "íŸ¿"       ,   5) ... OK: got object of type [string]: "íŸ¿"
+json_tokener_parse_ex(tok, "ğ€€"      ,   6) ... OK: got object of type [string]: "ğ€€"
 json_tokener_parse_ex(tok,   "ä¸–"     ,   7) ... OK: got object of type [string]: "ä¸–"
 json_tokener_parse_ex(tok,   "ä¸–"    ,   8) ... OK: got correct error: invalid utf-8 string
 json_tokener_parse_ex(tok, [ 1]       ,   5) ... OK: got correct error: invalid utf-8 string
@@ -388,5 +395,5 @@ json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
-End Incremental Tests OK=292 ERROR=0
+End Incremental Tests OK=299 ERROR=0
 ==================================
