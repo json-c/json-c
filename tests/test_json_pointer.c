@@ -122,6 +122,18 @@ static void test_example_get(void)
 		test_example_int(jo1, json_pointers[i].s, json_pointers[i].i);
 
 	json_object_put(jo1);
+
+	/* Test /1 == null, a null array element is found and returned as NULL */
+	jo1 = json_tokener_parse("[0, null, 2]");
+	jo2 = jo1;
+	assert(0 == json_pointer_get(jo1, "/1", NULL));
+	assert(0 == json_pointer_get(jo1, "/1", &jo2));
+	assert(NULL == jo2);
+	errno = 0;
+	assert(0 != json_pointer_get(jo1, "/1/foo", NULL));
+	assert(errno == ENOENT);
+	printf("PASSED - GET - /1 == null\n");
+	json_object_put(jo1);
 }
 
 /* I'm not too happy with the RFC example to test the recursion of the json_pointer_get() function */

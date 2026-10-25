@@ -291,6 +291,31 @@
       "expected": {"foo": null},
       "comment": "null value should still be valid obj property replace other value" },
 
+    { "doc": {"foo": [null]},
+      "patch": [{"op": "test", "path": "/foo/0", "value": null}],
+      "expected": {"foo": [null]},
+      "comment": "null value should be valid array element" },
+
+    { "doc": {"foo": [null]},
+      "patch": [{"op": "replace", "path": "/foo/0", "value": "truthy"}],
+      "expected": {"foo": ["truthy"]},
+      "comment": "null value should be valid array element to be replaced with something truthy" },
+
+    { "doc": {"foo": [null, 1]},
+      "patch": [{"op": "move", "from": "/foo/0", "path": "/bar"}],
+      "expected": {"foo": [1], "bar": null},
+      "comment": "null value should be valid array element to be moved" },
+
+    { "doc": {"foo": [null]},
+      "patch": [{"op": "copy", "from": "/foo/0", "path": "/foo/-"}],
+      "expected": {"foo": [null, null]},
+      "comment": "null value should be valid array element to be copied" },
+
+    { "doc": {"foo": [null, 1]},
+      "patch": [{"op": "remove", "path": "/foo/0"}],
+      "expected": {"foo": [1]},
+      "comment": "null value should be valid array element to be removed" },
+
     { "doc": {"foo": {"foo": 1, "bar": 2}},
       "patch": [{"op": "test", "path": "/foo", "value": {"bar": 2, "foo": 1}}],
       "expected": {"foo": {"foo": 1, "bar": 2}},
