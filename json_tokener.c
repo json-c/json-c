@@ -1473,7 +1473,25 @@ static int json_tokener_parse_double(const char *buf, int len, double *retval)
  * This keeps Valgrind clean.
  */
 #if defined(__GNUC__) || defined(__clang__)
-__attribute__((destructor))
+#define JSON_TOKENER_DESTRUCTOR __attribute__((destructor))
+#elif defined(_WIN32) || defined(_WIN64)
+#include <windows.h>
+
+// Windows implementation using DllMain
+// Executed when FreeLibrary is called or the process exits
+#define JSON_TOKENER_DESTRUCTOR \
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) \
+{ \
+	if (ul_reason_for_call == DLL_PROCESS_DETACH) \
+	{ \
+		json_tokener_locale_fini(); \
+	} \
+	return TRUE; \
+}
+#endif
+
+#ifdef JSON_TOKENER_DESTRUCTOR
+JSON_TOKENER_DESTRUCTOR
 static void json_tokener_locale_fini(void)
 {
 	if (c_numeric_locale != (locale_t)0)
@@ -1482,5 +1500,6 @@ static void json_tokener_locale_fini(void)
 		c_numeric_locale = (locale_t)0;
 	}
 }
-#endif /* __GNUC__ || __clang__ */
+#endif
+
 #endif /* HAVE_USELOCALE */
