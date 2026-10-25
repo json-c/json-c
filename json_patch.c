@@ -166,19 +166,12 @@ static int json_object_array_move_cb(struct json_object *parent, const char *key
                                      struct json_object *value, void *priv)
 {
 	int rc;
-	struct json_pointer_get_result *from = priv;
-	size_t len = json_object_array_length(parent);
 
 	/**
-	 * If it's the same array parent, it means that we removed
-	 * and element from it, so the length is temporarily reduced
-	 * by 1, which means that if we try to move an element to
-	 * the last position, we need to check the current length + 1
+	 * When moving within the same array, the element has already been
+	 * removed, and idx refers to the shorter array (RFC 6902 section 4.4)
 	 */
-	if (parent == from->parent)
-		len++;
-
-	if (idx > len)
+	if (idx > json_object_array_length(parent))
 	{
 		// Note: will propagate back out through json_pointer_set_with_cb()
 		errno = EINVAL;
