@@ -89,6 +89,11 @@ Testing 'null value should be valid obj property to be moved', doc '{ "foo": nul
 Testing 'null value should be valid obj property to be copied', doc '{ "foo": null }' patch '[ { "op": "copy", "from": "\/foo", "path": "\/bar" } ]' : OK
 Testing 'null value should be valid obj property to be removed', doc '{ "foo": null }' patch '[ { "op": "remove", "path": "\/foo" } ]' : OK
 Testing 'null value should still be valid obj property replace other value', doc '{ "foo": "bar" }' patch '[ { "op": "replace", "path": "\/foo", "value": null } ]' : OK
+Testing 'null value should be valid array element', doc '{ "foo": [ null ] }' patch '[ { "op": "test", "path": "\/foo\/0", "value": null } ]' : OK
+Testing 'null value should be valid array element to be replaced with something truthy', doc '{ "foo": [ null ] }' patch '[ { "op": "replace", "path": "\/foo\/0", "value": "truthy" } ]' : OK
+Testing 'null value should be valid array element to be moved', doc '{ "foo": [ null, 1 ] }' patch '[ { "op": "move", "from": "\/foo\/0", "path": "\/bar" } ]' : OK
+Testing 'null value should be valid array element to be copied', doc '{ "foo": [ null ] }' patch '[ { "op": "copy", "from": "\/foo\/0", "path": "\/foo\/-" } ]' : OK
+Testing 'null value should be valid array element to be removed', doc '{ "foo": [ null, 1 ] }' patch '[ { "op": "remove", "path": "\/foo\/0" } ]' : OK
 Testing 'test should pass despite rearrangement', doc '{ "foo": { "foo": 1, "bar": 2 } }' patch '[ { "op": "test", "path": "\/foo", "value": { "bar": 2, "foo": 1 } } ]' : OK
 Testing 'test should pass despite (nested) rearrangement', doc '{ "foo": [ { "foo": 1, "bar": 2 } ] }' patch '[ { "op": "test", "path": "\/foo", "value": [ { "bar": 2, "foo": 1 } ] } ]' : OK
 Testing 'test should pass - no error', doc '{ "foo": { "bar": [ 1, 2, 5, 4 ] } }' patch '[ { "op": "test", "path": "\/foo", "value": { "bar": [ 1, 2, 5, 4 ] } } ]' : OK

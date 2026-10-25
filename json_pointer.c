@@ -102,16 +102,10 @@ static int json_pointer_get_single_path(struct json_object *obj, char *path,
 			return -1;
 		}
 
-		obj = json_object_array_get_idx(obj, *idx);
-		if (obj)
-		{
-			if (value)
-				*value = obj;
-			return 0;
-		}
-		/* Entry not found */
-		errno = ENOENT;
-		return -1;
+		/* A null element is stored as NULL, but it exists */
+		if (value)
+			*value = json_object_array_get_idx(obj, *idx);
+		return 0;
 	}
 
 	/* RFC states that we first must eval all ~1 then all ~0 */

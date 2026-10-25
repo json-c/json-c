@@ -12,6 +12,7 @@ PASSED - GET -  /i\j == 5
 PASSED - GET -  /k"l == 6
 PASSED - GET -  /  == 7
 PASSED - GET -  /m~0n == 8
+PASSED - GET - /1 == null
 { "arr": [ { "obj": [ { }, { }, { "obj1": 0, "obj2": "1" } ] } ], "obj": { "obj": { "obj": [ { "obj1": 0, "obj2": "1" } ] } } }
 PASSED - GET - RECURSION TEST
 PASSED - GET - LOADED TEST JSON
