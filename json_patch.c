@@ -225,7 +225,7 @@ static int json_patch_apply_move_copy(struct json_object **res,
 	 * sibling keys that happen to share a name prefix.
 	 */
 	if (strncmp(from_s, path, from_s_len) == 0 &&
-	    (path[from_s_len] == '\0' || path[from_s_len] == '/')) {
+	    (from_s_len == 0 || path[from_s_len] == '\0' || path[from_s_len] == '/')) {
 		/**
 		 * If lengths match, it's a noop, if they don't,
 		 * then we're trying to move a parent under a child

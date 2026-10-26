@@ -405,6 +405,16 @@
       "patch": [{"op": "copy", "from": "/aa", "path": "/aab"}],
       "expected": {"aa": 1, "aab": 1} },
 
+    { "comment": "Moving the root to a path without a leading '/' must fail, not free the document",
+      "doc": {"a": null},
+      "patch": [{"op": "move", "from": "", "path": "a"}],
+      "error": "the root is a parent of every other location" },
+
+    { "comment": "Copying the root to a path without a leading '/' must fail",
+      "doc": {"a": null},
+      "patch": [{"op": "copy", "from": "", "path": "a"}],
+      "error": "the root is a parent of every other location" },
+
     { "comment": "Remove members whose names need escaping",
       "doc": {"a/b": 1, "m~n": 2, "c": 3},
       "patch": [{"op": "remove", "path": "/a~1b"},
