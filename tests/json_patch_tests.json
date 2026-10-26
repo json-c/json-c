@@ -137,6 +137,81 @@
       "patch": [{"op":"add", "path": "/3", "value": "bar"}],
       "error": "index is greater than number of items in array" },
       
+    { "comment": "test integer against equal double",
+      "doc": {"n": 1},
+      "patch": [{"op": "test", "path": "/n", "value": 1.0}],
+      "expected": {"n": 1} },
+
+    { "comment": "test double against equal integer",
+      "doc": {"n": 1.0},
+      "patch": [{"op": "test", "path": "/n", "value": 1}],
+      "expected": {"n": 1.0} },
+
+    { "comment": "test numeric equality inside arrays and objects",
+      "doc": {"a": [1, {"n": -2.0}], "b": null},
+      "patch": [{"op": "test", "path": "", "value": {"b": null, "a": [1.0, {"n": -2}]}}],
+      "expected": {"a": [1, {"n": -2.0}], "b": null} },
+
+    { "comment": "test integer against negative zero",
+      "doc": 0,
+      "patch": [{"op": "test", "path": "", "value": -0.0}],
+      "expected": 0 },
+
+    { "comment": "test unsigned integer against equal double",
+      "doc": 9223372036854775808,
+      "patch": [{"op": "test", "path": "", "value": 9223372036854775808.0}],
+      "expected": 9223372036854775808 },
+
+    { "comment": "test minimum signed integer against equal double",
+      "doc": -9223372036854775808,
+      "patch": [{"op": "test", "path": "", "value": -9223372036854775808.0}],
+      "expected": -9223372036854775808 },
+
+    { "comment": "test does not round integers to doubles",
+      "doc": 9007199254740993,
+      "patch": [{"op": "test", "path": "", "value": 9007199254740992.0}],
+      "error": "different integers must not compare equal after rounding" },
+
+    { "comment": "test does not round negative integers to doubles",
+      "doc": -9007199254740993,
+      "patch": [{"op": "test", "path": "", "value": -9007199254740992.0}],
+      "error": "different negative integers must not compare equal after rounding" },
+
+    { "comment": "test does not truncate fractional numbers",
+      "doc": 1,
+      "patch": [{"op": "test", "path": "", "value": 1.5}],
+      "error": "fractional number must not compare equal to an integer" },
+
+    { "comment": "test does not truncate negative fractional numbers",
+      "doc": -1,
+      "patch": [{"op": "test", "path": "", "value": -1.5}],
+      "error": "negative fractional number must not compare equal to an integer" },
+
+    { "comment": "test does not clamp out of range unsigned numbers",
+      "doc": 18446744073709551615,
+      "patch": [{"op": "test", "path": "", "value": 18446744073709551616.0}],
+      "error": "out of range double must not compare equal to UINT64_MAX" },
+
+    { "comment": "test does not clamp out of range negative numbers",
+      "doc": -9223372036854775808,
+      "patch": [{"op": "test", "path": "", "value": -18446744073709551616.0}],
+      "error": "out of range double must not compare equal to INT64_MIN" },
+
+    { "comment": "test does not coerce boolean values to numbers",
+      "doc": true,
+      "patch": [{"op": "test", "path": "", "value": 1.0}],
+      "error": "boolean is not a number" },
+
+    { "comment": "test does not coerce strings to numbers",
+      "doc": "1",
+      "patch": [{"op": "test", "path": "", "value": 1.0}],
+      "error": "string is not a number" },
+
+    { "comment": "test checks numeric equality recursively",
+      "doc": {"a": [1, {"n": -2}]},
+      "patch": [{"op": "test", "path": "", "value": {"a": [1.0, {"n": -3.0}]}}],
+      "error": "nested numbers differ" },
+
     { "comment": "test against implementation-specific numeric parsing",
       "doc": {"1e0": "foo"},
       "patch": [{"op": "test", "path": "/1e0", "value": "foo"}],
