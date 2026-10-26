@@ -42,6 +42,18 @@ int main(int argc, char **argv)
 	printf("obj.to_string(reset)=%s\n", json_object_to_json_string_ext(obj, 4));
 
 	json_object_put(obj);
+	/* NOZERO must only trim the fraction, never the exponent */
+	obj = json_object_new_double(1.5e20);
+	printf("obj(1.5e20).to_string(nozero)=%s\n",
+	       json_object_to_json_string_ext(obj, JSON_C_TO_STRING_NOZERO));
+	json_object_put(obj);
+	obj = json_object_new_double(1.5e20);
+	char data_e[] = "%.3e";
+	json_object_set_serializer(obj, json_object_double_to_json_string, data_e, NULL);
+	printf("obj(1.5e20).to_string(%%.3e,nozero)=%s\n",
+	       json_object_to_json_string_ext(obj, JSON_C_TO_STRING_NOZERO));
+
+	json_object_put(obj);
 	obj = json_object_new_double(0.52381);
 
 	printf("obj.to_string(default format)=%s\n", json_object_to_json_string(obj));

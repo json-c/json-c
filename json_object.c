@@ -1328,15 +1328,18 @@ static int json_object_double_to_json_string_format(struct json_object *jso, str
 		{
 			/* last useful digit, always keep 1 zero */
 			p++;
-			for (q = p; *q; q++)
+			for (q = p; is_plain_digit(*q); q++)
 			{
 				if (*q != '0')
 					p = q;
 			}
-			/* drop trailing zeroes */
-			if (*p != 0)
-				*(++p) = 0;
-			size = p - buf;
+			/* drop trailing zeroes, keeping any exponent after them */
+			if (is_plain_digit(*p))
+			{
+				p++;
+				memmove(p, q, strlen(q) + 1);
+			}
+			size = (int)strlen(buf);
 		}
 	}
 	// although unlikely, snprintf can fail
