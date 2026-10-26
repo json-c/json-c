@@ -54,6 +54,9 @@ Testing '(null)', doc '[ "foo", "sil" ]' patch '[ { "op": "add", "path": "\/0", 
 Testing 'push item to array via last index + 1', doc '[ "foo", "sil" ]' patch '[ { "op": "add", "path": "\/2", "value": "bar" } ]' : OK
 Testing 'add item to array at index > length should fail', doc '[ "foo", "sil" ]' patch '[ { "op": "add", "path": "\/3", "value": "bar" } ]' : OK
  => json_patch_apply failed as expected: ERRNO=EINVAL at patch idx 0: Failed to set value at path referenced by 'path' field
+Testing 'Move within an array to the old array length is out of bounds', doc '{ "foo": [ 1, 2, 3 ] }' patch '[ { "op": "move", "from": "\/foo\/0", "path": "\/foo\/3" } ]' : OK
+ => json_patch_apply failed as expected: ERRNO=EINVAL at patch idx 0: Failed to set value at path referenced by 'path' field
+Testing 'Move within an array to its last index', doc '{ "foo": [ 1, 2, 3 ] }' patch '[ { "op": "move", "from": "\/foo\/0", "path": "\/foo\/2" } ]' : OK
 Testing 'test against implementation-specific numeric parsing', doc '{ "1e0": "foo" }' patch '[ { "op": "test", "path": "\/1e0", "value": "foo" } ]' : OK
 Testing 'test with bad number should fail', doc '[ "foo", "bar" ]' patch '[ { "op": "test", "path": "\/1e0", "value": "bar" } ]' : OK
  => json_patch_apply failed as expected: ERRNO=EINVAL at patch idx 0: Invalid path field

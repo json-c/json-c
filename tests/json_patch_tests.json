@@ -136,6 +136,16 @@
       "doc": ["foo", "sil"],
       "patch": [{"op":"add", "path": "/3", "value": "bar"}],
       "error": "index is greater than number of items in array" },
+
+    { "comment": "Move within an array to the old array length is out of bounds",
+      "doc": {"foo": [1, 2, 3]},
+      "patch": [{"op": "move", "from": "/foo/0", "path": "/foo/3"}],
+      "error": "/foo/3 is past the end of the array once /foo/0 is removed" },
+
+    { "comment": "Move within an array to its last index",
+      "doc": {"foo": [1, 2, 3]},
+      "patch": [{"op": "move", "from": "/foo/0", "path": "/foo/2"}],
+      "expected": {"foo": [2, 3, 1]} },
       
     { "comment": "test against implementation-specific numeric parsing",
       "doc": {"1e0": "foo"},
