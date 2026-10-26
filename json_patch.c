@@ -15,6 +15,7 @@
 #include "json_patch.h"
 #include "json_object_private.h"
 #include "json_pointer_private.h"
+#include "linkhash.h"
 
 #include <limits.h>
 #ifndef SIZE_T_MAX
@@ -48,6 +49,72 @@
  *   RFC 6902 - https://tools.ietf.org/html/rfc6902
  */
 
+/* RFC 6902 compares numbers by value, including inside arrays and objects.
+ * json_object_equal() deliberately distinguishes integer and double objects.
+ */
+static int json_patch_equal(struct json_object *a, struct json_object *b)
+{
+	enum json_type type_a = json_object_get_type(a);
+	enum json_type type_b = json_object_get_type(b);
+
+	if (a == b)
+		return 1;
+
+	if ((type_a == json_type_int && type_b == json_type_double) ||
+	    (type_a == json_type_double && type_b == json_type_int))
+	{
+		struct json_object *integer = type_a == json_type_int ? a : b;
+		struct json_object *floating = type_a == json_type_double ? a : b;
+		double d = json_object_get_double(floating);
+		int64_t i = json_object_get_int64(integer);
+		uint64_t u;
+
+		/* Check the range before casting, then reject fractional values and
+		 * integers that would lose precision when converted to double.
+		 */
+		if (i < 0)
+			return d >= (double)INT64_MIN && d < 0 && (int64_t)d == i && (double)i == d;
+
+		u = json_object_get_uint64(integer);
+		/* As in json_object_get_uint64(), the rounded upper bound is exclusive. */
+		return d >= 0 && d < (double)UINT64_MAX && (uint64_t)d == u && (double)u == d;
+	}
+
+	if (type_a != type_b)
+		return 0;
+
+	if (type_a == json_type_array)
+	{
+		size_t i, len = json_object_array_length(a);
+		if (len != json_object_array_length(b))
+			return 0;
+		for (i = 0; i < len; i++)
+		{
+			if (!json_patch_equal(json_object_array_get_idx(a, i),
+			                      json_object_array_get_idx(b, i)))
+				return 0;
+		}
+		return 1;
+	}
+
+	if (type_a == json_type_object)
+	{
+		struct json_object_iter iter;
+		struct json_object *value;
+		if (json_object_object_length(a) != json_object_object_length(b))
+			return 0;
+		json_object_object_foreachC(a, iter)
+		{
+			if (!json_object_object_get_ex(b, iter.key, &value) ||
+			    !json_patch_equal(iter.val, value))
+				return 0;
+		}
+		return 1;
+	}
+
+	return json_object_equal(a, b);
+}
+
 static int json_patch_apply_test(struct json_object **res,
                                  struct json_object *patch_elem,
                                  const char *path, struct json_patch_error *patch_error)
@@ -65,7 +132,7 @@ static int json_patch_apply_test(struct json_object **res,
 		return -1;
 	}
 
-	if (!json_object_equal(value1, value2)) {
+	if (!json_patch_equal(value1, value2)) {
 		_set_err(ENOENT, "Value of element referenced by 'path' field did not match 'value' field");
 		return -1;
 	}
