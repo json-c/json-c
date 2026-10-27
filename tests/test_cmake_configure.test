@@ -1,0 +1,58 @@
+#!/bin/bash
+
+if test -z "$srcdir"; then
+	srcdir="${0%/*}"
+	test "$srcdir" = "$0" && srcdir=.
+	test -z "$srcdir" && srcdir=.
+fi
+. "$srcdir/test-defs.sh"
+
+wrapper="${srcdir}/../cmake-configure"
+_err=0
+
+# Isolate the wrapper from the installed cmake and avoid configuring another
+# build. The version probe succeeds, while configuration returns a known code.
+mkdir -p cmake-bin
+cat > cmake-bin/cmake <<'EOF'
+#!/bin/sh
+if test "$1" = --version; then
+	exit 0
+fi
+exit 37
+EOF
+chmod +x cmake-bin/cmake
+PATH="$(pwd)/cmake-bin:$PATH"
+export PATH
+
+expect_status()
+{
+	expected_status="$1"
+	shift
+	"$@" > configure.out 2> configure.err
+	actual_status=$?
+	if test "$actual_status" -ne "$expected_status"; then
+		echo "ERROR: $* returned $actual_status, expected $expected_status" 1>&2
+		cat configure.out configure.err 1>&2
+		_err=1
+	fi
+}
+
+# Explicit help remains successful, but usage errors must fail.
+expect_status 0 "$BASH" "$wrapper" --help
+expect_status 0 "$BASH" "$wrapper" -h
+expect_status 1 "$BASH" "$wrapper" --not-a-real-configure-option
+
+in_source()
+{
+	(cd "${srcdir}/.." && "$BASH" "$wrapper")
+}
+expect_status 1 in_source
+
+# The final exec must still propagate cmake's own exit status.
+expect_status 37 "$BASH" "$wrapper" -- -DCMAKE_BUILD_TYPE=Debug
+
+# A failed version probe takes the remaining usage-error path.
+printf '#!/bin/sh\nexit 1\n' > cmake-bin/cmake
+expect_status 1 "$BASH" "$wrapper" --help
+
+exit $_err
