@@ -311,6 +311,11 @@
       "expected": {"foo": [null, null]},
       "comment": "null value should be valid array element to be copied" },
 
+    { "doc": {"foo": [1, 2, 3]},
+      "patch": [{"op": "copy", "from": "/foo/0", "path": "/foo/1"}],
+      "expected": {"foo": [1, 1, 2, 3]},
+      "comment": "copy to an array index inserts, it does not replace" },
+
     { "doc": {"foo": [null, 1]},
       "patch": [{"op": "remove", "path": "/foo/0"}],
       "expected": {"foo": [1]},
