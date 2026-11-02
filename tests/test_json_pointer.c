@@ -241,6 +241,10 @@ static void test_wrong_inputs_get(void)
 	errno = 0;
 	assert(0 != json_pointer_get(jo1, "/foo/10", NULL));
 	assert(errno == ENOENT);
+	errno = 0;
+	/* An index that doesn't fit in a size_t must not wrap around to 0 */
+	assert(0 != json_pointer_get(jo1, "/foo/4294967296", NULL));
+	assert(errno == ENOENT);
 	printf("PASSED - GET - INVALID INDEXES\n");
 
 	json_object_put(jo1);
