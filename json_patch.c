@@ -263,11 +263,13 @@ static int json_patch_apply_move_copy(struct json_object **res,
                                       const char *path, int move, struct json_patch_error *patch_error)
 {
 	json_pointer_set_cb array_set_cb;
+	void *array_set_priv;
 	struct json_pointer_get_result from;
 	struct json_object *jfrom;
 	struct json_object *value;
 	const char *from_s;
 	size_t from_s_len;
+	int add = 1;
 	int rc;
 
 	if (!json_object_object_get_ex(patch_elem, "from", &jfrom)) {
@@ -331,7 +333,10 @@ static int json_patch_apply_move_copy(struct json_object **res,
 			_set_err(ENOMEM, "Unable to copy value referenced by 'from' field");
 			return -1;
 		}
+		/* copy is an "add" at the target, and json_object_array_insert_idx_cb()
+		 * reads its priv as the int add flag, not as the "from" result */
 		array_set_cb = json_object_array_insert_idx_cb;
+		array_set_priv = &add;
 	} else {
 		json_object_get(from.obj);
 		value = from.obj;
@@ -341,9 +346,10 @@ static int json_patch_apply_move_copy(struct json_object **res,
 			return rc;
 		}
 		array_set_cb = json_object_array_move_cb;
+		array_set_priv = &from;
 	}
 
-	rc = json_pointer_set_with_cb(res, path, value, array_set_cb, 0, &from);
+	rc = json_pointer_set_with_cb(res, path, value, array_set_cb, 0, array_set_priv);
 	if (rc)
 	{
 		_set_err(errno, "Failed to set value at path referenced by 'path' field");

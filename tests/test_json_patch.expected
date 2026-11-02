@@ -117,6 +117,7 @@ Testing 'null value should be valid array element', doc '{ "foo": [ null ] }' pa
 Testing 'null value should be valid array element to be replaced with something truthy', doc '{ "foo": [ null ] }' patch '[ { "op": "replace", "path": "\/foo\/0", "value": "truthy" } ]' : OK
 Testing 'null value should be valid array element to be moved', doc '{ "foo": [ null, 1 ] }' patch '[ { "op": "move", "from": "\/foo\/0", "path": "\/bar" } ]' : OK
 Testing 'null value should be valid array element to be copied', doc '{ "foo": [ null ] }' patch '[ { "op": "copy", "from": "\/foo\/0", "path": "\/foo\/-" } ]' : OK
+Testing 'copy to an array index inserts, it does not replace', doc '{ "foo": [ 1, 2, 3 ] }' patch '[ { "op": "copy", "from": "\/foo\/0", "path": "\/foo\/1" } ]' : OK
 Testing 'null value should be valid array element to be removed', doc '{ "foo": [ null, 1 ] }' patch '[ { "op": "remove", "path": "\/foo\/0" } ]' : OK
 Testing 'test should pass despite rearrangement', doc '{ "foo": { "foo": 1, "bar": 2 } }' patch '[ { "op": "test", "path": "\/foo", "value": { "bar": 2, "foo": 1 } } ]' : OK
 Testing 'test should pass despite (nested) rearrangement', doc '{ "foo": [ { "foo": 1, "bar": 2 } ] }' patch '[ { "op": "test", "path": "\/foo", "value": [ { "bar": 2, "foo": 1 } ] } ]' : OK
