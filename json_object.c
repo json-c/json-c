@@ -1195,6 +1195,23 @@ int json_c_set_serialization_double_format(const char *double_format, int global
 {
 	if (global_or_thread == JSON_C_OPTION_GLOBAL)
 	{
+		if (double_format)
+		{
+			char *p = strdup(double_format);
+			if (p == NULL)
+			{
+				_json_c_set_last_err("json_c_set_serialization_double_format: "
+				                     "out of memory\n");
+				return -1;
+			}
+			free(global_serialization_float_format);
+			global_serialization_float_format = p;
+		}
+		else
+		{
+			free(global_serialization_float_format);
+			global_serialization_float_format = NULL;
+		}
 #if defined(HAVE___THREAD)
 		if (tls_serialization_float_format)
 		{
@@ -1202,32 +1219,10 @@ int json_c_set_serialization_double_format(const char *double_format, int global
 			tls_serialization_float_format = NULL;
 		}
 #endif
-		if (global_serialization_float_format)
-			free(global_serialization_float_format);
-		if (double_format)
-		{
-			char *p = strdup(double_format);
-			if (p == NULL)
-			{
-				_json_c_set_last_err("json_c_set_serialization_double_format: "
-				                     "out of memory\n");
-				return -1;
-			}
-			global_serialization_float_format = p;
-		}
-		else
-		{
-			global_serialization_float_format = NULL;
-		}
 	}
 	else if (global_or_thread == JSON_C_OPTION_THREAD)
 	{
 #if defined(HAVE___THREAD)
-		if (tls_serialization_float_format)
-		{
-			free(tls_serialization_float_format);
-			tls_serialization_float_format = NULL;
-		}
 		if (double_format)
 		{
 			char *p = strdup(double_format);
@@ -1237,10 +1232,12 @@ int json_c_set_serialization_double_format(const char *double_format, int global
 				                     "out of memory\n");
 				return -1;
 			}
+			free(tls_serialization_float_format);
 			tls_serialization_float_format = p;
 		}
 		else
 		{
+			free(tls_serialization_float_format);
 			tls_serialization_float_format = NULL;
 		}
 #else
