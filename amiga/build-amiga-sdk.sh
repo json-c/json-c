@@ -14,10 +14,12 @@ cd "$ROOT"
 OSES=("$@"); [[ ${#OSES[@]} -eq 0 ]] && OSES=(AmigaOS3 AmigaOS4 MorphOS)
 
 # os | image tag | sdk subdir
+# Override an image with AMIGA_IMAGE_AmigaOS3 / _AmigaOS4 / _MorphOS, e.g. to
+# build against a locally built compiler image before it is published.
 os_image() { case "$1" in
-  AmigaOS3) echo "sacredbanana/amiga-compiler:m68k-amigaos m68k-amigaos" ;;
-  AmigaOS4) echo "sacredbanana/amiga-compiler:ppc-amigaos ppc-amigaos" ;;
-  MorphOS)  echo "sacredbanana/amiga-compiler:ppc-morphos ppc-morphos" ;;
+  AmigaOS3) echo "${AMIGA_IMAGE_AmigaOS3:-sacredbanana/amiga-compiler:m68k-amigaos} m68k-amigaos" ;;
+  AmigaOS4) echo "${AMIGA_IMAGE_AmigaOS4:-sacredbanana/amiga-compiler:ppc-amigaos} ppc-amigaos" ;;
+  MorphOS)  echo "${AMIGA_IMAGE_MorphOS:-sacredbanana/amiga-compiler:ppc-morphos} ppc-morphos" ;;
   *) return 1 ;;
 esac; }
 
@@ -46,6 +48,20 @@ variants_AmigaOS3=(
   "clib2|libb|-DM68K_CRT=clib2 -DM68K_CPU=68000 -DM68K_BASEREL=baserel"
   "clib2|libb/libm020|-DM68K_CRT=clib2 -DM68K_CPU=68020 -DM68K_BASEREL=baserel"
   "clib2|libb32/libm020|-DM68K_CRT=clib2 -DM68K_CPU=68020 -DM68K_BASEREL=baserel32"
+  # FPU slots (M68K_FPU=hard -> -mhard-float). -m68881, -mhard-float, and
+  # -m68040/-m68060 (which the specs map here too) link
+  # from libm020/libm881; without these the linker falls back to the
+  # soft-float libm020 build, whose __adddf3/__nedf2 calls clib2's FPU libm
+  # cannot satisfy.
+  "libnix|libm020/libm881|-DM68K_CRT=nix20 -DM68K_CPU=68020 -DM68K_FPU=hard -DM68K_BASEREL=off"
+  "libnix|libb/libm020/libm881|-DM68K_CRT=nix20 -DM68K_CPU=68020 -DM68K_FPU=hard -DM68K_BASEREL=baserel"
+  "libnix|libb32/libm020/libm881|-DM68K_CRT=nix20 -DM68K_CPU=68020 -DM68K_FPU=hard -DM68K_BASEREL=baserel32"
+  ".|libm020/libm881|-DM68K_CRT=newlib -DM68K_CPU=68020 -DM68K_FPU=hard -DM68K_BASEREL=off"
+  ".|libb/libm020/libm881|-DM68K_CRT=newlib -DM68K_CPU=68020 -DM68K_FPU=hard -DM68K_BASEREL=baserel"
+  ".|libb32/libm020/libm881|-DM68K_CRT=newlib -DM68K_CPU=68020 -DM68K_FPU=hard -DM68K_BASEREL=baserel32"
+  "clib2|libm020/libm881|-DM68K_CRT=clib2 -DM68K_CPU=68020 -DM68K_FPU=hard -DM68K_BASEREL=off"
+  "clib2|libb/libm020/libm881|-DM68K_CRT=clib2 -DM68K_CPU=68020 -DM68K_FPU=hard -DM68K_BASEREL=baserel"
+  "clib2|libb32/libm020/libm881|-DM68K_CRT=clib2 -DM68K_CPU=68020 -DM68K_FPU=hard -DM68K_BASEREL=baserel32"
 )
 # Unlike m68k, where each C runtime is its own tree (libnix/, clib2/), the PPC
 # toolchains make the runtime a multilib SLOT under lib/, with headers coming

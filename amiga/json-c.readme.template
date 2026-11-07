@@ -34,6 +34,13 @@ Contents
         lib/libb/              68000, -fbaserel
         lib/libb/libm020/      68020, -fbaserel
         lib/libb32/libm020/    68020, -fbaserel32
+        lib/libm020/libm881/          68020 + FPU (-m68881, -mhard-float,
+        lib/libb/libm020/libm881/     also -m68040/-m68060), absolute,
+        lib/libb32/libm020/libm881/   -fbaserel and -fbaserel32
+
+    The libm881/ builds use FPU instructions. Without them an FPU program
+    would fall back to the soft-float libm020/ build, which clib2 cannot link
+    (its FPU libm has no soft-float helpers such as __adddf3).
 
     On PPC a C runtime is not a separate tree but a multilib slot beneath one
     shared lib/, with headers in the single shared include/:
@@ -68,18 +75,16 @@ Which variants link
 
     Verified by compiling the snippet above against each shipped library.
 
-    AmigaOS3  libnix    all 5 slots link.
+    AmigaOS3  all 8 slots link for newlib, libnix and clib2, provided the
+              compiler image carries the AmigaSDK-gcc cleanup of 2026-11 that
+              stopped stale 2023/2024 toolchain files overwriting the newer
+              newlib and clib2. Older images lack strtoll()/strtoull() in
+              clib2's 68000 multilib and gettimeofday() in newlib, and fail
+              -fbaserel clib2 links with a "dangerous relocation".
 
-              clib2     lib/libm020/ and lib/libb32/libm020/ link. The other
-                        three fail inside clib2 itself: its 68000 multilib has
-                        no strtoll()/strtoull(), and 16-bit -fbaserel overflows
-                        with "truncated to fit: DREL16" once json-c's data is
-                        added. -fbaserel32 has no such limit.
-
-              newlib    builds, but does not link: the m68k newlib tree has no
-                        gettimeofday(). The libraries are shipped anyway, since
-                        that is a gap in the SDK rather than in json-c and a
-                        newlib with gettimeofday() implemented would link.
+              Known toolchain issue: with clib2, -m68040/-m68060 on their
+              own compile soft-float code but link the FPU libraries. Add
+              -m68881.
 
     AmigaOS4  all three (newlib, clib2, clib4) link.
 
