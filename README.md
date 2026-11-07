@@ -398,26 +398,34 @@ systems, so you do not have to drive the container by hand.
   produces `dist/json-c.lha` for distribution.
 
 Both default to `AmigaOS3 AmigaOS4 MorphOS`, and both take the variant list
-from the same table in `amiga/build-amiga-sdk.sh`, so they cannot disagree. 22
-libraries are built in total: 15 for AmigaOS 3 (newlib, libnix and clib2, each
-across the five multilib slots), 3 for AmigaOS 4 (newlib, clib2, clib4) and 4
-for MorphOS (ixemul and native, each with and without `-mbaserel32`).
+from the same table in `amiga/build-amiga-sdk.sh`, so they cannot disagree. 31
+libraries are built in total: 24 for AmigaOS 3 (newlib, libnix and clib2, each
+across eight multilib slots: 68000, 68020, `-fbaserel`, `-fbaserel -m68020`,
+`-fbaserel32 -m68020`, and a `libm881/` FPU build of the three 68020 slots),
+3 for AmigaOS 4 (newlib, clib2, clib4) and 4 for MorphOS (ixemul and native,
+each with and without `-mbaserel32`).
 
 Which of them actually *link* is a separate question from whether they build,
 and was checked by compiling a program against each one:
 
 | target | links |
 |--------|-------|
-| AmigaOS 3, libnix | all 5 slots |
-| AmigaOS 3, clib2 | `lib/libm020/` and `lib/libb32/libm020/` only |
-| AmigaOS 3, newlib | none -- the m68k newlib tree has no `gettimeofday()` |
+| AmigaOS 3, libnix | all 8 slots |
+| AmigaOS 3, clib2 | all 8 slots |
+| AmigaOS 3, newlib | all 8 slots |
 | AmigaOS 4 | all 3 (newlib, clib2, clib4) |
 | MorphOS | all 4 slots |
 
-The clib2 failures are inside clib2 itself: its 68000 multilib provides no
-`strtoll`/`strtoull`, and 16-bit `-fbaserel` overflows with *truncated to fit:
-DREL16* once json-c's data is added -- `-fbaserel32` has no 64 KB limit. Link
-with `-ljson-c -lm` after your own objects, and add `-lunix` for clib2.
+The AmigaOS 3 results need a compiler image with the November 2026
+AmigaSDK-gcc cleanup, which stopped stale toolchain files overwriting the
+newer newlib and clib2. With an older image, clib2's 68000 multilib lacks
+`strtoll`/`strtoull`, newlib lacks `gettimeofday()`, and clib2 `-fbaserel` links
+fail with a *dangerous relocation*. The `libm881/` slots matter for FPU builds
+(`-m68881`, `-mhard-float`, `-m68040`/`-m68060`). Without them the linker falls back
+to the soft-float build, which clib2 cannot link. With clib2, add `-m68881` to a
+bare `-m68040`/`-m68060`: those compile soft-float code but link the FPU
+libraries. Link with `-ljson-c -lm` after your own objects, and add `-lunix` for
+clib2.
 
 The archive is a single `json-c/` directory at the root, with the readme and
 one directory per system, each following the compiler's own layout so it can
