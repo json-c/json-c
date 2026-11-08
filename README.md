@@ -1,5 +1,3 @@
-\mainpage
-
 json-c
 ========
 
@@ -521,4 +519,3 @@ A json_object tree can be serialized back into a string with
 `json_object_to_json_string_ext()`.  The string that is returned 
 is only valid until the next "to_json_string" call on that same object.
 Also, it is freed when the json_object is freed.
-
