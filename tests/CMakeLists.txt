@@ -49,8 +49,9 @@ set(NOBUILD_TEST_NAMES "")
 if (UNIX)
   find_program(JSON_C_BASH_EXECUTABLE bash)
   if (JSON_C_BASH_EXECUTABLE)
-    add_test(NAME test_cmake_configure COMMAND ${JSON_C_BASH_EXECUTABLE}
-      ${PROJECT_SOURCE_DIR}/tests/test_cmake_configure.test)
+    add_test(NAME test_cmake_configure COMMAND /bin/sh
+      ${PROJECT_SOURCE_DIR}/tests/test_cmake_configure.test
+      "${JSON_C_BASH_EXECUTABLE}")
   endif()
 endif()
 if (BUILD_APPS)
