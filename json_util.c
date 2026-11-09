@@ -132,7 +132,7 @@ struct json_object *json_object_from_fd_ex(int fd, int in_depth)
 		return NULL;
 	}
 
-	obj = json_tokener_parse_ex(tok, pb->buf, printbuf_length(pb));
+	obj = json_tokener_parse_ex(tok, pb->buf, printbuf_length(pb) + 1);
 	if (obj == NULL)
 		_json_c_set_last_err("json_tokener_parse_ex failed: %s\n",
 		                     json_tokener_error_desc(json_tokener_get_error(tok)));
