@@ -494,15 +494,18 @@ struct incremental_step
 
 	/* INT64_MIN */
 	{"[-9223372036854775808]", 23, 22, json_tokener_success, 1, 0},
+	{"-9223372036854775808", 21, 20, json_tokener_success, 1, JSON_TOKENER_STRICT},
 
 	/* INT64_MIN-1 => success, but value ends up capped */
 	{"[-9223372036854775809]", 23, 22, json_tokener_success, 1, 0},
 
 	/* INT64_MIN-1 => failure due to underflow detected */
 	{"[-9223372036854775809]", 23, 21, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
+	{"-9223372036854775809", 21, 20, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
 
 	/* UINT64_MAX */
 	{"[18446744073709551615]", 23, 22, json_tokener_success, 1, 0}, 
+	{"18446744073709551615", 21, 20, json_tokener_success, 1, JSON_TOKENER_STRICT},
 
 	/* UINT64_MAX+1 => success, but value ends up capped */
 	{"[18446744073709551616]", 23, 22, json_tokener_success, 1, 0}, 
@@ -510,9 +513,9 @@ struct incremental_step
 	/* UINT64_MAX+1 => failure due to overflow detected */
 	{"[18446744073709551616]", 23, 21, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT}, 
 
-	/* XXX this seems like a bug, should fail with _error_parse_number instead */
+	/* Top-level overflow should also fail with _error_parse_number. */
 	{"18446744073709551616", 21, 20, json_tokener_success, 1, 0},
-	{"18446744073709551616", 21, 20, json_tokener_error_parse_eof, 1, JSON_TOKENER_STRICT}, 
+	{"18446744073709551616", 21, 20, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
 
 	/* Exceeding integer limits as double parse OK */
 	{"[9223372036854775808.0]", 24, 23, json_tokener_success, 1, 0},
