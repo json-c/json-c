@@ -26,6 +26,7 @@
 
 static void test_read_valid_with_fd(const char *testdir);
 static void test_read_valid_nested_with_fd(const char *testdir);
+static void test_read_eof_scalars(void);
 static void test_read_nonexistant(void);
 #ifndef _WIN32
 static void test_read_closed(void);
@@ -165,6 +166,7 @@ int main(int argc, char **argv)
 
 	test_read_valid_with_fd(testdir);
 	test_read_valid_nested_with_fd(testdir);
+	test_read_eof_scalars();
 	test_read_nonexistant();
 	#ifndef _WIN32
 	// Disabled because the Windows CRT causes a crash during this test that cannot be disabled/stopped/worked around
@@ -173,6 +175,27 @@ int main(int argc, char **argv)
 	test_write_to_file();
 	test_read_fd_equal(testdir);
 	return EXIT_SUCCESS;
+}
+
+static void test_read_eof_scalars(void)
+{
+	const char *values[] = {"123", "true"};
+	const char *filename = "eof-scalar.json";
+	size_t i;
+
+	for (i = 0; i < sizeof(values) / sizeof(values[0]); i++)
+	{
+		int d = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+		json_object *jso;
+		assert(d >= 0);
+		assert(write(d, values[i], strlen(values[i])) == (ssize_t)strlen(values[i]));
+		assert(close(d) == 0);
+
+		jso = json_object_from_file(filename);
+		assert(jso != NULL);
+		assert(strcmp(json_object_to_json_string_ext(jso, JSON_C_TO_STRING_PLAIN), values[i]) == 0);
+		json_object_put(jso);
+	}
 }
 
 static void test_read_valid_with_fd(const char *testdir)
