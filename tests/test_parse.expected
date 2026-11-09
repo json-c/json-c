@@ -246,13 +246,16 @@ json_tokener_parse_ex(tok, 1234        ,   5) ... OK: got object of type [int]: 
 json_tokener_parse_ex(tok, [9223372036854775807],  22) ... OK: got object of type [array]: [ 9223372036854775807 ]
 json_tokener_parse_ex(tok, [9223372036854775808],  22) ... OK: got object of type [array]: [ 9223372036854775808 ]
 json_tokener_parse_ex(tok, [-9223372036854775808],  23) ... OK: got object of type [array]: [ -9223372036854775808 ]
+json_tokener_parse_ex(tok, -9223372036854775808,  21) ... OK: got object of type [int]: -9223372036854775808
 json_tokener_parse_ex(tok, [-9223372036854775809],  23) ... OK: got object of type [array]: [ -9223372036854775808 ]
 json_tokener_parse_ex(tok, [-9223372036854775809],  23) ... OK: got correct error: number expected
+json_tokener_parse_ex(tok, -9223372036854775809,  21) ... OK: got correct error: number expected
 json_tokener_parse_ex(tok, [18446744073709551615],  23) ... OK: got object of type [array]: [ 18446744073709551615 ]
+json_tokener_parse_ex(tok, 18446744073709551615,  21) ... OK: got object of type [int]: 18446744073709551615
 json_tokener_parse_ex(tok, [18446744073709551616],  23) ... OK: got object of type [array]: [ 18446744073709551615 ]
 json_tokener_parse_ex(tok, [18446744073709551616],  23) ... OK: got correct error: number expected
 json_tokener_parse_ex(tok, 18446744073709551616,  21) ... OK: got object of type [int]: 18446744073709551615
-json_tokener_parse_ex(tok, 18446744073709551616,  21) ... OK: got correct error: unexpected end of data
+json_tokener_parse_ex(tok, 18446744073709551616,  21) ... OK: got correct error: number expected
 json_tokener_parse_ex(tok, [9223372036854775808.0],  24) ... OK: got object of type [array]: [ 9223372036854775808.0 ]
 json_tokener_parse_ex(tok, [-9223372036854775809.0],  25) ... OK: got object of type [array]: [ -9223372036854775809.0 ]
 json_tokener_parse_ex(tok, [-9223372036854775809.0],  25) ... OK: got object of type [array]: [ -9223372036854775809.0 ]
@@ -394,5 +397,5 @@ json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
-End Incremental Tests OK=298 ERROR=0
+End Incremental Tests OK=301 ERROR=0
 ==================================

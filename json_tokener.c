@@ -1130,6 +1130,8 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 					if (errno == ERANGE && (tok->flags & JSON_TOKENER_STRICT))
 					{
 						tok->err = json_tokener_error_parse_number;
+						if (!c)
+							state = json_tokener_state_finish;
 						goto out;
 					}
 					current = json_object_new_int64(num64);
@@ -1145,6 +1147,8 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 					if (errno == ERANGE && (tok->flags & JSON_TOKENER_STRICT))
 					{
 						tok->err = json_tokener_error_parse_number;
+						if (!c)
+							state = json_tokener_state_finish;
 						goto out;
 					}
 					if (numuint64 <= INT64_MAX)
