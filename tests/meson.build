@@ -44,6 +44,10 @@ test_cases = [
   ['test_json_patch', 'test_json_patch.expected'],
 ]
 
+if host_machine.system() == 'linux'
+  test_cases += [['test_util_file_cloexec', 'test_util_file_cloexec.expected']]
+endif
+
 # Copy expected files and test data
 expected_files = []
 foreach t : test_cases

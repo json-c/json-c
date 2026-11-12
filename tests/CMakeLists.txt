@@ -45,6 +45,11 @@ if (NOT WIN32 AND NOT APPLE)
     set(ALL_TEST_NAMES ${ALL_TEST_NAMES} test_tokener_oom)
 endif()
 
+# open/openat interposition and fork/exec are exercised on Linux only.
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set(ALL_TEST_NAMES ${ALL_TEST_NAMES} test_util_file_cloexec)
+endif()
+
 set(NOBUILD_TEST_NAMES "")
 if (UNIX)
   find_program(JSON_C_BASH_EXECUTABLE bash)
