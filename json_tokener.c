@@ -972,6 +972,13 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 					}
 					// else leave it set to 1, i.e. start of the new input
 				}
+				else
+				{
+					/* Any leading '-' is already in the saved text, so as in
+					   the loop below a sign can only follow a '.' here */
+					neg_sign_ok = pos_sign_ok =
+					    (tok->pb->buf[printbuf_length(tok->pb) - 1] == '.');
+				}
 			}
 
 			while (c && ((c >= '0' && c <= '9') ||
@@ -1028,8 +1035,10 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 			if (case_len > 0)
 				printbuf_memappend_checked(tok->pb, case_start, case_len);
 
-			// Check for -Infinity
-			if (tok->pb->buf[0] == '-' && case_len <= 1 && (c == 'i' || c == 'I'))
+			// Check for -Infinity, i.e. nothing but the '-' saved so far, which
+			// may have come from a previous call.
+			if (tok->pb->buf[0] == '-' && printbuf_length(tok->pb) == 1 &&
+			    (c == 'i' || c == 'I'))
 			{
 				state = json_tokener_state_inf;
 				tok->st_pos = 0;
