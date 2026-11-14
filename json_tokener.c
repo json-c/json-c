@@ -1291,6 +1291,17 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				{
 					printbuf_memappend_checked(tok->pb, case_start,
 					                           str - case_start);
+					/* Object keys are nul terminated C strings, so a key
+					 * containing \u0000 can't be stored as-is.  Copying it
+					 * with strdup() would silently truncate it and could
+					 * merge it with a different key, e.g. "a\u0000b" and
+					 * "a", so reject it instead.
+					 */
+					if (memchr(tok->pb->buf, '\0', printbuf_length(tok->pb)))
+					{
+						tok->err = json_tokener_error_parse_string;
+						goto out;
+					}
 					obj_field_name = strdup(tok->pb->buf);
 					if (obj_field_name == NULL)
 					{

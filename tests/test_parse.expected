@@ -298,6 +298,9 @@ json_tokener_parse_ex(tok, {"a":1]     ,   7) ... OK: got correct error: object 
 json_tokener_parse_ex(tok, {"a"::1}    ,   8) ... OK: got correct error: unexpected character
 json_tokener_parse_ex(tok, {"a":}      ,   6) ... OK: got correct error: unexpected character
 json_tokener_parse_ex(tok, {"a":1,"a":2},  13) ... OK: got object of type [object]: { "a": 2 }
+json_tokener_parse_ex(tok, {"a\u0000b":1},  14) ... OK: got correct error: invalid string sequence
+json_tokener_parse_ex(tok, {"a":1,"a\u0000":2},  19) ... OK: got correct error: invalid string sequence
+json_tokener_parse_ex(tok, ["a\u0000b"],  12) ... OK: got object of type [array]: [ "a\u0000b" ]
 json_tokener_parse_ex(tok, "a":1}      ,   6) ... OK: got object of type [string]: "a"
 json_tokener_parse_ex(tok, {"a":1      ,   6) ... OK: got correct error: continue
 json_tokener_parse_ex(tok, [,]         ,   3) ... OK: got correct error: unexpected character
@@ -397,5 +400,5 @@ json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
-End Incremental Tests OK=301 ERROR=0
+End Incremental Tests OK=304 ERROR=0
 ==================================
