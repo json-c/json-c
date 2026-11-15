@@ -46,7 +46,10 @@ if (NOT WIN32 AND NOT APPLE)
 endif()
 
 if (UNIX)
-    set(ALL_TEST_NAMES ${ALL_TEST_NAMES} test_util_file_cloexec)
+    find_package(Threads)
+    if (CMAKE_USE_PTHREADS_INIT)
+        set(ALL_TEST_NAMES ${ALL_TEST_NAMES} test_util_file_cloexec)
+    endif()
 endif()
 
 set(NOBUILD_TEST_NAMES "")
@@ -92,3 +95,7 @@ target_link_libraries(
   )
 
 endforeach(TESTNAME)
+
+if (TARGET test_util_file_cloexec)
+    target_link_libraries(test_util_file_cloexec PRIVATE Threads::Threads)
+endif()
