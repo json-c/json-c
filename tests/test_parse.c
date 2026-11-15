@@ -581,6 +581,8 @@ struct incremental_step
     /* Check '\'' in strict model */
     {"\'foo\'", -1, 5, json_tokener_success, 1, 0},
     {"\'foo\'", -1, 0, json_tokener_error_parse_unexpected, 1, JSON_TOKENER_STRICT},
+    {"{\'foo\':1}", -1, -1, json_tokener_success, 1, 0},
+    {"{\'foo\':1}", -1, 1, json_tokener_error_parse_object_key_name, 1, JSON_TOKENER_STRICT},
 
     /* Parse array/object */
     {"[1,2,3]", -1, -1, json_tokener_success, 0, 0},
