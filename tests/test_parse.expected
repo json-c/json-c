@@ -291,6 +291,8 @@ json_tokener_parse_ex(tok, "/"         ,   3) ... OK: got object of type [string
 json_tokener_parse_ex(tok, "\a"        ,   4) ... OK: got correct error: invalid string sequence
 json_tokener_parse_ex(tok, 'foo'       ,   5) ... OK: got object of type [string]: "foo"
 json_tokener_parse_ex(tok, 'foo'       ,   5) ... OK: got correct error: unexpected character
+json_tokener_parse_ex(tok, {'foo':1}   ,   9) ... OK: got object of type [object]: { "foo": 1 }
+json_tokener_parse_ex(tok, {'foo':1}   ,   9) ... OK: got correct error: quoted object property name expected
 json_tokener_parse_ex(tok, [1,2,3]     ,   7) ... OK: got object of type [array]: [ 1, 2, 3 ]
 json_tokener_parse_ex(tok, [1,2,3}     ,   7) ... OK: got correct error: array value separator ',' expected
 json_tokener_parse_ex(tok, {"a"}       ,   5) ... OK: got correct error: object property name separator ':' expected
@@ -404,5 +406,5 @@ json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
-End Incremental Tests OK=308 ERROR=0
+End Incremental Tests OK=310 ERROR=0
 ==================================
