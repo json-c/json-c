@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
+#include <spawn.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,10 +16,12 @@
 
 #include "json.h"
 
+extern char **environ;
+
 struct exec_check
 {
-	const char *self;
-	const char *fifo;
+	char *self;
+	char *fifo;
 	const char *ready;
 	int release;
 };
@@ -62,13 +65,13 @@ static void *check_exec(void *arg)
 			nanosleep(&delay, NULL);
 	}
 	snprintf(fd_arg, sizeof(fd_arg), "%d", found);
-	pid = fork();
-	assert(pid >= 0);
-	if (pid == 0)
 	{
-		execl(check->self, check->self, "--check-fd", fd_arg, check->fifo, (char *)NULL);
-		perror("execl");
-		_exit(127);
+		char option[] = "--check-fd";
+		char *args[] = {check->self, option, fd_arg, check->fifo, NULL};
+		int error = posix_spawn(&pid, check->self, NULL, NULL, args, environ);
+		if (error != 0)
+			fprintf(stderr, "posix_spawn: %s\n", strerror(error));
+		assert(error == 0);
 	}
 	assert(waitpid(pid, &status, 0) == pid);
 	assert(write(check->release, "x", 1) == 1);
@@ -90,7 +93,7 @@ static void write_all(int fd, const char *data, size_t len)
 	}
 }
 
-static void check_fifo(const char *self, const char *fifo, const char *ready,
+static void check_fifo(char *self, char *fifo, const char *ready,
                        json_object *obj, int reading)
 {
 	const char *document = json_object_to_json_string_ext(obj, JSON_C_TO_STRING_PLAIN);
