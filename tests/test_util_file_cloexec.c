@@ -66,12 +66,15 @@ static void *check_exec(void *arg)
 	assert(pid >= 0);
 	if (pid == 0)
 	{
-		execl(check->self, check->self, "--check-fd", fd_arg, (char *)NULL);
+		execl(check->self, check->self, "--check-fd", fd_arg, check->fifo, (char *)NULL);
+		perror("execl");
 		_exit(127);
 	}
 	assert(waitpid(pid, &status, 0) == pid);
 	assert(write(check->release, "x", 1) == 1);
 	assert(close(check->release) == 0);
+	if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
+		fprintf(stderr, "exec check failed with wait status %d\n", status);
 	assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
 	return NULL;
 }
@@ -157,10 +160,16 @@ int main(int argc, char **argv)
 	char *payload;
 	json_object *obj;
 	int fd;
-	if (argc == 3 && strcmp(argv[1], "--check-fd") == 0)
+	if (argc == 4 && strcmp(argv[1], "--check-fd") == 0)
 	{
-		errno = 0;
-		return fcntl(atoi(argv[2]), F_GETFD) == -1 && errno == EBADF ? 0 : 1;
+		struct stat fifo_stat, fd_stat;
+		assert(stat(argv[3], &fifo_stat) == 0);
+		if (fstat(atoi(argv[2]), &fd_stat) < 0)
+			return errno == EBADF ? 0 : 1;
+		if (fd_stat.st_dev != fifo_stat.st_dev || fd_stat.st_ino != fifo_stat.st_ino)
+			return 0;
+		fprintf(stderr, "FIFO descriptor %s survived exec\n", argv[2]);
+		return 1;
 	}
 	alarm(20);
 	assert(mkdtemp(directory) != NULL);
