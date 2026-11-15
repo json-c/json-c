@@ -16,7 +16,7 @@ jobs:
       matrix:
         cc: ['9', '13']
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: egor-tensin/setup-gcc@v1
         with:
           version: ${{matrix.cc}}
@@ -36,7 +36,7 @@ jobs:
       matrix:
         cc: ['9', '22']
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: egor-tensin/setup-clang@v1
 
       - name: Install packages
@@ -54,7 +54,7 @@ jobs:
       matrix:
         platform: ['x64', 'x86']
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install packages
         run: |
@@ -74,7 +74,7 @@ jobs:
   VisualStudio-clang-cl:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install packages
         run: |
@@ -98,7 +98,7 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: msys2/setup-msys2@v2
         with:
@@ -121,7 +121,7 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: msys2/setup-msys2@v2
         with:
           msystem: 'MSYS'
@@ -137,7 +137,7 @@ jobs:
   MacOS:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install packages
         run: |
@@ -151,7 +151,7 @@ jobs:
   DragonflyBSD:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: vmactions/dragonflybsd-vm@v1
         with:
           prepare: |
@@ -163,7 +163,7 @@ jobs:
   FreeBSD:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: vmactions/freebsd-vm@v1
         with:
           prepare: |
@@ -175,7 +175,7 @@ jobs:
   NetBSD:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: vmactions/netbsd-vm@v1
         with:
           prepare: |
@@ -187,7 +187,7 @@ jobs:
   OmniOS:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: vmactions/omnios-vm@v1
         with:
           prepare: |
@@ -199,7 +199,7 @@ jobs:
   OpenBSD:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: vmactions/openbsd-vm@v1
         with:
           prepare: |
@@ -217,7 +217,7 @@ jobs:
       run:
         shell: alpine.sh {0}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: jirutka/setup-alpine@v1
         with:
           branch: edge
