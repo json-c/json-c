@@ -372,6 +372,14 @@ struct incremental_step
     /* This should parse as the number 12, since it continues the "1" */
     {"2", 2, 1, json_tokener_success, 0, 0},
     {"12{", 3, 2, json_tokener_success, 1, 0},
+    /* A number split across calls must parse as it would in one call: the
+     * saved digits can't take another '-', or become part of -Infinity */
+    {"[1", -1, -1, json_tokener_continue, 0, 0},
+    {"-1]", -1, 0, json_tokener_error_parse_number, 1, 0},
+    {"[-5", -1, -1, json_tokener_continue, 0, JSON_TOKENER_STRICT},
+    {"Infinity]", -1, 0, json_tokener_error_parse_array, 1, JSON_TOKENER_STRICT},
+    {"-", 1, 1, json_tokener_continue, 0, JSON_TOKENER_STRICT},
+    {"-Infinity", 10, 0, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
     /* Parse number in strict mode */
     {"[02]", -1, 3, json_tokener_error_parse_number, 1, JSON_TOKENER_STRICT},
     /* Leading zeros are rejected in strict mode, for every sign and type ... */
