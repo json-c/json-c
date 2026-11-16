@@ -285,8 +285,13 @@ static int json_patch_apply_move_copy(struct json_object **res,
 	 * "path" (e.g. "/aa" and "/aab") was mistaken for "from" being an
 	 * ancestor pointer of "path", rejecting moves/copies between mere
 	 * sibling keys that happen to share a name prefix.
+	 *
+	 * This only restricts "move". A "copy" is an "add" of a deep copy of
+	 * the "from" value (RFC 6902 section 4.5), so copying a location into
+	 * one of its children, or onto itself (which inserts a duplicate when
+	 * "path" is an array index), is allowed.
 	 */
-	if (strncmp(from_s, path, from_s_len) == 0 &&
+	if (move && strncmp(from_s, path, from_s_len) == 0 &&
 	    (from_s_len == 0 || path[from_s_len] == '\0' || path[from_s_len] == '/')) {
 		/**
 		 * If lengths match, it's a noop, if they don't,
@@ -308,8 +313,9 @@ static int json_patch_apply_move_copy(struct json_object **res,
 		return rc;
 	}
 
-	// Note: it's impossible for json_pointer to find the root obj, due
-	// to the path check above, so from.parent is guaranteed non-NULL
+	// Note: for "move" it's impossible for json_pointer to find the root
+	// obj, due to the path check above, so from.parent is guaranteed
+	// non-NULL there. "copy" may read the root, but never removes it.
 
 	if (!move) {
 		/* RFC 6902 section 4.5: "copy" duplicates the value, it does

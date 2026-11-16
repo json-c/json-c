@@ -503,7 +503,27 @@
     { "comment": "Copying the root to a path without a leading '/' must fail",
       "doc": {"a": null},
       "patch": [{"op": "copy", "from": "", "path": "a"}],
-      "error": "the root is a parent of every other location" },
+      "error": "a path without a leading '/' is not a valid JSON pointer" },
+
+    { "comment": "Copying a location into one of its children is allowed (only move forbids it)",
+      "doc": {"a": {"b": 1}},
+      "patch": [{"op": "copy", "from": "/a", "path": "/a/c"}],
+      "expected": {"a": {"b": 1, "c": {"b": 1}}} },
+
+    { "comment": "Copying an array element onto its own index inserts a duplicate",
+      "doc": {"foo": [1, 2]},
+      "patch": [{"op": "copy", "from": "/foo/0", "path": "/foo/0"}],
+      "expected": {"foo": [1, 1, 2]} },
+
+    { "comment": "Copying the root into a member",
+      "doc": {"a": 1},
+      "patch": [{"op": "copy", "from": "", "path": "/b"}],
+      "expected": {"a": 1, "b": {"a": 1}} },
+
+    { "comment": "Moving a location into one of its children must fail",
+      "doc": {"a": {"b": 1}},
+      "patch": [{"op": "move", "from": "/a", "path": "/a/c"}],
+      "error": "a location cannot be moved into one of its children" },
 
     { "comment": "Remove members whose names need escaping",
       "doc": {"a/b": 1, "m~n": 2, "c": 3},
