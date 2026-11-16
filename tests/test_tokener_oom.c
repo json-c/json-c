@@ -174,8 +174,8 @@ static const char *test_docs[] = {
 	"{\"a\":1,\"b\":[true,false,null],\"c\":{\"d\":\"str\",\"e\":123}}",
 	"[[1,2],[3,[4,5]],{\"x\":\"y\"}]",
 	"{\"k\":{\"nested\":{\"deeper\":[\"s\",1.5,-2,true]}}}",
-	"[\"a string that is long enough to need a heap buffer\","
-	"\"another one\",{\"k\":9}]",
+	("[\"a string that is long enough to need a heap buffer\","
+	 "\"another one\",{\"k\":9}]"),
 	"{\"u\":\"\\u00e9\\u0041\",\"n\":-42,\"big\":18446744073709551615}",
 };
 
