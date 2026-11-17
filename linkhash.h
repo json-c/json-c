@@ -159,6 +159,11 @@ struct lh_table
 	 * @deprecated do not use outside of linkhash.c
 	 */
 	lh_equal_fn *equal_fn;
+	/**
+	 * Number of LH_FREED slots left behind by deletes.
+	 * @deprecated do not use outside of linkhash.c
+	 */
+	int deleted;
 };
 typedef struct lh_table lh_table;
 

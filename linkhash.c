@@ -558,6 +558,7 @@ int lh_table_resize(struct lh_table *t, int new_size)
 	free(t->table);
 	t->table = new_t->table;
 	t->size = new_size;
+	t->deleted = 0;
 	t->head = new_t->head;
 	t->tail = new_t->tail;
 	free(new_t);
@@ -582,12 +583,26 @@ int lh_table_insert_w_hash(struct lh_table *t, const void *k, const void *v, con
 {
 	unsigned long n;
 
-	if (t->count >= t->size * LH_LOAD_FACTOR)
+	/* A lookup only stops at an LH_EMPTY slot, so LH_FREED slots have to
+	 * count towards the load factor too.  Otherwise a table that sees
+	 * repeated deletes and inserts runs out of LH_EMPTY slots without ever
+	 * being resized, and every lookup of a missing key scans all of it.
+	 */
+	if (t->count >= t->size * LH_LOAD_FACTOR - t->deleted)
 	{
-		/* Avoid signed integer overflow with large tables. */
-		int new_size = (t->size > INT_MAX / 2) ? INT_MAX : (t->size * 2);
-		if (t->size == INT_MAX || lh_table_resize(t, new_size) != 0)
-			return -1;
+		if (t->count < t->size * LH_LOAD_FACTOR / 2)
+		{
+			/* Mostly freed slots: rebuild at the same size to drop them.
+			 * If that fails there is still room, so carry on. */
+			(void)lh_table_resize(t, t->size);
+		}
+		else
+		{
+			/* Avoid signed integer overflow with large tables. */
+			int new_size = (t->size > INT_MAX / 2) ? INT_MAX : (t->size * 2);
+			if (t->size == INT_MAX || lh_table_resize(t, new_size) != 0)
+				return -1;
+		}
 	}
 
 	n = h % t->size;
@@ -600,6 +615,8 @@ int lh_table_insert_w_hash(struct lh_table *t, const void *k, const void *v, con
 			n = 0;
 	}
 
+	if (t->table[n].k == LH_FREED)
+		t->deleted--;
 	t->table[n].k = k;
 	t->table[n].k_is_constant = (opts & JSON_C_OBJECT_ADD_CONSTANT_KEY);
 	t->table[n].v = v;
@@ -683,6 +700,7 @@ int lh_table_delete_entry(struct lh_table *t, struct lh_entry *e)
 		t->free_fn(e);
 	t->table[n].v = NULL;
 	t->table[n].k = LH_FREED;
+	t->deleted++;
 	if (t->tail == &t->table[n] && t->head == &t->table[n])
 	{
 		t->head = t->tail = NULL;
