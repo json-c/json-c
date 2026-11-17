@@ -590,6 +590,10 @@ struct incremental_step
     {"{\"a\"::1}", -1, 5, json_tokener_error_parse_unexpected, 1, 0},
     {"{\"a\":}", -1, 5, json_tokener_error_parse_unexpected, 1, 0},
     {"{\"a\":1,\"a\":2}", -1, -1, json_tokener_success, 1, 0},
+    /* A key can't hold a nul, so reject it rather than truncate it */
+    {"{\"a\\u0000b\":1}", -1, 8, json_tokener_error_parse_string, 1, 0},
+    {"{\"a\":1,\"a\\u0000\":2}", -1, 14, json_tokener_error_parse_string, 1, 0},
+    {"[\"a\\u0000b\"]", -1, -1, json_tokener_success, 1, 0},
     {"\"a\":1}", -1, 3, json_tokener_success, 1, 0},
     {"{\"a\":1", -1, -1, json_tokener_continue, 1, 0}, //}
     {"[,]", -1, 1, json_tokener_error_parse_unexpected, 1, 0},
