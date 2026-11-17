@@ -47,6 +47,7 @@ static void string_replace_all_occurrences_with_char(char *s, const char *occur,
 static int is_valid_index(const char *path, size_t *idx)
 {
 	size_t i, len = strlen(path);
+	unsigned long long ull;
 	/* an empty reference token is never a valid array index */
 	if (len == 0)
 	{
@@ -84,7 +85,12 @@ static int is_valid_index(const char *path, size_t *idx)
 
 	// We know it's all digits, so the only error case here is overflow,
 	// but ULLONG_MAX will be longer than any array length so that's ok.
-	*idx = strtoull(path, NULL, 10);
+	// Where size_t is narrower than that (32-bit targets) the conversion
+	// would wrap e.g. "4294967296" around to 0, so saturate instead.
+	ull = strtoull(path, NULL, 10);
+	*idx = (size_t)ull;
+	if ((unsigned long long)*idx != ull)
+		*idx = (size_t)-1;
 
 	return 1;
 }
