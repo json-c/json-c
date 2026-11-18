@@ -726,6 +726,24 @@
        "doc": {"foo": "bar"},
        "patch": [{"op": "remove", "path": null}],
        "error": "a null path field should fail rather than crash"
+    },
+
+    { "comment": "path containing a NUL must not be truncated to a different member",
+       "doc": {"foo": "bar", "baz": 1},
+       "patch": [{"op": "remove", "path": "/foo\u0000x"}],
+       "error": "/foo\\u0000x does not refer to /foo"
+    },
+
+    { "comment": "from containing a NUL must not be truncated to a different member",
+       "doc": {"foo": "bar"},
+       "patch": [{"op": "move", "from": "/foo\u0000x", "path": "/baz"}],
+       "error": "/foo\\u0000x does not refer to /foo"
+    },
+
+    { "comment": "op containing a NUL is not a valid op",
+       "doc": {"foo": "bar"},
+       "patch": [{"op": "add\u0000x", "path": "/baz", "value": 1}],
+       "error": "add\\u0000x is not the add op"
     }
 
 ]

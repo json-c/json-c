@@ -209,3 +209,9 @@ Testing 'null from field must be rejected, not dereferenced', doc '{ "foo": "bar
  => json_patch_apply failed as expected: ERRNO=EINVAL at patch idx 0: Patch object 'from' field is not a string
 Testing 'null path field must be rejected, not dereferenced', doc '{ "foo": "bar" }' patch '[ { "op": "remove", "path": null } ]' : OK
  => json_patch_apply failed as expected: ERRNO=EINVAL at patch idx 0: Patch object 'path' field is not a string
+Testing 'path containing a NUL must not be truncated to a different member', doc '{ "foo": "bar", "baz": 1 }' patch '[ { "op": "remove", "path": "\/foo\u0000x" } ]' : OK
+ => json_patch_apply failed as expected: ERRNO=EINVAL at patch idx 0: Patch object 'path' field contains a NUL character
+Testing 'from containing a NUL must not be truncated to a different member', doc '{ "foo": "bar" }' patch '[ { "op": "move", "from": "\/foo\u0000x", "path": "\/baz" } ]' : OK
+ => json_patch_apply failed as expected: ERRNO=EINVAL at patch idx 0: Patch object 'from' field contains a NUL character
+Testing 'op containing a NUL is not a valid op', doc '{ "foo": "bar" }' patch '[ { "op": "add\u0000x", "path": "\/baz", "value": 1 } ]' : OK
+ => json_patch_apply failed as expected: ERRNO=EINVAL at patch idx 0: Patch object has invalid 'op' field
