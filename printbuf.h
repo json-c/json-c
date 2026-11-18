@@ -45,10 +45,10 @@ typedef struct printbuf printbuf;
 
 JSON_EXPORT struct printbuf *printbuf_new(void);
 
-/* As an optimization, printbuf_memappend_fast() is defined as a macro
- * that handles copying data if the buffer is large enough; otherwise
- * it invokes printbuf_memappend() which performs the heavy
- * lifting of realloc()ing the buffer and copying data.
+/* As an optimization, printbuf_memappend_fast() handles copying data
+ * inline if the buffer is large enough; otherwise it invokes
+ * printbuf_memappend() which performs the heavy lifting of
+ * realloc()ing the buffer and copying data.
  *
  * Your code should not use printbuf_memappend() directly unless it
  * checks the return code. Use printbuf_memappend_fast() instead.
@@ -57,20 +57,17 @@ JSON_EXPORT struct printbuf *printbuf_new(void);
  */
 JSON_EXPORT int printbuf_memappend(struct printbuf *p, const char *buf, int size);
 
-#define printbuf_memappend_fast(p, bufptr, bufsize)                  \
-	do                                                           \
-	{                                                            \
-		if ((p->size - p->bpos) > bufsize)                   \
-		{                                                    \
-			memcpy(p->buf + p->bpos, (bufptr), bufsize); \
-			p->bpos += bufsize;                          \
-			p->buf[p->bpos] = '\0';                      \
-		}                                                    \
-		else                                                 \
-		{                                                    \
-			printbuf_memappend(p, (bufptr), bufsize);    \
-		}                                                    \
-	} while (0)
+static inline int printbuf_memappend_fast(struct printbuf *p, const char *bufptr, int bufsize)
+{
+	if ((p->size - p->bpos) > bufsize)
+	{
+		memcpy(p->buf + p->bpos, bufptr, bufsize);
+		p->bpos += bufsize;
+		p->buf[p->bpos] = '\0';
+		return 0;
+	}
+	return printbuf_memappend(p, bufptr, bufsize);
+}
 
 #define printbuf_length(p) ((p)->bpos)
 
