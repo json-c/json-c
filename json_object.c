@@ -666,7 +666,8 @@ static int json_object_object_to_json_string(struct json_object *jso, struct pri
 			printbuf_strappend(pb, ANSI_COLOR_FG_BLUE);
 
 		printbuf_strappend(pb, "\"");
-		json_escape_str(pb, iter.key, strlen(iter.key), flags);
+		if (json_escape_str(pb, iter.key, strlen(iter.key), flags) < 0)
+			return -1;
 		printbuf_strappend(pb, "\"");
 
 		if (flags & JSON_C_TO_STRING_COLOR)
@@ -1347,7 +1348,8 @@ static int json_object_double_to_json_string_format(struct json_object *jso, str
 		// The standard formats are guaranteed not to overrun the buffer,
 		// but if a custom one happens to do so, just silently truncate.
 		size = sizeof(buf) - 1;
-	printbuf_memappend(pb, buf, size);
+	if (printbuf_memappend(pb, buf, size) < 0)
+		return -1;
 	return size;
 }
 
@@ -1408,8 +1410,7 @@ int json_object_userdata_to_json_string(struct json_object *jso, struct printbuf
                                         int flags)
 {
 	int userdata_len = strlen((const char *)jso->_userdata);
-	printbuf_memappend(pb, (const char *)jso->_userdata, userdata_len);
-	return userdata_len;
+	return printbuf_memappend(pb, (const char *)jso->_userdata, userdata_len);
 }
 
 void json_object_free_userdata(struct json_object *jso, void *userdata)
