@@ -128,6 +128,7 @@ static const char *json_tokener_errors[] = {
 static json_bool json_tokener_validate_utf8(const char c, unsigned int *nBytes);
 
 static int json_tokener_parse_double(const char *buf, int len, double *retval);
+static int json_tokener_is_rfc_number(const char *num);
 
 const char *json_tokener_error_desc(enum json_tokener_error jerr)
 {
@@ -1035,73 +1036,11 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				tok->st_pos = 0;
 				goto redo_char;
 			}
-			if (tok->flags & JSON_TOKENER_STRICT)
+			if ((tok->flags & JSON_TOKENER_STRICT) &&
+			    !json_tokener_is_rfc_number(tok->pb->buf))
 			{
-				/* Check the accumulated text against the RFC 8259 grammar:
-				 *
-				 *   number = [ minus ] int [ frac ] [ exp ]
-				 *   int    = zero / ( digit1-9 *DIGIT )
-				 *   frac   = decimal-point 1*DIGIT
-				 *   exp    = e [ minus / plus ] 1*DIGIT
-				 *
-				 * so the integer part is mandatory and may not carry a
-				 * leading zero, and both the fraction and the exponent
-				 * need at least one digit of their own. That rejects
-				 * "01", ".5", "-.123", "1.", "2.e3" and "1e", while
-				 * "0", "-0", "0.5" and "2e3" stay valid.
-				 */
-				const char *num = tok->pb->buf;
-				if (*num == '-')
-					num++;
-				if (*num == '0')
-				{
-					num++;
-					if (*num >= '0' && *num <= '9')
-					{
-						tok->err = json_tokener_error_parse_number;
-						goto out;
-					}
-				}
-				else if (*num >= '1' && *num <= '9')
-				{
-					while (*num >= '0' && *num <= '9')
-						num++;
-				}
-				else
-				{
-					/* no integer part at all, e.g. ".5" or "-.123" */
-					tok->err = json_tokener_error_parse_number;
-					goto out;
-				}
-				if (*num == '.')
-				{
-					num++;
-					if (!(*num >= '0' && *num <= '9'))
-					{
-						tok->err = json_tokener_error_parse_number;
-						goto out;
-					}
-					while (*num >= '0' && *num <= '9')
-						num++;
-				}
-				if (*num == 'e' || *num == 'E')
-				{
-					num++;
-					if (*num == '+' || *num == '-')
-						num++;
-					if (!(*num >= '0' && *num <= '9'))
-					{
-						tok->err = json_tokener_error_parse_number;
-						goto out;
-					}
-					while (*num >= '0' && *num <= '9')
-						num++;
-				}
-				if (*num != '\0')
-				{
-					tok->err = json_tokener_error_parse_number;
-					goto out;
-				}
+				tok->err = json_tokener_error_parse_number;
+				goto out;
 			}
 			if (tok->is_double && !(tok->flags & JSON_TOKENER_STRICT))
 			{
@@ -1175,7 +1114,17 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				         json_tokener_parse_double(
 				             tok->pb->buf, printbuf_length(tok->pb), &numd) == 0)
 				{
-					current = json_object_new_double_s(numd, tok->pb->buf);
+					/* The text is kept as the serialized form of the
+					 * double, so only keep it when it is a valid JSON
+					 * number. Non-strict mode also accepts e.g. "1.",
+					 * "-.5" or "01.5", which would otherwise be written
+					 * back out as is by json_object_to_json_string().
+					 */
+					if (json_tokener_is_rfc_number(tok->pb->buf))
+						current =
+						    json_object_new_double_s(numd, tok->pb->buf);
+					else
+						current = json_object_new_double(numd);
 					if (current == NULL)
 					{
 						tok->err = json_tokener_error_memory;
@@ -1509,6 +1458,60 @@ size_t json_tokener_get_parse_end(struct json_tokener *tok)
 {
 	assert(tok->char_offset >= 0); /* Drop this line when char_offset becomes a size_t */
 	return (size_t)tok->char_offset;
+}
+
+/* Check a number's text against the RFC 8259 grammar:
+ *
+ *   number = [ minus ] int [ frac ] [ exp ]
+ *   int    = zero / ( digit1-9 *DIGIT )
+ *   frac   = decimal-point 1*DIGIT
+ *   exp    = e [ minus / plus ] 1*DIGIT
+ *
+ * so the integer part is mandatory and may not carry a
+ * leading zero, and both the fraction and the exponent
+ * need at least one digit of their own. That rejects
+ * "01", ".5", "-.123", "1.", "2.e3" and "1e", while
+ * "0", "-0", "0.5" and "2e3" stay valid.
+ */
+static int json_tokener_is_rfc_number(const char *num)
+{
+	if (*num == '-')
+		num++;
+	if (*num == '0')
+	{
+		num++;
+		if (*num >= '0' && *num <= '9')
+			return 0;
+	}
+	else if (*num >= '1' && *num <= '9')
+	{
+		while (*num >= '0' && *num <= '9')
+			num++;
+	}
+	else
+	{
+		/* no integer part at all, e.g. ".5" or "-.123" */
+		return 0;
+	}
+	if (*num == '.')
+	{
+		num++;
+		if (!(*num >= '0' && *num <= '9'))
+			return 0;
+		while (*num >= '0' && *num <= '9')
+			num++;
+	}
+	if (*num == 'e' || *num == 'E')
+	{
+		num++;
+		if (*num == '+' || *num == '-')
+			num++;
+		if (!(*num >= '0' && *num <= '9'))
+			return 0;
+		while (*num >= '0' && *num <= '9')
+			num++;
+	}
+	return *num == '\0';
 }
 
 static int json_tokener_parse_double(const char *buf, int len, double *retval)

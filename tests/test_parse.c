@@ -166,6 +166,11 @@ static void test_basic_parse(void)
 	single_basic_parse("{\"FoO\"  :   -12.3e512}", 0);
 	single_basic_parse("{\"FoO\"  :   -12.3E51.2}", 0);   /* non-sensical, returns null */
 	single_basic_parse("{\"FoO\"  :   -12.3E512E12}", 0); /* non-sensical, returns null */
+	/* Accepted in non-strict mode, but not valid JSON to write back out */
+	single_basic_parse("[1.]", 0);
+	single_basic_parse("[-.5]", 0);
+	single_basic_parse("[01.5]", 0);
+	single_basic_parse("[1.e5]", 0);
 	single_basic_parse("[\"\\n\"]", 0);
 	single_basic_parse("[\"\\nabc\\n\"]", 0);
 	single_basic_parse("[null]", 0);
