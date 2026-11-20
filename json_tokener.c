@@ -215,6 +215,7 @@ void json_tokener_reset(struct json_tokener *tok)
 	tok->depth = 0;
 	tok->err = json_tokener_success;
 	tok->high_surrogate = 0;
+	tok->utf8_state = 0;
 }
 
 struct json_object *json_tokener_parse(const char *str)
@@ -328,8 +329,8 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 {
 	struct json_object *obj = NULL;
 	char c = '\1';
-	unsigned int nBytes = 0;
-	unsigned int *nBytesp = &nBytes;
+	/* Kept in the tokener so a multi-byte sequence may span calls */
+	unsigned int *nBytesp = &tok->utf8_state;
 
 #ifdef HAVE_USELOCALE
 	locale_t oldlocale = uselocale(NULL);
@@ -1387,9 +1388,14 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 	} /* while(PEEK_CHAR) */
 
 out:
-	if ((tok->flags & JSON_TOKENER_VALIDATE_UTF8) && (nBytes != 0))
+	if ((tok->flags & JSON_TOKENER_VALIDATE_UTF8) && tok->err != json_tokener_continue)
 	{
-		tok->err = json_tokener_error_parse_utf8_string;
+		/* Only a sequence cut off by the end of this chunk may be
+		 * finished by the next call; anything else is truncated.
+		 */
+		if (tok->utf8_state != 0)
+			tok->err = json_tokener_error_parse_utf8_string;
+		tok->utf8_state = 0;
 	}
 	if (c && (state == json_tokener_state_finish) && (tok->depth == 0) &&
 	    (tok->flags & (JSON_TOKENER_STRICT | JSON_TOKENER_ALLOW_TRAILING_CHARS)) ==
