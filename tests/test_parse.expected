@@ -310,8 +310,15 @@ json_tokener_parse_ex(tok, {"a":1,}    ,   8) ... OK: got correct error: unexpec
 json_tokener_parse_ex(tok, "123asc$%&" ,  11) ... OK: got object of type [string]: "123asc$%&"
 json_tokener_parse_ex(tok, "123asc$%&" ,  11) ... OK: got object of type [string]: "123asc$%&"
 json_tokener_parse_ex(tok, "世界"    ,   8) ... OK: got object of type [string]: "世界"
-json_tokener_parse_ex(tok, "�         ,   3) ... OK: got correct error: invalid utf-8 string
-json_tokener_parse_ex(tok, �界"       ,   5) ... OK: got correct error: invalid utf-8 string
+json_tokener_parse_ex(tok, "�         ,   3) ... OK: got correct error: continue
+json_tokener_parse_ex(tok, �界"       ,   5) ... OK: got object of type [string]: "世界"
+json_tokener_parse_ex(tok, ["�        ,   4) ... OK: got correct error: continue
+json_tokener_parse_ex(tok, �           ,   1) ... OK: got correct error: continue
+json_tokener_parse_ex(tok, �"]         ,   3) ... OK: got object of type [array]: [ "😀" ]
+json_tokener_parse_ex(tok, "�          ,   2) ... OK: got correct error: continue
+json_tokener_parse_ex(tok, A"          ,   2) ... OK: got correct error: invalid utf-8 string
+json_tokener_parse_ex(tok, "�         ,   3) ... OK: got correct error: continue
+json_tokener_parse_ex(tok,             ,   1) ... OK: got correct error: invalid utf-8 string
 json_tokener_parse_ex(tok, "世界"    ,   8) ... OK: got object of type [string]: "世界"
 json_tokener_parse_ex(tok, "πφ"      ,   6) ... OK: got object of type [string]: "πφ"
 json_tokener_parse_ex(tok, "𥑕"      ,   6) ... OK: got object of type [string]: "𥑕"
@@ -404,5 +411,5 @@ json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
 json_tokener_parse_ex(tok, {"":1}     ,   7) ... OK: got correct error: invalid string sequence
-End Incremental Tests OK=308 ERROR=0
+End Incremental Tests OK=315 ERROR=0
 ==================================

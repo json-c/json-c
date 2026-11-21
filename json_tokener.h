@@ -118,6 +118,10 @@ struct json_tokener
 	char quote_char;
 	struct json_tokener_srec *stack;
 	int flags;
+	/**
+	 * @deprecated Do not access any of these fields outside of json_tokener.c
+	 */
+	unsigned int utf8_state;
 };
 
 /**
