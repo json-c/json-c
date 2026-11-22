@@ -67,7 +67,7 @@ Test Status
 
  - `gcc`, `clang`, or another C compiler
 
- - `cmake>=2.8`, `>=3.16` recommended, `cmake=>3.1` for tests
+ - `cmake>=3.10`, with 3.16 or newer recommended
 
 To generate docs you'll also need:
  - `doxygen>=1.8.13`
