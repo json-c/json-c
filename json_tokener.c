@@ -788,6 +788,18 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 				tok->high_surrogate = 0;
 			}
 
+			/* Object keys are nul terminated C strings, so a key
+			 * containing \u0000 can't be stored as-is.  Copying it
+			 * with strdup() would silently truncate it and could
+			 * merge it with a different key, e.g. "a\u0000b" and
+			 * "a", so reject it instead.
+			 */
+			if (tok->ucs_char == 0 && saved_state == json_tokener_state_object_field)
+			{
+				tok->err = json_tokener_error_parse_string;
+				goto out;
+			}
+
 			if (tok->ucs_char < 0x80)
 			{
 				unsigned char unescaped_utf[1];
