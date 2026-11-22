@@ -46,6 +46,8 @@ if (NOT WIN32 AND NOT APPLE)
 endif()
 
 set(NOBUILD_TEST_NAMES "")
+add_test(NAME test_cmake_minimum_version COMMAND ${CMAKE_COMMAND}
+  -P ${PROJECT_SOURCE_DIR}/tests/test_cmake_minimum_version.cmake)
 if (UNIX)
   find_program(JSON_C_BASH_EXECUTABLE bash)
   if (JSON_C_BASH_EXECUTABLE)
