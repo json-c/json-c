@@ -16,8 +16,6 @@
 
 #include "json.h"
 
-extern char **environ;
-
 struct exec_check
 {
 	char *self;
@@ -68,7 +66,8 @@ static void *check_exec(void *arg)
 	{
 		char option[] = "--check-fd";
 		char *args[] = {check->self, option, fd_arg, check->fifo, NULL};
-		int error = posix_spawn(&pid, check->self, NULL, NULL, args, environ);
+		char *envp[] = {NULL};
+		int error = posix_spawn(&pid, check->self, NULL, NULL, args, envp);
 		if (error != 0)
 			fprintf(stderr, "posix_spawn: %s\n", strerror(error));
 		assert(error == 0);
