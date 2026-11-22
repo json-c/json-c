@@ -1,9 +1,7 @@
-# CMake 3.9 was released in 2017/07
-#  As of 2023, many versions of Linux, NetBSD and FreeBSD provide,
+# CMake 3.10 was released in 2017/11
+#  As of 2026, many versions of Linux, NetBSD and FreeBSD provide,
 #   and many OpenWRT packages require, much newer CMake packages.
-#  We're stopping before 3.10 because that version starts requiring
-#   c++11, which isn't available on e.g HPUX.
-cmake_minimum_required(VERSION 3.9...3.12)
+cmake_minimum_required(VERSION 3.10...3.12)
 
 # JSON-C library is C only project.
 # PROJECT_VERSION{,_MAJOR,_MINOR,_PATCH} set by project():
