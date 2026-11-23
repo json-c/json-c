@@ -127,6 +127,14 @@ static const char *json_tokener_errors[] = {
  */
 static json_bool json_tokener_validate_utf8(const char c, unsigned int *nBytes);
 
+/* The pending state of the UTF-8 validator (see json_tokener_validate_utf8()
+ * for its layout) is kept in the upper bits of tok->flags, above any public
+ * JSON_TOKENER_* flag, so that a multi-byte sequence may span calls to
+ * json_tokener_parse_ex() without changing the size of struct json_tokener.
+ */
+#define JSON_TOKENER_UTF8_STATE_SHIFT 16
+#define JSON_TOKENER_UTF8_STATE_MASK (0x3ff << JSON_TOKENER_UTF8_STATE_SHIFT)
+
 static int json_tokener_parse_double(const char *buf, int len, double *retval);
 
 const char *json_tokener_error_desc(enum json_tokener_error jerr)
@@ -215,7 +223,7 @@ void json_tokener_reset(struct json_tokener *tok)
 	tok->depth = 0;
 	tok->err = json_tokener_success;
 	tok->high_surrogate = 0;
-	tok->utf8_state = 0;
+	tok->flags &= ~JSON_TOKENER_UTF8_STATE_MASK;
 }
 
 struct json_object *json_tokener_parse(const char *str)
@@ -329,8 +337,10 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 {
 	struct json_object *obj = NULL;
 	char c = '\1';
-	/* Kept in the tokener so a multi-byte sequence may span calls */
-	unsigned int *nBytesp = &tok->utf8_state;
+	/* Carried over from the previous call so a multi-byte sequence may span calls */
+	unsigned int nBytes =
+	    (tok->flags & JSON_TOKENER_UTF8_STATE_MASK) >> JSON_TOKENER_UTF8_STATE_SHIFT;
+	unsigned int *nBytesp = &nBytes;
 
 #ifdef HAVE_USELOCALE
 	locale_t oldlocale = uselocale(NULL);
@@ -1388,14 +1398,19 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 	} /* while(PEEK_CHAR) */
 
 out:
-	if ((tok->flags & JSON_TOKENER_VALIDATE_UTF8) && tok->err != json_tokener_continue)
+	if (tok->flags & JSON_TOKENER_VALIDATE_UTF8)
 	{
 		/* Only a sequence cut off by the end of this chunk may be
 		 * finished by the next call; anything else is truncated.
 		 */
-		if (tok->utf8_state != 0)
-			tok->err = json_tokener_error_parse_utf8_string;
-		tok->utf8_state = 0;
+		if (tok->err != json_tokener_continue)
+		{
+			if (nBytes != 0)
+				tok->err = json_tokener_error_parse_utf8_string;
+			nBytes = 0;
+		}
+		tok->flags = (tok->flags & ~JSON_TOKENER_UTF8_STATE_MASK) |
+		             (int)(nBytes << JSON_TOKENER_UTF8_STATE_SHIFT);
 	}
 	if (c && (state == json_tokener_state_finish) && (tok->depth == 0) &&
 	    (tok->flags & (JSON_TOKENER_STRICT | JSON_TOKENER_ALLOW_TRAILING_CHARS)) ==
@@ -1442,13 +1457,13 @@ out:
 static json_bool json_tokener_validate_utf8(const char c, unsigned int *nBytes)
 {
 	unsigned char chr = c;
-	/* The low byte of *nBytes holds how many continuation bytes are still
-	 * expected; the next byte up remembers the leading byte of the sequence.
+	/* The low two bits of *nBytes hold how many continuation bytes are still
+	 * expected; the bits above them remember the leading byte of the sequence.
 	 * Keeping the lead lets the first continuation byte be range-checked so
 	 * that overlong forms, UTF-16 surrogate halves and code points above
 	 * U+10FFFF are rejected, instead of only checking the byte framing.
 	 */
-	if ((*nBytes & 0xff) == 0)
+	if ((*nBytes & 0x3) == 0)
 	{
 		if (chr < 0x80)
 			return 1;
@@ -1468,7 +1483,7 @@ static json_bool json_tokener_validate_utf8(const char c, unsigned int *nBytes)
 		}
 		else
 			return 0;
-		*nBytes |= (unsigned int)chr << 8;
+		*nBytes |= (unsigned int)chr << 2;
 		return 1;
 	}
 
@@ -1478,7 +1493,7 @@ static json_bool json_tokener_validate_utf8(const char c, unsigned int *nBytes)
 	/* The first continuation byte has to be restricted for the leads that
 	 * would otherwise admit an overlong, surrogate or out-of-range encoding.
 	 */
-	switch ((*nBytes >> 8) & 0xff)
+	switch (*nBytes >> 2)
 	{
 	case 0xe0:
 		if (chr < 0xa0) /* overlong three-byte form */
@@ -1502,13 +1517,15 @@ static json_bool json_tokener_validate_utf8(const char c, unsigned int *nBytes)
 	/* Drop the remembered lead; any further continuation bytes only need to
 	 * be plain 0x80..0xbf bytes.
 	 */
-	*nBytes = (*nBytes & 0xff) - 1;
+	*nBytes = (*nBytes & 0x3) - 1;
 	return 1;
 }
 
 void json_tokener_set_flags(struct json_tokener *tok, int flags)
 {
-	tok->flags = flags;
+	/* Keep a UTF-8 sequence left open by the previous json_tokener_parse_ex() call */
+	tok->flags =
+	    (tok->flags & JSON_TOKENER_UTF8_STATE_MASK) | (flags & ~JSON_TOKENER_UTF8_STATE_MASK);
 }
 
 size_t json_tokener_get_parse_end(struct json_tokener *tok)
