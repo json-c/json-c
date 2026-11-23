@@ -118,6 +118,9 @@
 /* Define to 1 if you have the `setlocale' function. */
 #cmakedefine HAVE_SETLOCALE
 
+/* Define to 1 if the Microsoft CRT supports per-thread locales. */
+#cmakedefine HAVE__CONFIGTHREADLOCALE
+
 /* Define to 1 if you have the `snprintf' function. */
 #cmakedefine HAVE_SNPRINTF
 
