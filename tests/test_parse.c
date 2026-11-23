@@ -614,9 +614,17 @@ struct incremental_step
     // utf-8 encoding
     {"\x22\xe4\xb8\x96\xe7\x95\x8c\x22", -1, -1, json_tokener_success, 1,
      JSON_TOKENER_VALIDATE_UTF8},
-    {"\x22\xe4\xb8", -1, 3, json_tokener_error_parse_utf8_string, 0, JSON_TOKENER_VALIDATE_UTF8},
-    {"\x96\xe7\x95\x8c\x22", -1, 0, json_tokener_error_parse_utf8_string, 1,
-     JSON_TOKENER_VALIDATE_UTF8},
+    // a multi-byte char split across calls is completed by the next call
+    {"\x22\xe4\xb8", -1, -1, json_tokener_continue, 0, JSON_TOKENER_VALIDATE_UTF8},
+    {"\x96\xe7\x95\x8c\x22", -1, -1, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8},
+    {"[\x22\xf0\x9f", -1, -1, json_tokener_continue, 0, JSON_TOKENER_VALIDATE_UTF8},
+    {"\x98", -1, -1, json_tokener_continue, 0, JSON_TOKENER_VALIDATE_UTF8},
+    {"\x80\x22]", -1, -1, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8},
+    // the completing bytes are still checked
+    {"\x22\xe4", -1, -1, json_tokener_continue, 0, JSON_TOKENER_VALIDATE_UTF8},
+    {"\x41\x22", -1, 0, json_tokener_error_parse_utf8_string, 1, JSON_TOKENER_VALIDATE_UTF8},
+    {"\x22\xe4\xb8", -1, -1, json_tokener_continue, 0, JSON_TOKENER_VALIDATE_UTF8},
+    {"", 1, 0, json_tokener_error_parse_utf8_string, 1, JSON_TOKENER_VALIDATE_UTF8},
     {"\x22\xe4\xb8\x96\xe7\x95\x8c\x22", -1, -1, json_tokener_success, 1, 0},
     {"\x22\xcf\x80\xcf\x86\x22", -1, -1, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8},
     {"\x22\xf0\xa5\x91\x95\x22", -1, -1, json_tokener_success, 1, JSON_TOKENER_VALIDATE_UTF8},

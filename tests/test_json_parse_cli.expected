@@ -1,2 +1,2 @@
 Successfully parsed object from stdin
-Failed at offset 71: invalid utf-8 string: char=0x00
+Failed at offset 71: unexpected end of data
