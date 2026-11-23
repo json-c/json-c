@@ -1,11 +1,14 @@
 #ifdef NDEBUG
 #undef NDEBUG
 #endif
+#include "config.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
-#include "json.h"
+#include "json_object.h"
+#include "linkhash.h"
+#include "snprintf_compat.h"
 
 /*
  * Keys that are added to and deleted from an object over and over leave
