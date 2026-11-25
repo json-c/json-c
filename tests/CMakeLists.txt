@@ -29,6 +29,7 @@ set(ALL_TEST_NAMES
     test_locale
     test_null
     test_object_add_failure
+    test_object_churn
     test_parse
     test_parse_int64
     test_printbuf
