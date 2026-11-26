@@ -49,6 +49,15 @@
  *   RFC 6902 - https://tools.ietf.org/html/rfc6902
  */
 
+/* json_object_get_string() stops at the first NUL, but a JSON string may hold
+ * one (\u0000).  Acting on the truncated text would make a "path" such as
+ * "/a\u0000b" address "/a" instead of a member that cannot exist.
+ */
+static int json_patch_string_has_nul(struct json_object *jso, const char *s)
+{
+	return strlen(s) != (size_t)json_object_get_string_len(jso);
+}
+
 /* RFC 6902 compares numbers by value, including inside arrays and objects.
  * json_object_equal() deliberately distinguishes integer and double objects.
  */
@@ -275,6 +284,10 @@ static int json_patch_apply_move_copy(struct json_object **res,
 		_set_err(EINVAL, "Patch object 'from' field is not a string");
 		return -1;
 	}
+	if (json_patch_string_has_nul(jfrom, from_s)) {
+		_set_err(EINVAL, "Patch object 'from' field contains a NUL character");
+		return -1;
+	}
 
 	from_s_len = strlen(from_s);
 	/**
@@ -410,6 +423,10 @@ int json_patch_apply(struct json_object *copy_from, struct json_object *patch,
 			_set_err(EINVAL, "Patch object 'op' field is not a string");
 			return -1;
 		}
+		if (json_patch_string_has_nul(jop, op)) {
+			_set_err(EINVAL, "Patch object has invalid 'op' field");
+			return -1;
+		}
 		if (!json_object_object_get_ex(patch_elem, "path", &jpath)) {
 			_set_err(EINVAL, "Patch object does not contain 'path' field");
 			return -1;
@@ -419,6 +436,10 @@ int json_patch_apply(struct json_object *copy_from, struct json_object *patch,
 		                                                       : NULL;
 		if (path == NULL) {
 			_set_err(EINVAL, "Patch object 'path' field is not a string");
+			return -1;
+		}
+		if (json_patch_string_has_nul(jpath, path)) {
+			_set_err(EINVAL, "Patch object 'path' field contains a NUL character");
 			return -1;
 		}
 
