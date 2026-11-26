@@ -146,8 +146,12 @@ struct json_object *json_object_from_file(const char *filename)
 {
 	struct json_object *obj;
 	int fd;
+	int open_flags = O_RDONLY;
+#ifdef O_CLOEXEC
+	open_flags |= O_CLOEXEC;
+#endif
 
-	if ((fd = open(filename, O_RDONLY)) < 0)
+	if ((fd = open(filename, open_flags)) < 0)
 	{
 		_json_c_set_last_err("json_object_from_file: error opening file %s: %s\n",
 		                     filename, strerror(errno));
@@ -164,6 +168,10 @@ int json_object_to_file_ext(const char *filename, struct json_object *obj, int f
 {
 	int fd, ret;
 	int saved_errno;
+	int open_flags = O_WRONLY | O_TRUNC | O_CREAT;
+#ifdef O_CLOEXEC
+	open_flags |= O_CLOEXEC;
+#endif
 
 	if (!obj)
 	{
@@ -171,7 +179,7 @@ int json_object_to_file_ext(const char *filename, struct json_object *obj, int f
 		return -1;
 	}
 
-	if ((fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT, 0644)) < 0)
+	if ((fd = open(filename, open_flags, 0644)) < 0)
 	{
 		_json_c_set_last_err("json_object_to_file_ext: error opening file %s: %s\n",
 		                     filename, strerror(errno));

@@ -44,6 +44,11 @@ test_cases = [
   ['test_json_patch', 'test_json_patch.expected'],
 ]
 
+cloexec_threads = dependency('threads', required: false)
+if host_machine.system() != 'windows' and cloexec_threads.found()
+  test_cases += [['test_util_file_cloexec', 'test_util_file_cloexec.expected']]
+endif
+
 # Copy expected files and test data
 expected_files = []
 foreach t : test_cases
@@ -66,8 +71,12 @@ message('Test data directory: ' + testdir)
 foreach t : test_cases
   name = t[0]
   expected = t[1]
+  case_deps = [test_deps]
+  if name == 'test_util_file_cloexec'
+    case_deps += [cloexec_threads]
+  endif
   exe = executable(name, name + '.c',
-    dependencies: test_deps,
+    dependencies: case_deps,
     build_by_default: false
   )
 
