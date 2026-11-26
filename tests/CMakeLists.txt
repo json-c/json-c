@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9...3.12) # see ../CMakeLists.txt for why
+cmake_minimum_required(VERSION 3.10...3.12) # see ../CMakeLists.txt for why
 add_executable(test1Formatted test1.c parse_flags.c parse_flags.h)
 target_compile_definitions(test1Formatted PRIVATE TEST_FORMATTED=1)
 target_link_libraries(test1Formatted PRIVATE ${PROJECT_NAME})
@@ -46,6 +46,8 @@ if (NOT WIN32 AND NOT APPLE)
 endif()
 
 set(NOBUILD_TEST_NAMES "")
+add_test(NAME test_cmake_minimum_version COMMAND ${CMAKE_COMMAND}
+  -P ${PROJECT_SOURCE_DIR}/tests/test_cmake_minimum_version.cmake)
 if (UNIX)
   find_program(JSON_C_BASH_EXECUTABLE bash)
   if (JSON_C_BASH_EXECUTABLE)
