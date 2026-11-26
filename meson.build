@@ -114,6 +114,10 @@ if not conf_data.has('HAVE_VPRINTF') and cc.has_function('_doprnt')
   conf_data.set('HAVE_DOPRNT', 1, description : 'Define to 1 if you have _doprnt but not vprintf.')
 endif
 
+if cc.has_function('_configthreadlocale', prefix : '#include <locale.h>')
+  conf_data.set('HAVE__CONFIGTHREADLOCALE', 1)
+endif
+
 if conf_data.has('HAVE_STRTOLL')
   conf_data.set('json_c_strtoll', 'strtoll')
 elif cc.has_function('_strtoi64', prefix : '#include <stdlib.h>')

@@ -335,6 +335,9 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 	locale_t oldlocale = uselocale(NULL);
 #elif defined(HAVE_SETLOCALE)
 	char *oldlocale = NULL;
+#ifdef HAVE__CONFIGTHREADLOCALE
+	int old_thread_locale;
+#endif
 #endif
 
 	tok->char_offset = 0;
@@ -368,12 +371,24 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 #elif defined(HAVE_SETLOCALE)
 	{
 		char *tmplocale;
+#ifdef HAVE__CONFIGTHREADLOCALE
+		/* Keep this call's numeric locale private to the parsing thread. */
+		old_thread_locale = _configthreadlocale(_ENABLE_PER_THREAD_LOCALE);
+		if (old_thread_locale == -1)
+		{
+			tok->err = json_tokener_error_parse_unexpected;
+			return NULL;
+		}
+#endif
 		tmplocale = setlocale(LC_NUMERIC, NULL);
 		if (tmplocale)
 		{
 			oldlocale = strdup(tmplocale);
 			if (oldlocale == NULL)
 			{
+#ifdef HAVE__CONFIGTHREADLOCALE
+				_configthreadlocale(old_thread_locale);
+#endif
 				tok->err = json_tokener_error_memory;
 				return NULL;
 			}
@@ -1411,6 +1426,9 @@ out:
 #elif defined(HAVE_SETLOCALE)
 	setlocale(LC_NUMERIC, oldlocale);
 	free(oldlocale);
+#ifdef HAVE__CONFIGTHREADLOCALE
+	_configthreadlocale(old_thread_locale);
+#endif
 #endif
 
 	if (tok->err == json_tokener_success)

@@ -293,6 +293,7 @@ if (HAVE_STDLIB_H)
 endif()
 if (HAVE_LOCALE_H)
     check_symbol_exists(setlocale   "locale.h" HAVE_SETLOCALE)
+    check_symbol_exists(_configthreadlocale "locale.h" HAVE__CONFIGTHREADLOCALE)
     check_symbol_exists(uselocale   "locale.h" HAVE_USELOCALE)
     if (NOT NIX20 AND NOT NIX13)
         # libnix does not fully support this yet
