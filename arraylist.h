@@ -18,6 +18,8 @@
 #ifndef _json_c_arraylist_h_
 #define _json_c_arraylist_h_
 
+#include "json_types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -41,7 +43,7 @@ typedef struct array_list array_list;
  * Allocate an array_list of the default size (32).
  * @deprecated Use array_list_new2() instead.
  */
-extern struct array_list *array_list_new(array_list_free_fn *free_fn);
+JSON_EXPORT struct array_list *array_list_new(array_list_free_fn *free_fn);
 
 /**
  * Allocate an array_list of the desired size.
@@ -56,38 +58,38 @@ extern struct array_list *array_list_new(array_list_free_fn *free_fn);
  *
  * @see array_list_shrink
  */
-extern struct array_list *array_list_new2(array_list_free_fn *free_fn, int initial_size);
+JSON_EXPORT struct array_list *array_list_new2(array_list_free_fn *free_fn, int initial_size);
 
-extern void array_list_free(struct array_list *al);
+JSON_EXPORT void array_list_free(struct array_list *al);
 
-extern void *array_list_get_idx(struct array_list *al, size_t i);
+JSON_EXPORT void *array_list_get_idx(struct array_list *al, size_t i);
 
-extern int array_list_insert_idx(struct array_list *al, size_t i, void *data);
+JSON_EXPORT int array_list_insert_idx(struct array_list *al, size_t i, void *data);
 
-extern int array_list_put_idx(struct array_list *al, size_t i, void *data);
+JSON_EXPORT int array_list_put_idx(struct array_list *al, size_t i, void *data);
 
-extern int array_list_add(struct array_list *al, void *data);
+JSON_EXPORT int array_list_add(struct array_list *al, void *data);
 
 /**
  * Set the value at index i.  Caller is responsible for freeing the previous value.
  * To automatically free the existing value, use array_list_put_idx() instead.
  */
-extern int array_list_set_idx(struct array_list *al, size_t i, void *data);
+JSON_EXPORT int array_list_set_idx(struct array_list *al, size_t i, void *data);
 
-extern size_t array_list_length(struct array_list *al);
+JSON_EXPORT size_t array_list_length(struct array_list *al);
 
-extern void array_list_sort(struct array_list *arr, int (*compar)(const void *, const void *));
+JSON_EXPORT void array_list_sort(struct array_list *arr, int (*compar)(const void *, const void *));
 
-extern void *array_list_bsearch(const void **key, struct array_list *arr,
+JSON_EXPORT void *array_list_bsearch(const void **key, struct array_list *arr,
                                 int (*compar)(const void *, const void *));
 
-extern int array_list_del_idx(struct array_list *arr, size_t idx, size_t count);
+JSON_EXPORT int array_list_del_idx(struct array_list *arr, size_t idx, size_t count);
 
 /**
  * Shrink the array list to just enough to fit the number of elements in it,
  * plus empty_slots.
  */
-extern int array_list_shrink(struct array_list *arr, size_t empty_slots);
+JSON_EXPORT int array_list_shrink(struct array_list *arr, size_t empty_slots);
 
 #ifdef __cplusplus
 }
